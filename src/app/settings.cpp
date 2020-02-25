@@ -1,0 +1,44 @@
+#include "settings.h"
+
+#include <QCoreApplication>
+#include <QFile>
+#include <QSettings>
+
+using namespace kemai::app;
+
+QSettings getQSettingsInstance(const QString& confPath)
+{
+    if (confPath.isEmpty() or not QFile::exists(confPath))
+    {
+        return QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName());
+    }
+    else
+    {
+        return QSettings(confPath, QSettings::IniFormat);
+    }
+}
+
+bool Settings::isReady() const
+{
+    return not host.isEmpty() and not username.isEmpty() and not token.isEmpty();
+}
+
+Settings Settings::load(const QString& confPath)
+{
+    auto qset = getQSettingsInstance(confPath);
+
+    Settings settings;
+    settings.host     = qset.value("host").toString();
+    settings.username = qset.value("username").toString();
+    settings.token    = qset.value("token").toString();
+
+    return settings;
+}
+
+void Settings::save(const Settings& settings, const QString& confPath)
+{
+    auto qset = getQSettingsInstance(confPath);
+    qset.setValue("host", settings.host);
+    qset.setValue("username", settings.username);
+    qset.setValue("token", settings.token);
+}

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="play">icons/play.svg</file>
+        <file alias="stop">icons/octagon.svg</file>
+    </qresource>
+</RCC>

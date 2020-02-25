@@ -1,0 +1,71 @@
+#include "kimairequestfactory.h"
+
+#include "parser.h"
+
+using namespace kemai::client;
+
+KimaiRequest KimaiRequestFactory::version()
+{
+    return std::move(KimaiRequest(ApiMethod::Version));
+}
+
+KimaiRequest KimaiRequestFactory::customers()
+{
+    return std::move(KimaiRequest(ApiMethod::Customers));
+}
+
+KimaiRequest KimaiRequestFactory::customerAdd(const Customer& customer)
+{
+    auto krq = KimaiRequest(ApiMethod::Customers, HttpVerb::Post);
+
+    auto jsData = parser::toJson(customer);
+    krq.setData(parser::toPostData(jsData));
+
+    return std::move(krq);
+}
+
+KimaiRequest KimaiRequestFactory::projects(int customerId)
+{
+    auto krq = KimaiRequest(ApiMethod::Projects);
+    krq.setParameters({{"customer", QString::number(customerId)}});
+    return std::move(krq);
+}
+
+// KimaiRequest KimaiRequestFactory::projectAdd(const QString& name, int customerId)
+//{
+//
+//}
+
+KimaiRequest KimaiRequestFactory::activities(int projectId)
+{
+    auto krq = KimaiRequest(ApiMethod::Activities);
+    krq.setParameters({{"project", QString::number(projectId)}});
+    return std::move(krq);
+}
+
+KimaiRequest KimaiRequestFactory::activeTimeSheets()
+{
+    return std::move(KimaiRequest(ApiMethod::ActiveTimeSheets));
+}
+
+KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, const QDateTime& beginAt)
+{
+    auto krq = KimaiRequest(ApiMethod::TimeSheets, HttpVerb::Post);
+
+    TimeSheet ts;
+    ts.beginAt     = beginAt;
+    ts.activity.id = activityId;
+    ts.project.id  = projectId;
+
+    auto jsData = parser::toJson(ts);
+    krq.setData(parser::toPostData(jsData));
+
+    return std::move(krq);
+}
+
+KimaiRequest KimaiRequestFactory::stopTimeSheet(int timeSheetId)
+{
+    auto krq = KimaiRequest(ApiMethod::TimeSheets, HttpVerb::Patch);
+    krq.setPatchVerb(QString("%1/stop").arg(timeSheetId));
+    return std::move(krq);
+}

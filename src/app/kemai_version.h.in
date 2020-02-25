@@ -1,0 +1,3 @@
+#pragma once
+
+#define KEMAI_VERSION "@Kemai_VERSION@"
