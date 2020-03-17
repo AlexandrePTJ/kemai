@@ -34,7 +34,7 @@ type: exec
 name: mac
 
 platform:
-  os: mac
+  os: darwin
 
 steps:
   - name: build
