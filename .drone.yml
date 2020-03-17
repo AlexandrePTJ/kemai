@@ -27,3 +27,19 @@ steps:
       - c:\setup_msvc.bat amd64
       - cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$env:QT_DIR" -B build .
       - cmake --build build --config Release
+
+---
+kind: pipeline
+type: exec
+name: mac
+
+platform:
+  os: darwin
+
+steps:
+  - name: build
+    environment:
+      QT_DIR: /usr/local/opt/qt
+    commands:
+      - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$QT_DIR -B build .
+      - cmake --build build --config Release
