@@ -39,7 +39,7 @@ platform:
 steps:
   - name: build
     environment:
-      PATH: /usr/local/opt/qt/bin:$PATH
+      QT_DIR: /usr/local/opt/qt
     commands:
-      - cmake -DCMAKE_BUILD_TYPE=Release -B build .
+      - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$QT_DIR -B build .
       - cmake --build build --config Release
