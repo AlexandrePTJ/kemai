@@ -41,5 +41,5 @@ steps:
     environment:
       QT_DIR: /Users/alexandrepetitjean/Qt/5.14.1/clang_64
     commands:
-      - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${QT_DIR} -B build .
+      - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$QT_DIR -B build .
       - cmake --build build --config Release
