@@ -33,7 +33,8 @@ set(UIS
         mainwindow.ui
         settingswidget.ui)
 
-set(RESX)
+set(RESX
+        icons.qrc)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX})
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets KemaiClient ${CONAN_LIBS})

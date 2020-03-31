@@ -64,14 +64,16 @@ void SettingsWidget::loadSettings()
     mUi->leHost->setText(settings.host);
     mUi->leUsername->setText(settings.username);
     mUi->leToken->setText(settings.token);
+    mUi->cbCloseToSystemTray->setChecked(settings.closeToSystemTray);
 }
 
 void SettingsWidget::saveSettings()
 {
     Settings settings;
-    settings.host     = mUi->leHost->text();
-    settings.username = mUi->leUsername->text();
-    settings.token    = mUi->leToken->text();
+    settings.host              = mUi->leHost->text();
+    settings.username          = mUi->leUsername->text();
+    settings.token             = mUi->leToken->text();
+    settings.closeToSystemTray = mUi->cbCloseToSystemTray->isChecked();
     Settings::save(settings);
 }
 
