@@ -13,6 +13,7 @@ add_executable(${PROJECT_NAME} ${OS_BUNDLE})
 add_definitions(-DKemaiClient_EXPORTS)
 
 set(SRCS
+        kemai.rc
         activitywidget.cpp
         customerdialog.cpp
         main.cpp
@@ -37,6 +38,4 @@ set(RESX
         icons.qrc)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX})
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets KemaiClient ${CONAN_LIBS})
-
-install(TARGETS ${PROJECT_NAME} DESTINATION .)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets KemaiClient)
