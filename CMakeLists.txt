@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(Kemai VERSION 0.0.1 LANGUAGES CXX)
+project(Kemai VERSION 0.0.2 LANGUAGES CXX)
 
 # Point CMake to the custom modules
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
