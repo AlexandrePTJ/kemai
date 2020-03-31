@@ -28,9 +28,10 @@ Settings Settings::load(const QString& confPath)
     auto qset = getQSettingsInstance(confPath);
 
     Settings settings;
-    settings.host     = qset.value("host").toString();
-    settings.username = qset.value("username").toString();
-    settings.token    = qset.value("token").toString();
+    settings.host              = qset.value("host").toString();
+    settings.username          = qset.value("username").toString();
+    settings.token             = qset.value("token").toString();
+    settings.closeToSystemTray = qset.value("closeToSystemTray", false).toBool();
 
     return settings;
 }
@@ -41,4 +42,5 @@ void Settings::save(const Settings& settings, const QString& confPath)
     qset.setValue("host", settings.host);
     qset.setValue("username", settings.username);
     qset.setValue("token", settings.token);
+    qset.setValue("closeToSystemTray", settings.closeToSystemTray);
 }
