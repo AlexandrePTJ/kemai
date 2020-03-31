@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QSystemTrayIcon>
 
 namespace Ui {
 class MainWindow;
@@ -16,9 +17,13 @@ public:
     MainWindow();
     ~MainWindow();
 
+protected:
+    void closeEvent(QCloseEvent* event);
+
 private slots:
     void onActionSettingsTriggered();
     void onStackedCurrentChanged(int id);
+    void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
     Ui::MainWindow* mUi;
@@ -26,6 +31,13 @@ private:
     // keep stacked widgets ids
     int mActivitySId;
     int mSettingsSId;
+
+    // Actions
+    QAction* mActQuit = nullptr;
+
+    // Tray
+    QMenu* mTrayMenu                 = nullptr;
+    QSystemTrayIcon* mSystemTrayIcon = nullptr;
 };
 
 } // namespace kemai::app

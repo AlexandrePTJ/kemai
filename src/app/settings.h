@@ -9,6 +9,7 @@ struct Settings
     QString host;
     QString username;
     QString token;
+    bool closeToSystemTray;
 
     bool isReady() const;
 

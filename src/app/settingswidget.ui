@@ -43,16 +43,23 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="leUsername"/>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="lbToken">
-       <property name="text">
-        <string>Token</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="leToken"/>
-     </item>
+        <item row="2" column="0">
+            <widget class="QLabel" name="lbToken">
+                <property name="text">
+                    <string>Token</string>
+                </property>
+            </widget>
+        </item>
+        <item row="2" column="1">
+            <widget class="QLineEdit" name="leToken"/>
+        </item>
+        <item row="3" column="0" colspan="2">
+            <widget class="QCheckBox" name="cbCloseToSystemTray">
+                <property name="text">
+                    <string>Close to system tray</string>
+                </property>
+            </widget>
+        </item>
     </layout>
    </item>
    <item>
