@@ -14,7 +14,7 @@ for:
       - image: Ubuntu
 
   install:
-    - apt install -y qt5-default
+    - sudo apt install -y qt5-default
 
   build_script:
     - cmake . -B build
@@ -34,3 +34,19 @@ for:
 
   after_build:
     - cmake --build build --config Release --target package
+
+  deploy:
+    - provider: GitHub
+      draft: true
+      auth_token:
+        secure: ZBA/qLsYwRJ9xw8sf1Q96NrJYNFdqAfDKVD7cA+okvEnjFSOt5aBk52bI+v++pIQ
+      on:
+        APPVEYOR_REPO_TAG: true
+
+    - provider: GitHub
+      draft: true
+      prerelease: true
+      auth_token:
+        secure: ZBA/qLsYwRJ9xw8sf1Q96NrJYNFdqAfDKVD7cA+okvEnjFSOt5aBk52bI+v++pIQ
+      on:
+        branch: master
