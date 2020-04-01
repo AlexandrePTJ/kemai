@@ -3,6 +3,7 @@ version: 1.0.{build}-{branch}
 image:
   - Visual Studio 2017
   - Ubuntu
+  - macos
 
 platform:
   - x64
@@ -53,3 +54,15 @@ for:
         secure: ZBA/qLsYwRJ9xw8sf1Q96NrJYNFdqAfDKVD7cA+okvEnjFSOt5aBk52bI+v++pIQ
       on:
         branch: master
+
+-
+  matrix:
+    only:
+      - image: macos
+
+  install:
+    - brew install qt5
+
+  build_script:
+    - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt
+    - cmake --build build --config Release
