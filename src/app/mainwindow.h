@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QMenuBar>
 #include <QSystemTrayIcon>
 
 namespace Ui {
@@ -33,7 +34,11 @@ private:
     int mSettingsSId;
 
     // Actions
-    QAction* mActQuit = nullptr;
+    QAction* mActQuit     = nullptr;
+    QAction* mActSettings = nullptr;
+
+    // Main menu
+    QMenuBar* mMenuBar = nullptr;
 
     // Tray
     QMenu* mTrayMenu                 = nullptr;

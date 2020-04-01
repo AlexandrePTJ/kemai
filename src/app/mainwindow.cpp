@@ -23,18 +23,34 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     /*
      * Setup actions
      */
-    mActQuit = new QAction(tr("Quit"), this);
+    mActQuit     = new QAction(tr("&Quit"), this);
+    mActSettings = new QAction(tr("&Settings"), this);
 
     /*
      * Setup systemtray
      */
     mTrayMenu = new QMenu(this);
+    mTrayMenu->addAction(mActSettings);
+    mTrayMenu->addSeparator();
     mTrayMenu->addAction(mActQuit);
 
     mSystemTrayIcon = new QSystemTrayIcon(this);
     mSystemTrayIcon->setContextMenu(mTrayMenu);
     mSystemTrayIcon->setIcon(icon);
     mSystemTrayIcon->show();
+
+    /*
+     * Setup main menu
+     */
+    mMenuBar = new QMenuBar;
+
+    auto fileMenu = new QMenu(tr("&File"), mMenuBar);
+    fileMenu->addAction(mActSettings);
+    fileMenu->addSeparator();
+    fileMenu->addAction(mActQuit);
+
+    mMenuBar->addMenu(fileMenu);
+    setMenuBar(mMenuBar);
 
     /*
      * Setup widgets
@@ -49,8 +65,8 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     /*
      * Connections
      */
-    connect(mUi->actionSettings, &QAction::triggered, this, &MainWindow::onActionSettingsTriggered);
     connect(mUi->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::onStackedCurrentChanged);
+    connect(mActSettings, &QAction::triggered, this, &MainWindow::onActionSettingsTriggered);
     connect(mActQuit, &QAction::triggered, qApp, &QCoreApplication::quit);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
 
@@ -62,6 +78,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
 
 MainWindow::~MainWindow()
 {
+    delete mMenuBar;
     delete mUi;
 }
 
