@@ -35,6 +35,9 @@ for:
   after_build:
     - cmake --build build --config Release --target package
 
+  artifacts:
+    - path: build\Kemai-*.msi
+
   deploy:
     - provider: GitHub
       draft: true
