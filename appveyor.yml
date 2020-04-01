@@ -1,16 +1,11 @@
 version: 1.0.{build}-{branch}
 
+image:
+  - Visual Studio 2017
+  - Ubuntu
+
 platform:
   - x64
-
-environment:
-  matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      QT_LOCATION: C:\Qt\5.12.6\msvc2017_64
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
-      CC: gcc-9
-      CXX: gcc-9
-      QT_LOCATION:
 
 for:
 -
@@ -21,6 +16,10 @@ for:
   install:
     - apt install -y qt5-default
 
+  build_script:
+    - cmake . -B build
+    - cmake --build build
+
 -
   matrix:
     only:
@@ -29,9 +28,9 @@ for:
   before_build:
     - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 
+  build_script:
+    - cmake . -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=c:\Qt\5.12.6\msvc2017_64
+    - cmake --build build --config Release
+
   after_build:
     - cmake --build build --config Release --target package
-
-build_script:
-  - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${QT_LOCATION}
-  - cmake --build build --config Release
