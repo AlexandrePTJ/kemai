@@ -1,16 +1,10 @@
-project(KemaiApp)
-
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
+project(Kemai)
 
 find_package(Qt5 COMPONENTS Widgets Network CONFIG REQUIRED)
 
 configure_file(kemai_version.h.in ${PROJECT_BINARY_DIR}/kemai_version.h)
 
 add_executable(${PROJECT_NAME} ${OS_BUNDLE})
-add_definitions(-DKemaiClient_EXPORTS)
 
 set(SRCS
         kemai.rc

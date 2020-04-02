@@ -39,22 +39,6 @@ for:
   artifacts:
     - path: build\Kemai-*.msi
 
-  deploy:
-    - provider: GitHub
-      draft: true
-      auth_token:
-        secure: ZBA/qLsYwRJ9xw8sf1Q96NrJYNFdqAfDKVD7cA+okvEnjFSOt5aBk52bI+v++pIQ
-      on:
-        APPVEYOR_REPO_TAG: true
-
-    - provider: GitHub
-      draft: true
-      prerelease: true
-      auth_token:
-        secure: ZBA/qLsYwRJ9xw8sf1Q96NrJYNFdqAfDKVD7cA+okvEnjFSOt5aBk52bI+v++pIQ
-      on:
-        branch: master
-
 -
   matrix:
     only:
@@ -63,3 +47,25 @@ for:
   build_script:
     - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt
     - cmake --build build --config Release
+
+  after_build:
+    - /usr/local/opt/qt/bin/macdeployqt build/src/Kemai.app
+
+  artifacts:
+    - path: build/src/Kemai.app
+
+deploy:
+  - provider: GitHub
+    draft: true
+    auth_token:
+      secure: ZBA/qLsYwRJ9xw8sf1Q96NrJYNFdqAfDKVD7cA+okvEnjFSOt5aBk52bI+v++pIQ
+    on:
+      APPVEYOR_REPO_TAG: true
+
+  - provider: GitHub
+    draft: true
+    prerelease: true
+    auth_token:
+      secure: ZBA/qLsYwRJ9xw8sf1Q96NrJYNFdqAfDKVD7cA+okvEnjFSOt5aBk52bI+v++pIQ
+    on:
+      branch: master

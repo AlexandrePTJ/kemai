@@ -2,13 +2,12 @@
 
 #include <QObject>
 
-#include <kemai/kemai_export.h>
-#include <kemai/kimaireply.h>
-#include <kemai/kimairequest.h>
+#include "kimaireply.h"
+#include "kimairequest.h"
 
 namespace kemai::client {
 
-class KEMAI_EXPORT KimaiClient : public QObject
+class KimaiClient : public QObject
 {
     Q_OBJECT
 

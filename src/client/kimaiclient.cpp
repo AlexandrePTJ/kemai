@@ -1,4 +1,4 @@
-#include "kimaiclient.h"
+#include "kemai/kimaiclient.h"
 #include "kimaiclient_p.h"
 
 #include <QNetworkRequest>

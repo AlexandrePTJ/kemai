@@ -1,8 +1,8 @@
 #include "settingswidget.h"
 #include "ui_settingswidget.h"
 
+#include "kemai/kimairequestfactory.h"
 #include "settings.h"
-#include <kemai/kimairequestfactory.h>
 
 #include <QStackedWidget>
 

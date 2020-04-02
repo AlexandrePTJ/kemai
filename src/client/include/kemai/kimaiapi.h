@@ -4,8 +4,6 @@
 #include <QString>
 #include <QVector>
 
-#include <kemai/kemai_export.h>
-
 namespace kemai::client {
 
 // available requests
@@ -67,6 +65,6 @@ struct TimeSheet
 };
 using TimeSheets = QVector<TimeSheet>;
 
-QString KEMAI_EXPORT apiMethodToString(ApiMethod method);
+QString apiMethodToString(ApiMethod method);
 
 } // namespace kemai::client

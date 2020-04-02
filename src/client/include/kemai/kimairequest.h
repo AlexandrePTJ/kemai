@@ -5,12 +5,11 @@
 #include <QString>
 #include <QUrl>
 
-#include <kemai/kemai_export.h>
-#include <kemai/kimaiapi.h>
+#include "kimaiapi.h"
 
 namespace kemai::client {
 
-class KEMAI_EXPORT KimaiRequest
+class KimaiRequest
 {
 public:
     KimaiRequest() = delete;

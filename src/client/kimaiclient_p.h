@@ -5,7 +5,7 @@
 #include <QNetworkReply>
 #include <QObject>
 
-#include "kimaiclient.h"
+#include "kemai/kimaiclient.h"
 
 namespace kemai::client {
 

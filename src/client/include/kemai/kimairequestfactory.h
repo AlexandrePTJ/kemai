@@ -1,11 +1,10 @@
 #pragma once
 
-#include <kemai/kemai_export.h>
-#include <kemai/kimairequest.h>
+#include "kimairequest.h"
 
 namespace kemai::client {
 
-class KEMAI_EXPORT KimaiRequestFactory
+class KimaiRequestFactory
 {
 public:
     static KimaiRequest version();
