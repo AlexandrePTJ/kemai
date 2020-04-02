@@ -15,10 +15,14 @@ if (WIN32)
 
     # Enable isos646
     add_compile_options("/FIiso646.h")
+
+    #
+    set(DEPLOY_DIR .)
 elseif(APPLE)
     set(OS_BUNDLE MACOSX_BUNDLE)
 else ()
     set(OS_BUNDLE)
+    set(DEPLOY_DIR bin)
 endif ()
 
 # Project code
@@ -26,14 +30,14 @@ add_subdirectory(src)
 
 # Install targets and files
 if (WIN32 OR (UNIX AND NOT APPLE))
-    install(TARGETS Kemai)
-    install(FILES LICENSE.txt DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    install(TARGETS Kemai DESTINATION ${DEPLOY_DIR})
+    install(FILES LICENSE.txt DESTINATION ${DEPLOY_DIR})
 endif()
 
 # Add Qt libs and installer for windows platform
 if (WIN32)
     include(WinDeployQt)
-    windeployqt(KemaiApp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    windeployqt(Kemai ${DEPLOY_DIR})
 
     set(KEMAI_GUID "88815E44-85A0-469C-9740-B4887D456BAA")
     set(KEMAI_CAPTURE_SHORTCUT_NAME "Kemai")
