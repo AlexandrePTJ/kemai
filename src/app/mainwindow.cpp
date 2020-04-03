@@ -73,7 +73,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     /*
      * Delay first refresh
      */
-    QTimer::singleShot(500, activityWidget, &ActivityWidget::refresh);
+    QTimer::singleShot(100, activityWidget, &ActivityWidget::refresh);
 }
 
 MainWindow::~MainWindow()

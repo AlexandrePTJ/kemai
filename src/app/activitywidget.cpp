@@ -65,6 +65,8 @@ void ActivityWidget::refresh()
     {
         mClient.reset(nullptr);
     }
+
+    setEnabled(mClient != nullptr);
 }
 
 void ActivityWidget::onClientError(const QString& errorMsg)
@@ -218,10 +220,12 @@ void ActivityWidget::updateControls()
     if (enable)
     {
         mUi->btStartStop->setText(tr("Start"));
+        mUi->btStartStop->setIcon(QIcon(":/icons/play"));
         mUi->lbDurationTime->clear();
     }
     else
     {
         mUi->btStartStop->setText(tr("Stop"));
+        mUi->btStartStop->setIcon(QIcon(":/icons/stop"));
     }
 }
