@@ -1,4 +1,4 @@
-#include "kimaiapi.h"
+#include "kemai/kimaiapi.h"
 
 namespace kemai::client {
 

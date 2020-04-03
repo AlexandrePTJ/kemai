@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kemai/kimaiclient.h>
+#include "kemai/kimaiclient.h"
 
 #include <QWidget>
 

@@ -3,7 +3,7 @@
 #include <QTimer>
 #include <QWidget>
 
-#include <kemai/kimaiclient.h>
+#include "kemai/kimaiclient.h"
 
 namespace Ui {
 class ActivityWidget;

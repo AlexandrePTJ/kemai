@@ -4,7 +4,7 @@
 #include "customerdialog.h"
 #include "settings.h"
 
-#include <kemai/kimairequestfactory.h>
+#include "kemai/kimairequestfactory.h"
 
 #include <QDebug>
 

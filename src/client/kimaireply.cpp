@@ -1,4 +1,4 @@
-#include "kimaireply.h"
+#include "kemai/kimaireply.h"
 
 #include "parser.h"
 
@@ -73,7 +73,7 @@ bool KimaiReply::isValid() const
 }
 
 // parsers
-template<> KimaiVersion KEMAI_EXPORT KimaiReply::get() const
+template<> KimaiVersion KimaiReply::get() const
 {
     KimaiVersion kv;
     parser::fromJson(mD->jsonValue.toObject(), kv);
@@ -81,14 +81,14 @@ template<> KimaiVersion KEMAI_EXPORT KimaiReply::get() const
 }
 
 template<>
-Customer KEMAI_EXPORT KimaiReply::get() const
+Customer KimaiReply::get() const
 {
     Customer ts;
     parser::fromJson(mD->jsonValue.toObject(), ts);
     return ts;
 }
 
-template<> Customers KEMAI_EXPORT KimaiReply::get() const
+template<> Customers KimaiReply::get() const
 {
     Customers customers;
     for (const auto& jscusto : mD->jsonValue.toArray())
@@ -100,7 +100,7 @@ template<> Customers KEMAI_EXPORT KimaiReply::get() const
     return customers;
 }
 
-template<> Projects KEMAI_EXPORT KimaiReply::get() const
+template<> Projects KimaiReply::get() const
 {
     Projects projects;
     for (const auto& jsproject : mD->jsonValue.toArray())
@@ -112,7 +112,7 @@ template<> Projects KEMAI_EXPORT KimaiReply::get() const
     return projects;
 }
 
-template<> Activities KEMAI_EXPORT KimaiReply::get() const
+template<> Activities KimaiReply::get() const
 {
     Activities activities;
     for (const auto& jsactivity : mD->jsonValue.toArray())
@@ -125,14 +125,14 @@ template<> Activities KEMAI_EXPORT KimaiReply::get() const
 }
 
 template<>
-TimeSheet KEMAI_EXPORT KimaiReply::get() const
+TimeSheet KimaiReply::get() const
 {
     TimeSheet ts;
     parser::fromJson(mD->jsonValue.toObject(), ts);
     return ts;
 }
 
-template<> TimeSheets KEMAI_EXPORT KimaiReply::get() const
+template<> TimeSheets KimaiReply::get() const
 {
     TimeSheets timeSheets;
     for (const auto& jstimeSheet : mD->jsonValue.toArray())

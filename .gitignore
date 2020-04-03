@@ -113,8 +113,8 @@ fabric.properties
 
 /.idea/deployment.xml
 
-# ---> Generated
-include/kemai/kemai_export.h
-
 # ---> Tests
 tests/kimai_server/data/kimai.sqlite
+
+# ---> MacOSX
+.DS_Store
