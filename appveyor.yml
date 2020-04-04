@@ -49,10 +49,10 @@ for:
     - cmake --build build --config Release
 
   after_build:
-    - /usr/local/opt/qt/bin/macdeployqt build/src/Kemai.app
+    - /usr/local/opt/qt/bin/macdeployqt build/src/app/Kemai.app
 
   artifacts:
-    - path: build/src/Kemai.app
+    - path: build/src/app/Kemai.app
 
 deploy:
   - provider: GitHub
