@@ -13,9 +13,9 @@ How to build
 _Kemai_ is Qt5 based application and it uses CMake to build. So regular cmake process will work.
 
 ```shell script
-> cmake . -B build
+> cmake . -B build -DCMAKE_PREFIX_PATH=<path to Qt installation>
 > cmake --build build
-``` 
+```
 
 
 Credits
