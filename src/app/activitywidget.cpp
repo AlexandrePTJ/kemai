@@ -144,6 +144,9 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
         updateControls();
     }
     break;
+
+    default:
+        break;
     }
 }
 

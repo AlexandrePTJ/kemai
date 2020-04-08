@@ -2,6 +2,6 @@
     <qresource prefix="/icons">
         <file alias="play">icons/play.svg</file>
         <file alias="stop">icons/octagon.svg</file>
-        <file alias="kemai">icons/mustard.png</file>
+        <file alias="kemai">icons/kimai.png</file>
     </qresource>
 </RCC>
