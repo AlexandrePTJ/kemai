@@ -1,3 +1,0 @@
-#!/usr/bin/bash
-
-docker stop kimai2
