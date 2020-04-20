@@ -16,71 +16,42 @@
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
   </property>
-  <layout class="QFormLayout" name="formLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="lbCustomer">
-     <property name="text">
-      <string>Customer</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="lbCustomer">
+       <property name="text">
+        <string>Customer</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
       <widget class="QComboBox" name="cbCustomer"/>
      </item>
-     <item>
-      <widget class="QToolButton" name="tbAddCustomer">
+     <item row="1" column="0">
+      <widget class="QLabel" name="lbProject">
        <property name="text">
-        <string>+</string>
+        <string>Project</string>
        </property>
       </widget>
      </item>
-    </layout>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="lbProject">
-     <property name="text">
-      <string>Project</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
+     <item row="1" column="1">
       <widget class="QComboBox" name="cbProject"/>
      </item>
-     <item>
-      <widget class="QToolButton" name="tbAddProject">
+     <item row="2" column="0">
+      <widget class="QLabel" name="lbActivity">
        <property name="text">
-        <string>+</string>
+        <string>Activity</string>
        </property>
       </widget>
      </item>
-    </layout>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="lbActivity">
-     <property name="text">
-      <string>Activity</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+     <item row="2" column="1">
       <widget class="QComboBox" name="cbActivity"/>
      </item>
-     <item>
-      <widget class="QToolButton" name="tbAddActivity">
-       <property name="text">
-        <string>+</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item>
     <widget class="QPushButton" name="btStartStop">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
@@ -109,14 +80,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="lbStartedAt">
-     <property name="text">
-      <string>Started at</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
+   <item>
     <widget class="QDateTimeEdit" name="dteStartedAt">
      <property name="enabled">
       <bool>false</bool>
@@ -126,7 +90,14 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item>
+    <widget class="QLabel" name="lbStartedAt">
+     <property name="text">
+      <string>Started at</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="lbDurationTime">
      <property name="font">
       <font>

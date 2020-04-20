@@ -36,6 +36,9 @@ struct Customer
 {
     int id = 0;
     QString name;
+    QString countryKey;
+    QString currencyKey;
+    QString timezone;
 };
 using Customers = QVector<Customer>;
 

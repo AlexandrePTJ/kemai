@@ -27,7 +27,6 @@ private slots:
     void onClientReply(const client::KimaiReply& reply);
 
     void onCbCustomerTextChanged(const QString& text);
-    void onTbCustomerAddClicked();
     void onCbProjectTextChanged(const QString& text);
     void onCbActivityTextChanged(const QString& text);
 

@@ -19,7 +19,7 @@ set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 # OS Dependant options / configurations
 if (WIN32)
     # Hide console
-    set(OS_BUNDLE WIN32)
+    set(OS_BUNDLE )
 
     # Enable isos646
     add_compile_options("/FIiso646.h")

@@ -1,7 +1,6 @@
 #include "activitywidget.h"
 #include "ui_activitywidget.h"
 
-#include "customerdialog.h"
 #include "settings.h"
 
 #include "kemai/kimairequestfactory.h"
@@ -16,7 +15,6 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
     mUi->setupUi(this);
 
     connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbCustomerTextChanged);
-    connect(mUi->tbAddCustomer, &QToolButton::clicked, this, &ActivityWidget::onTbCustomerAddClicked);
     connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbProjectTextChanged);
     connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbActivityTextChanged);
     connect(mUi->btStartStop, &QPushButton::clicked, this, &ActivityWidget::onBtStartStopClicked);
@@ -25,11 +23,6 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
     mSecondTimer.setInterval(1000);
     mSecondTimer.setTimerType(Qt::PreciseTimer);
     mSecondTimer.start();
-
-    // TODO: Enable once ready
-    mUi->tbAddCustomer->setVisible(false);
-    mUi->tbAddProject->setVisible(false);
-    mUi->tbAddActivity->setVisible(false);
 }
 
 ActivityWidget::~ActivityWidget()
@@ -158,16 +151,6 @@ void ActivityWidget::onCbCustomerTextChanged(const QString& text)
     {
         auto customerId = mUi->cbCustomer->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::projects(customerId));
-    }
-}
-
-void ActivityWidget::onTbCustomerAddClicked()
-{
-    auto dialog = CustomerDialog(this);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        auto customer = dialog.customer();
-        mClient->sendRequest(KimaiRequestFactory::customerAdd(customer));
     }
 }
 

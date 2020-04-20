@@ -96,7 +96,11 @@ QJsonObject toJson(const Customer& inst)
 
     if (inst.id > 0)
         joCustomer["id"] = inst.id;
-    joCustomer["name"] = inst.name;
+    joCustomer["name"]       = inst.name;
+    joCustomer["country"]    = inst.countryKey;
+    joCustomer["currency"]   = inst.currencyKey;
+    joCustomer["timezone"]   = inst.timezone;
+    joCustomer["color"]      = "black";
 
     return joCustomer;
 }

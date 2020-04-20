@@ -9,6 +9,7 @@ add_executable(${PROJECT_NAME} ${OS_BUNDLE})
 set(SRCS
         activitywidget.cpp
         customerdialog.cpp
+        datareader.cpp
         main.cpp
         mainwindow.cpp
         settings.cpp
@@ -16,6 +17,7 @@ set(SRCS
 
 set(HDRS
         activitywidget.h
+        datareader.h
         customerdialog.h
         mainwindow.h
         settings.h
@@ -28,6 +30,7 @@ set(UIS
         settingswidget.ui)
 
 set(RESX
+        data.qrc
         icons.qrc)
 
 if (WIN32)

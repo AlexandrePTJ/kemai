@@ -4,6 +4,8 @@
 #include <QMenuBar>
 #include <QSystemTrayIcon>
 
+#include "kemai/kimaiclient.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -22,12 +24,15 @@ protected:
     void closeEvent(QCloseEvent* event);
 
 private slots:
+    void onClientError(const QString& errorMsg);
     void onActionSettingsTriggered();
+    void onActionNewCustomerTriggered();
     void onStackedCurrentChanged(int id);
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
     Ui::MainWindow* mUi;
+    QScopedPointer<client::KimaiClient> mClient;
 
     // keep stacked widgets ids
     int mActivitySId;
@@ -36,6 +41,7 @@ private:
     // Actions
     QAction* mActQuit     = nullptr;
     QAction* mActSettings = nullptr;
+    QAction* mActNewCustomer = nullptr;
 
     // Main menu
     QMenuBar* mMenuBar = nullptr;
