@@ -76,6 +76,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
      */
     auto activityWidget = new ActivityWidget;
     mActivitySId        = mUi->stackedWidget->addWidget(activityWidget);
+    mCurrentSId         = mActivitySId;
 
     auto settingsWidget = new SettingsWidget;
     settingsWidget->setActivityWidgetIndex(mActivitySId);
@@ -98,12 +99,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     QTimer::singleShot(100, activityWidget, &ActivityWidget::refresh);
 
     // Get client
-    mClient = helpers::createClient();
-    if (mClient)
-    {
-        connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
-        connect(mClient.data(), &KimaiClient::replyReceived, this, &MainWindow::onClientReply);
-    }
+    refreshClient();
 }
 
 MainWindow::~MainWindow()
@@ -120,6 +116,20 @@ void MainWindow::closeEvent(QCloseEvent* event)
         hide();
         event->ignore();
     }
+}
+
+void MainWindow::refreshClient()
+{
+    mClient = helpers::createClient();
+    if (mClient)
+    {
+        connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
+        connect(mClient.data(), &KimaiClient::replyReceived, this, &MainWindow::onClientReply);
+    }
+
+    mActNewCustomer->setEnabled(mClient != nullptr);
+    mActNewProject->setEnabled(mClient != nullptr);
+    mActNewActivity->setEnabled(mClient != nullptr);
 }
 
 void MainWindow::onClientError(const QString& errorMsg)
@@ -172,13 +182,21 @@ void MainWindow::onActionNewActivityTriggered()
 
 void MainWindow::onStackedCurrentChanged(int id)
 {
-    if (id == mActivitySId)
+    // Check if we left settings stack
+    if (mCurrentSId == mSettingsSId)
     {
-        if (auto activityWidget = qobject_cast<ActivityWidget*>(mUi->stackedWidget->widget(id)))
+        if (id == mActivitySId)
         {
-            activityWidget->refresh();
+            if (auto activityWidget = qobject_cast<ActivityWidget*>(mUi->stackedWidget->widget(id)))
+            {
+                activityWidget->refresh();
+            }
         }
+
+        refreshClient();
     }
+
+    mCurrentSId = id;
 }
 
 void MainWindow::onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason)

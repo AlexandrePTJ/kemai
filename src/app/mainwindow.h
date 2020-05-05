@@ -24,6 +24,7 @@ protected:
     void closeEvent(QCloseEvent* event);
 
 private slots:
+    void refreshClient();
     void onClientError(const QString& errorMsg);
     void onClientReply(const client::KimaiReply& reply);
     void onActionSettingsTriggered();
@@ -40,6 +41,7 @@ private:
     // keep stacked widgets ids
     int mActivitySId;
     int mSettingsSId;
+    int mCurrentSId = -1;
 
     // Actions
     QAction* mActQuit        = nullptr;
