@@ -2,7 +2,7 @@
 
 #include <QDialog>
 
-#include "kemai/kimaiapi.h"
+#include "kemai/kimaiclient.h"
 
 namespace Ui {
 class ActivityDialog;
@@ -25,10 +25,13 @@ private:
     void enableSave(bool enable);
 
 private slots:
+    void onClientReply(const client::KimaiReply& reply);
+    void onCbCustomerTextChanged(const QString& text);
     void validateForm();
 
 private:
     Ui::ActivityDialog* mUi;
+    QSharedPointer<client::KimaiClient> mClient;
 };
 
 } // namespace kemai::app

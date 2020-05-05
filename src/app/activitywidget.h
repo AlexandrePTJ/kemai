@@ -39,7 +39,7 @@ private slots:
 private:
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;
-    QScopedPointer<client::KimaiClient> mClient;
+    QSharedPointer<client::KimaiClient> mClient;
     QScopedPointer<client::TimeSheet> mCurrentTimeSheet;
 };
 

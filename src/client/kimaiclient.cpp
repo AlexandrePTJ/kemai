@@ -1,6 +1,7 @@
 #include "kemai/kimaiclient.h"
 #include "kimaiclient_p.h"
 
+#include <QDebug>
 #include <QNetworkRequest>
 
 using namespace kemai::client;
@@ -78,14 +79,17 @@ void KimaiClient::sendRequest(const KimaiRequest& rq)
     switch (rq.httpVerb())
     {
     case HttpVerb::Get:
+        qDebug() << "===> [GET]  " << qreq.url().toString();
         reply = mD->networkAccessManager->get(qreq);
         break;
 
     case HttpVerb::Post:
+        qDebug() << "===> [POST] " << qreq.url().toString() << rq.data();
         reply = mD->networkAccessManager->post(qreq, rq.data());
         break;
 
     case HttpVerb ::Patch:
+        qDebug() << "===> [PATCH]" << qreq.url().toString();
         reply = mD->networkAccessManager->sendCustomRequest(qreq, "PATCH", rq.data());
         break;
     }

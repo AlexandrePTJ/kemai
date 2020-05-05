@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "activitywidget.h"
+#include "helpers.h"
 #include "settings.h"
+
+#include "activitywidget.h"
 #include "settingswidget.h"
 
 #include "activitydialog.h"
@@ -95,14 +97,10 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
      */
     QTimer::singleShot(100, activityWidget, &ActivityWidget::refresh);
 
-    // TODO: Move to factory
-    auto settings = Settings::load();
-    if (settings.isReady())
+    // Get client
+    mClient = helpers::createClient();
+    if (mClient)
     {
-        mClient.reset(new KimaiClient);
-        mClient->setHost(settings.host);
-        mClient->setUsername(settings.username);
-        mClient->setToken(settings.token);
         connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
         connect(mClient.data(), &KimaiClient::replyReceived, this, &MainWindow::onClientReply);
     }

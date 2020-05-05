@@ -111,9 +111,11 @@ QJsonObject toJson(const Project& inst)
 {
     QJsonObject joProject;
 
-    joProject["name"]     = inst.name;
-    joProject["customer"] = inst.customer.id;
-    joProject["visible"]  = true;
+    joProject["name"]       = inst.name;
+    joProject["customer"]   = inst.customer.id;
+    joProject["budget"]     = 0;
+    joProject["timeBudget"] = 0;
+    joProject["visible"]    = true;
 
     return joProject;
 }
@@ -123,6 +125,13 @@ QJsonObject toJson(const Activity& inst)
     QJsonObject joActivity;
 
     joActivity["name"] = inst.name;
+    if (inst.project)
+    {
+        joActivity["project"] = inst.project->id;
+    }
+    joActivity["budget"]     = 0;
+    joActivity["timeBudget"] = 0;
+    joActivity["visible"]    = true;
 
     return joActivity;
 }

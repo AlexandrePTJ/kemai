@@ -35,7 +35,7 @@ private slots:
 
 private:
     Ui::MainWindow* mUi;
-    QScopedPointer<client::KimaiClient> mClient;
+    QSharedPointer<client::KimaiClient> mClient;
 
     // keep stacked widgets ids
     int mActivitySId;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QDateTime>
 #include <QString>
 #include <QVector>
@@ -54,6 +56,7 @@ struct Activity
 {
     int id;
     QString name;
+    std::optional<Project> project;
 };
 using Activities = QVector<Activity>;
 

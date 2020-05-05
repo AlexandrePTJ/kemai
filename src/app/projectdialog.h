@@ -2,7 +2,7 @@
 
 #include <QDialog>
 
-#include "kemai/kimaiapi.h"
+#include "kemai/kimaiclient.h"
 
 namespace Ui {
 class ProjectDialog;
@@ -18,7 +18,6 @@ public:
     ProjectDialog(QWidget* parent = nullptr);
     ~ProjectDialog();
 
-    void setCustomers(const client::Customers& customers);
     void setProject(const client::Project& project);
     client::Project project() const;
 
@@ -26,10 +25,12 @@ private:
     void enableSave(bool enable);
 
 private slots:
+    void onClientReply(const client::KimaiReply& reply);
     void validateForm();
 
 private:
     Ui::ProjectDialog* mUi;
+    QSharedPointer<client::KimaiClient> mClient;
 };
 
 } // namespace kemai::app

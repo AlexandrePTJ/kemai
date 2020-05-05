@@ -11,6 +11,7 @@ set(SRCS
         activitywidget.cpp
         customerdialog.cpp
         datareader.cpp
+        helpers.cpp
         main.cpp
         mainwindow.cpp
         projectdialog.cpp
@@ -20,8 +21,9 @@ set(SRCS
 set(HDRS
         activitydialog.h
         activitywidget.h
-        datareader.h
         customerdialog.h
+        datareader.h
+        helpers.h
         mainwindow.h
         projectdialog.h
         settings.h

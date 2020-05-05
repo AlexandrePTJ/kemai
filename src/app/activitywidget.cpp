@@ -1,7 +1,7 @@
 #include "activitywidget.h"
 #include "ui_activitywidget.h"
 
-#include "settings.h"
+#include "helpers.h"
 
 #include "kemai/kimairequestfactory.h"
 
@@ -38,14 +38,9 @@ void ActivityWidget::refresh()
     mUi->cbCustomer->clear();
 
     // reset client
-    auto settings = Settings::load();
-    if (settings.isReady())
+    mClient = helpers::createClient();
+    if (mClient)
     {
-        mClient.reset(new KimaiClient);
-        mClient->setHost(settings.host);
-        mClient->setUsername(settings.username);
-        mClient->setToken(settings.token);
-
         connect(mClient.data(), &KimaiClient::requestError, this, &ActivityWidget::onClientError);
         connect(mClient.data(), &KimaiClient::replyReceived, this, &ActivityWidget::onClientReply);
 
