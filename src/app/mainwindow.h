@@ -28,6 +28,8 @@ private slots:
     void onClientReply(const client::KimaiReply& reply);
     void onActionSettingsTriggered();
     void onActionNewCustomerTriggered();
+    void onActionNewProjectTriggered();
+    void onActionNewActivityTriggered();
     void onStackedCurrentChanged(int id);
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
 
@@ -40,9 +42,11 @@ private:
     int mSettingsSId;
 
     // Actions
-    QAction* mActQuit     = nullptr;
-    QAction* mActSettings = nullptr;
+    QAction* mActQuit        = nullptr;
+    QAction* mActSettings    = nullptr;
     QAction* mActNewCustomer = nullptr;
+    QAction* mActNewProject  = nullptr;
+    QAction* mActNewActivity = nullptr;
 
     // Main menu
     QMenuBar* mMenuBar = nullptr;

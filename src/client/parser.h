@@ -15,5 +15,7 @@ bool fromJson(const QJsonObject& jso, TimeSheet& inst);
 QByteArray toPostData(const QJsonValue& jv);
 QJsonObject toJson(const TimeSheet& inst);
 QJsonObject toJson(const Customer& inst);
+QJsonObject toJson(const Project& inst);
+QJsonObject toJson(const Activity& inst);
 
 } // namespace kemai::client::parser

@@ -107,4 +107,24 @@ QJsonObject toJson(const Customer& inst)
     return joCustomer;
 }
 
+QJsonObject toJson(const Project& inst)
+{
+    QJsonObject joProject;
+
+    joProject["name"]     = inst.name;
+    joProject["customer"] = inst.customer.id;
+    joProject["visible"]  = true;
+
+    return joProject;
+}
+
+QJsonObject toJson(const Activity& inst)
+{
+    QJsonObject joActivity;
+
+    joActivity["name"] = inst.name;
+
+    return joActivity;
+}
+
 } // namespace kemai::client::parser

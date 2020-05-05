@@ -5,13 +5,15 @@
 #include "settings.h"
 #include "settingswidget.h"
 
+#include "activitydialog.h"
 #include "customerdialog.h"
+#include "projectdialog.h"
 
 #include "kemai/kimairequestfactory.h"
 
 #include <QCloseEvent>
-#include <QTimer>
 #include <QDebug>
+#include <QTimer>
 
 using namespace kemai::app;
 using namespace kemai::client;
@@ -32,6 +34,8 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     mActQuit        = new QAction(tr("&Quit"), this);
     mActSettings    = new QAction(tr("&Settings"), this);
     mActNewCustomer = new QAction(tr("New customer..."), this);
+    mActNewProject  = new QAction(tr("New project..."), this);
+    mActNewActivity = new QAction(tr("New activity..."), this);
 
     /*
      * Setup systemtray
@@ -58,6 +62,8 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
 
     auto editMenu = new QMenu(tr("&Edit"), mMenuBar);
     editMenu->addAction(mActNewCustomer);
+    editMenu->addAction(mActNewProject);
+    editMenu->addAction(mActNewActivity);
 
     mMenuBar->addMenu(fileMenu);
     mMenuBar->addMenu(editMenu);
@@ -80,6 +86,8 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     connect(mActSettings, &QAction::triggered, this, &MainWindow::onActionSettingsTriggered);
     connect(mActQuit, &QAction::triggered, qApp, &QCoreApplication::quit);
     connect(mActNewCustomer, &QAction::triggered, this, &MainWindow::onActionNewCustomerTriggered);
+    connect(mActNewProject, &QAction::triggered, this, &MainWindow::onActionNewProjectTriggered);
+    connect(mActNewActivity, &QAction::triggered, this, &MainWindow::onActionNewActivityTriggered);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
 
     /*
@@ -141,6 +149,26 @@ void MainWindow::onActionNewCustomerTriggered()
     {
         const auto& customer = dialog.customer();
         mClient->sendRequest(KimaiRequestFactory::customerAdd(customer));
+    }
+}
+
+void MainWindow::onActionNewProjectTriggered()
+{
+    auto dialog = ProjectDialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        const auto& project = dialog.project();
+        mClient->sendRequest(KimaiRequestFactory::projectAdd(project));
+    }
+}
+
+void MainWindow::onActionNewActivityTriggered()
+{
+    auto dialog = ActivityDialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        const auto& activity = dialog.activity();
+        mClient->sendRequest(KimaiRequestFactory::activityAdd(activity));
     }
 }
 

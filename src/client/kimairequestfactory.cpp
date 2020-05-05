@@ -31,15 +31,30 @@ KimaiRequest KimaiRequestFactory::projects(int customerId)
     return std::move(krq);
 }
 
-// KimaiRequest KimaiRequestFactory::projectAdd(const QString& name, int customerId)
-//{
-//
-//}
+KimaiRequest KimaiRequestFactory::projectAdd(const Project& project)
+{
+    auto krq = KimaiRequest(ApiMethod::Projects, HttpVerb::Post);
+
+    auto jsData = parser::toJson(project);
+    krq.setData(parser::toPostData(jsData));
+
+    return std::move(krq);
+}
 
 KimaiRequest KimaiRequestFactory::activities(int projectId)
 {
     auto krq = KimaiRequest(ApiMethod::Activities);
     krq.setParameters({{"project", QString::number(projectId)}});
+    return std::move(krq);
+}
+
+KimaiRequest KimaiRequestFactory::activityAdd(const Activity& activity)
+{
+    auto krq = KimaiRequest(ApiMethod::Activities, HttpVerb::Post);
+
+    auto jsData = parser::toJson(activity);
+    krq.setData(parser::toPostData(jsData));
+
     return std::move(krq);
 }
 

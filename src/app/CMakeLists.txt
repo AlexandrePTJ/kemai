@@ -7,26 +7,32 @@ configure_file(kemai_version.h.in ${PROJECT_BINARY_DIR}/kemai_version.h)
 add_executable(${PROJECT_NAME} ${OS_BUNDLE})
 
 set(SRCS
+        activitydialog.cpp
         activitywidget.cpp
         customerdialog.cpp
         datareader.cpp
         main.cpp
         mainwindow.cpp
+        projectdialog.cpp
         settings.cpp
         settingswidget.cpp)
 
 set(HDRS
+        activitydialog.h
         activitywidget.h
         datareader.h
         customerdialog.h
         mainwindow.h
+        projectdialog.h
         settings.h
         settingswidget.h)
 
 set(UIS
+        activitydialog.ui
         activitywidget.ui
         customerdialog.ui
         mainwindow.ui
+        projectdialog.ui
         settingswidget.ui)
 
 set(RESX
