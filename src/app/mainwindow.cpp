@@ -96,6 +96,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
         mClient->setUsername(settings.username);
         mClient->setToken(settings.token);
         connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
+        connect(mClient.data(), &KimaiClient::replyReceived, this, &MainWindow::onClientReply);
     }
 }
 
@@ -118,6 +119,14 @@ void MainWindow::closeEvent(QCloseEvent* event)
 void MainWindow::onClientError(const QString& errorMsg)
 {
     qDebug() << errorMsg;
+}
+
+void MainWindow::onClientReply(const KimaiReply&)
+{
+    if (auto activityWidget = qobject_cast<ActivityWidget*>(mUi->stackedWidget->currentWidget()))
+    {
+        activityWidget->refresh();
+    }
 }
 
 void MainWindow::onActionSettingsTriggered()

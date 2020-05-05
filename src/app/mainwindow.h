@@ -25,6 +25,7 @@ protected:
 
 private slots:
     void onClientError(const QString& errorMsg);
+    void onClientReply(const client::KimaiReply& reply);
     void onActionSettingsTriggered();
     void onActionNewCustomerTriggered();
     void onStackedCurrentChanged(int id);
