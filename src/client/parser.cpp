@@ -100,7 +100,9 @@ QJsonObject toJson(const Customer& inst)
     joCustomer["country"]    = inst.countryKey;
     joCustomer["currency"]   = inst.currencyKey;
     joCustomer["timezone"]   = inst.timezone;
-    joCustomer["color"]      = "black";
+    joCustomer["budget"]     = 0;
+    joCustomer["timeBudget"] = 0;
+    joCustomer["visible"]    = true;
 
     return joCustomer;
 }

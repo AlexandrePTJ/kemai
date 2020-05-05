@@ -32,10 +32,10 @@ QMap<QString, QString> DataReader::currencies()
     fdata.open(QIODevice::ReadOnly | QIODevice::Text);
 
     auto jdoc = QJsonDocument::fromJson(fdata.readAll());
-    for (const auto& currencyVal : jdoc.array())
+    auto jobj = jdoc.object();
+    for (auto it = jobj.begin(); it != jobj.end(); ++it)
     {
-        const auto& currencyObj = currencyVal.toObject();
-        res.insert(currencyObj.value("AlphabeticCode").toString(), currencyObj.value("Currency").toString());
+        res.insert(it.key(), it.value().toString());
     }
 
     return res;

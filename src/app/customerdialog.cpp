@@ -46,7 +46,7 @@ Customer CustomerDialog::customer() const
     customer.name        = mUi->leName->text();
     customer.countryKey  = mUi->cbCountry->currentData(Qt::UserRole).toString();
     customer.currencyKey = mUi->cbCurrency->currentData(Qt::UserRole).toString();
-    customer.timezone    = mUi->cbTimezone->currentData(Qt::UserRole).toString();
+    customer.timezone    = mUi->cbTimezone->currentText();
     return customer;
 }
 
