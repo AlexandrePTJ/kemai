@@ -19,10 +19,10 @@ set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 # OS Dependant options / configurations
 if (WIN32)
     # Hide console
-    set(OS_BUNDLE )
+    set(OS_BUNDLE WIN32)
 
-    # Enable isos646
-    add_compile_options("/FIiso646.h")
+    # Enable and/or/... keywords
+    add_compile_options("/permissive-")
 
     # Add Qt libs and installer for windows platform
     include(WinDeployQt)
