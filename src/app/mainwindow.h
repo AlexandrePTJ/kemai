@@ -4,8 +4,8 @@
 #include <QMenuBar>
 #include <QSystemTrayIcon>
 
-#include "kemai/kimaiclient.h"
 #include "kemai/kemaiupdater.h"
+#include "kemai/kimaiclient.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,6 +33,7 @@ private slots:
     void onActionNewProjectTriggered();
     void onActionNewActivityTriggered();
     void onActionCheckUpdateTriggered();
+    void onActionOpenHostTriggered();
     void onStackedCurrentChanged(int id);
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
     void onNewVersionCheckFinished(const updater::VersionDetails& details);
@@ -54,6 +55,7 @@ private:
     QAction* mActNewProject  = nullptr;
     QAction* mActNewActivity = nullptr;
     QAction* mActCheckUpdate = nullptr;
+    QAction* mActOpenHost    = nullptr;
 
     // Main menu
     QMenuBar* mMenuBar = nullptr;

@@ -43,6 +43,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     mActNewProject  = new QAction(tr("New project..."), this);
     mActNewActivity = new QAction(tr("New activity..."), this);
     mActCheckUpdate = new QAction(tr("Check for updates..."), this);
+    mActOpenHost    = new QAction(tr("Open Kimai instance"), this);
 
     /*
      * Setup systemtray
@@ -73,6 +74,8 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     editMenu->addAction(mActNewActivity);
 
     auto helpMenu = new QMenu(tr("&Help"), mMenuBar);
+    helpMenu->addAction(mActOpenHost);
+    helpMenu->addSeparator();
     helpMenu->addAction(mActCheckUpdate);
     helpMenu->addSeparator();
     helpMenu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
@@ -103,6 +106,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     connect(mActNewProject, &QAction::triggered, this, &MainWindow::onActionNewProjectTriggered);
     connect(mActNewActivity, &QAction::triggered, this, &MainWindow::onActionNewActivityTriggered);
     connect(mActCheckUpdate, &QAction::triggered, this, &MainWindow::onActionCheckUpdateTriggered);
+    connect(mActOpenHost, &QAction::triggered, this, &MainWindow::onActionOpenHostTriggered);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
     connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
 
@@ -202,6 +206,15 @@ void MainWindow::onActionCheckUpdateTriggered()
 {
     auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
     mUpdater.checkAvailableNewVersion(currentVersion, false);
+}
+
+void MainWindow::onActionOpenHostTriggered()
+{
+    auto settings = Settings::load();
+    if (settings.isReady())
+    {
+        QDesktopServices::openUrl(QUrl::fromUserInput(settings.host));
+    }
 }
 
 void MainWindow::onStackedCurrentChanged(int id)
