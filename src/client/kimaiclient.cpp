@@ -1,9 +1,6 @@
 #include "kemai/kimaiclient.h"
 #include "kimaiclient_p.h"
 
-#include <QDebug>
-#include <QNetworkRequest>
-
 using namespace kemai::client;
 
 /*

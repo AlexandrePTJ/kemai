@@ -5,6 +5,7 @@
 #include <QSystemTrayIcon>
 
 #include "kemai/kimaiclient.h"
+#include "kemai/kemaiupdater.h"
 
 namespace Ui {
 class MainWindow;
@@ -31,12 +32,15 @@ private slots:
     void onActionNewCustomerTriggered();
     void onActionNewProjectTriggered();
     void onActionNewActivityTriggered();
+    void onActionCheckUpdateTriggered();
     void onStackedCurrentChanged(int id);
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
+    void onNewVersionCheckFinished(const updater::VersionDetails& details);
 
 private:
     Ui::MainWindow* mUi;
     QSharedPointer<client::KimaiClient> mClient;
+    updater::KemaiUpdater mUpdater;
 
     // keep stacked widgets ids
     int mActivitySId;
@@ -49,6 +53,7 @@ private:
     QAction* mActNewCustomer = nullptr;
     QAction* mActNewProject  = nullptr;
     QAction* mActNewActivity = nullptr;
+    QAction* mActCheckUpdate = nullptr;
 
     // Main menu
     QMenuBar* mMenuBar = nullptr;

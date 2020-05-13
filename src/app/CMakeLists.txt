@@ -50,4 +50,5 @@ elseif(APPLE)
 endif()
 
 target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX} ${KEMAI_ICNS})
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets KemaiClient)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets KemaiClient KemaiUpdater)

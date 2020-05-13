@@ -32,6 +32,7 @@ Settings Settings::load(const QString& confPath)
     settings.username          = qset.value("username").toString();
     settings.token             = qset.value("token").toString();
     settings.closeToSystemTray = qset.value("closeToSystemTray", false).toBool();
+    settings.ignoredVersion    = qset.value("ignoredVersion", "0.0.0").toString();
 
     return settings;
 }
@@ -43,4 +44,5 @@ void Settings::save(const Settings& settings, const QString& confPath)
     qset.setValue("username", settings.username);
     qset.setValue("token", settings.token);
     qset.setValue("closeToSystemTray", settings.closeToSystemTray);
+    qset.setValue("ignoredVersion", settings.ignoredVersion);
 }

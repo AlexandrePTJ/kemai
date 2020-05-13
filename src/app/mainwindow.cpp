@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "helpers.h"
+#include "kemai_version.h"
 #include "settings.h"
 
 #include "activitywidget.h"
@@ -15,10 +16,13 @@
 
 #include <QCloseEvent>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QMessageBox>
 #include <QTimer>
 
 using namespace kemai::app;
 using namespace kemai::client;
+using namespace kemai::updater;
 
 MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
 {
@@ -38,6 +42,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     mActNewCustomer = new QAction(tr("New customer..."), this);
     mActNewProject  = new QAction(tr("New project..."), this);
     mActNewActivity = new QAction(tr("New activity..."), this);
+    mActCheckUpdate = new QAction(tr("Check for updates..."), this);
 
     /*
      * Setup systemtray
@@ -67,8 +72,14 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     editMenu->addAction(mActNewProject);
     editMenu->addAction(mActNewActivity);
 
+    auto helpMenu = new QMenu(tr("&Help"), mMenuBar);
+    helpMenu->addAction(mActCheckUpdate);
+    helpMenu->addSeparator();
+    helpMenu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
+
     mMenuBar->addMenu(fileMenu);
     mMenuBar->addMenu(editMenu);
+    mMenuBar->addMenu(helpMenu);
     setMenuBar(mMenuBar);
 
     /*
@@ -91,12 +102,19 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     connect(mActNewCustomer, &QAction::triggered, this, &MainWindow::onActionNewCustomerTriggered);
     connect(mActNewProject, &QAction::triggered, this, &MainWindow::onActionNewProjectTriggered);
     connect(mActNewActivity, &QAction::triggered, this, &MainWindow::onActionNewActivityTriggered);
+    connect(mActCheckUpdate, &QAction::triggered, this, &MainWindow::onActionCheckUpdateTriggered);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
+    connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
 
     /*
-     * Delay first refresh
+     * Delay first refresh and update check
      */
     QTimer::singleShot(100, activityWidget, &ActivityWidget::refresh);
+    QTimer::singleShot(100, [&]() {
+        auto ignoreVersion  = QVersionNumber::fromString(Settings::load().ignoredVersion);
+        auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
+        mUpdater.checkAvailableNewVersion(currentVersion >= ignoreVersion ? currentVersion : ignoreVersion, true);
+    });
 
     // Get client
     refreshClient();
@@ -180,6 +198,12 @@ void MainWindow::onActionNewActivityTriggered()
     }
 }
 
+void MainWindow::onActionCheckUpdateTriggered()
+{
+    auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
+    mUpdater.checkAvailableNewVersion(currentVersion, false);
+}
+
 void MainWindow::onStackedCurrentChanged(int id)
 {
     // Check if we left settings stack
@@ -209,5 +233,37 @@ void MainWindow::onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason)
 
     default:
         break;
+    }
+}
+
+void MainWindow::onNewVersionCheckFinished(const VersionDetails& details)
+{
+    if (not details.vn.isNull())
+    {
+        auto res = QMessageBox::information(
+            this, tr("New version available"),
+            tr("Version %1 is available.\n\n%2").arg(details.vn.toString()).arg(details.description),
+            QMessageBox::Open | QMessageBox::Ignore | QMessageBox::Cancel, QMessageBox::Open);
+
+        switch (res)
+        {
+        case QMessageBox::Open:
+            QDesktopServices::openUrl(details.url);
+            break;
+
+        case QMessageBox::Ignore: {
+            auto settings           = Settings::load();
+            settings.ignoredVersion = details.vn.toString();
+            Settings::save(settings);
+        }
+        break;
+
+        default:
+            break;
+        }
+    }
+    else
+    {
+        QMessageBox::information(this, tr("No update"), tr("%1 is latest version.").arg(KEMAI_VERSION));
     }
 }

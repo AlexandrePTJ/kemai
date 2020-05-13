@@ -11,6 +11,8 @@ struct Settings
     QString token;
     bool closeToSystemTray;
 
+    QString ignoredVersion;
+
     bool isReady() const;
 
     static Settings load(const QString& confPath = "");
