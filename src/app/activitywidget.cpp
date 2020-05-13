@@ -6,6 +6,7 @@
 #include "kemai/kimairequestfactory.h"
 
 #include <QDebug>
+#include <QTimeZone>
 
 using namespace kemai::app;
 using namespace kemai::client;
@@ -66,6 +67,11 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
 {
     switch (reply.method())
     {
+    case ApiMethod::MeUsers: {
+        mMe.reset(new User(reply.get<User>()));
+    }
+    break;
+
     case ApiMethod::Customers: {
         mUi->cbCustomer->addItem("");
 
@@ -115,6 +121,7 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
         updateControls();
 
         mClient->sendRequest(KimaiRequestFactory::customers());
+        mClient->sendRequest(KimaiRequestFactory::me());
     }
     break;
 
@@ -184,7 +191,19 @@ void ActivityWidget::onBtStartStopClicked()
     }
     else
     {
-        auto beginAt    = QDateTime::currentDateTime();
+
+        auto beginAt = QDateTime::currentDateTime();
+
+        // Be sure to use expected timezone
+        if (mMe)
+        {
+            auto tz = QTimeZone(mMe->timezone.toLocal8Bit());
+            if (tz.isValid())
+            {
+                beginAt = beginAt.toTimeZone(tz);
+            }
+        }
+
         auto projectId  = mUi->cbProject->currentData().toInt();
         auto activityId = mUi->cbActivity->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::startTimeSheet(projectId, activityId, beginAt));

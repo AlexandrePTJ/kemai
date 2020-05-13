@@ -24,6 +24,12 @@ QString apiMethodToString(ApiMethod method)
     case ApiMethod::TimeSheets:
         return "timesheets";
 
+    case ApiMethod::Users:
+        return "users";
+
+    case ApiMethod::MeUsers:
+        return "users/me";
+
     default:
         return "";
     }

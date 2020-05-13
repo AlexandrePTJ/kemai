@@ -17,7 +17,9 @@ enum class ApiMethod
     Projects,
     Activities,
     ActiveTimeSheets,
-    TimeSheets
+    TimeSheets,
+    Users,
+    MeUsers
 };
 
 // available verbs
@@ -70,6 +72,14 @@ struct TimeSheet
     QDateTime endAt;
 };
 using TimeSheets = QVector<TimeSheet>;
+
+struct User
+{
+    int id;
+    QString username;
+    QString language;
+    QString timezone;
+};
 
 QString apiMethodToString(ApiMethod method);
 

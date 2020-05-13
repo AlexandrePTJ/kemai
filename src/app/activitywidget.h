@@ -41,6 +41,7 @@ private:
     QTimer mSecondTimer;
     QSharedPointer<client::KimaiClient> mClient;
     QScopedPointer<client::TimeSheet> mCurrentTimeSheet;
+    QScopedPointer<client::User> mMe;
 };
 
 } // namespace kemai::app

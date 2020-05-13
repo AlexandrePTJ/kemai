@@ -80,8 +80,7 @@ template<> KimaiVersion KimaiReply::get() const
     return kv;
 }
 
-template<>
-Customer KimaiReply::get() const
+template<> Customer KimaiReply::get() const
 {
     Customer ts;
     parser::fromJson(mD->jsonValue.toObject(), ts);
@@ -124,8 +123,7 @@ template<> Activities KimaiReply::get() const
     return activities;
 }
 
-template<>
-TimeSheet KimaiReply::get() const
+template<> TimeSheet KimaiReply::get() const
 {
     TimeSheet ts;
     parser::fromJson(mD->jsonValue.toObject(), ts);
@@ -142,4 +140,11 @@ template<> TimeSheets KimaiReply::get() const
             timeSheets << timeSheet;
     }
     return timeSheets;
+}
+
+template<> User KimaiReply::get() const
+{
+    User user;
+    parser::fromJson(mD->jsonValue.toObject(), user);
+    return user;
 }

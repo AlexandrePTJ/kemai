@@ -68,6 +68,19 @@ bool fromJson(const QJsonObject& jso, TimeSheet& inst)
     return true;
 }
 
+bool fromJson(const QJsonObject& jso, User& inst)
+{
+    if (not jso.contains("id"))
+        return false;
+
+    inst.id       = jso.value("id").toInt();
+    inst.username = jso.value("username").toString();
+    inst.language = jso.value("language").toString();
+    inst.timezone = jso.value("timezone").toString();
+
+    return true;
+}
+
 QByteArray toPostData(const QJsonValue& jv)
 {
     QJsonDocument jdoc;

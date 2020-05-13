@@ -9,6 +9,11 @@ KimaiRequest KimaiRequestFactory::version()
     return std::move(KimaiRequest(ApiMethod::Version));
 }
 
+KimaiRequest KimaiRequestFactory::me()
+{
+    return std::move(KimaiRequest(ApiMethod::MeUsers));
+}
+
 KimaiRequest KimaiRequestFactory::customers()
 {
     return std::move(KimaiRequest(ApiMethod::Customers));

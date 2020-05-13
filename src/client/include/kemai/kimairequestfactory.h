@@ -8,6 +8,7 @@ class KimaiRequestFactory
 {
 public:
     static KimaiRequest version();
+    static KimaiRequest me(); // me as user
     static KimaiRequest customers();
     static KimaiRequest customerAdd(const Customer& customer);
     static KimaiRequest projects(int customerId);
