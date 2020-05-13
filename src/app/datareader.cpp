@@ -40,18 +40,3 @@ QMap<QString, QString> DataReader::currencies()
 
     return res;
 }
-
-QStringList DataReader::timezones()
-{
-    QStringList res;
-
-    QFile fdata(":/data/timezones");
-    fdata.open(QIODevice::ReadOnly | QIODevice::Text);
-
-    auto jdoc = QJsonDocument::fromJson(fdata.readAll());
-    for (const auto& tzVal : jdoc.array())
-    {
-        res << tzVal.toString();
-    }
-    return res;
-}

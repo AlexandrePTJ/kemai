@@ -4,6 +4,7 @@
 #include "datareader.h"
 
 #include <QPushButton>
+#include <QTimeZone>
 
 using namespace kemai::app;
 using namespace kemai::client;
@@ -25,8 +26,9 @@ CustomerDialog::CustomerDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::C
     {
         mUi->cbCurrency->addItem(it.value(), it.key());
     }
-    const auto& timezones = DataReader::timezones();
-    mUi->cbTimezone->addItems(timezones);
+
+    for(const auto& tz : QTimeZone::availableTimeZoneIds())
+        mUi->cbTimezone->addItem(tz);
 }
 
 CustomerDialog::~CustomerDialog()
