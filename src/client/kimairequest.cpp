@@ -72,7 +72,13 @@ QUrl KimaiRequest::url(const QString& host) const
 {
     auto url = QUrl::fromUserInput(host);
 
-    auto path = "/api/" + apiMethodToString(mD->method);
+    auto path = url.path();
+    if (not path.endsWith('/'))
+    {
+        path += '/';
+    }
+
+    path += "api/" + apiMethodToString(mD->method);
     if (not mD->patchVerb.isEmpty())
         path += "/" + mD->patchVerb;
     url.setPath(path);
