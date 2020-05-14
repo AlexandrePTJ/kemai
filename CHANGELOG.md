@@ -2,6 +2,7 @@
 ==================
 
 - [#6](https://github.com/AlexandrePTJ/kemai/issues/6) Handle user timezone correctly
+- [#5](https://github.com/AlexandrePTJ/kemai/issues/5) Fix host with subpath
 - [#3](https://github.com/AlexandrePTJ/kemai/issues/3) Add updater
 
 
