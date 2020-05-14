@@ -1,4 +1,4 @@
-0.2.0 (Unreleased)
+0.2.0 (2020-05-14)
 ==================
 
 - [#6](https://github.com/AlexandrePTJ/kemai/issues/6) Handle user timezone correctly
