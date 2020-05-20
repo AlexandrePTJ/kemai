@@ -2,6 +2,7 @@
 ==================
 
 - [#8](https://github.com/AlexandrePTJ/kemai/issues/8) Add OpenSSL binaries to windows installer
+- [#7](https://github.com/AlexandrePTJ/kemai/issues/7) Fix Windows installer upgrade process
 
 
 0.2.0 (2020-05-14)
