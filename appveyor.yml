@@ -24,13 +24,13 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2017
+      - image: Visual Studio 2019
   
   before_build:
-    - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+    - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=amd64 -vcvars_ver=14.1
 
   build_script:
-    - cmake . -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=c:\Qt\5.12.6\msvc2017_64
+    - cmake . -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=c:\Qt\5.12\msvc2017_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64
     - cmake --build build --config Release
 
   after_build:
