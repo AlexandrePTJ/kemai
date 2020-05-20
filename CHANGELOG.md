@@ -1,4 +1,4 @@
-0.x.y (UNRELEASED)
+0.2.1 (2020-05-20)
 ==================
 
 - [#8](https://github.com/AlexandrePTJ/kemai/issues/8) Add OpenSSL binaries to windows installer
