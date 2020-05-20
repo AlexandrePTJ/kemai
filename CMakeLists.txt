@@ -27,6 +27,9 @@ if (WIN32)
     # Add Qt libs and installer for windows platform
     include(WinDeployQt)
 
+    # Add OpenSSL binaries for installer
+    include(WinDeployOpenSSL)
+
     # Package
     set(DEPLOY_DIR .)
     set(CPACK_GENERATOR WIX)
@@ -55,6 +58,7 @@ install(FILES LICENSE.txt DESTINATION ${DEPLOY_DIR})
 
 if (WIN32)
     windeployqt(Kemai ${DEPLOY_DIR})
+    windeployopenssl(${DEPLOY_DIR})
 endif ()
 
 include(CPack)
