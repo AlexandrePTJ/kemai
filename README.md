@@ -9,6 +9,10 @@ As credentials for API are not the same as login, here is how to create them:
 
 ![API password](https://github.com/AlexandrePTJ/kemai/blob/master/docs/api_password.gif)
 
+Then, you can set this credentials to _Kemai_ settings :
+
+![Kemai settings](https://github.com/AlexandrePTJ/kemai/blob/master/docs/kemai_settings.gif)
+
 
 How to build
 ------------
