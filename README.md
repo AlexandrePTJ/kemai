@@ -1,10 +1,13 @@
 Kemai, a Kimai Desktop Client
 =============================
 
-Why Kemai
----------
+How to use
+----------
 
-Because "Il n'y a que Maille qui m'aille".
+_Kemai_ connect to your _Kimai_ instance through its API.
+As credentials for API are not the same as login, here is how to create them:
+
+![API password](https://github.com/AlexandrePTJ/kemai/blob/master/docs/api_password.gif)
 
 
 How to build
@@ -17,8 +20,7 @@ _Kemai_ is Qt5 based application and it uses CMake to build. So regular cmake pr
 > cmake --build build --config Release
 ```
 
+Why Kemai
+---------
 
-Credits
--------
-
-Application icon is made by [Freepik](https://www.flaticon.com/authors/freepik) from [www.flaticon.com](https://www.flaticon.com/)
+Because "Il n'y a que Maille qui m'aille".
