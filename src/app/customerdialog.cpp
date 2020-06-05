@@ -15,6 +15,7 @@ CustomerDialog::CustomerDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::C
     enableSave(false);
 
     connect(mUi->leName, &QLineEdit::textChanged, this, &CustomerDialog::validateForm);
+    connect(mUi->leTimeBudget, &QLineEdit::textChanged, this, &CustomerDialog::validateForm);
 
     const auto& countries = DataReader::countries();
     for (auto it = countries.begin(); it != countries.end(); ++it)
@@ -27,7 +28,7 @@ CustomerDialog::CustomerDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::C
         mUi->cbCurrency->addItem(it.value(), it.key());
     }
 
-    for(const auto& tz : QTimeZone::availableTimeZoneIds())
+    for (const auto& tz : QTimeZone::availableTimeZoneIds())
         mUi->cbTimezone->addItem(tz);
 }
 
@@ -49,6 +50,9 @@ Customer CustomerDialog::customer() const
     customer.countryKey  = mUi->cbCountry->currentData(Qt::UserRole).toString();
     customer.currencyKey = mUi->cbCurrency->currentData(Qt::UserRole).toString();
     customer.timezone    = mUi->cbTimezone->currentText();
+    customer.budget      = mUi->sbBudget->value();
+    customer.timeBudget  = mUi->leTimeBudget->seconds();
+
     return customer;
 }
 
@@ -61,6 +65,8 @@ void CustomerDialog::enableSave(bool enable)
 
 void CustomerDialog::validateForm()
 {
-    bool nameOk = not mUi->leName->text().isEmpty();
-    enableSave(nameOk);
+    const auto& name  = mUi->leName->text();
+    bool nameOk       = (not name.isEmpty()) and (name.size() > 1);
+    bool timeBudgetOk = mUi->leTimeBudget->hasAcceptableInput();
+    enableSave(nameOk and timeBudgetOk);
 }

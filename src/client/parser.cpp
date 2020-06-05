@@ -21,8 +21,24 @@ bool fromJson(const QJsonObject& jso, Customer& inst)
     if (not jso.contains("id"))
         return false;
 
-    inst.name = jso.value("name").toString();
-    inst.id   = jso.value("id").toInt();
+    inst.id = jso.value("id").toInt();
+    safeGetJsonValue("name", jso, inst.name);
+    safeGetJsonValue("number", jso, inst.number);
+    safeGetJsonValue("comment", jso, inst.comment);
+    safeGetJsonValue("company", jso, inst.company);
+    safeGetJsonValue("address", jso, inst.address);
+    safeGetJsonValue("countryKey", jso, inst.countryKey);
+    safeGetJsonValue("currencyKey", jso, inst.currencyKey);
+    safeGetJsonValue("phone", jso, inst.phone);
+    safeGetJsonValue("fax", jso, inst.fax);
+    safeGetJsonValue("mobile", jso, inst.mobile);
+    safeGetJsonValue("email", jso, inst.email);
+    safeGetJsonValue("homepage", jso, inst.homepage);
+    safeGetJsonValue("timezone", jso, inst.timezone);
+//    safeGetJsonValue("color", jso, inst.color);
+    safeGetJsonValue("budget", jso, inst.budget);
+    safeGetJsonValue("timeBudget", jso, inst.timeBudget);
+    safeGetJsonValue("visible", jso, inst.visible);
 
     return true;
 }
@@ -109,13 +125,24 @@ QJsonObject toJson(const Customer& inst)
 
     if (inst.id > 0)
         joCustomer["id"] = inst.id;
-    joCustomer["name"]       = inst.name;
-    joCustomer["country"]    = inst.countryKey;
-    joCustomer["currency"]   = inst.currencyKey;
-    joCustomer["timezone"]   = inst.timezone;
-    joCustomer["budget"]     = 0;
-    joCustomer["timeBudget"] = 0;
-    joCustomer["visible"]    = true;
+
+    joCustomer["name"]        = inst.name;
+    joCustomer["number"]      = inst.number;
+    joCustomer["comment"]     = inst.comment;
+    joCustomer["company"]     = inst.company;
+    joCustomer["address"]     = inst.address;
+    joCustomer["countryKey"]  = inst.countryKey;
+    joCustomer["currencyKey"] = inst.currencyKey;
+    joCustomer["phone"]       = inst.phone;
+    joCustomer["fax"]         = inst.fax;
+    joCustomer["mobile"]      = inst.mobile;
+    joCustomer["email"]       = inst.email;
+    joCustomer["homepage"]    = inst.homepage;
+    joCustomer["timezone"]    = inst.timezone;
+//    joCustomer["color"]       = inst.color;
+    joCustomer["budget"]      = inst.budget;
+    joCustomer["timeBudget"]  = inst.timeBudget;
+    joCustomer["visible"]     = inst.visible;
 
     return joCustomer;
 }

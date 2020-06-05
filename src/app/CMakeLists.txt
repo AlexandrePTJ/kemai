@@ -4,13 +4,14 @@ find_package(Qt5 COMPONENTS Widgets Network CONFIG REQUIRED)
 
 configure_file(kemai_version.h.in ${PROJECT_BINARY_DIR}/kemai_version.h)
 
-add_executable(${PROJECT_NAME} ${OS_BUNDLE})
+add_executable(${PROJECT_NAME})
 
 set(SRCS
         activitydialog.cpp
         activitywidget.cpp
         customerdialog.cpp
         datareader.cpp
+        durationedit.cpp
         helpers.cpp
         main.cpp
         mainwindow.cpp
@@ -23,6 +24,7 @@ set(HDRS
         activitywidget.h
         customerdialog.h
         datareader.h
+        durationedit.h
         helpers.h
         mainwindow.h
         projectdialog.h

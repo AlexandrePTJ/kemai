@@ -1,10 +1,25 @@
 #pragma once
 
 #include <QJsonObject>
+#include <QVariant>
 
 #include "kemai/kimaiapi.h"
 
 namespace kemai::client::parser {
+
+template<typename T>
+void safeGetJsonValue(const QString& key, const QJsonObject& obj, T& dest)
+{
+    auto jsval = obj.value(key);
+    if (not jsval.isUndefined())
+    {
+        auto var = jsval.toVariant();
+        if (var.canConvert<T>())
+        {
+            dest = var.value<T>();
+        }
+    }
+}
 
 bool fromJson(const QJsonObject& jso, KimaiVersion& inst);
 bool fromJson(const QJsonObject& jso, Customer& inst);

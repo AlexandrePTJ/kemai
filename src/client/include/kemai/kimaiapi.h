@@ -39,10 +39,23 @@ struct KimaiVersion
 struct Customer
 {
     int id = 0;
+    bool visible = true;
     QString name;
+    QString number;
+    QString comment;
+    QString company;
+    QString address;
     QString countryKey;
     QString currencyKey;
+    QString phone;
+    QString fax;
+    QString mobile;
+    QString email;
+    QString homepage;
     QString timezone;
+    QString color;
+    double budget;
+    int timeBudget; // seconds
 };
 using Customers = QVector<Customer>;
 
