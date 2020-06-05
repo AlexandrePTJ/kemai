@@ -3,28 +3,25 @@
  <class>ActivityDialog</class>
  <widget class="QDialog" name="ActivityDialog">
   <property name="geometry">
-   <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>340</width>
-       <height>127</height>
-   </rect>
+      <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>352</width>
+          <height>181</height>
+      </rect>
   </property>
-  <property name="windowTitle">
-   <string>Activity</string>
-  </property>
+     <property name="windowTitle">
+         <string>Activity</string>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-             <layout class="QFormLayout" name="formLayout">
+             <layout class="QGridLayout" name="gridLayout">
                  <item row="0" column="0">
                      <widget class="QLabel" name="lbName">
                          <property name="text">
                              <string>Name</string>
                          </property>
                      </widget>
-                 </item>
-                 <item row="0" column="1">
-                     <widget class="QLineEdit" name="leName"/>
                  </item>
                  <item row="1" column="0">
                      <widget class="QLabel" name="lbCustomer">
@@ -33,9 +30,6 @@
                          </property>
                      </widget>
                  </item>
-                 <item row="1" column="1">
-                     <widget class="QComboBox" name="cbCustomer"/>
-                 </item>
                  <item row="2" column="0">
                      <widget class="QLabel" name="lbProject">
                          <property name="text">
@@ -43,7 +37,70 @@
                          </property>
                      </widget>
                  </item>
-                 <item row="2" column="1">
+                 <item row="3" column="0">
+                     <widget class="QLabel" name="label_2">
+                         <property name="text">
+                             <string>Budget</string>
+                         </property>
+                     </widget>
+                 </item>
+                 <item row="3" column="1">
+                     <widget class="QDoubleSpinBox" name="sbBudget">
+                         <property name="alignment">
+                             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                         </property>
+                         <property name="buttonSymbols">
+                             <enum>QAbstractSpinBox::NoButtons</enum>
+                         </property>
+                         <property name="prefix">
+                             <string/>
+                         </property>
+                         <property name="maximum">
+                             <double>999999999.000000000000000</double>
+                         </property>
+                     </widget>
+                 </item>
+                 <item row="3" column="2">
+                     <spacer name="horizontalSpacer">
+                         <property name="orientation">
+                             <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                             <size>
+                                 <width>40</width>
+                                 <height>20</height>
+                             </size>
+                         </property>
+                     </spacer>
+                 </item>
+                 <item row="3" column="3">
+                     <widget class="QLabel" name="label_3">
+                         <property name="text">
+                             <string>Time Budget</string>
+                         </property>
+                     </widget>
+                 </item>
+                 <item row="3" column="4">
+                     <widget class="kemai::app::DurationEdit" name="leTimeBudget">
+                         <property name="text">
+                             <string>0</string>
+                         </property>
+                         <property name="alignment">
+                             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                         </property>
+                     </widget>
+                 </item>
+                 <item row="0" column="1" colspan="4">
+                     <widget class="QLineEdit" name="leName">
+                         <property name="maxLength">
+                             <number>150</number>
+                         </property>
+                     </widget>
+                 </item>
+                 <item row="1" column="1" colspan="4">
+                     <widget class="QComboBox" name="cbCustomer"/>
+                 </item>
+                 <item row="2" column="1" colspan="4">
                      <widget class="QComboBox" name="cbProject"/>
                  </item>
              </layout>
@@ -71,18 +128,25 @@
                  </property>
              </widget>
          </item>
-  </layout>
+     </layout>
  </widget>
- <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>ActivityDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
+    <customwidgets>
+        <customwidget>
+            <class>kemai::app::DurationEdit</class>
+            <extends>QLineEdit</extends>
+            <header>durationedit.h</header>
+        </customwidget>
+    </customwidgets>
+    <resources/>
+    <connections>
+        <connection>
+            <sender>buttonBox</sender>
+            <signal>accepted()</signal>
+            <receiver>ActivityDialog</receiver>
+            <slot>accept()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>248</x>
      <y>254</y>
     </hint>
     <hint type="destinationlabel">

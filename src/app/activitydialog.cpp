@@ -26,6 +26,7 @@ ActivityDialog::ActivityDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::A
     connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, &ActivityDialog::onCbCustomerTextChanged);
     connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &ActivityDialog::validateForm);
     connect(mUi->leName, &QLineEdit::textChanged, this, &ActivityDialog::validateForm);
+    connect(mUi->leTimeBudget, &QLineEdit::textChanged, this, &ActivityDialog::validateForm);
 }
 
 ActivityDialog::~ActivityDialog()
@@ -41,7 +42,9 @@ void ActivityDialog::setActivity(const Activity& activity)
 Activity ActivityDialog::activity() const
 {
     Activity activity;
-    activity.name = mUi->leName->text();
+    activity.name       = mUi->leName->text();
+    activity.budget     = mUi->sbBudget->value();
+    activity.timeBudget = mUi->leTimeBudget->seconds();
 
     auto idCustomer = mUi->cbCustomer->currentData(Qt::UserRole).toInt();
     auto idProject  = mUi->cbProject->currentData(Qt::UserRole).toInt();
@@ -107,8 +110,10 @@ void ActivityDialog::onCbCustomerTextChanged(const QString& text)
 
 void ActivityDialog::validateForm()
 {
-    bool nameOk    = not mUi->leName->text().isEmpty();
-    bool projectOk = mUi->cbCustomer->currentText().isEmpty() or
+    const auto& name = mUi->leName->text();
+    bool nameOk      = (not name.isEmpty()) and (name.size() > 1);
+    bool projectOk   = mUi->cbCustomer->currentText().isEmpty() or
                      (not mUi->cbCustomer->currentText().isEmpty() and not mUi->cbProject->currentText().isEmpty());
-    enableSave(nameOk and projectOk);
+    bool timeBudgetOk = mUi->leTimeBudget->hasAcceptableInput();
+    enableSave(nameOk and projectOk and timeBudgetOk);
 }

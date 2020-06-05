@@ -62,15 +62,29 @@ using Customers = QVector<Customer>;
 struct Project
 {
     int id;
+    bool visible = true;
     QString name;
     Customer customer;
+    QString comment;
+    QString orderNumber;
+    QString orderDate;
+    QString start;
+    QString end;
+    QString color;
+    double budget;
+    int timeBudget;
 };
 using Projects = QVector<Project>;
 
 struct Activity
 {
     int id;
+    bool visible = true;
     QString name;
+    QString comment;
+    QString color;
+    double budget;
+    int timeBudget;
     std::optional<Project> project;
 };
 using Activities = QVector<Activity>;

@@ -1,3 +1,9 @@
+0.3.0 (UNRELEASED)
+==================
+
+- Add budget and timeBudget to activity, project and customer dialogs
+
+
 0.2.1 (2020-05-20)
 ==================
 

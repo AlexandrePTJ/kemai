@@ -25,6 +25,7 @@ ProjectDialog::ProjectDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::Pro
 
     connect(mUi->leName, &QLineEdit::textChanged, this, &ProjectDialog::validateForm);
     connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, &ProjectDialog::validateForm);
+    connect(mUi->leTimeBudget, &QLineEdit::textChanged, this, &ProjectDialog::validateForm);
 }
 
 ProjectDialog::~ProjectDialog()
@@ -42,6 +43,8 @@ Project ProjectDialog::project() const
     Project project;
     project.name        = mUi->leName->text();
     project.customer.id = mUi->cbCustomer->currentData(Qt::UserRole).toInt();
+    project.budget      = mUi->sbBudget->value();
+    project.timeBudget  = mUi->leTimeBudget->seconds();
     return project;
 }
 
@@ -72,7 +75,9 @@ void ProjectDialog::onClientReply(const KimaiReply& reply)
 
 void ProjectDialog::validateForm()
 {
-    bool nameOk     = not mUi->leName->text().isEmpty();
-    bool customerOk = not mUi->cbCustomer->currentText().isEmpty();
-    enableSave(nameOk and customerOk);
+    const auto& name  = mUi->leName->text();
+    bool nameOk       = (not name.isEmpty()) and (name.size() > 1);
+    bool customerOk   = not mUi->cbCustomer->currentText().isEmpty();
+    bool timeBudgetOk = mUi->leTimeBudget->hasAcceptableInput();
+    enableSave(nameOk and customerOk and timeBudgetOk);
 }

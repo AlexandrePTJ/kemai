@@ -27,15 +27,15 @@ bool fromJson(const QJsonObject& jso, Customer& inst)
     safeGetJsonValue("comment", jso, inst.comment);
     safeGetJsonValue("company", jso, inst.company);
     safeGetJsonValue("address", jso, inst.address);
-    safeGetJsonValue("countryKey", jso, inst.countryKey);
-    safeGetJsonValue("currencyKey", jso, inst.currencyKey);
+    safeGetJsonValue("country", jso, inst.countryKey);
+    safeGetJsonValue("currency", jso, inst.currencyKey);
     safeGetJsonValue("phone", jso, inst.phone);
     safeGetJsonValue("fax", jso, inst.fax);
     safeGetJsonValue("mobile", jso, inst.mobile);
     safeGetJsonValue("email", jso, inst.email);
     safeGetJsonValue("homepage", jso, inst.homepage);
     safeGetJsonValue("timezone", jso, inst.timezone);
-//    safeGetJsonValue("color", jso, inst.color);
+    //    safeGetJsonValue("color", jso, inst.color);
     safeGetJsonValue("budget", jso, inst.budget);
     safeGetJsonValue("timeBudget", jso, inst.timeBudget);
     safeGetJsonValue("visible", jso, inst.visible);
@@ -48,8 +48,17 @@ bool fromJson(const QJsonObject& jso, Project& inst)
     if (not jso.contains("id"))
         return false;
 
-    inst.name = jso.value("name").toString();
-    inst.id   = jso.value("id").toInt();
+    inst.id = jso.value("id").toInt();
+    safeGetJsonValue("name", jso, inst.name);
+    safeGetJsonValue("comment", jso, inst.comment);
+    safeGetJsonValue("orderNumber", jso, inst.orderNumber);
+    safeGetJsonValue("orderDate", jso, inst.orderDate);
+    safeGetJsonValue("start", jso, inst.start);
+    safeGetJsonValue("end", jso, inst.end);
+    //    safeGetJsonValue("color", jso, inst.color);
+    safeGetJsonValue("budget", jso, inst.budget);
+    safeGetJsonValue("timeBudget", jso, inst.timeBudget);
+    safeGetJsonValue("visible", jso, inst.visible);
 
     if (jso.contains("customer"))
         fromJson(jso.value("customer").toObject(), inst.customer);
@@ -62,8 +71,13 @@ bool fromJson(const QJsonObject& jso, Activity& inst)
     if (not jso.contains("id"))
         return false;
 
-    inst.name = jso.value("name").toString();
-    inst.id   = jso.value("id").toInt();
+    inst.id = jso.value("id").toInt();
+    safeGetJsonValue("name", jso, inst.name);
+    safeGetJsonValue("comment", jso, inst.comment);
+    //    safeGetJsonValue("color", jso, inst.color);
+    safeGetJsonValue("budget", jso, inst.budget);
+    safeGetJsonValue("timeBudget", jso, inst.timeBudget);
+    safeGetJsonValue("visible", jso, inst.visible);
 
     return true;
 }
@@ -126,23 +140,23 @@ QJsonObject toJson(const Customer& inst)
     if (inst.id > 0)
         joCustomer["id"] = inst.id;
 
-    joCustomer["name"]        = inst.name;
-    joCustomer["number"]      = inst.number;
-    joCustomer["comment"]     = inst.comment;
-    joCustomer["company"]     = inst.company;
-    joCustomer["address"]     = inst.address;
-    joCustomer["countryKey"]  = inst.countryKey;
-    joCustomer["currencyKey"] = inst.currencyKey;
-    joCustomer["phone"]       = inst.phone;
-    joCustomer["fax"]         = inst.fax;
-    joCustomer["mobile"]      = inst.mobile;
-    joCustomer["email"]       = inst.email;
-    joCustomer["homepage"]    = inst.homepage;
-    joCustomer["timezone"]    = inst.timezone;
-//    joCustomer["color"]       = inst.color;
-    joCustomer["budget"]      = inst.budget;
-    joCustomer["timeBudget"]  = inst.timeBudget;
-    joCustomer["visible"]     = inst.visible;
+    joCustomer["name"]     = inst.name;
+    joCustomer["number"]   = inst.number;
+    joCustomer["comment"]  = inst.comment;
+    joCustomer["company"]  = inst.company;
+    joCustomer["address"]  = inst.address;
+    joCustomer["country"]  = inst.countryKey;
+    joCustomer["currency"] = inst.currencyKey;
+    joCustomer["phone"]    = inst.phone;
+    joCustomer["fax"]      = inst.fax;
+    joCustomer["mobile"]   = inst.mobile;
+    joCustomer["email"]    = inst.email;
+    joCustomer["homepage"] = inst.homepage;
+    joCustomer["timezone"] = inst.timezone;
+    //    joCustomer["color"]       = inst.color;
+    joCustomer["budget"]     = inst.budget;
+    joCustomer["timeBudget"] = inst.timeBudget;
+    joCustomer["visible"]    = inst.visible;
 
     return joCustomer;
 }
@@ -151,11 +165,20 @@ QJsonObject toJson(const Project& inst)
 {
     QJsonObject joProject;
 
-    joProject["name"]       = inst.name;
-    joProject["customer"]   = inst.customer.id;
-    joProject["budget"]     = 0;
-    joProject["timeBudget"] = 0;
-    joProject["visible"]    = true;
+    if (inst.id > 0)
+        joProject["id"] = inst.id;
+
+    joProject["name"]        = inst.name;
+    joProject["visible"]     = inst.visible;
+    joProject["comment"]     = inst.comment;
+    joProject["orderNumber"] = inst.orderNumber;
+    joProject["orderDate"]   = inst.orderDate;
+    joProject["start"]       = inst.start;
+    joProject["end"]         = inst.end;
+    joProject["color"]       = inst.color;
+    joProject["customer"]    = inst.customer.id;
+    joProject["budget"]      = inst.budget;
+    joProject["timeBudget"]  = inst.timeBudget;
 
     return joProject;
 }
@@ -164,14 +187,16 @@ QJsonObject toJson(const Activity& inst)
 {
     QJsonObject joActivity;
 
-    joActivity["name"] = inst.name;
+    joActivity["name"]    = inst.name;
+    joActivity["visible"] = inst.visible;
+    joActivity["comment"] = inst.comment;
     if (inst.project)
     {
         joActivity["project"] = inst.project->id;
     }
-    joActivity["budget"]     = 0;
-    joActivity["timeBudget"] = 0;
-    joActivity["visible"]    = true;
+    //    joCustomer["color"]       = inst.color;
+    joActivity["budget"]     = inst.budget;
+    joActivity["timeBudget"] = inst.timeBudget;
 
     return joActivity;
 }
