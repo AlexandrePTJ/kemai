@@ -18,9 +18,8 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiReque
     r.setUrl(cmd.url(host));
     r.setRawHeader("X-AUTH-USER", username.toLatin1());
     r.setRawHeader("X-AUTH-TOKEN", token.toLatin1());
-    r.setRawHeader("accept", "application/json");
     if (cmd.httpVerb() == HttpVerb::Post)
-        r.setRawHeader("content-type", "application/json");
+        r.setRawHeader("Content-Type", "application/json");
     return r;
 }
 
@@ -37,7 +36,9 @@ void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
         }
         else
         {
-            emit mQ->replyReceived({kimaiRequest->method(), reply->readAll()});
+            auto replyData = reply->readAll();
+            qDebug() << "<=== " << replyData;
+            emit mQ->replyReceived({kimaiRequest->method(), replyData});
         }
     }
     else
