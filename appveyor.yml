@@ -14,7 +14,7 @@ for:
       - image: Ubuntu
 
   build_script:
-    - cmake . -B build -DCMAKE_PREFIX_PATH=$HOME/Qt/latest
+    - cmake . -B build -DCMAKE_PREFIX_PATH=${HOME}/Qt/latest
     - cmake --build build
 
 - matrix:
@@ -37,6 +37,9 @@ for:
 - matrix:
     only:
       - image: macos
+
+  install:
+    - brew install qt
 
   build_script:
     - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt
