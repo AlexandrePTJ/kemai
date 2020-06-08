@@ -17,7 +17,7 @@ for:
     - pip install conan
 
   build_script:
-    - cmake . -B build -DCMAKE_PREFIX_PATH=$HOME/Qt/latest
+    - cmake . -DCMAKE_BUILD_TYPE=Release -B build -DCMAKE_PREFIX_PATH=$HOME/Qt/latest
     - cmake --build build
 
 - matrix:
