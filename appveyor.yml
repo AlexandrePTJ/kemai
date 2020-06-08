@@ -8,18 +8,17 @@ image:
 platform:
   - x64
 
+install:
+  - pip install conan
+
 for:
--
-  matrix:
-    only:
-      - image: Ubuntu
+  - matrix:
+      only:
+        - image: Ubuntu
 
-  install:
-    - sudo apt install -y qt5-default
-
-  build_script:
-    - cmake . -B build
-    - cmake --build build
+    build_script:
+      - cmake . -B build -DCMAKE_PREFIX_PATH=$HOME/Qt/latest
+      - cmake --build build
 
 -
   matrix:
