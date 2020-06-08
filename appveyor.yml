@@ -13,19 +13,13 @@ for:
     only:
       - image: Ubuntu
 
-  install:
-    - sudo python3 -m pip install conan
-
   build_script:
-    - cmake . -DCMAKE_BUILD_TYPE=Release -B build -DCMAKE_PREFIX_PATH=$HOME/Qt/latest
+    - cmake . -B build -DCMAKE_PREFIX_PATH=$HOME/Qt/latest
     - cmake --build build
 
 - matrix:
     only:
       - image: Visual Studio 2019
-
-  install:
-    - pip3 install conan
 
   before_build:
     - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=amd64 -vcvars_ver=14.1
@@ -44,12 +38,7 @@ for:
     only:
       - image: macos
 
-  install:
-    - source ~/venv3.8/bin/activate
-    - pip install conan
-
   build_script:
-    - source ~/venv3.8/bin/activate
     - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt
     - cmake --build build --config Release
 

@@ -4,19 +4,14 @@ project(KemaiProject VERSION 0.2.1 LANGUAGES CXX)
 # Point CMake to the custom modules
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# Download cmake-conan
-if (NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-    message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.15/conan.cmake" "${CMAKE_BINARY_DIR}/conan.cmake")
-endif ()
-
-# Install dependencies
-include(${CMAKE_BINARY_DIR}/conan.cmake)
-conan_cmake_run(
-        CONANFILE conanfile.txt
-        BASIC_SETUP CMAKE_TARGETS
-        BUILD missing)
-
+# Install spdlog
+include(FetchContent)
+FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG v1.6.1)
+FetchContent_MakeAvailable(spdlog)
+include_directories(${spdlog_SOURCE_DIR}/include)
 
 # Common configuration
 set(CMAKE_CXX_STANDARD 17)
