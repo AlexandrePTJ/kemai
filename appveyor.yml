@@ -14,7 +14,7 @@ for:
       - image: Ubuntu
 
   build_script:
-    - cmake . -B build -DCMAKE_PREFIX_PATH=${HOME}/Qt/latest
+    - cmake . -B build -DCMAKE_PREFIX_PATH=${HOME}/Qt/latest/gcc_64
     - cmake --build build
 
 - matrix:
