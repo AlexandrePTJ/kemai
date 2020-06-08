@@ -15,10 +15,11 @@
 #include "kemai/kimairequestfactory.h"
 
 #include <QCloseEvent>
-#include <QDebug>
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QTimer>
+
+#include <spdlog/spdlog.h>
 
 using namespace kemai::app;
 using namespace kemai::client;
@@ -156,7 +157,7 @@ void MainWindow::refreshClient()
 
 void MainWindow::onClientError(const QString& errorMsg)
 {
-    qDebug() << errorMsg;
+    spdlog::error("Client error: {}", errorMsg.toStdString());
 }
 
 void MainWindow::onClientReply(const KimaiReply&)

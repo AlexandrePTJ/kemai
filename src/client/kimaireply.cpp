@@ -2,7 +2,6 @@
 
 #include "parser.h"
 
-#include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
 

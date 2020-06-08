@@ -5,8 +5,9 @@
 
 #include "kemai/kimairequestfactory.h"
 
-#include <QDebug>
 #include <QTimeZone>
+
+#include <spdlog/spdlog.h>
 
 using namespace kemai::app;
 using namespace kemai::client;
@@ -60,7 +61,7 @@ void ActivityWidget::refresh()
 
 void ActivityWidget::onClientError(const QString& errorMsg)
 {
-    qDebug() << errorMsg;
+    spdlog::error("Client error: {}", errorMsg.toStdString());
 }
 
 void ActivityWidget::onClientReply(const KimaiReply& reply)

@@ -1,6 +1,8 @@
 #include "kemai/kimaiclient.h"
 #include "kimaiclient_p.h"
 
+#include <spdlog/spdlog.h>
+
 using namespace kemai::client;
 
 /*
@@ -37,7 +39,7 @@ void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
         else
         {
             auto replyData = reply->readAll();
-            qDebug() << "<=== " << replyData;
+            spdlog::debug("<=== {}", replyData.toStdString());
             emit mQ->replyReceived({kimaiRequest->method(), replyData});
         }
     }
@@ -77,17 +79,17 @@ void KimaiClient::sendRequest(const KimaiRequest& rq)
     switch (rq.httpVerb())
     {
     case HttpVerb::Get:
-        qDebug() << "===> [GET]  " << qreq.url().toString();
+        spdlog::debug("===> [GET] {}", qreq.url().toString().toStdString());
         reply = mD->networkAccessManager->get(qreq);
         break;
 
     case HttpVerb::Post:
-        qDebug() << "===> [POST] " << qreq.url().toString() << rq.data();
+        spdlog::debug("===> [POST] {} {}", qreq.url().toString().toStdString(), rq.data().toStdString());
         reply = mD->networkAccessManager->post(qreq, rq.data());
         break;
 
     case HttpVerb ::Patch:
-        qDebug() << "===> [PATCH]" << qreq.url().toString();
+        spdlog::debug("===> [PATCH] {}", qreq.url().toString().toStdString());
         reply = mD->networkAccessManager->sendCustomRequest(qreq, "PATCH", rq.data());
         break;
     }

@@ -1,8 +1,10 @@
 #include "kemai/kemaiupdater.h"
 #include "kemaiupdater_p.h"
 
-#include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonObject>
+
+#include <spdlog/spdlog.h>
 
 using namespace kemai::updater;
 
@@ -32,7 +34,7 @@ void KemaiUpdater::KemaiUpdaterPrivate::onNamFinished(QNetworkReply* reply)
 {
     if (reply->error() != QNetworkReply::NoError)
     {
-        qDebug() << "Error on update check:" << reply->errorString();
+        spdlog::error("Error on update check: {}", reply->errorString().toStdString());
     }
     else
     {
