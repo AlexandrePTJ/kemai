@@ -13,8 +13,11 @@ for:
     only:
       - image: Ubuntu
 
+  install:
+    - sudo apt install -y qt5-default
+
   build_script:
-    - cmake . -B build -DCMAKE_PREFIX_PATH=${HOME}/Qt/latest/gcc_64
+    - cmake . -B build
     - cmake --build build
 
 - matrix:
