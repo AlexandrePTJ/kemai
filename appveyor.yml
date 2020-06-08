@@ -8,23 +8,25 @@ image:
 platform:
   - x64
 
-install:
-  - pip install conan
-
 for:
-  - matrix:
-      only:
-        - image: Ubuntu
+- matrix:
+    only:
+      - image: Ubuntu
 
-    build_script:
-      - cmake . -B build -DCMAKE_PREFIX_PATH=$HOME/Qt/latest
-      - cmake --build build
+  install:
+    - pip install conan
 
--
-  matrix:
+  build_script:
+    - cmake . -B build -DCMAKE_PREFIX_PATH=$HOME/Qt/latest
+    - cmake --build build
+
+- matrix:
     only:
       - image: Visual Studio 2019
-  
+
+  install:
+    - pip install conan
+
   before_build:
     - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=amd64 -vcvars_ver=14.1
 
@@ -38,10 +40,12 @@ for:
   artifacts:
     - path: build\Kemai-*.msi
 
--
-  matrix:
+- matrix:
     only:
       - image: macos
+
+  install:
+    - pip install conan
 
   build_script:
     - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt
