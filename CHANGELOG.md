@@ -1,7 +1,9 @@
-0.3.0 (UNRELEASED)
+0.3.0 (2020-06-09)
 ==================
 
 - Add budget and timeBudget to activity, project and customer dialogs
+- Add rotating file logger
+- [#9](https://github.com/AlexandrePTJ/kemai/issues/) Fix 'Not acceptable'
 
 
 0.2.1 (2020-05-20)
