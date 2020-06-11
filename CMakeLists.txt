@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.14)
 project(KemaiProject VERSION 0.3.0 LANGUAGES CXX)
 
 # Point CMake to the custom modules
