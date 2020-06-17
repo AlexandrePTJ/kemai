@@ -131,6 +131,11 @@ MainWindow::~MainWindow()
     delete mUi;
 }
 
+void MainWindow::setSystemTrayIcon(QIcon icon)
+{
+    mSystemTrayIcon->setIcon(icon);
+}
+
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     auto closeToSysTray = Settings::load().closeToSystemTray;

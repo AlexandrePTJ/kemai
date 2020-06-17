@@ -21,6 +21,8 @@ public:
     MainWindow();
     ~MainWindow();
 
+    void setSystemTrayIcon(QIcon icon);
+
 protected:
     void closeEvent(QCloseEvent* event);
 
