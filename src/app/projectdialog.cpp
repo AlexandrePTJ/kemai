@@ -41,6 +41,8 @@ void ProjectDialog::setProject(const Project& project)
 Project ProjectDialog::project() const
 {
     Project project;
+    project.id          = 0;
+    project.visible     = true;
     project.name        = mUi->leName->text();
     project.customer.id = mUi->cbCustomer->currentData(Qt::UserRole).toInt();
     project.budget      = mUi->sbBudget->value();

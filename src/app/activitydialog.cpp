@@ -42,6 +42,8 @@ void ActivityDialog::setActivity(const Activity& activity)
 Activity ActivityDialog::activity() const
 {
     Activity activity;
+    activity.id = 0;
+    activity.visible = true;
     activity.name       = mUi->leName->text();
     activity.budget     = mUi->sbBudget->value();
     activity.timeBudget = mUi->leTimeBudget->seconds();

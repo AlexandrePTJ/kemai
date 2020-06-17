@@ -46,6 +46,8 @@ void CustomerDialog::setCustomer(const Customer& customer)
 Customer CustomerDialog::customer() const
 {
     Customer customer;
+    customer.id = 0;
+    customer.visible = true;
     customer.name        = mUi->leName->text();
     customer.countryKey  = mUi->cbCountry->currentData(Qt::UserRole).toString();
     customer.currencyKey = mUi->cbCurrency->currentData(Qt::UserRole).toString();
