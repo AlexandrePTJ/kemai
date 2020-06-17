@@ -118,3 +118,5 @@ tests/kimai_server/data/kimai.sqlite
 
 # ---> MacOSX
 .DS_Store
+
+/build/
