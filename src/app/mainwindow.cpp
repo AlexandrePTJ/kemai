@@ -110,6 +110,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     connect(mActOpenHost, &QAction::triggered, this, &MainWindow::onActionOpenHostTriggered);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
     connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
+    connect(activityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChange);
 
     /*
      * Delay first refresh and update check
@@ -129,11 +130,6 @@ MainWindow::~MainWindow()
 {
     delete mMenuBar;
     delete mUi;
-}
-
-void MainWindow::setSystemTrayIcon(QIcon icon)
-{
-    mSystemTrayIcon->setIcon(icon);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -284,5 +280,19 @@ void MainWindow::onNewVersionCheckFinished(const VersionDetails& details)
     else
     {
         QMessageBox::information(this, tr("No update"), tr("%1 is latest version.").arg(KEMAI_VERSION));
+    }
+}
+
+void MainWindow::onActivityChange(bool started)
+{
+    if (started)
+    {
+        setWindowIcon(QIcon(":/icons/kemai"));
+        mSystemTrayIcon->setIcon(QIcon(":/icons/kemai"));
+    }
+    else
+    {
+        setWindowIcon(QIcon(":/icons/kemai-red"));
+        mSystemTrayIcon->setIcon(QIcon(":/icons/kemai-red"));
     }
 }

@@ -223,30 +223,12 @@ void ActivityWidget::updateControls()
         mUi->btStartStop->setText(tr("Start"));
         mUi->btStartStop->setIcon(QIcon(":/icons/play"));
         mUi->lbDurationTime->clear();
-
-        window()->setWindowIcon(QIcon(":/icons/kemai"));
-
-        // TODO: probably not the best way to do this, needs improvement
-        MainWindow* mW = static_cast<MainWindow*>(getMainWindow());
-        mW->setSystemTrayIcon(QIcon(":/icons/kemai"));
     }
     else
     {
         mUi->btStartStop->setText(tr("Stop"));
         mUi->btStartStop->setIcon(QIcon(":/icons/stop"));
-
-        window()->setWindowIcon(QIcon(":/icons/kemai-red"));
-
-        // TODO: probably not the best way to do this, needs improvement
-        MainWindow* mW = static_cast<MainWindow*>(getMainWindow());
-        mW->setSystemTrayIcon(QIcon(":/icons/kemai-red"));
     }
-}
 
-QMainWindow* ActivityWidget::getMainWindow()
-{
-    foreach (QWidget *w, qApp->topLevelWidgets())
-        if (QMainWindow* mainWin = qobject_cast<QMainWindow*>(w))
-            return mainWin;
-    return nullptr;
+    emit currentActivityChanged(enable);
 }

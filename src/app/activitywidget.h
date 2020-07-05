@@ -9,8 +9,6 @@ namespace Ui {
 class ActivityWidget;
 }
 
-#include "mainwindow.h"
-
 namespace kemai::app {
 
 class ActivityWidget : public QWidget
@@ -38,9 +36,10 @@ private slots:
 
     void updateControls();
 
-private:
-    QMainWindow* getMainWindow();
+signals:
+    void currentActivityChanged(bool started);
 
+private:
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;
     QSharedPointer<client::KimaiClient> mClient;
