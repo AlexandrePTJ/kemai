@@ -54,14 +54,14 @@ struct Customer
     QString homepage;
     QString timezone;
     QString color;
-    double budget;
-    int timeBudget; // seconds
+    double budget = 0.0;
+    int timeBudget = 0; // seconds
 };
 using Customers = QVector<Customer>;
 
 struct Project
 {
-    int id;
+    int id = 0;
     bool visible = true;
     QString name;
     Customer customer;
@@ -71,27 +71,27 @@ struct Project
     QString start;
     QString end;
     QString color;
-    double budget;
-    int timeBudget;
+    double budget = 0.0;
+    int timeBudget = 0;
 };
 using Projects = QVector<Project>;
 
 struct Activity
 {
-    int id;
+    int id = 0;
     bool visible = true;
     QString name;
     QString comment;
     QString color;
-    double budget;
-    int timeBudget;
+    double budget = 0.0;
+    int timeBudget = 0;
     std::optional<Project> project;
 };
 using Activities = QVector<Activity>;
 
 struct TimeSheet
 {
-    int id;
+    int id = 0;
     Activity activity;
     Project project;
     QString description;
@@ -102,7 +102,7 @@ using TimeSheets = QVector<TimeSheet>;
 
 struct User
 {
-    int id;
+    int id = 0;
     QString username;
     QString language;
     QString timezone;
