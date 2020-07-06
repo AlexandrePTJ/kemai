@@ -37,6 +37,7 @@ private slots:
     void onStackedCurrentChanged(int id);
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
     void onNewVersionCheckFinished(const updater::VersionDetails& details);
+    void onActivityChange(bool started);
 
 private:
     Ui::MainWindow* mUi;

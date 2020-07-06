@@ -229,4 +229,6 @@ void ActivityWidget::updateControls()
         mUi->btStartStop->setText(tr("Stop"));
         mUi->btStartStop->setIcon(QIcon(":/icons/stop"));
     }
+
+    emit currentActivityChanged(enable);
 }

@@ -3,5 +3,6 @@
         <file alias="play">icons/play.svg</file>
         <file alias="stop">icons/octagon.svg</file>
         <file alias="kemai">icons/kimai.png</file>
+        <file alias="kemai-red">icons/kimai-red.png</file>
     </qresource>
 </RCC>

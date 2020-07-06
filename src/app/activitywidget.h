@@ -36,6 +36,9 @@ private slots:
 
     void updateControls();
 
+signals:
+    void currentActivityChanged(bool started);
+
 private:
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;

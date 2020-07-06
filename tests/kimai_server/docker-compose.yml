@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   kimai:
-    image: kimai/kimai2:fpm-alpine-1.8-prod
+    image: kimai/kimai2:fpm-alpine-1.9-prod
     ports:
       - 9000:9000
     environment:
