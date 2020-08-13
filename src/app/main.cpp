@@ -8,9 +8,12 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+#include "kemai/settings.h"
 #include "mainwindow.h"
 
 using namespace kemai::app;
+using namespace kemai::core;
+using namespace kemai::client;
 
 int main(int argc, char* argv[])
 {
@@ -40,6 +43,11 @@ int main(int argc, char* argv[])
     qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     app.installTranslator(&qtTranslator);
 
+    // Setup trusted certificates
+    auto kemaiSettings = Settings::load();
+    KimaiClient::addTrustedCertificates(kemaiSettings.trustedCertificates);
+
+    // Startup
     MainWindow w;
     w.show();
 

@@ -3,7 +3,6 @@
 
 #include "helpers.h"
 #include "kemai_version.h"
-#include "settings.h"
 
 #include "activitywidget.h"
 #include "settingswidget.h"
@@ -13,6 +12,7 @@
 #include "projectdialog.h"
 
 #include "kemai/kimairequestfactory.h"
+#include "kemai/settings.h"
 
 #include <QCloseEvent>
 #include <QDesktopServices>
@@ -23,6 +23,7 @@
 
 using namespace kemai::app;
 using namespace kemai::client;
+using namespace kemai::core;
 using namespace kemai::updater;
 
 MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)

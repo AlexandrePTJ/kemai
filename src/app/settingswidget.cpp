@@ -2,13 +2,14 @@
 #include "ui_settingswidget.h"
 
 #include "kemai/kimairequestfactory.h"
-#include "settings.h"
+#include "kemai/settings.h"
 
 #include <QAction>
 #include <QStackedWidget>
 
 using namespace kemai::app;
 using namespace kemai::client;
+using namespace kemai::core;
 
 SettingsWidget::SettingsWidget(QWidget* parent)
     : QWidget(parent), mUi(new Ui::SettingsWidget), mKimaiClient(new KimaiClient)
@@ -23,7 +24,7 @@ SettingsWidget::SettingsWidget(QWidget* parent)
     connect(mUi->btSave, &QPushButton::clicked, this, &SettingsWidget::onBtSaveClicked);
 
     auto actToggleTokenVisible = mUi->leToken->addAction(QIcon(":/icons/visible"), QLineEdit::TrailingPosition);
-    connect(actToggleTokenVisible, &QAction::triggered, [&](){
+    connect(actToggleTokenVisible, &QAction::triggered, [&]() {
         if (mUi->leToken->echoMode() == QLineEdit::Password)
             mUi->leToken->setEchoMode(QLineEdit::Normal);
         else
