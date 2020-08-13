@@ -14,6 +14,7 @@ for:
       - image: Ubuntu
 
   install:
+    - sudo apt update
     - sudo apt install -y qt5-default
 
   build_script:
