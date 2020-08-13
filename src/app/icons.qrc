@@ -4,5 +4,6 @@
         <file alias="stop">icons/octagon.svg</file>
         <file alias="kemai">icons/kimai.png</file>
         <file alias="kemai-red">icons/kimai-red.png</file>
+        <file alias="visible">icons/visible.png</file>
     </qresource>
 </RCC>
