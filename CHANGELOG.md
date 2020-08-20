@@ -1,8 +1,9 @@
 # Changelog
 
-## 0.4.0 (Unreleased)
+## 0.4.0 (2020-08-20)
 
 - [#14](https://github.com/AlexandrePTJ/kemai/issues/14) Set token edit field as password
+- [#13](https://github.com/AlexandrePTJ/kemai/issues/13) Better handling of SSL errors
 - [#12](https://github.com/AlexandrePTJ/kemai/pull/12) Change icon when timer is running (Thanks to @maxguru)
 - [#12](https://github.com/AlexandrePTJ/kemai/pull/12) Fix sizes policies (Thanks to @maxguru)
 
