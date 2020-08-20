@@ -140,7 +140,7 @@ void KimaiClient::addTrustedCertificates(const QStringList& trustedCertificates)
     {
         auto certificates = sslConfiguration.caCertificates();
         certificates << QSslCertificate::fromData(pemStr.toLocal8Bit());
-        sslConfiguration.addCaCertificates(certificates);
+        sslConfiguration.setCaCertificates(certificates);
     }
     QSslConfiguration::setDefaultConfiguration(sslConfiguration);
 }
