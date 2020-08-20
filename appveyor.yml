@@ -13,8 +13,12 @@ for:
     only:
       - image: Ubuntu2004
 
+  install:
+    - sudo apt update
+    - sudo apt install -y qt5-default
+
   build_script:
-    - cmake . -B build -DCMAKE_PREFIX_PATH=$HOME/Qt/latest
+    - cmake . -B build
     - cmake --build build
 
 - matrix:
