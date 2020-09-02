@@ -1,7 +1,11 @@
 #include "kemai/kimaiclient.h"
 #include "kimaiclient_p.h"
 
+#include "kemai/settings.h"
+
 #include <spdlog/spdlog.h>
+
+#include <QMessageBox>
 
 using namespace kemai::client;
 
@@ -12,6 +16,7 @@ KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c)
     : networkAccessManager(new QNetworkAccessManager), mQ(c)
 {
     connect(networkAccessManager.data(), &QNetworkAccessManager::finished, this, &KimaiClientPrivate::onNamFinished);
+    connect(networkAccessManager.data(), &QNetworkAccessManager::sslErrors, this, &KimaiClientPrivate::onNamSslErrors);
 }
 
 QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiRequest& cmd)
@@ -46,6 +51,36 @@ void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
     else
     {
         emit mQ->requestError(tr("Unknown request [%1]").arg(reply->errorString()));
+    }
+}
+
+void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* reply, const QList<QSslError>& errors)
+{
+    for (auto error : errors)
+    {
+        spdlog::error("<=== SSL Error: {}", error.errorString().toStdString());
+    }
+
+    // Process certificate errors one by one.
+    const auto crtError       = errors.first();
+    const auto certificateSN  = crtError.certificate().serialNumber();
+    const auto certificatePem = crtError.certificate().toPem();
+    const auto errStr         = crtError.errorString();
+
+    auto res =
+        QMessageBox::question(nullptr, "SSL Errors",
+                              tr("Following certificate generates an error: \n%1\n%2\nAdd to trusted certificates ?")
+                                  .arg(QString(certificateSN))
+                                  .arg(errStr));
+
+    if (res == QMessageBox::Yes)
+    {
+        reply->ignoreSslErrors({crtError});
+        KimaiClient::addTrustedCertificates({certificatePem});
+
+        auto settings = core::Settings::load();
+        settings.trustedCertificates << certificatePem;
+        core::Settings::save(settings);
     }
 }
 
@@ -94,5 +129,18 @@ void KimaiClient::sendRequest(const KimaiRequest& rq)
         break;
     }
 
-    mD->runningRequests.insert(reply, QSharedPointer<KimaiRequest>::create(rq));
+    if (reply)
+        mD->runningRequests.insert(reply, QSharedPointer<KimaiRequest>::create(rq));
+}
+
+void KimaiClient::addTrustedCertificates(const QStringList& trustedCertificates)
+{
+    auto sslConfiguration = QSslConfiguration::defaultConfiguration();
+    for (auto pemStr : trustedCertificates)
+    {
+        auto certificates = sslConfiguration.caCertificates();
+        certificates << QSslCertificate::fromData(pemStr.toLocal8Bit());
+        sslConfiguration.setCaCertificates(certificates);
+    }
+    QSslConfiguration::setDefaultConfiguration(sslConfiguration);
 }

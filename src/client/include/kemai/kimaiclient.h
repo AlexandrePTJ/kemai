@@ -21,6 +21,8 @@ public:
 
     void sendRequest(const KimaiRequest& rq);
 
+    static void addTrustedCertificates(const QStringList& trustedCertificates);
+
 signals:
     void requestError(const QString& errorMsg);
     void replyReceived(const KimaiReply& reply);

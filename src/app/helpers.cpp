@@ -1,5 +1,5 @@
 #include "helpers.h"
-#include "settings.h"
+#include "kemai/settings.h"
 
 namespace kemai::app::helpers {
 
@@ -7,7 +7,7 @@ QSharedPointer<client::KimaiClient> createClient()
 {
     QSharedPointer<client::KimaiClient> client;
 
-    auto settings = Settings::load();
+    auto settings = core::Settings::load();
     if (settings.isReady())
     {
         client = QSharedPointer<client::KimaiClient>::create();

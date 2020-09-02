@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QString>
+#include <QStringList>
 
-namespace kemai::app {
+namespace kemai::core {
 
 struct Settings
 {
@@ -10,6 +10,7 @@ struct Settings
     QString username;
     QString token;
     bool closeToSystemTray;
+    QStringList trustedCertificates;
 
     QString ignoredVersion;
 
@@ -19,4 +20,4 @@ struct Settings
     static void save(const Settings& settings, const QString& confPath = "");
 };
 
-} // namespace kemai::app
+} // namespace kemai::core

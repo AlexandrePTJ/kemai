@@ -1,7 +1,5 @@
 project(Kemai)
 
-find_package(Qt5 COMPONENTS Widgets Network CONFIG REQUIRED)
-
 configure_file(kemai_version.h.in ${PROJECT_BINARY_DIR}/kemai_version.h)
 
 add_executable(${PROJECT_NAME} ${OS_BUNDLE})
@@ -16,7 +14,6 @@ set(SRCS
         main.cpp
         mainwindow.cpp
         projectdialog.cpp
-        settings.cpp
         settingswidget.cpp)
 
 set(HDRS
@@ -28,7 +25,6 @@ set(HDRS
         helpers.h
         mainwindow.h
         projectdialog.h
-        settings.h
         settingswidget.h)
 
 set(UIS
@@ -53,4 +49,4 @@ endif()
 
 target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX} ${KEMAI_ICNS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets KemaiClient KemaiUpdater)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets KemaiCore KemaiClient KemaiUpdater)

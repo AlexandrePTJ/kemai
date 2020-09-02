@@ -2,7 +2,7 @@ version: 1.0.{build}-{branch}
 
 image:
   - Visual Studio 2019
-  - Ubuntu
+  - Ubuntu2004
   - macos
 
 platform:
@@ -11,7 +11,7 @@ platform:
 for:
 - matrix:
     only:
-      - image: Ubuntu
+      - image: Ubuntu2004
 
   install:
     - sudo apt update
