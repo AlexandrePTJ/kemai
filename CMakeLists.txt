@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(KemaiProject VERSION 0.4.0 LANGUAGES CXX)
+project(KemaiProject VERSION 0.5.0 LANGUAGES CXX)
 
 # Point CMake to the custom modules
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -56,7 +56,7 @@ if (WIN32)
     set(CPACK_PACKAGE_EXECUTABLES Kemai;${KEMAI_PROJECT_NAME})
     set(CPACK_CREATE_DESKTOP_LINKS Kemai;${KEMAI_PROJECT_NAME})
     set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt)
-elseif(APPLE)
+elseif (APPLE)
     set(OS_BUNDLE MACOSX_BUNDLE)
     set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
     set(DEPLOY_DIR .)

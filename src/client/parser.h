@@ -7,8 +7,7 @@
 
 namespace kemai::client::parser {
 
-template<typename T>
-void safeGetJsonValue(const QString& key, const QJsonObject& obj, T& dest)
+template<typename T> void safeGetJsonValue(const QString& key, const QJsonObject& obj, T& dest)
 {
     auto jsval = obj.value(key);
     if (not jsval.isUndefined())

@@ -30,6 +30,9 @@ QString apiMethodToString(ApiMethod method)
     case ApiMethod::MeUsers:
         return "users/me";
 
+    case ApiMethod::Tags:
+        return "tags";
+
     default:
         return "";
     }

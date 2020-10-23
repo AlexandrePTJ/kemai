@@ -15,11 +15,23 @@ for:
 
   install:
     - sudo apt update
-    - sudo apt install -y qt5-default
+    - sudo apt install -y qt5-default curl
+    - curl -L https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -o linuxdeployqt.AppImage
+    - chmod +x linuxdeployqt.AppImage
 
   build_script:
-    - cmake . -B build
+    - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=dist
     - cmake --build build
+
+  after_build:
+    - cmake --build build --target install
+    - cp dist/bin/Kemai dist/
+    - cp -r bundle/linux/* dist/
+    - cp src/app/icons/kimai.png dist/kemai.png
+    - ./linuxdeployqt.AppImage dist/Kemai -appimage -unsupported-allow-new-glibc --appimage-extract-and-run
+
+  artifacts:
+    - path: Kemai-*.AppImage
 
 - matrix:
     only:

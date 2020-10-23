@@ -6,45 +6,49 @@
 
 using namespace kemai::core;
 
-QSettings getQSettingsInstance(const QString& confPath)
+QSettings getQSettingsInstance()
 {
-    if (confPath.isEmpty() or not QFile::exists(confPath))
-    {
-        return QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName());
-    }
-    else
-    {
-        return QSettings(confPath, QSettings::IniFormat);
-    }
+    return QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName());
 }
 
 bool Settings::isReady() const
 {
-    return not host.isEmpty() and not username.isEmpty() and not token.isEmpty();
+    return not kimai.host.isEmpty() and not kimai.username.isEmpty() and not kimai.token.isEmpty();
 }
 
-Settings Settings::load(const QString& confPath)
+Settings Settings::load()
 {
-    auto qset = getQSettingsInstance(confPath);
+    auto qset = getQSettingsInstance();
 
     Settings settings;
-    settings.host                = qset.value("host").toString();
-    settings.username            = qset.value("username").toString();
-    settings.token               = qset.value("token").toString();
-    settings.closeToSystemTray   = qset.value("closeToSystemTray", false).toBool();
-    settings.ignoredVersion      = qset.value("ignoredVersion", "0.0.0").toString();
-    settings.trustedCertificates = qset.value("trustedCertificates", {}).toStringList();
+
+    QString kimaiGrpPrefix, kemaiGrpPrefix;
+
+    if (qset.childGroups().contains("kimai"))
+        kimaiGrpPrefix = "kimai/";
+    if (qset.childGroups().contains("kemai"))
+        kemaiGrpPrefix = "kemai/";
+
+    settings.kimai.host                = qset.value(kimaiGrpPrefix + "host").toString();
+    settings.kimai.username            = qset.value(kimaiGrpPrefix + "username").toString();
+    settings.kimai.token               = qset.value(kimaiGrpPrefix + "token").toString();
+    settings.kimai.trustedCertificates = qset.value(kimaiGrpPrefix + "trustedCertificates", {}).toStringList();
+
+    settings.kemai.closeToSystemTray = qset.value(kemaiGrpPrefix + "closeToSystemTray", false).toBool();
+    settings.kemai.ignoredVersion    = qset.value(kemaiGrpPrefix + "ignoredVersion", "0.0.0").toString();
+    settings.kemai.geometry          = qset.value(kemaiGrpPrefix + "geometry").toByteArray();
 
     return settings;
 }
 
-void Settings::save(const Settings& settings, const QString& confPath)
+void Settings::save(const Settings& settings)
 {
-    auto qset = getQSettingsInstance(confPath);
-    qset.setValue("host", settings.host);
-    qset.setValue("username", settings.username);
-    qset.setValue("token", settings.token);
-    qset.setValue("closeToSystemTray", settings.closeToSystemTray);
-    qset.setValue("ignoredVersion", settings.ignoredVersion);
-    qset.setValue("trustedCertificates", settings.trustedCertificates);
+    auto qset = getQSettingsInstance();
+    qset.setValue("kimai/host", settings.kimai.host);
+    qset.setValue("kimai/username", settings.kimai.username);
+    qset.setValue("kimai/token", settings.kimai.token);
+    qset.setValue("kimai/trustedCertificates", settings.kimai.trustedCertificates);
+    qset.setValue("kemai/closeToSystemTray", settings.kemai.closeToSystemTray);
+    qset.setValue("kemai/ignoredVersion", settings.kemai.ignoredVersion);
+    qset.setValue("kemai/geometry", settings.kemai.geometry);
 }

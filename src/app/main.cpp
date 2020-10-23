@@ -45,10 +45,11 @@ int main(int argc, char* argv[])
 
     // Setup trusted certificates
     auto kemaiSettings = Settings::load();
-    KimaiClient::addTrustedCertificates(kemaiSettings.trustedCertificates);
+    KimaiClient::addTrustedCertificates(kemaiSettings.kimai.trustedCertificates);
 
     // Startup
     MainWindow w;
+    w.restoreGeometry(kemaiSettings.kemai.geometry);
     w.show();
 
     return app.exec();

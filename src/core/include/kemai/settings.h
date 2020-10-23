@@ -6,18 +6,25 @@ namespace kemai::core {
 
 struct Settings
 {
-    QString host;
-    QString username;
-    QString token;
-    bool closeToSystemTray;
-    QStringList trustedCertificates;
+    struct Kimai
+    {
+        QString host;
+        QString username;
+        QString token;
+        QStringList trustedCertificates;
+    } kimai;
 
-    QString ignoredVersion;
+    struct Kemai
+    {
+        bool closeToSystemTray;
+        QString ignoredVersion;
+        QByteArray geometry;
+    } kemai;
 
     bool isReady() const;
 
-    static Settings load(const QString& confPath = "");
-    static void save(const Settings& settings, const QString& confPath = "");
+    static Settings load();
+    static void save(const Settings& settings);
 };
 
 } // namespace kemai::core

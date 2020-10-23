@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>260</width>
-    <height>270</height>
+    <width>318</width>
+    <height>347</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -106,7 +106,7 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0" colspan="2">
+     <item row="5" column="0" colspan="2">
       <widget class="QPushButton" name="btStartStop">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
@@ -135,14 +135,14 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="lbStartedAt">
        <property name="text">
         <string>Started at</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="6" column="1">
       <widget class="QDateTimeEdit" name="dteStartedAt">
        <property name="enabled">
         <bool>false</bool>
@@ -155,6 +155,26 @@
        </property>
        <property name="calendarPopup">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="leTags"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="lbTags">
+       <property name="text">
+        <string>Tags</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QPlainTextEdit" name="pteDescription"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="lbDescription">
+       <property name="text">
+        <string>Description</string>
        </property>
       </widget>
      </item>

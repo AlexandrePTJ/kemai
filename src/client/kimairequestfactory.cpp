@@ -68,7 +68,8 @@ KimaiRequest KimaiRequestFactory::activeTimeSheets()
     return std::move(KimaiRequest(ApiMethod::ActiveTimeSheets));
 }
 
-KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, const QDateTime& beginAt)
+KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, const QDateTime& beginAt,
+                                                 const QString& description, const QStringList& tags)
 {
     auto krq = KimaiRequest(ApiMethod::TimeSheets, HttpVerb::Post);
 
@@ -76,6 +77,8 @@ KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, 
     ts.beginAt     = beginAt;
     ts.activity.id = activityId;
     ts.project.id  = projectId;
+    ts.tags        = tags;
+    ts.description = description;
 
     auto jsData = parser::toJson(ts);
     krq.setData(parser::toPostData(jsData));
@@ -88,4 +91,9 @@ KimaiRequest KimaiRequestFactory::stopTimeSheet(int timeSheetId)
     auto krq = KimaiRequest(ApiMethod::TimeSheets, HttpVerb::Patch);
     krq.setPatchVerb(QString("%1/stop").arg(timeSheetId));
     return std::move(krq);
+}
+
+KimaiRequest KimaiRequestFactory::tags()
+{
+    return std::move(KimaiRequest(ApiMethod::Tags));
 }

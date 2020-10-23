@@ -16,8 +16,10 @@ public:
     static KimaiRequest activities(int projectId);
     static KimaiRequest activityAdd(const Activity& activity);
     static KimaiRequest activeTimeSheets();
-    static KimaiRequest startTimeSheet(int projectId, int activityId, const QDateTime& beginAt);
+    static KimaiRequest startTimeSheet(int projectId, int activityId, const QDateTime& beginAt,
+                                       const QString& description, const QStringList& tags);
     static KimaiRequest stopTimeSheet(int timeSheetId);
+    static KimaiRequest tags();
 };
 
 } // namespace kemai::client

@@ -11,9 +11,9 @@ QSharedPointer<client::KimaiClient> createClient()
     if (settings.isReady())
     {
         client = QSharedPointer<client::KimaiClient>::create();
-        client->setHost(settings.host);
-        client->setUsername(settings.username);
-        client->setToken(settings.token);
+        client->setHost(settings.kimai.host);
+        client->setUsername(settings.kimai.username);
+        client->setToken(settings.kimai.token);
     }
 
     return client;
