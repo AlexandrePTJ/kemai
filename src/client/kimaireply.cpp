@@ -147,3 +147,13 @@ template<> User KimaiReply::get() const
     parser::fromJson(mD->jsonValue.toObject(), user);
     return user;
 }
+
+template<> Tags KimaiReply::get() const
+{
+    Tags tags;
+    for (const auto& jstag : mD->jsonValue.toArray())
+    {
+        tags << jstag.toString();
+    }
+    return tags;
+}

@@ -50,6 +50,7 @@ void ActivityWidget::refresh()
         // if one is running, it will re-fill combobox one by one, and set correct values
         // else it will only fill customer
         mClient->sendRequest(KimaiRequestFactory::activeTimeSheets());
+        mClient->sendRequest(KimaiRequestFactory::tags());
     }
     else
     {
@@ -113,6 +114,8 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
         {
             mCurrentTimeSheet.reset(new TimeSheet(timeSheets.first()));
             mUi->dteStartedAt->setDateTime(mCurrentTimeSheet->beginAt);
+            mUi->pteDescription->setPlainText(mCurrentTimeSheet->description);
+            mUi->leTags->setText(mCurrentTimeSheet->tags.join(','));
         }
         else
         {
@@ -141,6 +144,10 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
     }
     break;
 
+    case ApiMethod::Tags: {
+        auto tags = reply.get<Tags>();
+    }
+
     default:
         break;
     }
@@ -168,7 +175,14 @@ void ActivityWidget::onCbProjectTextChanged(const QString& text)
     }
 }
 
-void ActivityWidget::onCbActivityTextChanged(const QString& text) {}
+void ActivityWidget::onCbActivityTextChanged(const QString& text)
+{
+    if (not mCurrentTimeSheet)
+    {
+        mUi->pteDescription->clear();
+        mUi->leTags->clear();
+    }
+}
 
 void ActivityWidget::onSecondTimeout()
 {
@@ -207,7 +221,9 @@ void ActivityWidget::onBtStartStopClicked()
 
         auto projectId  = mUi->cbProject->currentData().toInt();
         auto activityId = mUi->cbActivity->currentData().toInt();
-        mClient->sendRequest(KimaiRequestFactory::startTimeSheet(projectId, activityId, beginAt));
+        auto desc       = mUi->pteDescription->toPlainText();
+        auto tags       = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
+        mClient->sendRequest(KimaiRequestFactory::startTimeSheet(projectId, activityId, beginAt, desc, tags));
     }
 }
 

@@ -94,6 +94,9 @@ bool fromJson(const QJsonObject& jso, TimeSheet& inst)
     inst.endAt       = QDateTime::fromString(jso.value("end").toString(), Qt::ISODate);
     inst.id          = jso.value("id").toInt();
 
+    for (const auto& jstag : jso.value("tags").toArray())
+        inst.tags << jstag.toString();
+
     return true;
 }
 
@@ -129,6 +132,7 @@ QJsonObject toJson(const TimeSheet& inst)
     joTimeSheet["project"]     = inst.project.id;
     joTimeSheet["activity"]    = inst.activity.id;
     joTimeSheet["description"] = inst.description;
+    joTimeSheet["tags"]        = inst.tags.join(',');
     return joTimeSheet;
 }
 

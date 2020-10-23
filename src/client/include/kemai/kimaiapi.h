@@ -19,7 +19,8 @@ enum class ApiMethod
     ActiveTimeSheets,
     TimeSheets,
     Users,
-    MeUsers
+    MeUsers,
+    Tags
 };
 
 // available verbs
@@ -36,9 +37,11 @@ struct KimaiVersion
     QString kimai = "0.0.0";
 };
 
+using Tags = QStringList;
+
 struct Customer
 {
-    int id = 0;
+    int id       = 0;
     bool visible = true;
     QString name;
     QString number;
@@ -54,14 +57,14 @@ struct Customer
     QString homepage;
     QString timezone;
     QString color;
-    double budget = 0.0;
+    double budget  = 0.0;
     int timeBudget = 0; // seconds
 };
 using Customers = QVector<Customer>;
 
 struct Project
 {
-    int id = 0;
+    int id       = 0;
     bool visible = true;
     QString name;
     Customer customer;
@@ -71,19 +74,19 @@ struct Project
     QString start;
     QString end;
     QString color;
-    double budget = 0.0;
+    double budget  = 0.0;
     int timeBudget = 0;
 };
 using Projects = QVector<Project>;
 
 struct Activity
 {
-    int id = 0;
+    int id       = 0;
     bool visible = true;
     QString name;
     QString comment;
     QString color;
-    double budget = 0.0;
+    double budget  = 0.0;
     int timeBudget = 0;
     std::optional<Project> project;
 };
@@ -97,6 +100,7 @@ struct TimeSheet
     QString description;
     QDateTime beginAt;
     QDateTime endAt;
+    Tags tags;
 };
 using TimeSheets = QVector<TimeSheet>;
 
