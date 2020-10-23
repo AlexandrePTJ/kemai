@@ -222,7 +222,14 @@ void ActivityWidget::onBtStartStopClicked()
         auto projectId  = mUi->cbProject->currentData().toInt();
         auto activityId = mUi->cbActivity->currentData().toInt();
         auto desc       = mUi->pteDescription->toPlainText();
-        auto tags       = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
+
+        // FixMe: Until Ubuntu provides a more recent Qt version.
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        auto tags = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
+#else
+        auto tags = mUi->leTags->text().split(',', QString::SkipEmptyParts);
+#endif
+
         mClient->sendRequest(KimaiRequestFactory::startTimeSheet(projectId, activityId, beginAt, desc, tags));
     }
 }
