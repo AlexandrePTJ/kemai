@@ -79,7 +79,7 @@ void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* reply, const
         KimaiClient::addTrustedCertificates({certificatePem});
 
         auto settings = core::Settings::load();
-        settings.trustedCertificates << certificatePem;
+        settings.kimai.trustedCertificates << certificatePem;
         core::Settings::save(settings);
     }
 }

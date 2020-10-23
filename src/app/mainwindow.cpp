@@ -118,7 +118,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
      */
     QTimer::singleShot(100, activityWidget, &ActivityWidget::refresh);
     QTimer::singleShot(100, [&]() {
-        auto ignoreVersion  = QVersionNumber::fromString(Settings::load().ignoredVersion);
+        auto ignoreVersion  = QVersionNumber::fromString(Settings::load().kemai.ignoredVersion);
         auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
         mUpdater.checkAvailableNewVersion(currentVersion >= ignoreVersion ? currentVersion : ignoreVersion, true);
     });
@@ -135,12 +135,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    auto closeToSysTray = Settings::load().closeToSystemTray;
-    if (closeToSysTray)
+    auto settings = Settings::load();
+    if (settings.kemai.closeToSystemTray)
     {
         hide();
         event->ignore();
     }
+    settings.kemai.geometry = saveGeometry();
+    Settings::save(settings);
 }
 
 void MainWindow::refreshClient()
@@ -216,7 +218,7 @@ void MainWindow::onActionOpenHostTriggered()
     auto settings = Settings::load();
     if (settings.isReady())
     {
-        QDesktopServices::openUrl(QUrl::fromUserInput(settings.host));
+        QDesktopServices::openUrl(QUrl::fromUserInput(settings.kimai.host));
     }
 }
 
@@ -268,8 +270,8 @@ void MainWindow::onNewVersionCheckFinished(const VersionDetails& details)
             break;
 
         case QMessageBox::Ignore: {
-            auto settings           = Settings::load();
-            settings.ignoredVersion = details.vn.toString();
+            auto settings                 = Settings::load();
+            settings.kemai.ignoredVersion = details.vn.toString();
             Settings::save(settings);
         }
         break;
