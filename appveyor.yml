@@ -2,7 +2,7 @@ version: 1.0.{build}-{branch}
 
 image:
   - Visual Studio 2019
-  - Ubuntu2004
+  - Ubuntu
   - macos
 
 platform:
@@ -11,19 +11,21 @@ platform:
 for:
 - matrix:
     only:
-      - image: Ubuntu2004
+      - image: Ubuntu
 
   install:
     - sudo apt update
-    - sudo apt install -y qt5-default curl
+    - sudo apt install -y freeglut3-dev
     - curl -L https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -o linuxdeployqt.AppImage
     - chmod +x linuxdeployqt.AppImage
 
   build_script:
-    - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=dist
+    - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/latest/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
     - cmake --build build
 
   after_build:
+    - export PATH=$HOME/Qt/latest/gcc_64/bin:$PATH
+    - export VERSION=$(grep -oP "VERSION \K(\d+\.\d+\.\d+)" CMakeLists.txt)
     - cmake --build build --target install
     - cp dist/bin/Kemai dist/
     - cp -r bundle/linux/* dist/
