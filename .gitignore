@@ -80,6 +80,7 @@ CTestTestfile.cmake
 
 # CMake
 cmake-build-*/
+CMakeLists.txt.user
 
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
