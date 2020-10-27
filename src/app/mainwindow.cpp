@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 #include "helpers.h"
-#include "kemai_version.h"
 
 #include "activitywidget.h"
 #include "settingswidget.h"
@@ -11,6 +10,7 @@
 #include "customerdialog.h"
 #include "projectdialog.h"
 
+#include "kemai/kemai_version.h"
 #include "kemai/kimairequestfactory.h"
 #include "kemai/settings.h"
 
