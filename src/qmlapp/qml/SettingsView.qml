@@ -1,17 +1,17 @@
-import QtQuick 2.12
-import QtQuick.Controls 2.12
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Item {
 
-    anchors.fill: parent
-
     ColumnLayout {
+
         anchors.fill: parent
 
         GridLayout {
-            anchors.fill: parent
-            anchors.bottom: undefined
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
             columns: 2
             flow: GridLayout.LeftToRight
@@ -43,20 +43,28 @@ Item {
             }
         }
 
+        Item {
 
-        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignBottom
 
-            anchors.bottom: parent
+            RowLayout {
 
-            Button {
-                text: qsTr("Test")
-            }
-            Item { Layout.fillWidth: true }
-            Button {
-                text: qsTr("Cancel")
-            }
-            Button {
-                text: qsTr("Save")
+                anchors.fill: parent
+
+                Button {
+                    text: qsTr("Test")
+                }
+//                Item { Layout.fillWidth: true }
+//                Button {
+//                    text: qsTr("Cancel")
+//                    Layout.alignment: Qt.AlignRight
+//                }
+//                Button {
+//                    text: qsTr("Save")
+//                    Layout.alignment: Qt.AlignRight
+//                }
             }
         }
     }
