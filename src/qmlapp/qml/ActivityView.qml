@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.15
 
 Item {
 
-    Layout.margins: 10
+    id: activityItem
 
     ColumnLayout {
 
@@ -12,15 +12,15 @@ Item {
 
         ScrollView {
 
+            clip: true
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             GridLayout {
 
-                anchors.fill: parent
-
                 columns: 2
                 flow: GridLayout.LeftToRight
+                width: activityItem.width
 
                 Label {
                     text: qsTr("Customer")

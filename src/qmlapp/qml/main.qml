@@ -3,8 +3,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
 
 ApplicationWindow {
-	width: 240
-    height: 320
+	width: 320
+    height: 480
     visible: true
 
     ColumnLayout {
@@ -14,6 +14,7 @@ ApplicationWindow {
         ActivityView {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.margins: 10
         }
 
 //        SettingsView {

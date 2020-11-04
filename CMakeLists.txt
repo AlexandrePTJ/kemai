@@ -21,6 +21,8 @@ include_directories(${spdlog_SOURCE_DIR}/include)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_compile_definitions(UNICODE _UNICODE)
+
 # Setup Qt
 find_package(Qt5 COMPONENTS Widgets Network CONFIG REQUIRED)
 
