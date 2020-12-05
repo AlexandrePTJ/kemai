@@ -3,7 +3,7 @@
 
 #include "helpers.h"
 
-#include "kemai/kimairequestfactory.h"
+#include "client/kimairequestfactory.h"
 
 #include <QPushButton>
 #include <QTimer>

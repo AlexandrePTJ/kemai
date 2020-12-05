@@ -1,4 +1,4 @@
-#include "kemai/kimairequest.h"
+#include "kimairequest.h"
 
 #include <QUrlQuery>
 

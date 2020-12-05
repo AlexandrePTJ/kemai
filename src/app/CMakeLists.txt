@@ -41,12 +41,12 @@ set(RESX
 
 if (WIN32)
     list(APPEND SRCS resources/windows/kemai.rc)
-elseif(APPLE)
+elseif (APPLE)
     set(KEMAI_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/resources/macos/kemai.icns")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/resources/macos/Info.plist)
-endif()
+endif ()
 
 target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX} ${KEMAI_ICNS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets KemaiCore KemaiClient KemaiUpdater)
+target_link_libraries(${PROJECT_NAME} Qt::Widgets KemaiCore)

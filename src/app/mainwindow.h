@@ -4,8 +4,8 @@
 #include <QMenuBar>
 #include <QSystemTrayIcon>
 
-#include "kemai/kemaiupdater.h"
-#include "kemai/kimaiclient.h"
+#include "client/kimaiclient.h"
+#include "updater/kemaiupdater.h"
 
 namespace Ui {
 class MainWindow;

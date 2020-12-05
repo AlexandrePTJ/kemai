@@ -2,7 +2,7 @@
 
 #include <QSharedPointer>
 
-#include <kemai/kimaiclient.h>
+#include "client/kimaiclient.h"
 
 namespace kemai::app::helpers {
 

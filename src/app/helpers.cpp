@@ -1,5 +1,5 @@
 #include "helpers.h"
-#include "kemai/settings.h"
+#include "settings.h"
 
 namespace kemai::app::helpers {
 

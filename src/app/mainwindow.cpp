@@ -11,8 +11,8 @@
 #include "customerdialog.h"
 #include "projectdialog.h"
 
-#include "kemai/kimairequestfactory.h"
-#include "kemai/settings.h"
+#include "client/kimairequestfactory.h"
+#include "settings.h"
 
 #include <QCloseEvent>
 #include <QDesktopServices>

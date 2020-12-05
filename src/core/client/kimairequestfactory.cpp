@@ -1,4 +1,4 @@
-#include "kemai/kimairequestfactory.h"
+#include "kimairequestfactory.h"
 
 #include "parser.h"
 

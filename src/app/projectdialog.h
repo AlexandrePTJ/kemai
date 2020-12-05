@@ -2,7 +2,7 @@
 
 #include <QDialog>
 
-#include "kemai/kimaiclient.h"
+#include "client/kimaiclient.h"
 
 namespace Ui {
 class ProjectDialog;

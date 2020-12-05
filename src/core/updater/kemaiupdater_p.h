@@ -1,17 +1,16 @@
 #pragma once
 
-//#include <QMap>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QObject>
 
-#include "kemai/kemaiupdater.h"
+#include "kemaiupdater.h"
 
 namespace kemai::updater {
 
 class KemaiUpdater::KemaiUpdaterPrivate : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit KemaiUpdaterPrivate(KemaiUpdater* c);
@@ -31,4 +30,4 @@ private:
     KemaiUpdater* const mQ;
 };
 
-} // namespace kemai::client
+} // namespace kemai::updater

@@ -1,4 +1,4 @@
-#include "kemai/settings.h"
+#include "settings.h"
 
 #include <QCoreApplication>
 #include <QFile>

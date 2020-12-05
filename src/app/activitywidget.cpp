@@ -3,7 +3,7 @@
 
 #include "helpers.h"
 
-#include "kemai/kimairequestfactory.h"
+#include "client/kimairequestfactory.h"
 
 #include <QTimeZone>
 
@@ -222,13 +222,7 @@ void ActivityWidget::onBtStartStopClicked()
         auto projectId  = mUi->cbProject->currentData().toInt();
         auto activityId = mUi->cbActivity->currentData().toInt();
         auto desc       = mUi->pteDescription->toPlainText();
-
-        // FixMe: Until Ubuntu provides a more recent Qt version.
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-        auto tags = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
-#else
-        auto tags = mUi->leTags->text().split(',', QString::SkipEmptyParts);
-#endif
+        auto tags       = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
 
         mClient->sendRequest(KimaiRequestFactory::startTimeSheet(projectId, activityId, beginAt, desc, tags));
     }

@@ -1,4 +1,4 @@
-#include "kemai/kemaiupdater.h"
+#include "kemaiupdater.h"
 #include "kemaiupdater_p.h"
 
 #include <QJsonDocument>

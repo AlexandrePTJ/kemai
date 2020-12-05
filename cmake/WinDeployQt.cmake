@@ -20,8 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-find_package(Qt5Core REQUIRED)
-
 # Retrieve the absolute path to qmake and then use that path to find
 # the windeployqt binary
 get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
