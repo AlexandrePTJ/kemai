@@ -1,15 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "helpers.h"
 #include "kemai_version.h"
 
 #include "activitywidget.h"
 #include "settingswidget.h"
-
-#include "activitydialog.h"
-#include "customerdialog.h"
-#include "projectdialog.h"
 
 #include "client/kimairequestfactory.h"
 #include "settings.h"
@@ -18,8 +13,6 @@
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QTimer>
-
-#include <spdlog/spdlog.h>
 
 using namespace kemai::app;
 using namespace kemai::client;
@@ -41,9 +34,6 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
      */
     mActQuit        = new QAction(tr("&Quit"), this);
     mActSettings    = new QAction(tr("&Settings"), this);
-    mActNewCustomer = new QAction(tr("New customer..."), this);
-    mActNewProject  = new QAction(tr("New project..."), this);
-    mActNewActivity = new QAction(tr("New activity..."), this);
     mActCheckUpdate = new QAction(tr("Check for updates..."), this);
     mActOpenHost    = new QAction(tr("Open Kimai instance"), this);
 
@@ -70,11 +60,6 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     fileMenu->addSeparator();
     fileMenu->addAction(mActQuit);
 
-    auto editMenu = new QMenu(tr("&Edit"), mMenuBar);
-    editMenu->addAction(mActNewCustomer);
-    editMenu->addAction(mActNewProject);
-    editMenu->addAction(mActNewActivity);
-
     auto helpMenu = new QMenu(tr("&Help"), mMenuBar);
     helpMenu->addAction(mActOpenHost);
     helpMenu->addSeparator();
@@ -83,7 +68,6 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     helpMenu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 
     mMenuBar->addMenu(fileMenu);
-    mMenuBar->addMenu(editMenu);
     mMenuBar->addMenu(helpMenu);
     setMenuBar(mMenuBar);
 
@@ -104,9 +88,6 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     connect(mUi->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::onStackedCurrentChanged);
     connect(mActSettings, &QAction::triggered, this, &MainWindow::onActionSettingsTriggered);
     connect(mActQuit, &QAction::triggered, qApp, &QCoreApplication::quit);
-    connect(mActNewCustomer, &QAction::triggered, this, &MainWindow::onActionNewCustomerTriggered);
-    connect(mActNewProject, &QAction::triggered, this, &MainWindow::onActionNewProjectTriggered);
-    connect(mActNewActivity, &QAction::triggered, this, &MainWindow::onActionNewActivityTriggered);
     connect(mActCheckUpdate, &QAction::triggered, this, &MainWindow::onActionCheckUpdateTriggered);
     connect(mActOpenHost, &QAction::triggered, this, &MainWindow::onActionOpenHostTriggered);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
@@ -122,9 +103,6 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
         auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
         mUpdater.checkAvailableNewVersion(currentVersion >= ignoreVersion ? currentVersion : ignoreVersion, true);
     });
-
-    // Get client
-    refreshClient();
 }
 
 MainWindow::~MainWindow()
@@ -145,66 +123,9 @@ void MainWindow::closeEvent(QCloseEvent* event)
     Settings::save(settings);
 }
 
-void MainWindow::refreshClient()
-{
-    mClient = helpers::createClient();
-    if (mClient)
-    {
-        connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
-        connect(mClient.data(), &KimaiClient::replyReceived, this, &MainWindow::onClientReply);
-    }
-
-    mActNewCustomer->setEnabled(mClient != nullptr);
-    mActNewProject->setEnabled(mClient != nullptr);
-    mActNewActivity->setEnabled(mClient != nullptr);
-}
-
-void MainWindow::onClientError(const QString& errorMsg)
-{
-    spdlog::error("Client error: {}", errorMsg.toStdString());
-}
-
-void MainWindow::onClientReply(const KimaiReply&)
-{
-    if (auto activityWidget = qobject_cast<ActivityWidget*>(mUi->stackedWidget->currentWidget()))
-    {
-        activityWidget->refresh();
-    }
-}
-
 void MainWindow::onActionSettingsTriggered()
 {
     mUi->stackedWidget->setCurrentIndex(mSettingsSId);
-}
-
-void MainWindow::onActionNewCustomerTriggered()
-{
-    auto dialog = CustomerDialog(this);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        const auto& customer = dialog.customer();
-        mClient->sendRequest(KimaiRequestFactory::customerAdd(customer));
-    }
-}
-
-void MainWindow::onActionNewProjectTriggered()
-{
-    auto dialog = ProjectDialog(this);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        const auto& project = dialog.project();
-        mClient->sendRequest(KimaiRequestFactory::projectAdd(project));
-    }
-}
-
-void MainWindow::onActionNewActivityTriggered()
-{
-    auto dialog = ActivityDialog(this);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        const auto& activity = dialog.activity();
-        mClient->sendRequest(KimaiRequestFactory::activityAdd(activity));
-    }
 }
 
 void MainWindow::onActionCheckUpdateTriggered()
@@ -234,8 +155,6 @@ void MainWindow::onStackedCurrentChanged(int id)
                 activityWidget->refresh();
             }
         }
-
-        refreshClient();
     }
 
     mCurrentSId = id;

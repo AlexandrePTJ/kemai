@@ -1,10 +1,14 @@
 #include "activitywidget.h"
 #include "ui_activitywidget.h"
 
+#include "activitydialog.h"
+#include "customerdialog.h"
 #include "helpers.h"
+#include "projectdialog.h"
 
 #include "client/kimairequestfactory.h"
 
+#include <QInputDialog>
 #include <QTimeZone>
 
 #include <spdlog/spdlog.h>
@@ -19,6 +23,9 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
     connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbCustomerTextChanged);
     connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbProjectTextChanged);
     connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbActivityTextChanged);
+    connect(mUi->tbAddCustomer, &QToolButton::clicked, this, &ActivityWidget::onTbAddCustomerClicked);
+    connect(mUi->tbAddProject, &QToolButton::clicked, this, &ActivityWidget::onTbAddProjectClicked);
+    connect(mUi->tbAddActivity, &QToolButton::clicked, this, &ActivityWidget::onTbAddActivityClicked);
     connect(mUi->btStartStop, &QPushButton::clicked, this, &ActivityWidget::onBtStartStopClicked);
     connect(&mSecondTimer, &QTimer::timeout, this, &ActivityWidget::onSecondTimeout);
 
@@ -161,6 +168,14 @@ void ActivityWidget::onCbCustomerTextChanged(const QString& text)
     {
         auto customerId = mUi->cbCustomer->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::projects(customerId));
+
+        mUi->tbAddProject->setEnabled(true);
+        mUi->tbAddActivity->setEnabled(false);
+    }
+    else
+    {
+        mUi->tbAddProject->setEnabled(false);
+        mUi->tbAddActivity->setEnabled(true);
     }
 }
 
@@ -172,6 +187,12 @@ void ActivityWidget::onCbProjectTextChanged(const QString& text)
     {
         auto projectId = mUi->cbProject->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::activities(projectId));
+
+        mUi->tbAddActivity->setEnabled(true);
+    }
+    else
+    {
+        mUi->tbAddActivity->setEnabled(false);
     }
 }
 
@@ -181,6 +202,45 @@ void ActivityWidget::onCbActivityTextChanged(const QString& text)
     {
         mUi->pteDescription->clear();
         mUi->leTags->clear();
+    }
+}
+
+void ActivityWidget::onTbAddCustomerClicked()
+{
+    auto dialog = CustomerDialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        const auto& customer = dialog.customer();
+        mClient->sendRequest(KimaiRequestFactory::customerAdd(customer));
+    }
+}
+
+void ActivityWidget::onTbAddProjectClicked()
+{
+    auto dialog = ProjectDialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        auto project        = dialog.project();
+        project.customer.id = mUi->cbCustomer->currentData().toInt();
+        mClient->sendRequest(KimaiRequestFactory::projectAdd(project));
+    }
+}
+
+void ActivityWidget::onTbAddActivityClicked()
+{
+    auto dialog = ActivityDialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        auto activity = dialog.activity();
+        if (not mUi->cbCustomer->currentText().isEmpty())
+        {
+            Project project;
+            project.customer.id = mUi->cbCustomer->currentData().toInt();
+            project.id          = mUi->cbProject->currentData().toInt();
+
+            activity.project = project;
+        }
+        mClient->sendRequest(KimaiRequestFactory::activityAdd(activity));
     }
 }
 
@@ -234,6 +294,13 @@ void ActivityWidget::updateControls()
     mUi->cbCustomer->setEnabled(enable);
     mUi->cbProject->setEnabled(enable);
     mUi->cbActivity->setEnabled(enable);
+
+    mUi->tbAddCustomer->setEnabled(enable);
+    mUi->tbAddProject->setEnabled(enable && !mUi->cbCustomer->currentText().isEmpty());
+
+    bool projectOk = mUi->cbCustomer->currentText().isEmpty() or
+                     (not mUi->cbCustomer->currentText().isEmpty() and not mUi->cbProject->currentText().isEmpty());
+    mUi->tbAddActivity->setEnabled(enable && projectOk);
 
     if (enable)
     {

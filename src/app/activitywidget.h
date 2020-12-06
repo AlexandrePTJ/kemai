@@ -30,6 +30,10 @@ private slots:
     void onCbProjectTextChanged(const QString& text);
     void onCbActivityTextChanged(const QString& text);
 
+    void onTbAddCustomerClicked();
+    void onTbAddProjectClicked();
+    void onTbAddActivityClicked();
+
     void onBtStartStopClicked();
 
     void onSecondTimeout();
