@@ -10,7 +10,6 @@ set(SRCS
         customerdialog.cpp
         datareader.cpp
         durationedit.cpp
-        helpers.cpp
         main.cpp
         mainwindow.cpp
         projectdialog.cpp
@@ -22,7 +21,6 @@ set(HDRS
         customerdialog.h
         datareader.h
         durationedit.h
-        helpers.h
         mainwindow.h
         projectdialog.h
         settingswidget.h)

@@ -98,6 +98,13 @@ template<> Customers KimaiReply::get() const
     return customers;
 }
 
+template<> Project KimaiReply::get() const
+{
+    Project ts;
+    parser::fromJson(mD->jsonValue.toObject(), ts);
+    return ts;
+}
+
 template<> Projects KimaiReply::get() const
 {
     Projects projects;
@@ -108,6 +115,13 @@ template<> Projects KimaiReply::get() const
             projects << project;
     }
     return projects;
+}
+
+template<> Activity KimaiReply::get() const
+{
+    Activity ts;
+    parser::fromJson(mD->jsonValue.toObject(), ts);
+    return ts;
 }
 
 template<> Activities KimaiReply::get() const

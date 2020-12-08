@@ -1,8 +1,6 @@
 #include "activitydialog.h"
 #include "ui_activitydialog.h"
 
-#include "helpers.h"
-
 #include "client/kimairequestfactory.h"
 
 #include <QPushButton>

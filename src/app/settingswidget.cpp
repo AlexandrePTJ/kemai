@@ -23,12 +23,18 @@ SettingsWidget::SettingsWidget(QWidget* parent)
     connect(mUi->btCancel, &QPushButton::clicked, this, &SettingsWidget::onBtCancelClicked);
     connect(mUi->btSave, &QPushButton::clicked, this, &SettingsWidget::onBtSaveClicked);
 
-    auto actToggleTokenVisible = mUi->leToken->addAction(QIcon(":/icons/visible"), QLineEdit::TrailingPosition);
-    connect(actToggleTokenVisible, &QAction::triggered, [&]() {
+    mActToggleTokenVisible = mUi->leToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
+    connect(mActToggleTokenVisible, &QAction::triggered, [&]() {
         if (mUi->leToken->echoMode() == QLineEdit::Password)
+        {
             mUi->leToken->setEchoMode(QLineEdit::Normal);
+            mActToggleTokenVisible->setIcon(QIcon(":/icons/visible"));
+        }
         else
+        {
             mUi->leToken->setEchoMode(QLineEdit::Password);
+            mActToggleTokenVisible->setIcon(QIcon(":/icons/visible-off"));
+        }
     });
 }
 

@@ -46,7 +46,7 @@ signals:
 private:
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;
-    QSharedPointer<client::KimaiClient> mClient;
+    QScopedPointer<client::KimaiClient> mClient;
     QScopedPointer<client::TimeSheet> mCurrentTimeSheet;
     QScopedPointer<client::User> mMe;
 };

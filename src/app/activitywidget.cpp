@@ -3,8 +3,8 @@
 
 #include "activitydialog.h"
 #include "customerdialog.h"
-#include "helpers.h"
 #include "projectdialog.h"
+#include "settings.h"
 
 #include "client/kimairequestfactory.h"
 
@@ -15,6 +15,7 @@
 
 using namespace kemai::app;
 using namespace kemai::client;
+using namespace kemai::core;
 
 ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::ActivityWidget)
 {
@@ -47,9 +48,15 @@ void ActivityWidget::refresh()
     mUi->cbCustomer->clear();
 
     // reset client
-    mClient = helpers::createClient();
-    if (mClient)
+    auto settings = Settings::load();
+    if (settings.isReady())
     {
+        mClient.reset(new KimaiClient);
+
+        mClient->setHost(settings.kimai.host);
+        mClient->setUsername(settings.kimai.username);
+        mClient->setToken(settings.kimai.token);
+
         connect(mClient.data(), &KimaiClient::requestError, this, &ActivityWidget::onClientError);
         connect(mClient.data(), &KimaiClient::replyReceived, this, &ActivityWidget::onClientReply);
 
@@ -74,6 +81,9 @@ void ActivityWidget::onClientError(const QString& errorMsg)
 
 void ActivityWidget::onClientReply(const KimaiReply& reply)
 {
+    if (not reply.isValid())
+        return;
+
     switch (reply.method())
     {
     case ApiMethod::MeUsers: {
@@ -82,35 +92,67 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
     break;
 
     case ApiMethod::Customers: {
-        mUi->cbCustomer->addItem("");
-
-        for (const auto& customer : reply.get<Customers>())
-            mUi->cbCustomer->addItem(customer.name, customer.id);
+        const auto& customers = reply.get<Customers>();
+        if (not customers.isEmpty())
+        {
+            mUi->cbCustomer->clear();
+            mUi->cbCustomer->addItem("");
+            for (const auto& customer : customers)
+                mUi->cbCustomer->addItem(customer.name, customer.id);
+        }
 
         if (mCurrentTimeSheet)
             mUi->cbCustomer->setCurrentText(mCurrentTimeSheet->project.customer.name);
     }
     break;
 
-    case ApiMethod::Projects: {
-        mUi->cbProject->addItem("");
+    case ApiMethod::CustomerAdd: {
+        const auto& customer = reply.get<Customer>();
+        mUi->cbCustomer->addItem(customer.name, customer.id);
+    }
+    break;
 
-        for (const auto& project : reply.get<Projects>())
-            mUi->cbProject->addItem(project.name, project.id);
+    case ApiMethod::Projects: {
+        const auto& projects = reply.get<Projects>();
+        if (not projects.isEmpty())
+        {
+            mUi->cbProject->clear();
+            mUi->cbProject->addItem("");
+
+            for (const auto& project : projects)
+                mUi->cbProject->addItem(project.name, project.id);
+        }
 
         if (mCurrentTimeSheet)
             mUi->cbProject->setCurrentText(mCurrentTimeSheet->project.name);
     }
     break;
 
-    case ApiMethod::Activities: {
-        mUi->cbActivity->addItem("");
+    case ApiMethod::ProjectAdd: {
+        const auto& project = reply.get<Project>();
+        mUi->cbProject->addItem(project.name, project.id);
+    }
+    break;
 
-        for (const auto& activity : reply.get<Activities>())
-            mUi->cbActivity->addItem(activity.name, activity.id);
+    case ApiMethod::Activities: {
+        const auto& activites = reply.get<Activities>();
+        if (not activites.isEmpty())
+        {
+            mUi->cbActivity->clear();
+            mUi->cbActivity->addItem("");
+
+            for (const auto& activity : activites)
+                mUi->cbActivity->addItem(activity.name, activity.id);
+        }
 
         if (mCurrentTimeSheet)
             mUi->cbActivity->setCurrentText(mCurrentTimeSheet->activity.name);
+    }
+    break;
+
+    case ApiMethod::ActivityAdd: {
+        const auto& activity = reply.get<Activity>();
+        mUi->cbActivity->addItem(activity.name, activity.id);
     }
     break;
 
@@ -168,15 +210,8 @@ void ActivityWidget::onCbCustomerTextChanged(const QString& text)
     {
         auto customerId = mUi->cbCustomer->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::projects(customerId));
-
-        mUi->tbAddProject->setEnabled(true);
-        mUi->tbAddActivity->setEnabled(false);
     }
-    else
-    {
-        mUi->tbAddProject->setEnabled(false);
-        mUi->tbAddActivity->setEnabled(true);
-    }
+    updateControls();
 }
 
 void ActivityWidget::onCbProjectTextChanged(const QString& text)
@@ -187,13 +222,8 @@ void ActivityWidget::onCbProjectTextChanged(const QString& text)
     {
         auto projectId = mUi->cbProject->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::activities(projectId));
-
-        mUi->tbAddActivity->setEnabled(true);
     }
-    else
-    {
-        mUi->tbAddActivity->setEnabled(false);
-    }
+    updateControls();
 }
 
 void ActivityWidget::onCbActivityTextChanged(const QString& text)
@@ -304,13 +334,11 @@ void ActivityWidget::updateControls()
 
     if (enable)
     {
-        mUi->btStartStop->setText(tr("Start"));
         mUi->btStartStop->setIcon(QIcon(":/icons/play"));
         mUi->lbDurationTime->clear();
     }
     else
     {
-        mUi->btStartStop->setText(tr("Stop"));
         mUi->btStartStop->setIcon(QIcon(":/icons/stop"));
     }
 

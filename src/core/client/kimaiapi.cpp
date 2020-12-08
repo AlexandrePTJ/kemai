@@ -10,12 +10,15 @@ QString apiMethodToString(ApiMethod method)
         return "version";
 
     case ApiMethod::Customers:
+    case ApiMethod::CustomerAdd:
         return "customers";
 
     case ApiMethod::Projects:
+    case ApiMethod::ProjectAdd:
         return "projects";
 
     case ApiMethod::Activities:
+    case ApiMethod::ActivityAdd:
         return "activities";
 
     case ApiMethod::ActiveTimeSheets:
