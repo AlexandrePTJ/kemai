@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kemai/kimaiclient.h"
+#include "client/kimaiclient.h"
 
 #include <QWidget>
 
@@ -33,8 +33,9 @@ private slots:
     void onBtSaveClicked();
 
 private:
-    int mActivityWidgetIndex = 0;
-    Ui::SettingsWidget* mUi;
+    int mActivityWidgetIndex        = 0;
+    Ui::SettingsWidget* mUi         = nullptr;
+    QAction* mActToggleTokenVisible = nullptr;
 
     // for connection testing
     QScopedPointer<client::KimaiClient> mKimaiClient;

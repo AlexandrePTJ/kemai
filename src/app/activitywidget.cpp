@@ -1,16 +1,21 @@
 #include "activitywidget.h"
 #include "ui_activitywidget.h"
 
-#include "helpers.h"
+#include "activitydialog.h"
+#include "customerdialog.h"
+#include "projectdialog.h"
+#include "settings.h"
 
-#include "kemai/kimairequestfactory.h"
+#include "client/kimairequestfactory.h"
 
+#include <QInputDialog>
 #include <QTimeZone>
 
 #include <spdlog/spdlog.h>
 
 using namespace kemai::app;
 using namespace kemai::client;
+using namespace kemai::core;
 
 ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::ActivityWidget)
 {
@@ -19,6 +24,9 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
     connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbCustomerTextChanged);
     connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbProjectTextChanged);
     connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbActivityTextChanged);
+    connect(mUi->tbAddCustomer, &QToolButton::clicked, this, &ActivityWidget::onTbAddCustomerClicked);
+    connect(mUi->tbAddProject, &QToolButton::clicked, this, &ActivityWidget::onTbAddProjectClicked);
+    connect(mUi->tbAddActivity, &QToolButton::clicked, this, &ActivityWidget::onTbAddActivityClicked);
     connect(mUi->btStartStop, &QPushButton::clicked, this, &ActivityWidget::onBtStartStopClicked);
     connect(&mSecondTimer, &QTimer::timeout, this, &ActivityWidget::onSecondTimeout);
 
@@ -40,9 +48,15 @@ void ActivityWidget::refresh()
     mUi->cbCustomer->clear();
 
     // reset client
-    mClient = helpers::createClient();
-    if (mClient)
+    auto settings = Settings::load();
+    if (settings.isReady())
     {
+        mClient.reset(new KimaiClient);
+
+        mClient->setHost(settings.kimai.host);
+        mClient->setUsername(settings.kimai.username);
+        mClient->setToken(settings.kimai.token);
+
         connect(mClient.data(), &KimaiClient::requestError, this, &ActivityWidget::onClientError);
         connect(mClient.data(), &KimaiClient::replyReceived, this, &ActivityWidget::onClientReply);
 
@@ -67,6 +81,9 @@ void ActivityWidget::onClientError(const QString& errorMsg)
 
 void ActivityWidget::onClientReply(const KimaiReply& reply)
 {
+    if (not reply.isValid())
+        return;
+
     switch (reply.method())
     {
     case ApiMethod::MeUsers: {
@@ -75,35 +92,67 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
     break;
 
     case ApiMethod::Customers: {
-        mUi->cbCustomer->addItem("");
-
-        for (const auto& customer : reply.get<Customers>())
-            mUi->cbCustomer->addItem(customer.name, customer.id);
+        const auto& customers = reply.get<Customers>();
+        if (not customers.isEmpty())
+        {
+            mUi->cbCustomer->clear();
+            mUi->cbCustomer->addItem("");
+            for (const auto& customer : customers)
+                mUi->cbCustomer->addItem(customer.name, customer.id);
+        }
 
         if (mCurrentTimeSheet)
             mUi->cbCustomer->setCurrentText(mCurrentTimeSheet->project.customer.name);
     }
     break;
 
-    case ApiMethod::Projects: {
-        mUi->cbProject->addItem("");
+    case ApiMethod::CustomerAdd: {
+        const auto& customer = reply.get<Customer>();
+        mUi->cbCustomer->addItem(customer.name, customer.id);
+    }
+    break;
 
-        for (const auto& project : reply.get<Projects>())
-            mUi->cbProject->addItem(project.name, project.id);
+    case ApiMethod::Projects: {
+        const auto& projects = reply.get<Projects>();
+        if (not projects.isEmpty())
+        {
+            mUi->cbProject->clear();
+            mUi->cbProject->addItem("");
+
+            for (const auto& project : projects)
+                mUi->cbProject->addItem(project.name, project.id);
+        }
 
         if (mCurrentTimeSheet)
             mUi->cbProject->setCurrentText(mCurrentTimeSheet->project.name);
     }
     break;
 
-    case ApiMethod::Activities: {
-        mUi->cbActivity->addItem("");
+    case ApiMethod::ProjectAdd: {
+        const auto& project = reply.get<Project>();
+        mUi->cbProject->addItem(project.name, project.id);
+    }
+    break;
 
-        for (const auto& activity : reply.get<Activities>())
-            mUi->cbActivity->addItem(activity.name, activity.id);
+    case ApiMethod::Activities: {
+        const auto& activites = reply.get<Activities>();
+        if (not activites.isEmpty())
+        {
+            mUi->cbActivity->clear();
+            mUi->cbActivity->addItem("");
+
+            for (const auto& activity : activites)
+                mUi->cbActivity->addItem(activity.name, activity.id);
+        }
 
         if (mCurrentTimeSheet)
             mUi->cbActivity->setCurrentText(mCurrentTimeSheet->activity.name);
+    }
+    break;
+
+    case ApiMethod::ActivityAdd: {
+        const auto& activity = reply.get<Activity>();
+        mUi->cbActivity->addItem(activity.name, activity.id);
     }
     break;
 
@@ -162,6 +211,7 @@ void ActivityWidget::onCbCustomerTextChanged(const QString& text)
         auto customerId = mUi->cbCustomer->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::projects(customerId));
     }
+    updateControls();
 }
 
 void ActivityWidget::onCbProjectTextChanged(const QString& text)
@@ -173,6 +223,7 @@ void ActivityWidget::onCbProjectTextChanged(const QString& text)
         auto projectId = mUi->cbProject->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::activities(projectId));
     }
+    updateControls();
 }
 
 void ActivityWidget::onCbActivityTextChanged(const QString& text)
@@ -181,6 +232,45 @@ void ActivityWidget::onCbActivityTextChanged(const QString& text)
     {
         mUi->pteDescription->clear();
         mUi->leTags->clear();
+    }
+}
+
+void ActivityWidget::onTbAddCustomerClicked()
+{
+    auto dialog = CustomerDialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        const auto& customer = dialog.customer();
+        mClient->sendRequest(KimaiRequestFactory::customerAdd(customer));
+    }
+}
+
+void ActivityWidget::onTbAddProjectClicked()
+{
+    auto dialog = ProjectDialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        auto project        = dialog.project();
+        project.customer.id = mUi->cbCustomer->currentData().toInt();
+        mClient->sendRequest(KimaiRequestFactory::projectAdd(project));
+    }
+}
+
+void ActivityWidget::onTbAddActivityClicked()
+{
+    auto dialog = ActivityDialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        auto activity = dialog.activity();
+        if (not mUi->cbCustomer->currentText().isEmpty())
+        {
+            Project project;
+            project.customer.id = mUi->cbCustomer->currentData().toInt();
+            project.id          = mUi->cbProject->currentData().toInt();
+
+            activity.project = project;
+        }
+        mClient->sendRequest(KimaiRequestFactory::activityAdd(activity));
     }
 }
 
@@ -222,13 +312,7 @@ void ActivityWidget::onBtStartStopClicked()
         auto projectId  = mUi->cbProject->currentData().toInt();
         auto activityId = mUi->cbActivity->currentData().toInt();
         auto desc       = mUi->pteDescription->toPlainText();
-
-        // FixMe: Until Ubuntu provides a more recent Qt version.
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-        auto tags = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
-#else
-        auto tags = mUi->leTags->text().split(',', QString::SkipEmptyParts);
-#endif
+        auto tags       = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
 
         mClient->sendRequest(KimaiRequestFactory::startTimeSheet(projectId, activityId, beginAt, desc, tags));
     }
@@ -241,15 +325,20 @@ void ActivityWidget::updateControls()
     mUi->cbProject->setEnabled(enable);
     mUi->cbActivity->setEnabled(enable);
 
+    mUi->tbAddCustomer->setEnabled(enable);
+    mUi->tbAddProject->setEnabled(enable && !mUi->cbCustomer->currentText().isEmpty());
+
+    bool projectOk = mUi->cbCustomer->currentText().isEmpty() or
+                     (not mUi->cbCustomer->currentText().isEmpty() and not mUi->cbProject->currentText().isEmpty());
+    mUi->tbAddActivity->setEnabled(enable && projectOk);
+
     if (enable)
     {
-        mUi->btStartStop->setText(tr("Start"));
         mUi->btStartStop->setIcon(QIcon(":/icons/play"));
         mUi->lbDurationTime->clear();
     }
     else
     {
-        mUi->btStartStop->setText(tr("Stop"));
         mUi->btStartStop->setIcon(QIcon(":/icons/stop"));
     }
 

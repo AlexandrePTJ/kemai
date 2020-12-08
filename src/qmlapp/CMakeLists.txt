@@ -39,5 +39,5 @@ target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME}
-        KemaiCore KemaiClient KemaiUpdater
-        Qt5::Widgets Qt5::Quick)
+        KemaiCore
+        Qt::Widgets Qt::Quick)

@@ -1,4 +1,4 @@
-#include "kemai/kimairequestfactory.h"
+#include "kimairequestfactory.h"
 
 #include "parser.h"
 
@@ -21,7 +21,7 @@ KimaiRequest KimaiRequestFactory::customers()
 
 KimaiRequest KimaiRequestFactory::customerAdd(const Customer& customer)
 {
-    auto krq = KimaiRequest(ApiMethod::Customers, HttpVerb::Post);
+    auto krq = KimaiRequest(ApiMethod::CustomerAdd, HttpVerb::Post);
 
     auto jsData = parser::toJson(customer);
     krq.setData(parser::toPostData(jsData));
@@ -38,7 +38,7 @@ KimaiRequest KimaiRequestFactory::projects(int customerId)
 
 KimaiRequest KimaiRequestFactory::projectAdd(const Project& project)
 {
-    auto krq = KimaiRequest(ApiMethod::Projects, HttpVerb::Post);
+    auto krq = KimaiRequest(ApiMethod::ProjectAdd, HttpVerb::Post);
 
     auto jsData = parser::toJson(project);
     krq.setData(parser::toPostData(jsData));
@@ -55,7 +55,7 @@ KimaiRequest KimaiRequestFactory::activities(int projectId)
 
 KimaiRequest KimaiRequestFactory::activityAdd(const Activity& activity)
 {
-    auto krq = KimaiRequest(ApiMethod::Activities, HttpVerb::Post);
+    auto krq = KimaiRequest(ApiMethod::ActivityAdd, HttpVerb::Post);
 
     auto jsData = parser::toJson(activity);
     krq.setData(parser::toPostData(jsData));

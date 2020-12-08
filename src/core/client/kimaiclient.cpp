@@ -1,11 +1,7 @@
-#include "kemai/kimaiclient.h"
+#include "kimaiclient.h"
 #include "kimaiclient_p.h"
 
-#include "kemai/settings.h"
-
 #include <spdlog/spdlog.h>
-
-#include <QMessageBox>
 
 using namespace kemai::client;
 
@@ -62,26 +58,25 @@ void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* reply, const
     }
 
     // Process certificate errors one by one.
-    const auto crtError       = errors.first();
-    const auto certificateSN  = crtError.certificate().serialNumber();
-    const auto certificatePem = crtError.certificate().toPem();
-    const auto errStr         = crtError.errorString();
+    const auto crtError = errors.first();
+    emit mQ->sslError(crtError.errorString(), crtError.certificate().serialNumber(), crtError.certificate().toPem());
 
-    auto res =
-        QMessageBox::question(nullptr, "SSL Errors",
-                              tr("Following certificate generates an error: \n%1\n%2\nAdd to trusted certificates ?")
-                                  .arg(QString(certificateSN))
-                                  .arg(errStr));
-
-    if (res == QMessageBox::Yes)
-    {
-        reply->ignoreSslErrors({crtError});
-        KimaiClient::addTrustedCertificates({certificatePem});
-
-        auto settings = core::Settings::load();
-        settings.kimai.trustedCertificates << certificatePem;
-        core::Settings::save(settings);
-    }
+    //    auto res =
+    //        QMessageBox::question(nullptr, "SSL Errors",
+    //                              tr("Following certificate generates an error: \n%1\n%2\nAdd to trusted certificates
+    //                              ?")
+    //                                  .arg(QString(certificateSN))
+    //                                  .arg(errStr));
+    //
+    //    if (res == QMessageBox::Yes)
+    //    {
+    //        reply->ignoreSslErrors({crtError});
+    //        KimaiClient::addTrustedCertificates({certificatePem});
+    //
+    //        auto settings = core::Settings::load();
+    //        settings.kimai.trustedCertificates << certificatePem;
+    //        core::Settings::save(settings);
+    //    }
 }
 
 /*

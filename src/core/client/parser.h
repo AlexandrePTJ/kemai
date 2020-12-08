@@ -3,7 +3,7 @@
 #include <QJsonObject>
 #include <QVariant>
 
-#include "kemai/kimaiapi.h"
+#include "kimaiapi.h"
 
 namespace kemai::client::parser {
 

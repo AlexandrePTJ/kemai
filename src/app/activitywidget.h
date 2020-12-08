@@ -3,7 +3,7 @@
 #include <QTimer>
 #include <QWidget>
 
-#include "kemai/kimaiclient.h"
+#include "client/kimaiclient.h"
 
 namespace Ui {
 class ActivityWidget;
@@ -30,6 +30,10 @@ private slots:
     void onCbProjectTextChanged(const QString& text);
     void onCbActivityTextChanged(const QString& text);
 
+    void onTbAddCustomerClicked();
+    void onTbAddProjectClicked();
+    void onTbAddActivityClicked();
+
     void onBtStartStopClicked();
 
     void onSecondTimeout();
@@ -42,7 +46,7 @@ signals:
 private:
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;
-    QSharedPointer<client::KimaiClient> mClient;
+    QScopedPointer<client::KimaiClient> mClient;
     QScopedPointer<client::TimeSheet> mCurrentTimeSheet;
     QScopedPointer<client::User> mMe;
 };

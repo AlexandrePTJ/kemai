@@ -8,7 +8,6 @@ set(SRCS
         customerdialog.cpp
         datareader.cpp
         durationedit.cpp
-        helpers.cpp
         main.cpp
         mainwindow.cpp
         projectdialog.cpp
@@ -20,7 +19,6 @@ set(HDRS
         customerdialog.h
         datareader.h
         durationedit.h
-        helpers.h
         mainwindow.h
         projectdialog.h
         settingswidget.h)
@@ -47,4 +45,4 @@ endif ()
 
 target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX} ${KEMAI_ICNS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets KemaiCore KemaiClient KemaiUpdater)
+target_link_libraries(${PROJECT_NAME} Qt::Widgets KemaiCore)

@@ -9,7 +9,7 @@ include(FetchContent)
 FetchContent_Declare(
         spdlog
         GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.6.1)
+        GIT_TAG v1.8.1)
 FetchContent_GetProperties(spdlog)
 if (NOT spdlog_POPULATED)
     FetchContent_Populate(spdlog)
@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_definitions(UNICODE _UNICODE)
 
 # Setup Qt
-find_package(Qt5 COMPONENTS Widgets Network CONFIG REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Network Quick CONFIG REQUIRED)
 
 # Common package configuration
 set(KEMAI_GUID "88815E44-85A0-469C-9740-B4887D456BAA")
