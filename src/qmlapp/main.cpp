@@ -1,5 +1,10 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
+
+#include "settingsviewbridge.h"
+
+using namespace kemai::qmlapp;
 
 int main(int argc, char* argv[])
 {
@@ -7,8 +12,14 @@ int main(int argc, char* argv[])
 
     QGuiApplication app(argc, argv);
     app.setApplicationName("Kemai");
+    app.setOrganizationName("Kemai");
+
+    SettingsViewBridge settingsViewBridge;
 
     QQmlApplicationEngine engine;
+
+    engine.rootContext()->setContextProperty("settingsViewBridge", &settingsViewBridge);
+
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated, &app,

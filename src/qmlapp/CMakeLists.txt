@@ -19,12 +19,15 @@ else ()
 endif ()
 
 set(SRCS
-        main.cpp)
+        main.cpp
+        settingsviewbridge.cpp)
 
-set(HDRS)
+set(HDRS
+    settingsviewbridge.h)
 
 set(RESX
-        qml/qml.qrc)
+        qml/qml.qrc
+        resources/resources.qrc)
 
 if (WIN32)
     list(APPEND SRCS ${CMAKE_SOURCE_DIR}/bundle/windows/kemai.rc)

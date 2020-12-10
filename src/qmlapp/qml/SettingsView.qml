@@ -4,6 +4,9 @@ import QtQuick.Layouts 1.15
 
 Item {
 
+    signal saveActivated()
+    signal cancelActivated()
+
     ColumnLayout {
 
         anchors.fill: parent
@@ -21,6 +24,8 @@ Item {
             }
             TextField {
                 placeholderText: qsTr("Host")
+                text: settingsViewBridge.host
+                onTextChanged: settingsViewBridge.host = text;
                 Layout.fillWidth: true
             }
             Label {
@@ -28,6 +33,8 @@ Item {
             }
             TextField {
                 placeholderText: qsTr("Username")
+                text: settingsViewBridge.username
+                onTextChanged: settingsViewBridge.username = text;
                 Layout.fillWidth: true
             }
             Label {
@@ -35,6 +42,8 @@ Item {
             }
             TextField {
                 placeholderText: qsTr("Token")
+                text: settingsViewBridge.token
+                onTextChanged: settingsViewBridge.token = text;
                 Layout.fillWidth: true
             }
             CheckBox {
@@ -43,29 +52,44 @@ Item {
             }
         }
 
-        Item {
+        Item { Layout.fillHeight: true }
+
+        Label {
+            id: testResult
+            wrapMode: Text.Wrap
 
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.alignment: Qt.AlignBottom
+        }
 
-            RowLayout {
+        RowLayout {
 
-                anchors.fill: parent
+            Layout.fillWidth: true
 
-                Button {
-                    text: qsTr("Test")
+            Button {
+                text: qsTr("Test")
+                onClicked: {
+                    testResult.text = "";
+                    settingsViewBridge.test();
                 }
-//                Item { Layout.fillWidth: true }
-//                Button {
-//                    text: qsTr("Cancel")
-//                    Layout.alignment: Qt.AlignRight
-//                }
-//                Button {
-//                    text: qsTr("Save")
-//                    Layout.alignment: Qt.AlignRight
-//                }
             }
+            Item { Layout.fillWidth: true }
+            Button {
+                text: qsTr("Cancel")
+                Layout.alignment: Qt.AlignRight
+                onClicked: cancelActivated()
+            }
+            Button {
+                text: qsTr("Save")
+                Layout.alignment: Qt.AlignRight
+                onClicked: saveActivated()
+            }
+        }
+    }
+
+    Connections {
+        target: settingsViewBridge
+        function onTestFinished(ok, message) {
+            testResult.text = message;
         }
     }
 }

@@ -1,5 +1,5 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick 2.12
+import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
 ApplicationWindow {
@@ -7,19 +7,37 @@ ApplicationWindow {
     height: 480
     visible: true
 
-    ColumnLayout {
-
-        anchors.fill: parent
-
-        ActivityView {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.margins: 10
+    header: ToolBar {
+        RowLayout {
+            anchors.fill: parent
+            ToolButton {
+                icon.source: "qrc:/icons/settings.svg"
+                onClicked: settingsDrawer.visible = true
+            }
+            Item { Layout.fillWidth: true }
+            ToolButton {
+                icon.source: "qrc:/icons/refresh.svg"
+            }
         }
+    }
 
-//        SettingsView {
-//            Layout.fillWidth: true
-//            Layout.fillHeight: true
-//        }
+    ActivityView {
+        anchors.fill: parent
+        anchors.margins: 5
+    }
+
+    Drawer {
+        id: settingsDrawer
+        width: parent.width
+        height: parent.height - header.height
+        y: header.height
+
+        SettingsView {
+            anchors.fill: parent
+            anchors.margins: 5
+
+            onSaveActivated: settingsDrawer.visible = false
+            onCancelActivated: settingsDrawer.visible = false
+        }
     }
 }
