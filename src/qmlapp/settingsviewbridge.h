@@ -35,6 +35,7 @@ signals:
     void usernameChanged(const QString& username);
     void tokenChanged(const QString& token);
     void testFinished(bool ok, const QString& message);
+    void settingsSaved();
 
 private slots:
     void onClientError(const QString& errorMsg);

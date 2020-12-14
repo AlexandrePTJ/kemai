@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>ActivityView.qml</file>
+        <file>MainView.qml</file>
         <file>SettingsView.qml</file>
         <file>qtquickcontrols2.conf</file>
     </qresource>

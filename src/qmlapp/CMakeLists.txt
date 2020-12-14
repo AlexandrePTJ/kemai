@@ -1,7 +1,5 @@
 project(KemaiQml)
 
-find_package(Qt5 COMPONENTS Quick REQUIRED)
-
 
 #if(ANDROID)
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
@@ -20,10 +18,14 @@ endif ()
 
 set(SRCS
         main.cpp
+        kimaibasedatamodel.cpp
+        kimaiclientbridge.cpp
         settingsviewbridge.cpp)
 
 set(HDRS
-    settingsviewbridge.h)
+        kimaibasedatamodel.h
+        kimaiclientbridge.h
+        settingsviewbridge.h)
 
 set(RESX
         qml/qml.qrc
@@ -43,4 +45,4 @@ target_compile_definitions(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME}
         KemaiCore
-        Qt::Widgets Qt::Quick)
+        Qt::Gui Qt::Quick)

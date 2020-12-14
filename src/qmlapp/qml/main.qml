@@ -12,16 +12,17 @@ ApplicationWindow {
             anchors.fill: parent
             ToolButton {
                 icon.source: "qrc:/icons/settings.svg"
-                onClicked: settingsDrawer.visible = true
+                onClicked: settingsDrawer.visible = !settingsDrawer.visible
             }
             Item { Layout.fillWidth: true }
             ToolButton {
                 icon.source: "qrc:/icons/refresh.svg"
+                onClicked: kimaiClientBridge.refresh()
             }
         }
     }
 
-    ActivityView {
+    MainView {
         anchors.fill: parent
         anchors.margins: 5
     }
@@ -31,6 +32,7 @@ ApplicationWindow {
         width: parent.width
         height: parent.height - header.height
         y: header.height
+        edge: Qt.LeftEdge
 
         SettingsView {
             anchors.fill: parent
@@ -38,6 +40,19 @@ ApplicationWindow {
 
             onSaveActivated: settingsDrawer.visible = false
             onCancelActivated: settingsDrawer.visible = false
+        }
+    }
+
+    Drawer {
+        id: timesheetDrawer
+        width: parent.width
+        height: parent.height - header.height
+        y: header.height
+        edge: Qt.BottomEdge
+
+        ActivityView {
+            anchors.fill: parent
+            anchors.margins: 5
         }
     }
 }
