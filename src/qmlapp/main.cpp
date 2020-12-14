@@ -36,6 +36,8 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("kimaiClientBridge", &kimaiClientBridge);
     engine.rootContext()->setContextProperty("settingsViewBridge", &settingsViewBridge);
     engine.rootContext()->setContextProperty("customerDataModel", kimaiClientBridge.customerDataModel());
+    engine.rootContext()->setContextProperty("projectDataModel", kimaiClientBridge.projectDataModel());
+    engine.rootContext()->setContextProperty("activityDataModel", kimaiClientBridge.activityDataModel());
 
     // load main page
     const QUrl url(QStringLiteral("qrc:/main.qml"));

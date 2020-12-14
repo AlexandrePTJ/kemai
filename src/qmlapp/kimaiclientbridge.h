@@ -19,7 +19,10 @@ public:
     virtual ~KimaiClientBridge() = default;
 
     Q_INVOKABLE void refresh();
-    Q_INVOKABLE QAbstractListModel* customerDataModel();
+
+    QAbstractListModel* customerDataModel();
+    QAbstractListModel* projectDataModel();
+    QAbstractListModel* activityDataModel();
 
     bool timeSheetRunning() const;
 
@@ -37,6 +40,8 @@ private:
     client::KimaiClient mClient;
     QScopedPointer<client::TimeSheet> mCurrentTimeSheet;
     KimaiBaseDataModel<client::Customer> mCustomerDataModel;
+    KimaiBaseDataModel<client::Project> mProjectDataModel;
+    KimaiBaseDataModel<client::Activity> mActivityDataModel;
 };
 
 } // namespace kemai::qmlapp

@@ -29,6 +29,16 @@ QAbstractListModel* KimaiClientBridge::customerDataModel()
     return &mCustomerDataModel;
 }
 
+QAbstractListModel* KimaiClientBridge::projectDataModel()
+{
+    return &mProjectDataModel;
+}
+
+QAbstractListModel* KimaiClientBridge::activityDataModel()
+{
+    return &mActivityDataModel;
+}
+
 bool KimaiClientBridge::timeSheetRunning() const
 {
     return not mCurrentTimeSheet.isNull();
@@ -64,56 +74,13 @@ void KimaiClientBridge::onClientReply(const KimaiReply& reply)
         mCustomerDataModel.setValues(reply.get<Customers>());
         break;
 
-        //
-        //    case ApiMethod::CustomerAdd: {
-        //        const auto& customer = reply.get<Customer>();
-        //        mUi->cbCustomer->addItem(customer.name, customer.id);
-        //    }
-        //    break;
-        //
-        //    case ApiMethod::Projects: {
-        //        const auto& projects = reply.get<Projects>();
-        //        if (not projects.isEmpty())
-        //        {
-        //            mUi->cbProject->clear();
-        //            mUi->cbProject->addItem("");
-        //
-        //            for (const auto& project : projects)
-        //                mUi->cbProject->addItem(project.name, project.id);
-        //        }
-        //
-        //        if (mCurrentTimeSheet)
-        //            mUi->cbProject->setCurrentText(mCurrentTimeSheet->project.name);
-        //    }
-        //    break;
-        //
-        //    case ApiMethod::ProjectAdd: {
-        //        const auto& project = reply.get<Project>();
-        //        mUi->cbProject->addItem(project.name, project.id);
-        //    }
-        //    break;
-        //
-        //    case ApiMethod::Activities: {
-        //        const auto& activites = reply.get<Activities>();
-        //        if (not activites.isEmpty())
-        //        {
-        //            mUi->cbActivity->clear();
-        //            mUi->cbActivity->addItem("");
-        //
-        //            for (const auto& activity : activites)
-        //                mUi->cbActivity->addItem(activity.name, activity.id);
-        //        }
-        //
-        //        if (mCurrentTimeSheet)
-        //            mUi->cbActivity->setCurrentText(mCurrentTimeSheet->activity.name);
-        //    }
-        //    break;
-        //
-        //    case ApiMethod::ActivityAdd: {
-        //        const auto& activity = reply.get<Activity>();
-        //        mUi->cbActivity->addItem(activity.name, activity.id);
-        //    }
-        //    break;
+    case ApiMethod::Projects:
+        mProjectDataModel.setValues(reply.get<Projects>());
+        break;
+
+    case ApiMethod::Activities:
+        mActivityDataModel.setValues(reply.get<Activities>());
+        break;
 
     case ApiMethod::ActiveTimeSheets: {
         const auto& timeSheets = reply.get<TimeSheets>();
