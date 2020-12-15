@@ -4,9 +4,6 @@ import QtQuick.Layouts 1.15
 
 Item {
 
-    signal saveActivated()
-    signal cancelActivated()
-
     ColumnLayout {
 
         anchors.fill: parent
@@ -76,12 +73,15 @@ Item {
             Button {
                 text: qsTr("Cancel")
                 Layout.alignment: Qt.AlignRight
-                onClicked: cancelActivated()
+                onClicked: settingsDrawer.close()
             }
             Button {
                 text: qsTr("Save")
                 Layout.alignment: Qt.AlignRight
-                onClicked: saveActivated()
+                onClicked: {
+                    // TODO: impl save
+                    settingsDrawer.close()
+                }
             }
         }
     }
@@ -90,6 +90,7 @@ Item {
         target: settingsViewBridge
         function onTestFinished(ok, message) {
             testResult.text = message;
+            testResult.color = ok ? "green" : "red";
         }
     }
 }

@@ -13,6 +13,10 @@ KimaiClientBridge::KimaiClientBridge()
 {
     connect(&mClient, &KimaiClient::requestError, this, &KimaiClientBridge::onClientError);
     connect(&mClient, &KimaiClient::replyReceived, this, &KimaiClientBridge::onClientReply);
+    connect(&mSecondTimer, &QTimer::timeout, this, &KimaiClientBridge::timeSheetDurationChanged);
+
+    mSecondTimer.setInterval(1000);
+    mSecondTimer.setTimerType(Qt::PreciseTimer);
 }
 
 void KimaiClientBridge::refresh()
@@ -42,6 +46,20 @@ QAbstractListModel* KimaiClientBridge::activityDataModel()
 bool KimaiClientBridge::timeSheetRunning() const
 {
     return not mCurrentTimeSheet.isNull();
+}
+
+QString KimaiClientBridge::timeSheetDuration() const
+{
+    if (mCurrentTimeSheet)
+    {
+    auto nsecs        = mCurrentTimeSheet->beginAt.secsTo(QDateTime::currentDateTime());
+    auto durationTime = QTime(0, 0).addSecs(nsecs);
+    return durationTime.toString();
+    }
+    else
+    {
+        return "--:--:--";
+    }
 }
 
 void KimaiClientBridge::reloadClientSettings()
@@ -97,12 +115,14 @@ void KimaiClientBridge::onClientReply(const KimaiReply& reply)
             }
 
             mCurrentTimeSheet.reset(new TimeSheet(currentTimeSheet));
-            emit timeSheetRunningChanged(true);
+            mSecondTimer.start();
+            emit timeSheetRunningChanged();
         }
         else if (timeSheets.empty() and not mCurrentTimeSheet)
         {
             mCurrentTimeSheet.reset(nullptr);
-            emit timeSheetRunningChanged(false);
+            mSecondTimer.stop();
+            emit timeSheetRunningChanged();
         }
 
         mClient.sendRequest(KimaiRequestFactory::customers());

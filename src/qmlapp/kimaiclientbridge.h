@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QTimer>
 
 #include "client/kimaiapi.h"
 #include "client/kimaiclient.h"
@@ -13,6 +14,7 @@ class KimaiClientBridge : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool timeSheetRunning READ timeSheetRunning NOTIFY timeSheetRunningChanged)
+    Q_PROPERTY(QString timeSheetDuration READ timeSheetDuration NOTIFY timeSheetDurationChanged)
 
 public:
     KimaiClientBridge();
@@ -25,12 +27,14 @@ public:
     QAbstractListModel* activityDataModel();
 
     bool timeSheetRunning() const;
+    QString timeSheetDuration() const;
 
 public slots:
     void reloadClientSettings();
 
 signals:
-    void timeSheetRunningChanged(bool running);
+    void timeSheetRunningChanged();
+    void timeSheetDurationChanged();
 
 private slots:
     void onClientError(const QString& errorMsg);
@@ -38,6 +42,7 @@ private slots:
 
 private:
     client::KimaiClient mClient;
+    QTimer mSecondTimer;
     QScopedPointer<client::TimeSheet> mCurrentTimeSheet;
     KimaiBaseDataModel<client::Customer> mCustomerDataModel;
     KimaiBaseDataModel<client::Project> mProjectDataModel;
