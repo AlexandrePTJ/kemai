@@ -79,7 +79,8 @@ Item {
                 text: qsTr("Save")
                 Layout.alignment: Qt.AlignRight
                 onClicked: {
-                    // TODO: impl save
+                    settingsViewBridge.save();
+                    kimaiClientBridge.reloadClientSettings();
                     settingsDrawer.close()
                 }
             }

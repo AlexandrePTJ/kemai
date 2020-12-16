@@ -18,14 +18,20 @@ endif ()
 
 set(SRCS
         main.cpp
+        activityfiltermodel.cpp
         kimaibasedatamodel.cpp
         kimaiclientbridge.cpp
-        settingsviewbridge.cpp)
+        projectfiltermodel.cpp
+        settingsviewbridge.cpp
+        timesheetviewbridge.cpp)
 
 set(HDRS
+        activityfiltermodel.h
         kimaibasedatamodel.h
         kimaiclientbridge.h
-        settingsviewbridge.h)
+        projectfiltermodel.h
+        settingsviewbridge.h
+        timesheetviewbridge.h)
 
 set(RESX
         qml/qml.qrc

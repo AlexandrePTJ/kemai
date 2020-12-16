@@ -17,11 +17,14 @@ Item {
             ToolButton { text: "+" }
         }
         ComboBox {
+            id: customerComboBox
             enabled: !kimaiClientBridge.timeSheetRunning
             Layout.fillWidth: true
             model: customerDataModel
             valueRole: "kimaiId"
             textRole: "name"
+
+            onCurrentValueChanged: projectDataModel.customerId = currentValue;
         }
 
         /*
@@ -32,11 +35,14 @@ Item {
             ToolButton { text: "+" }
         }
         ComboBox {
-            enabled: !kimaiClientBridge.timeSheetRunning
+            id: projectComboBox
+            enabled: !kimaiClientBridge.timeSheetRunning && customerComboBox.currentIndex > 0
             Layout.fillWidth: true
             model: projectDataModel
             valueRole: "kimaiId"
             textRole: "name"
+
+            onCurrentValueChanged: activityDataModel.projectId = currentValue;
         }
 
         /*
@@ -47,7 +53,7 @@ Item {
             ToolButton { text: "+" }
         }
         ComboBox {
-            enabled: !kimaiClientBridge.timeSheetRunning
+            enabled: !kimaiClientBridge.timeSheetRunning && projectComboBox.currentIndex >= 0
             Layout.fillWidth: true
             model: activityDataModel
             valueRole: "kimaiId"

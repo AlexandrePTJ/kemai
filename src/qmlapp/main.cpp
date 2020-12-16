@@ -4,6 +4,7 @@
 
 #include "kimaiclientbridge.h"
 #include "settingsviewbridge.h"
+#include "timesheetviewbridge.h"
 
 using namespace kemai::qmlapp;
 
@@ -27,6 +28,10 @@ int main(int argc, char* argv[])
     SettingsViewBridge settingsViewBridge;
     QObject::connect(&settingsViewBridge, &SettingsViewBridge::settingsSaved, &kimaiClientBridge, &KimaiClientBridge::reloadClientSettings);
 
+    TimesheetViewBridge timesheetViewBridge;
+    timesheetViewBridge.setProjectModel(kimaiClientBridge.projectDataModel());
+    timesheetViewBridge.setActivityModel(kimaiClientBridge.activityDataModel());
+
     /*
      * Create QML application
      */
@@ -36,8 +41,8 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("kimaiClientBridge", &kimaiClientBridge);
     engine.rootContext()->setContextProperty("settingsViewBridge", &settingsViewBridge);
     engine.rootContext()->setContextProperty("customerDataModel", kimaiClientBridge.customerDataModel());
-    engine.rootContext()->setContextProperty("projectDataModel", kimaiClientBridge.projectDataModel());
-    engine.rootContext()->setContextProperty("activityDataModel", kimaiClientBridge.activityDataModel());
+    engine.rootContext()->setContextProperty("projectDataModel", timesheetViewBridge.projectFilterModel());
+    engine.rootContext()->setContextProperty("activityDataModel", timesheetViewBridge.activityFilterModel());
 
     // load main page
     const QUrl url(QStringLiteral("qrc:/main.qml"));

@@ -60,7 +60,13 @@ bool fromJson(const QJsonObject& jso, Project& inst)
     safeGetJsonValue("visible", jso, inst.visible);
 
     if (jso.contains("customer"))
-        fromJson(jso.value("customer").toObject(), inst.customer);
+    {
+        const auto& jsvCustomer = jso.value("customer");
+        if (jsvCustomer.isObject())
+            fromJson(jsvCustomer.toObject(), inst.customer);
+        else if (jsvCustomer.isDouble())
+            inst.customer.id = jsvCustomer.toInt();
+    }
 
     return true;
 }
@@ -77,6 +83,17 @@ bool fromJson(const QJsonObject& jso, Activity& inst)
     safeGetJsonValue("budget", jso, inst.budget);
     safeGetJsonValue("timeBudget", jso, inst.timeBudget);
     safeGetJsonValue("visible", jso, inst.visible);
+
+    // handle project-less project
+    if (jso.contains("project"))
+    {
+        if (!jso.value("project").isNull())
+        {
+            Project project;
+            project.id   = jso.value("project").toInt();
+            inst.project = project;
+        }
+    }
 
     return true;
 }

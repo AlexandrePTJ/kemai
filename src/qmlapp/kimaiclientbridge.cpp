@@ -25,6 +25,12 @@ void KimaiClientBridge::refresh()
     // if one is running, it will re-fill combobox one by one, and set correct values
     // else it will only fill customer
     mClient.sendRequest(KimaiRequestFactory::activeTimeSheets());
+
+    mClient.sendRequest(KimaiRequestFactory::customers());
+    mClient.sendRequest(KimaiRequestFactory::projects());
+    mClient.sendRequest(KimaiRequestFactory::activities());
+
+    mClient.sendRequest(KimaiRequestFactory::me());
     mClient.sendRequest(KimaiRequestFactory::tags());
 }
 
@@ -52,9 +58,9 @@ QString KimaiClientBridge::timeSheetDuration() const
 {
     if (mCurrentTimeSheet)
     {
-    auto nsecs        = mCurrentTimeSheet->beginAt.secsTo(QDateTime::currentDateTime());
-    auto durationTime = QTime(0, 0).addSecs(nsecs);
-    return durationTime.toString();
+        auto nsecs        = mCurrentTimeSheet->beginAt.secsTo(QDateTime::currentDateTime());
+        auto durationTime = QTime(0, 0).addSecs(nsecs);
+        return durationTime.toString();
     }
     else
     {
@@ -124,9 +130,6 @@ void KimaiClientBridge::onClientReply(const KimaiReply& reply)
             mSecondTimer.stop();
             emit timeSheetRunningChanged();
         }
-
-        mClient.sendRequest(KimaiRequestFactory::customers());
-        mClient.sendRequest(KimaiRequestFactory::me());
     }
     break;
 
