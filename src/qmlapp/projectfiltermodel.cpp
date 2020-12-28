@@ -17,7 +17,7 @@ void ProjectFilterModel::setCustomerId(int id)
     invalidateFilter();
 }
 
-bool ProjectFilterModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
+bool ProjectFilterModel::filterAcceptsRow(int sourceRow, const QModelIndex&) const
 {
     if (!mCustomerId.has_value())
         return true;
