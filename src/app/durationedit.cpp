@@ -24,14 +24,14 @@ int DurationEdit::seconds() const
     {
         // hours
         auto hourstr = match.captured(1);
-        if (not hourstr.isEmpty())
+        if (!hourstr.isEmpty())
         {
             nsecs += 3600 * hourstr.toInt();
         }
 
         // minutes
         auto minstr = match.captured(3);
-        if (not minstr.isEmpty())
+        if (!minstr.isEmpty())
         {
             nsecs += 60 * minstr.toInt();
         }

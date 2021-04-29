@@ -80,7 +80,7 @@ void ActivityWidget::onClientError(const QString& errorMsg)
 
 void ActivityWidget::onClientReply(const KimaiReply& reply)
 {
-    if (not reply.isValid())
+    if (!reply.isValid())
         return;
 
     switch (reply.method())
@@ -92,7 +92,7 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
 
     case ApiMethod::Customers: {
         const auto& customers = reply.get<Customers>();
-        if (not customers.isEmpty())
+        if (!customers.isEmpty())
         {
             mUi->cbCustomer->clear();
             mUi->cbCustomer->addItem("");
@@ -113,7 +113,7 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
 
     case ApiMethod::Projects: {
         const auto& projects = reply.get<Projects>();
-        if (not projects.isEmpty())
+        if (!projects.isEmpty())
         {
             mUi->cbProject->clear();
             mUi->cbProject->addItem("");
@@ -135,7 +135,7 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
 
     case ApiMethod::Activities: {
         const auto& activites = reply.get<Activities>();
-        if (not activites.isEmpty())
+        if (!activites.isEmpty())
         {
             mUi->cbActivity->clear();
             mUi->cbActivity->addItem("");
@@ -158,7 +158,7 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
     case ApiMethod::ActiveTimeSheets: {
         const auto& timeSheets = reply.get<TimeSheets>();
 
-        if (not timeSheets.empty())
+        if (!timeSheets.empty())
         {
             mCurrentTimeSheet.reset(new TimeSheet(timeSheets.first()));
             mUi->dteStartedAt->setDateTime(mCurrentTimeSheet->beginAt);
@@ -179,7 +179,7 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
 
     case ApiMethod::TimeSheets: {
         auto ts = reply.get<TimeSheet>();
-        if (not ts.endAt.isValid())
+        if (!ts.endAt.isValid())
         {
             mCurrentTimeSheet.reset(new TimeSheet(ts));
             mUi->dteStartedAt->setDateTime(mCurrentTimeSheet->beginAt);
@@ -205,7 +205,7 @@ void ActivityWidget::onCbCustomerTextChanged(const QString& text)
 {
     mUi->cbProject->clear();
 
-    if (not text.isEmpty())
+    if (!text.isEmpty())
     {
         auto customerId = mUi->cbCustomer->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::projects(customerId));
@@ -217,7 +217,7 @@ void ActivityWidget::onCbProjectTextChanged(const QString& text)
 {
     mUi->cbActivity->clear();
 
-    if (not text.isEmpty())
+    if (!text.isEmpty())
     {
         auto projectId = mUi->cbProject->currentData().toInt();
         mClient->sendRequest(KimaiRequestFactory::activities(projectId));
@@ -227,7 +227,7 @@ void ActivityWidget::onCbProjectTextChanged(const QString& text)
 
 void ActivityWidget::onCbActivityTextChanged(const QString& text)
 {
-    if (not mCurrentTimeSheet)
+    if (!mCurrentTimeSheet)
     {
         mUi->pteDescription->clear();
         mUi->leTags->clear();
@@ -261,7 +261,7 @@ void ActivityWidget::onTbAddActivityClicked()
     if (dialog.exec() == QDialog::Accepted)
     {
         auto activity = dialog.activity();
-        if (not mUi->cbCustomer->currentText().isEmpty())
+        if (!mUi->cbCustomer->currentText().isEmpty())
         {
             Project project;
             project.customer.id = mUi->cbCustomer->currentData().toInt();
@@ -295,7 +295,6 @@ void ActivityWidget::onBtStartStopClicked()
     }
     else
     {
-
         auto beginAt = QDateTime::currentDateTime();
 
         // Be sure to use expected timezone
@@ -327,8 +326,8 @@ void ActivityWidget::updateControls()
     mUi->tbAddCustomer->setEnabled(enable);
     mUi->tbAddProject->setEnabled(enable && !mUi->cbCustomer->currentText().isEmpty());
 
-    bool projectOk = mUi->cbCustomer->currentText().isEmpty() or
-                     (not mUi->cbCustomer->currentText().isEmpty() and not mUi->cbProject->currentText().isEmpty());
+    bool projectOk = mUi->cbCustomer->currentText().isEmpty() ||
+                     (!mUi->cbCustomer->currentText().isEmpty() && !mUi->cbProject->currentText().isEmpty());
     mUi->tbAddActivity->setEnabled(enable && projectOk);
 
     if (enable)

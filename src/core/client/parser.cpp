@@ -7,7 +7,7 @@ namespace kemai::client::parser {
 
 bool fromJson(const QJsonObject& jso, KimaiVersion& inst)
 {
-    if (not jso.contains("version"))
+    if (!jso.contains("version"))
         return false;
 
     inst.kimai = jso.value("version").toString();
@@ -17,7 +17,7 @@ bool fromJson(const QJsonObject& jso, KimaiVersion& inst)
 
 bool fromJson(const QJsonObject& jso, Customer& inst)
 {
-    if (not jso.contains("id"))
+    if (!jso.contains("id"))
         return false;
 
     inst.id = jso.value("id").toInt();
@@ -44,7 +44,7 @@ bool fromJson(const QJsonObject& jso, Customer& inst)
 
 bool fromJson(const QJsonObject& jso, Project& inst)
 {
-    if (not jso.contains("id"))
+    if (!jso.contains("id"))
         return false;
 
     inst.id = jso.value("id").toInt();
@@ -73,7 +73,7 @@ bool fromJson(const QJsonObject& jso, Project& inst)
 
 bool fromJson(const QJsonObject& jso, Activity& inst)
 {
-    if (not jso.contains("id"))
+    if (!jso.contains("id"))
         return false;
 
     inst.id = jso.value("id").toInt();
@@ -100,7 +100,7 @@ bool fromJson(const QJsonObject& jso, Activity& inst)
 
 bool fromJson(const QJsonObject& jso, TimeSheet& inst)
 {
-    if (not jso.contains("id"))
+    if (!jso.contains("id"))
         return false;
 
     fromJson(jso.value("project").toObject(), inst.project);
@@ -119,7 +119,7 @@ bool fromJson(const QJsonObject& jso, TimeSheet& inst)
 
 bool fromJson(const QJsonObject& jso, User& inst)
 {
-    if (not jso.contains("id"))
+    if (!jso.contains("id"))
         return false;
 
     inst.id       = jso.value("id").toInt();

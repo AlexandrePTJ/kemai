@@ -25,7 +25,7 @@ public:
         }
     }
 
-    bool isValid() const { return apiMethod != ApiMethod::Undefined and not jsonValue.isNull(); }
+    bool isValid() const { return apiMethod != ApiMethod::Undefined && !jsonValue.isNull(); }
 
     ApiMethod apiMethod;
     QJsonValue jsonValue;

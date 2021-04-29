@@ -40,7 +40,7 @@ void ActivityDialog::enableSave(bool enable)
 void ActivityDialog::validateForm()
 {
     const auto& name  = mUi->leName->text();
-    bool nameOk       = (not name.isEmpty()) and (name.size() > 1);
+    bool nameOk       = (!name.isEmpty()) && (name.size() > 1);
     bool timeBudgetOk = mUi->leTimeBudget->hasAcceptableInput();
-    enableSave(nameOk and timeBudgetOk);
+    enableSave(nameOk && timeBudgetOk);
 }

@@ -175,7 +175,7 @@ void MainWindow::onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason)
 
 void MainWindow::onNewVersionCheckFinished(const VersionDetails& details)
 {
-    if (not details.vn.isNull())
+    if (!details.vn.isNull())
     {
         auto res = QMessageBox::information(
             this, tr("New version available"),

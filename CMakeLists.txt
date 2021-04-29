@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(KemaiProject VERSION 0.5.0 LANGUAGES CXX)
+project(KemaiProject VERSION 0.6.0 LANGUAGES CXX)
 
 # Point CMake to the custom modules
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -38,9 +38,6 @@ if (WIN32)
     if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
         set(OS_BUNDLE WIN32)
     endif ()
-
-    # Enable and/or/... keywords
-    add_compile_options("/permissive-")
 
     # Add Qt libs and installer for windows platform
     include(WinDeployQt)

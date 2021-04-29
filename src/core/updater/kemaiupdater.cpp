@@ -52,7 +52,7 @@ void KemaiUpdater::KemaiUpdaterPrivate::onNamFinished(QNetworkReply* reply)
 
             emit mQ->checkFinished(vd);
         }
-        else if (not silenceIfNoNew)
+        else if (!silenceIfNoNew)
         {
             emit mQ->checkFinished(VersionDetails());
         }

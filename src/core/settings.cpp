@@ -13,7 +13,7 @@ QSettings getQSettingsInstance()
 
 bool Settings::isReady() const
 {
-    return not kimai.host.isEmpty() and not kimai.username.isEmpty() and not kimai.token.isEmpty();
+    return !kimai.host.isEmpty() && !kimai.username.isEmpty() && !kimai.token.isEmpty();
 }
 
 Settings Settings::load()

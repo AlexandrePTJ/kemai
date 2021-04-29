@@ -63,7 +63,7 @@ void SettingsWidget::onClientError(const QString& errorMsg)
 
 void SettingsWidget::onClientReply(const KimaiReply& reply)
 {
-    if (not reply.isValid())
+    if (!reply.isValid())
     {
         mUi->lbTestResult->setText(tr("Invalid reply."));
     }

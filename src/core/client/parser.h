@@ -10,7 +10,7 @@ namespace kemai::client::parser {
 template<typename T> void safeGetJsonValue(const QString& key, const QJsonObject& obj, T& dest)
 {
     auto jsval = obj.value(key);
-    if (not jsval.isUndefined())
+    if (!jsval.isUndefined())
     {
         auto var = jsval.toVariant();
         if (var.canConvert<T>())
