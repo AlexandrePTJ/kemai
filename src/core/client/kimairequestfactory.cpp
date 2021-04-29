@@ -6,17 +6,17 @@ using namespace kemai::client;
 
 KimaiRequest KimaiRequestFactory::version()
 {
-    return std::move(KimaiRequest(ApiMethod::Version));
+    return KimaiRequest(ApiMethod::Version);
 }
 
 KimaiRequest KimaiRequestFactory::me()
 {
-    return std::move(KimaiRequest(ApiMethod::MeUsers));
+    return KimaiRequest(ApiMethod::MeUsers);
 }
 
 KimaiRequest KimaiRequestFactory::customers()
 {
-    return std::move(KimaiRequest(ApiMethod::Customers));
+    return KimaiRequest(ApiMethod::Customers);
 }
 
 KimaiRequest KimaiRequestFactory::customerAdd(const Customer& customer)
@@ -26,14 +26,14 @@ KimaiRequest KimaiRequestFactory::customerAdd(const Customer& customer)
     auto jsData = parser::toJson(customer);
     krq.setData(parser::toPostData(jsData));
 
-    return std::move(krq);
+    return krq;
 }
 
 KimaiRequest KimaiRequestFactory::projects(int customerId)
 {
     auto krq = KimaiRequest(ApiMethod::Projects);
     krq.setParameters({{"customer", QString::number(customerId)}});
-    return std::move(krq);
+    return krq;
 }
 
 KimaiRequest KimaiRequestFactory::projectAdd(const Project& project)
@@ -43,14 +43,14 @@ KimaiRequest KimaiRequestFactory::projectAdd(const Project& project)
     auto jsData = parser::toJson(project);
     krq.setData(parser::toPostData(jsData));
 
-    return std::move(krq);
+    return krq;
 }
 
 KimaiRequest KimaiRequestFactory::activities(int projectId)
 {
     auto krq = KimaiRequest(ApiMethod::Activities);
     krq.setParameters({{"project", QString::number(projectId)}});
-    return std::move(krq);
+    return krq;
 }
 
 KimaiRequest KimaiRequestFactory::activityAdd(const Activity& activity)
@@ -60,7 +60,7 @@ KimaiRequest KimaiRequestFactory::activityAdd(const Activity& activity)
     auto jsData = parser::toJson(activity);
     krq.setData(parser::toPostData(jsData));
 
-    return std::move(krq);
+    return krq;
 }
 
 KimaiRequest KimaiRequestFactory::activeTimeSheets()
@@ -83,17 +83,17 @@ KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, 
     auto jsData = parser::toJson(ts);
     krq.setData(parser::toPostData(jsData));
 
-    return std::move(krq);
+    return krq;
 }
 
 KimaiRequest KimaiRequestFactory::stopTimeSheet(int timeSheetId)
 {
     auto krq = KimaiRequest(ApiMethod::TimeSheets, HttpVerb::Patch);
     krq.setPatchVerb(QString("%1/stop").arg(timeSheetId));
-    return std::move(krq);
+    return krq;
 }
 
 KimaiRequest KimaiRequestFactory::tags()
 {
-    return std::move(KimaiRequest(ApiMethod::Tags));
+    return KimaiRequest(ApiMethod::Tags);
 }
