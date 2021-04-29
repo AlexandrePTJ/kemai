@@ -1,0 +1,13 @@
+Checks: >
+  -*,
+  bugprone-*,
+  modernize-*,
+  -modernize-pass-by-value,
+  -modernize-use-nodiscard,
+  -modernize-use-trailing-return-type,
+  -modernize-redundant-void-arg,
+  performance-*,
+  readability-*
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+FormatStyle: none

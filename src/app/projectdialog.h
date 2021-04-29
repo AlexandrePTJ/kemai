@@ -16,9 +16,8 @@ class ProjectDialog : public QDialog
 
 public:
     ProjectDialog(QWidget* parent = nullptr);
-    ~ProjectDialog();
+    ~ProjectDialog() override;
 
-    void setProject(const client::Project& project);
     client::Project project() const;
 
 private:

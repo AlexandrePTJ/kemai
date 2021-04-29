@@ -13,7 +13,7 @@ class KimaiClient : public QObject
 
 public:
     explicit KimaiClient(QObject* parent = nullptr);
-    virtual ~KimaiClient();
+    ~KimaiClient() override;
 
     void setHost(const QString& host);
     void setUsername(const QString& username);

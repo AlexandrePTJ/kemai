@@ -1,8 +1,6 @@
 #include "projectdialog.h"
 #include "ui_projectdialog.h"
 
-#include "client/kimairequestfactory.h"
-
 #include <QPushButton>
 #include <QTimer>
 
@@ -21,11 +19,6 @@ ProjectDialog::ProjectDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::Pro
 ProjectDialog::~ProjectDialog()
 {
     delete mUi;
-}
-
-void ProjectDialog::setProject(const Project& project)
-{
-    validateForm();
 }
 
 Project ProjectDialog::project() const

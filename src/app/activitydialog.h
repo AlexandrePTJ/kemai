@@ -16,9 +16,8 @@ class ActivityDialog : public QDialog
 
 public:
     ActivityDialog(QWidget* parent = nullptr);
-    ~ActivityDialog();
+    ~ActivityDialog() override;
 
-    void setActivity(const client::Activity& activity);
     client::Activity activity() const;
 
 private:

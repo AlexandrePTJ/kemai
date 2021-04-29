@@ -46,9 +46,9 @@ void KemaiUpdater::KemaiUpdaterPrivate::onNamFinished(QNetworkReply* reply)
         if (newVersion > currentChecksinceVersion)
         {
             VersionDetails vd;
-            vd.vn = newVersion;
+            vd.vn          = newVersion;
             vd.description = jobj.value("body").toString();
-            vd.url = jobj.value("html_url").toString();
+            vd.url         = jobj.value("html_url").toString();
 
             emit mQ->checkFinished(vd);
         }
@@ -64,12 +64,12 @@ void KemaiUpdater::KemaiUpdaterPrivate::onNamFinished(QNetworkReply* reply)
  */
 KemaiUpdater::KemaiUpdater(QObject* parent) : QObject(parent), mD(new KemaiUpdaterPrivate(this)) {}
 
-KemaiUpdater::~KemaiUpdater() {}
+KemaiUpdater::~KemaiUpdater() = default;
 
 void KemaiUpdater::checkAvailableNewVersion(const QVersionNumber& sinceVersion, bool silenceIfNoNew)
 {
     mD->currentChecksinceVersion = sinceVersion;
-    mD->silenceIfNoNew = silenceIfNoNew;
+    mD->silenceIfNoNew           = silenceIfNoNew;
 
     auto rq = mD->prepareGithubRequest("/repos/AlexandrePTJ/kemai/releases/latest");
     mD->networkAccessManager->get(rq);

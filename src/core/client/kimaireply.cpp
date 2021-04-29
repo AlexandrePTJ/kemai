@@ -10,7 +10,7 @@ using namespace kemai::client;
 class KimaiReply::KimaiReplyPrivate
 {
 public:
-    KimaiReplyPrivate() {}
+    KimaiReplyPrivate() = default;
 
     KimaiReplyPrivate(ApiMethod method, const QByteArray& data) : apiMethod(method)
     {
@@ -33,7 +33,7 @@ public:
 
 KimaiReply::KimaiReply(ApiMethod method, const QByteArray& data) : mD(new KimaiReplyPrivate(method, data)) {}
 
-KimaiReply::~KimaiReply() {}
+KimaiReply::~KimaiReply() = default;
 
 KimaiReply::KimaiReply(const KimaiReply& rhs) : mD(new KimaiReplyPrivate)
 {
@@ -41,7 +41,7 @@ KimaiReply::KimaiReply(const KimaiReply& rhs) : mD(new KimaiReplyPrivate)
     mD->jsonValue = rhs.mD->jsonValue;
 }
 
-KimaiReply::KimaiReply(KimaiReply&& rhs) : mD(new KimaiReplyPrivate)
+KimaiReply::KimaiReply(KimaiReply&& rhs) noexcept : mD(new KimaiReplyPrivate)
 {
     mD->apiMethod = rhs.mD->apiMethod;
     mD->jsonValue = std::move(rhs.mD->jsonValue);
@@ -54,7 +54,7 @@ KimaiReply& KimaiReply::operator=(const KimaiReply& rhs)
     return *this;
 }
 
-KimaiReply& KimaiReply::operator=(KimaiReply&& rhs)
+KimaiReply& KimaiReply::operator=(KimaiReply&& rhs) noexcept
 {
     mD->apiMethod = rhs.mD->apiMethod;
     mD->jsonValue = std::move(rhs.mD->jsonValue);

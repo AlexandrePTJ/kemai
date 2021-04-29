@@ -15,7 +15,7 @@ KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c)
     connect(networkAccessManager.data(), &QNetworkAccessManager::sslErrors, this, &KimaiClientPrivate::onNamSslErrors);
 }
 
-QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiRequest& cmd)
+QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiRequest& cmd) const
 {
     QNetworkRequest r;
     r.setUrl(cmd.url(host));
@@ -33,9 +33,8 @@ void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
     {
         if (reply->error() != QNetworkReply::NoError)
         {
-            emit mQ->requestError(tr("Error on request [%1]: %2")
-                                      .arg(apiMethodToString(kimaiRequest->method()))
-                                      .arg(reply->errorString()));
+            emit mQ->requestError(
+                tr("Error on request [%1]: %2").arg(apiMethodToString(kimaiRequest->method()), reply->errorString()));
         }
         else
         {
@@ -50,33 +49,16 @@ void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
     }
 }
 
-void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* reply, const QList<QSslError>& errors)
+void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* /*reply*/, const QList<QSslError>& errors)
 {
-    for (auto error : errors)
+    for (const auto& error : errors)
     {
         spdlog::error("<=== SSL Error: {}", error.errorString().toStdString());
     }
 
     // Process certificate errors one by one.
-    const auto crtError = errors.first();
+    const auto& crtError = errors.first();
     emit mQ->sslError(crtError.errorString(), crtError.certificate().serialNumber(), crtError.certificate().toPem());
-
-    //    auto res =
-    //        QMessageBox::question(nullptr, "SSL Errors",
-    //                              tr("Following certificate generates an error: \n%1\n%2\nAdd to trusted certificates
-    //                              ?")
-    //                                  .arg(QString(certificateSN))
-    //                                  .arg(errStr));
-    //
-    //    if (res == QMessageBox::Yes)
-    //    {
-    //        reply->ignoreSslErrors({crtError});
-    //        KimaiClient::addTrustedCertificates({certificatePem});
-    //
-    //        auto settings = core::Settings::load();
-    //        settings.kimai.trustedCertificates << certificatePem;
-    //        core::Settings::save(settings);
-    //    }
 }
 
 /*
@@ -84,7 +66,7 @@ void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* reply, const
  */
 KimaiClient::KimaiClient(QObject* parent) : QObject(parent), mD(new KimaiClientPrivate(this)) {}
 
-KimaiClient::~KimaiClient() {}
+KimaiClient::~KimaiClient() = default;
 
 void KimaiClient::setHost(const QString& host)
 {
@@ -131,7 +113,7 @@ void KimaiClient::sendRequest(const KimaiRequest& rq)
 void KimaiClient::addTrustedCertificates(const QStringList& trustedCertificates)
 {
     auto sslConfiguration = QSslConfiguration::defaultConfiguration();
-    for (auto pemStr : trustedCertificates)
+    for (const auto& pemStr : trustedCertificates)
     {
         auto certificates = sslConfiguration.caCertificates();
         certificates << QSslCertificate::fromData(pemStr.toLocal8Bit());

@@ -1,8 +1,6 @@
 #include "activitydialog.h"
 #include "ui_activitydialog.h"
 
-#include "client/kimairequestfactory.h"
-
 #include <QPushButton>
 #include <QTimer>
 
@@ -21,11 +19,6 @@ ActivityDialog::ActivityDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::A
 ActivityDialog::~ActivityDialog()
 {
     delete mUi;
-}
-
-void ActivityDialog::setActivity(const Activity& activity)
-{
-    validateForm();
 }
 
 Activity ActivityDialog::activity() const

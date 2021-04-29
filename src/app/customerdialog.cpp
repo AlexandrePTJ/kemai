@@ -37,12 +37,6 @@ CustomerDialog::~CustomerDialog()
     delete mUi;
 }
 
-void CustomerDialog::setCustomer(const Customer& customer)
-{
-    mUi->leName->setText(customer.name);
-    validateForm();
-}
-
 Customer CustomerDialog::customer() const
 {
     Customer customer;

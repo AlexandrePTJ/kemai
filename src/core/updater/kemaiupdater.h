@@ -19,7 +19,7 @@ class KemaiUpdater : public QObject
 
 public:
     explicit KemaiUpdater(QObject* parent = nullptr);
-    virtual ~KemaiUpdater();
+    ~KemaiUpdater() override;
 
     void checkAvailableNewVersion(const QVersionNumber& sinceVersion = QVersionNumber(0, 0, 0),
                                   bool silenceIfNoNew                = false);

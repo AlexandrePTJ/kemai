@@ -8,7 +8,6 @@
 
 #include "client/kimairequestfactory.h"
 
-#include <QInputDialog>
 #include <QTimeZone>
 
 #include <spdlog/spdlog.h>
@@ -39,7 +38,7 @@ ActivityWidget::~ActivityWidget()
 {
     mSecondTimer.stop();
     delete mUi;
-};
+}
 
 void ActivityWidget::refresh()
 {

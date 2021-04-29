@@ -16,9 +16,8 @@ class CustomerDialog : public QDialog
 
 public:
     CustomerDialog(QWidget* parent = nullptr);
-    ~CustomerDialog();
+    ~CustomerDialog() override;
 
-    void setCustomer(const client::Customer& customer);
     client::Customer customer() const;
 
 private:

@@ -12,7 +12,7 @@ DurationEdit::DurationEdit(QWidget* parent) : QLineEdit(parent), mDurationRx("^(
 
 void DurationEdit::setSeconds(int seconds)
 {
-    setText(QString("%1:%2").arg(seconds / 3600).arg(seconds % 3600));
+    setText(QString("%1:%2").arg(seconds / 3600, seconds % 3600));
 }
 
 int DurationEdit::seconds() const

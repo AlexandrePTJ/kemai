@@ -51,7 +51,7 @@ KimaiRequest& KimaiRequest::operator=(KimaiRequest&& rhs) noexcept
     return *this;
 }
 
-KimaiRequest::~KimaiRequest() {}
+KimaiRequest::~KimaiRequest() = default;
 
 ApiMethod KimaiRequest::method() const
 {

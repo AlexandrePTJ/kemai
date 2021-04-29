@@ -16,7 +16,7 @@ class KimaiClient::KimaiClientPrivate : public QObject
 public:
     explicit KimaiClientPrivate(KimaiClient* c);
 
-    QNetworkRequest prepareRequest(const KimaiRequest& cmd);
+    QNetworkRequest prepareRequest(const KimaiRequest& cmd) const;
 
 public:
     QString username, host, token;

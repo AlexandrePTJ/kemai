@@ -179,7 +179,7 @@ void MainWindow::onNewVersionCheckFinished(const VersionDetails& details)
     {
         auto res = QMessageBox::information(
             this, tr("New version available"),
-            tr("Version %1 is available.\n\n%2").arg(details.vn.toString()).arg(details.description),
+            tr("Version %1 is available.\n\n%2").arg(details.vn.toString(), details.description),
             QMessageBox::Open | QMessageBox::Ignore | QMessageBox::Cancel, QMessageBox::Open);
 
         switch (res)

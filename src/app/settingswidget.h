@@ -16,7 +16,7 @@ class SettingsWidget : public QWidget
 
 public:
     SettingsWidget(QWidget* parent = nullptr);
-    ~SettingsWidget();
+    ~SettingsWidget() override;
 
     void setActivityWidgetIndex(int idx);
 

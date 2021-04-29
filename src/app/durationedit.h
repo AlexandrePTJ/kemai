@@ -12,7 +12,7 @@ class DurationEdit : public QLineEdit
 
 public:
     DurationEdit(QWidget* parent = nullptr);
-    ~DurationEdit() = default;
+    ~DurationEdit() override = default;
 
     void setSeconds(int seconds);
     int seconds() const;

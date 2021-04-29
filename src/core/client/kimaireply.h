@@ -14,10 +14,10 @@ public:
     virtual ~KimaiReply();
 
     KimaiReply(const KimaiReply& rhs);
-    KimaiReply(KimaiReply&& rhs);
+    KimaiReply(KimaiReply&& rhs) noexcept;
 
     KimaiReply& operator=(const KimaiReply& rhs);
-    KimaiReply& operator=(KimaiReply&& rhs);
+    KimaiReply& operator=(KimaiReply&& rhs) noexcept;
 
     ApiMethod method() const;
 

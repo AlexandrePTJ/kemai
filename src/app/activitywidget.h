@@ -17,7 +17,7 @@ class ActivityWidget : public QWidget
 
 public:
     ActivityWidget(QWidget* parent = nullptr);
-    ~ActivityWidget();
+    ~ActivityWidget() override;
 
 public slots:
     void refresh();
