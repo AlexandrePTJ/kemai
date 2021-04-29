@@ -44,6 +44,10 @@ int main(int argc, char* argv[])
     qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     app.installTranslator(&qtTranslator);
 
+    QTranslator appTranslator;
+    appTranslator.load(QLocale::system(), "kemai", "_", ":/l10n");
+    app.installTranslator(&appTranslator);
+
     // Setup trusted certificates
     auto kemaiSettings = Settings::load();
     KimaiClient::addTrustedCertificates(kemaiSettings.kimai.trustedCertificates);
