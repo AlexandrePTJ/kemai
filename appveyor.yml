@@ -21,6 +21,7 @@ for:
 
     build_script:
       - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/5.15.2/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
+      - cmake --build build --target l10n-qrc
       - cmake --build build
 
     after_build:
@@ -58,11 +59,12 @@ for:
 
     build_script:
       - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/5.15.2/clang_64
-      - cmake --build build --config Release
+      - cmake --build build --target l10n-qrc
+      - cmake --build build
 
     after_build:
       - $HOME/Qt/5.15.2/clang_64/bin/macdeployqt build/src/app/Kemai.app
-      - cmake --build build --config Release --target package
+      - cmake --build build --target package
 
     artifacts:
       - path: build/Kemai-*.dmg
