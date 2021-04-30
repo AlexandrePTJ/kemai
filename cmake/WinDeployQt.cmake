@@ -55,7 +55,7 @@ function(windeployqt target directory)
         "
             )
     set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/${directory})
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ${directory})
     include(InstallRequiredSystemLibraries)
 
 endfunction()
