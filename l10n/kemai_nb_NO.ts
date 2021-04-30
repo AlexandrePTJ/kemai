@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr_FR">
+<TS version="2.1" language="nb_NO">
 <context>
     <name>ActivityDialog</name>
     <message>
         <location filename="../src/app/activitydialog.ui" line="14"/>
         <source>Activity</source>
-        <translation>Activité</translation>
+        <translation>Aktivitet</translation>
     </message>
     <message>
         <location filename="../src/app/activitydialog.ui" line="25"/>
@@ -16,17 +16,17 @@
     <message>
         <location filename="../src/app/activitydialog.ui" line="35"/>
         <source>Budget</source>
-        <translation>Budget</translation>
+        <translation>Budsjett</translation>
     </message>
     <message>
         <location filename="../src/app/activitydialog.ui" line="62"/>
         <source>Name</source>
-        <translation>Nom</translation>
+        <translation>Navn</translation>
     </message>
     <message>
         <location filename="../src/app/activitydialog.ui" line="85"/>
         <source>Time Budget</source>
-        <translation>Budget horaire</translation>
+        <translation>Tidsbudsjett</translation>
     </message>
 </context>
 <context>
@@ -34,44 +34,44 @@
     <message>
         <location filename="../src/app/activitywidget.ui" line="14"/>
         <source>ActivityWidget</source>
-        <translation>ActivityWidget</translation>
+        <translation>AktivitetsMiniprogram</translation>
     </message>
     <message>
         <location filename="../src/app/activitywidget.ui" line="29"/>
         <source>Customer</source>
-        <translation>Client</translation>
+        <translation>Kunde</translation>
     </message>
     <message>
         <location filename="../src/app/activitywidget.ui" line="60"/>
         <location filename="../src/app/activitywidget.ui" line="110"/>
         <location filename="../src/app/activitywidget.ui" line="160"/>
         <source>...</source>
-        <translation>...</translation>
+        <translation type="unfinished">…</translation>
     </message>
     <message>
         <location filename="../src/app/activitywidget.ui" line="79"/>
         <source>Project</source>
-        <translation>Projet</translation>
+        <translation>Prosjekt</translation>
     </message>
     <message>
         <location filename="../src/app/activitywidget.ui" line="129"/>
         <source>Activity</source>
-        <translation>Activité</translation>
+        <translation>Aktivitet</translation>
     </message>
     <message>
         <location filename="../src/app/activitywidget.ui" line="173"/>
         <source>Description</source>
-        <translation>Description</translation>
+        <translation>Beskrivelse</translation>
     </message>
     <message>
         <location filename="../src/app/activitywidget.ui" line="183"/>
         <source>Tags</source>
-        <translation>Tags</translation>
+        <translation>Etiketter</translation>
     </message>
     <message>
         <location filename="../src/app/activitywidget.ui" line="222"/>
         <source>Started at</source>
-        <translation>Commencé à</translation>
+        <translation>Startet</translation>
     </message>
     <message>
         <location filename="../src/app/activitywidget.ui" line="234"/>
@@ -84,37 +84,37 @@
     <message>
         <location filename="../src/app/customerdialog.ui" line="14"/>
         <source>Customer</source>
-        <translation>Client</translation>
+        <translation>Kunde</translation>
     </message>
     <message>
         <location filename="../src/app/customerdialog.ui" line="25"/>
         <source>Country</source>
-        <translation>Pays</translation>
+        <translation>Land</translation>
     </message>
     <message>
         <location filename="../src/app/customerdialog.ui" line="55"/>
         <source>Currency</source>
-        <translation>Devise</translation>
+        <translation>Valuta</translation>
     </message>
     <message>
         <location filename="../src/app/customerdialog.ui" line="62"/>
         <source>Name</source>
-        <translation>Nom</translation>
+        <translation>Navn</translation>
     </message>
     <message>
         <location filename="../src/app/customerdialog.ui" line="69"/>
         <source>Time Budget</source>
-        <translation>Budget horaire</translation>
+        <translation>Tidsbudsjett</translation>
     </message>
     <message>
         <location filename="../src/app/customerdialog.ui" line="93"/>
         <source>Timezone</source>
-        <translation>Fuseau horaire</translation>
+        <translation>Tidssone</translation>
     </message>
     <message>
         <location filename="../src/app/customerdialog.ui" line="103"/>
         <source>Budget</source>
-        <translation>Budget</translation>
+        <translation>Budsjett</translation>
     </message>
     <message>
         <location filename="../src/app/customerdialog.ui" line="126"/>
@@ -127,12 +127,12 @@
     <message>
         <location filename="../src/app/mainwindow.ui" line="14"/>
         <source>Kemai - Kimai client</source>
-        <translation>Kemai - client Kimai</translation>
+        <translation>Kemai - Kimai-klient</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.ui" line="48"/>
         <source>Settings...</source>
-        <translation>Paramètres...</translation>
+        <translation type="unfinished">Innstillinger …</translation>
     </message>
 </context>
 <context>
@@ -140,22 +140,22 @@
     <message>
         <location filename="../src/app/projectdialog.ui" line="14"/>
         <source>Project</source>
-        <translation>Projet</translation>
+        <translation>Prosjekt</translation>
     </message>
     <message>
         <location filename="../src/app/projectdialog.ui" line="25"/>
         <source>Name</source>
-        <translation>Nom</translation>
+        <translation>Navn</translation>
     </message>
     <message>
         <location filename="../src/app/projectdialog.ui" line="32"/>
         <source>Budget</source>
-        <translation>Budget</translation>
+        <translation>Budsjett</translation>
     </message>
     <message>
         <location filename="../src/app/projectdialog.ui" line="68"/>
         <source>Time Budget</source>
-        <translation>Budget horaire</translation>
+        <translation>Tidsbudsjett</translation>
     </message>
     <message>
         <location filename="../src/app/projectdialog.ui" line="75"/>
@@ -168,27 +168,27 @@
     <message>
         <location filename="../src/app/settingswidget.ui" line="14"/>
         <source>Settings</source>
-        <translation>Paramètres</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <location filename="../src/app/settingswidget.ui" line="25"/>
         <source>Host</source>
-        <translation>Hôte</translation>
+        <translation>Vert</translation>
     </message>
     <message>
         <location filename="../src/app/settingswidget.ui" line="39"/>
         <source>Username</source>
-        <translation>Utilisateur</translation>
+        <translation>Brukernavn</translation>
     </message>
     <message>
         <location filename="../src/app/settingswidget.ui" line="49"/>
         <source>Token</source>
-        <translation>Jeton</translation>
+        <translation>Symbol</translation>
     </message>
     <message>
         <location filename="../src/app/settingswidget.ui" line="63"/>
         <source>Close to system tray</source>
-        <translation>Fermer dans la barre des tâches</translation>
+        <translation>Lukk til systemkurv</translation>
     </message>
     <message>
         <location filename="../src/app/settingswidget.ui" line="94"/>
@@ -198,12 +198,12 @@
     <message>
         <location filename="../src/app/settingswidget.ui" line="114"/>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <location filename="../src/app/settingswidget.ui" line="121"/>
         <source>Save</source>
-        <translation>Sauvegarder</translation>
+        <translation>Lagre</translation>
     </message>
 </context>
 <context>
@@ -211,61 +211,61 @@
     <message>
         <location filename="../src/app/mainwindow.cpp" line="35"/>
         <source>&amp;Quit</source>
-        <translation>&amp;Quitter</translation>
+        <translation>&amp;Avslutt</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="36"/>
         <source>&amp;Settings</source>
-        <translation>&amp;Paramètres</translation>
+        <translation>&amp;Innstillinger</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="37"/>
         <source>Check for updates...</source>
-        <translation>Vérifier les mises à jour...</translation>
+        <translation type="unfinished">Se etter oppgraderinger …</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="38"/>
         <source>Open Kimai instance</source>
-        <translation>Ouvrir Kimai</translation>
+        <translation type="unfinished">Åpne Kimai-instans</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="58"/>
         <source>&amp;File</source>
-        <translation>&amp;Fichier</translation>
+        <translation>&amp;Fil</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="63"/>
         <source>&amp;Help</source>
-        <translation>&amp;Aide</translation>
+        <translation>&amp;Hjelp</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="68"/>
         <source>About Qt</source>
-        <translation>A propos de Qt</translation>
+        <translation>Om Qt</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="181"/>
         <source>New version available</source>
-        <translation>Nouvelle version disponible</translation>
+        <translation>Ny versjon tilgjengelig</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="182"/>
         <source>Version %1 is available.
 
 %2</source>
-        <translation>Version %1 est disponible.
+        <translation>Versjon %1 er tilgjengelig.
 
 %2</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="204"/>
         <source>No update</source>
-        <translation>Aucune mise à jour</translation>
+        <translation>Ingen oppgradering</translation>
     </message>
     <message>
         <location filename="../src/app/mainwindow.cpp" line="204"/>
         <source>%1 is latest version.</source>
-        <translation>%1 est la dernière version.</translation>
+        <translation>%1 er siste versjon.</translation>
     </message>
 </context>
 <context>
@@ -273,12 +273,12 @@
     <message>
         <location filename="../src/app/settingswidget.cpp" line="68"/>
         <source>Invalid reply.</source>
-        <translation>Réponse invalide.</translation>
+        <translation>Ugyldig svar.</translation>
     </message>
     <message>
         <location filename="../src/app/settingswidget.cpp" line="73"/>
         <source>Connected to Kimai %1</source>
-        <translation>Connecté à Kimai %1</translation>
+        <translation type="unfinished">Tilkoblet til Kimai %1</translation>
     </message>
 </context>
 <context>
@@ -286,12 +286,12 @@
     <message>
         <location filename="../src/core/client/kimaiclient.cpp" line="37"/>
         <source>Error on request [%1]: %2</source>
-        <translation>Erreur sur la requête [%1] : %2</translation>
+        <translation>Feil ved forespørsel [%1]: %2</translation>
     </message>
     <message>
         <location filename="../src/core/client/kimaiclient.cpp" line="48"/>
         <source>Unknown request [%1]</source>
-        <translation>Requête inconnue [%1]</translation>
+        <translation>Ukjent forespørsel [%1]</translation>
     </message>
 </context>
 </TS>
