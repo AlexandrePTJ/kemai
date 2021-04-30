@@ -11,7 +11,7 @@ platform:
 for:
   - matrix:
       only:
-        - image: Ubuntu
+        - image: Ubuntu2004
 
     install:
       - sudo apt update
@@ -55,9 +55,6 @@ for:
   - matrix:
       only:
         - image: macOS
-
-    install:
-      - brew install qt
 
     build_script:
       - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/5.15.2/clang_64
