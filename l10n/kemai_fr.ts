@@ -188,7 +188,7 @@
     <message>
         <location filename="../src/app/settingswidget.ui" line="63"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Langue</translation>
     </message>
     <message>
         <location filename="../src/app/settingswidget.ui" line="70"/>
@@ -278,7 +278,7 @@
     <message>
         <location filename="../src/app/settingswidget.cpp" line="57"/>
         <source>Language changed. Application restart is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>La langue a changé. Le redémarrage de l&apos;application est requis.</translation>
     </message>
     <message>
         <location filename="../src/app/settingswidget.cpp" line="91"/>
