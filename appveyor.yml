@@ -21,7 +21,6 @@ for:
 
     build_script:
       - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/5.15.2/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
-      - cmake --build build --target l10n-qrc
       - cmake --build build
 
     after_build:
@@ -59,7 +58,6 @@ for:
 
     build_script:
       - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/5.15.2/clang_64
-      - cmake --build build --target l10n-qrc
       - cmake --build build
 
     after_build:
