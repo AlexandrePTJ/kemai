@@ -25,13 +25,13 @@ int main(int argc, char* argv[])
     app.setOrganizationName("Kemai");
 
     // Get kemai data directory and log file path
-    auto appDataDir  = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    auto logFilePath = QDir(appDataDir).absoluteFilePath("kemai.log");
+    auto kemaiSettings = Settings::load();
+    auto appDataDir    = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    auto logFilePath   = QDir(appDataDir).absoluteFilePath("kemai.log");
 
     // Init spdlog console and rotating file (3 x 5Mb)
     auto console = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    auto rotfile =
-        std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFilePath.toStdString(), 1024 * 1024 * 5, 3);
+    auto rotfile = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFilePath.toStdString(), 1024 * 1024 * 5, 3);
     std::vector<spdlog::sink_ptr> sinks{console, rotfile};
 
     auto logger = std::make_shared<spdlog::logger>("kemai", sinks.begin(), sinks.end());
@@ -41,15 +41,18 @@ int main(int argc, char* argv[])
 
     // Setup Qt and app translations
     QTranslator qtTranslator;
-    qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    app.installTranslator(&qtTranslator);
+    if (qtTranslator.load("qt_" + kemaiSettings.kemai.language.name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+    {
+        app.installTranslator(&qtTranslator);
+    }
 
     QTranslator appTranslator;
-    appTranslator.load(QLocale::system(), "kemai", "_", ":/l10n");
-    app.installTranslator(&appTranslator);
+    if (appTranslator.load(kemaiSettings.kemai.language, "kemai", "_", ":/l10n"))
+    {
+        app.installTranslator(&appTranslator);
+    }
 
     // Setup trusted certificates
-    auto kemaiSettings = Settings::load();
     KimaiClient::addTrustedCertificates(kemaiSettings.kimai.trustedCertificates);
 
     // Startup

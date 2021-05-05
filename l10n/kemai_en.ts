@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="bn_BD">
+<TS version="2.1" language="en_US">
 <context>
     <name>ActivityDialog</name>
     <message>
@@ -187,21 +187,26 @@
     </message>
     <message>
         <location filename="../src/app/settingswidget.ui" line="63"/>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/app/settingswidget.ui" line="70"/>
         <source>Close to system tray</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/app/settingswidget.ui" line="94"/>
+        <location filename="../src/app/settingswidget.ui" line="104"/>
         <source>Test</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/app/settingswidget.ui" line="114"/>
+        <location filename="../src/app/settingswidget.ui" line="124"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/app/settingswidget.ui" line="121"/>
+        <location filename="../src/app/settingswidget.ui" line="131"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
@@ -269,12 +274,17 @@
 <context>
     <name>kemai::app::SettingsWidget</name>
     <message>
-        <location filename="../src/app/settingswidget.cpp" line="68"/>
+        <location filename="../src/app/settingswidget.cpp" line="57"/>
+        <source>Language changed. Application restart is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/app/settingswidget.cpp" line="91"/>
         <source>Invalid reply.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/app/settingswidget.cpp" line="73"/>
+        <location filename="../src/app/settingswidget.cpp" line="96"/>
         <source>Connected to Kimai %1</source>
         <translation type="unfinished"></translation>
     </message>

@@ -5,25 +5,37 @@
 #include "settings.h"
 
 #include <QAction>
+#include <QDir>
+#include <QMessageBox>
 #include <QStackedWidget>
+#include <QTranslator>
 
 using namespace kemai::app;
 using namespace kemai::client;
 using namespace kemai::core;
 
-SettingsWidget::SettingsWidget(QWidget* parent)
-    : QWidget(parent), mUi(new Ui::SettingsWidget), mKimaiClient(new KimaiClient)
+SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::SettingsWidget), mKimaiClient(new KimaiClient)
 {
     mUi->setupUi(this);
-    loadSettings();
+
+    mActToggleTokenVisible = mUi->leToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
+
+    QDir l10nDir(":/l10n");
+    for (const auto& flang : l10nDir.entryList())
+    {
+        QTranslator translator;
+        if (translator.load(l10nDir.absoluteFilePath(flang), "kemai", "_", ":/l10n"))
+        {
+            QLocale locale(translator.language());
+            mUi->cbLanguage->addItem(QString("%1 [%2]").arg(QLocale::languageToString(locale.language()), QLocale::countryToString(locale.country())), locale);
+        }
+    }
 
     connect(mKimaiClient.data(), &KimaiClient::requestError, this, &SettingsWidget::onClientError);
     connect(mKimaiClient.data(), &KimaiClient::replyReceived, this, &SettingsWidget::onClientReply);
     connect(mUi->btTest, &QPushButton::clicked, this, &SettingsWidget::onBtTestClicked);
     connect(mUi->btCancel, &QPushButton::clicked, this, &SettingsWidget::onBtCancelClicked);
     connect(mUi->btSave, &QPushButton::clicked, this, &SettingsWidget::onBtSaveClicked);
-
-    mActToggleTokenVisible = mUi->leToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
     connect(mActToggleTokenVisible, &QAction::triggered, [&]() {
         if (mUi->leToken->echoMode() == QLineEdit::Password)
         {
@@ -36,6 +48,17 @@ SettingsWidget::SettingsWidget(QWidget* parent)
             mActToggleTokenVisible->setIcon(QIcon(":/icons/visible-off"));
         }
     });
+
+    // show dialog if language changes from settings
+    connect(mUi->cbLanguage, &QComboBox::currentTextChanged, [&](const QString&) {
+        auto settings = Settings::load();
+        if (settings.kemai.language != mUi->cbLanguage->currentData().toLocale())
+        {
+            QMessageBox::warning(this, tr(""), tr("Language changed. Application restart is required."));
+        }
+    });
+
+    loadSettings();
 }
 
 SettingsWidget::~SettingsWidget()
@@ -81,6 +104,12 @@ void SettingsWidget::loadSettings()
     mUi->leUsername->setText(settings.kimai.username);
     mUi->leToken->setText(settings.kimai.token);
     mUi->cbCloseToSystemTray->setChecked(settings.kemai.closeToSystemTray);
+
+    auto idLanguage = mUi->cbLanguage->findData(settings.kemai.language);
+    if (idLanguage >= 0)
+    {
+        mUi->cbLanguage->setCurrentIndex(idLanguage);
+    }
 }
 
 void SettingsWidget::saveSettings()
@@ -90,6 +119,7 @@ void SettingsWidget::saveSettings()
     settings.kimai.username          = mUi->leUsername->text();
     settings.kimai.token             = mUi->leToken->text();
     settings.kemai.closeToSystemTray = mUi->cbCloseToSystemTray->isChecked();
+    settings.kemai.language          = mUi->cbLanguage->currentData().toLocale();
     Settings::save(settings);
 }
 

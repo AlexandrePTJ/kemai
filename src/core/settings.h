@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QLocale>
 #include <QStringList>
 
 namespace kemai::core {
@@ -19,6 +20,7 @@ struct Settings
         bool closeToSystemTray;
         QString ignoredVersion;
         QByteArray geometry;
+        QLocale language;
     } kemai;
 
     bool isReady() const;

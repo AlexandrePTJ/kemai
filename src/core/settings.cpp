@@ -37,6 +37,7 @@ Settings Settings::load()
     settings.kemai.closeToSystemTray = qset.value(kemaiGrpPrefix + "closeToSystemTray", false).toBool();
     settings.kemai.ignoredVersion    = qset.value(kemaiGrpPrefix + "ignoredVersion", "0.0.0").toString();
     settings.kemai.geometry          = qset.value(kemaiGrpPrefix + "geometry").toByteArray();
+    settings.kemai.language          = qset.value(kemaiGrpPrefix + "language", QLocale::system()).toLocale();
 
     return settings;
 }
@@ -51,4 +52,5 @@ void Settings::save(const Settings& settings)
     qset.setValue("kemai/closeToSystemTray", settings.kemai.closeToSystemTray);
     qset.setValue("kemai/ignoredVersion", settings.kemai.ignoredVersion);
     qset.setValue("kemai/geometry", settings.kemai.geometry);
+    qset.setValue("kemai/language", settings.kemai.language);
 }

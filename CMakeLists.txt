@@ -66,17 +66,9 @@ endif ()
 # Localization
 include(LocalizationTools)
 set(KEMAI_TS_FILES
-        l10n/kemai_ar.ts
-        l10n/kemai_bn.ts
-        l10n/kemai_de.ts
-        l10n/kemai_es.ts
+        l10n/kemai_en.ts
         l10n/kemai_fr.ts
-        l10n/kemai_it.ts
-        l10n/kemai_ja.ts
-        l10n/kemai_pt.ts
-        l10n/kemai_ru.ts
-        l10n/kemai_zh_Hans.ts
-        l10n/kemai_zh_Hant.ts)
+        l10n/kemai_nb_NO.ts)
 qt5_create_translation(KEMAI_QM_FILES ${CMAKE_SOURCE_DIR}/src ${KEMAI_TS_FILES})
 add_qm_files_to_qrc(KEMAI_L10N_QRC ${KEMAI_QM_FILES})
 
