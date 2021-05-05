@@ -130,6 +130,23 @@ bool fromJson(const QJsonObject& jso, User& inst)
     return true;
 }
 
+bool fromJson(const QJsonObject& jso, Task& inst)
+{
+    if (!jso.contains("id"))
+        return false;
+
+    fromJson(jso.value("project").toObject(), inst.project);
+    fromJson(jso.value("activity").toObject(), inst.activity);
+    fromJson(jso.value("user").toObject(), inst.user);
+
+    inst.description = jso.value("description").toString();
+    inst.beginAt     = QDateTime::fromString(jso.value("begin").toString(), Qt::ISODate);
+    inst.endAt       = QDateTime::fromString(jso.value("end").toString(), Qt::ISODate);
+    inst.id          = jso.value("id").toInt();
+
+    return true;
+}
+
 QByteArray toPostData(const QJsonValue& jv)
 {
     QJsonDocument jdoc;

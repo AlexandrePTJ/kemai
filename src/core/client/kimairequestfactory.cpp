@@ -68,8 +68,7 @@ KimaiRequest KimaiRequestFactory::activeTimeSheets()
     return std::move(KimaiRequest(ApiMethod::ActiveTimeSheets));
 }
 
-KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, const QDateTime& beginAt,
-                                                 const QString& description, const QStringList& tags)
+KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, const QDateTime& beginAt, const QString& description, const QStringList& tags)
 {
     auto krq = KimaiRequest(ApiMethod::TimeSheets, HttpVerb::Post);
 
@@ -96,4 +95,9 @@ KimaiRequest KimaiRequestFactory::stopTimeSheet(int timeSheetId)
 KimaiRequest KimaiRequestFactory::tags()
 {
     return KimaiRequest(ApiMethod::Tags);
+}
+
+KimaiRequest KimaiRequestFactory::tasks()
+{
+    return KimaiRequest(ApiMethod::Tasks);
 }

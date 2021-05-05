@@ -23,7 +23,8 @@ enum class ApiMethod
     TimeSheets,
     Users,
     MeUsers,
-    Tags
+    Tags,
+    Tasks
 };
 
 // available verbs
@@ -114,6 +115,18 @@ struct User
     QString language;
     QString timezone;
 };
+
+struct Task
+{
+    int id = 0;
+    QString description;
+    QDateTime beginAt;
+    QDateTime endAt;
+    Activity activity;
+    Project project;
+    User user;
+};
+using Tasks = QVector<Task>;
 
 QString apiMethodToString(ApiMethod method);
 

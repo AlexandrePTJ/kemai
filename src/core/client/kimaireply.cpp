@@ -171,3 +171,15 @@ template<> Tags KimaiReply::get() const
     }
     return tags;
 }
+
+template<> Tasks KimaiReply::get() const
+{
+    Tasks tasks;
+    for (const auto& jsTask : mD->jsonValue.toArray())
+    {
+        Task task;
+        if (parser::fromJson(jsTask.toObject(), task))
+            tasks << task;
+    }
+    return tasks;
+}

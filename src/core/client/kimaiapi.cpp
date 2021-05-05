@@ -36,6 +36,9 @@ QString apiMethodToString(ApiMethod method)
     case ApiMethod::Tags:
         return "tags";
 
+    case ApiMethod::Tasks:
+        return "tasks";
+
     default:
         return "";
     }
