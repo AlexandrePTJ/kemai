@@ -69,12 +69,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/app/activitywidget.ui" line="222"/>
+        <location filename="../src/app/activitywidget.ui" line="193"/>
         <source>Started at</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/app/activitywidget.ui" line="234"/>
+        <location filename="../src/app/activitywidget.ui" line="240"/>
         <source>00:00:00</source>
         <translation type="unfinished"></translation>
     </message>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>249</width>
-    <height>356</height>
+    <width>280</width>
+    <height>383</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -187,6 +187,63 @@
    <item row="4" column="1">
     <widget class="QLineEdit" name="leTags"/>
    </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="lbStartedAt">
+     <property name="text">
+      <string>Started at</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QDateTimeEdit" name="dteStartedAt">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tbEnableStartedAtEdit">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="icons.qrc">
+         <normaloff>:/icons/update</normaloff>
+         <normalon>:/icons/update-off</normalon>:/icons/update</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="7" column="0" colspan="2">
+    <widget class="QLabel" name="lbDurationTime">
+     <property name="font">
+      <font>
+       <pointsize>24</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>00:00:00</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
    <item row="5" column="0" colspan="2">
     <widget class="QPushButton" name="btStartStop">
      <property name="sizePolicy">
@@ -216,48 +273,27 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="lbStartedAt">
-     <property name="text">
-      <string>Started at</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0" colspan="2">
-    <widget class="QLabel" name="lbDurationTime">
-     <property name="font">
-      <font>
-       <pointsize>24</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>00:00:00</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QDateTimeEdit" name="dteStartedAt">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources>
   <include location="icons.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>tbEnableStartedAtEdit</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>dteStartedAt</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>247</x>
+     <y>314</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>223</x>
+     <y>313</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

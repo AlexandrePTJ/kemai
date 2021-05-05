@@ -275,15 +275,20 @@ void ActivityWidget::onTbAddActivityClicked()
 
 void ActivityWidget::onSecondTimeout()
 {
+    const auto& now = QDateTime::currentDateTime();
     if (mCurrentTimeSheet)
     {
-        auto nsecs        = mCurrentTimeSheet->beginAt.secsTo(QDateTime::currentDateTime());
+        auto nsecs        = mCurrentTimeSheet->beginAt.secsTo(now);
         auto durationTime = QTime(0, 0).addSecs(nsecs);
         mUi->lbDurationTime->setText(durationTime.toString());
     }
     else
     {
-        mUi->dteStartedAt->setDateTime(QDateTime::currentDateTime());
+        mUi->dteStartedAt->setMaximumDateTime(now);
+        if (!mUi->dteStartedAt->isEnabled())
+        {
+            mUi->dteStartedAt->setDateTime(now);
+        }
     }
 }
 
@@ -295,7 +300,7 @@ void ActivityWidget::onBtStartStopClicked()
     }
     else
     {
-        auto beginAt = QDateTime::currentDateTime();
+        auto beginAt = mUi->dteStartedAt->dateTime();
 
         // Be sure to use expected timezone
         if (mMe)
@@ -322,12 +327,13 @@ void ActivityWidget::updateControls()
     mUi->cbCustomer->setEnabled(enable);
     mUi->cbProject->setEnabled(enable);
     mUi->cbActivity->setEnabled(enable);
+    mUi->tbEnableStartedAtEdit->setEnabled(enable);
+    mUi->dteStartedAt->setEnabled(enable && mUi->tbEnableStartedAtEdit->isChecked());
 
     mUi->tbAddCustomer->setEnabled(enable);
     mUi->tbAddProject->setEnabled(enable && !mUi->cbCustomer->currentText().isEmpty());
 
-    bool projectOk = mUi->cbCustomer->currentText().isEmpty() ||
-                     (!mUi->cbCustomer->currentText().isEmpty() && !mUi->cbProject->currentText().isEmpty());
+    bool projectOk = mUi->cbCustomer->currentText().isEmpty() || (!mUi->cbCustomer->currentText().isEmpty() && !mUi->cbProject->currentText().isEmpty());
     mUi->tbAddActivity->setEnabled(enable && projectOk);
 
     if (enable)
