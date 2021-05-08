@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/settings.svg</file>
+        <file>icons/refresh.svg</file>
+        <file>icons/kimai-green.png</file>
+        <file>icons/kimai-red.png</file>
+        <file>icons/menu.svg</file>
+    </qresource>
+</RCC>

@@ -31,19 +31,28 @@ set(UIS
         projectdialog.ui
         settingswidget.ui)
 
+# Localization
+include(LocalizationTools)
+set(KEMAI_TS_FILES
+        l10n/kemai_en.ts
+        l10n/kemai_fr.ts
+        l10n/kemai_nb_NO.ts)
+qt_create_translation(KEMAI_QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${KEMAI_TS_FILES})
+add_qm_files_to_qrc(KEMAI_L10N_QRC ${KEMAI_QM_FILES})
+
 set(RESX
         data.qrc
-        icons.qrc)
+        icons.qrc
+        ${KEMAI_L10N_QRC})
 
 if (WIN32)
-    list(APPEND SRCS resources/windows/kemai.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/bundle/windows/kemai.rc)
 elseif (APPLE)
-    set(KEMAI_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/resources/macos/kemai.icns")
+    set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/kemai.icns")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/resources/macos/Info.plist)
+    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/bundle/macos/Info.plist)
 endif ()
 
-target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX} ${KEMAI_ICNS} ${KEMAI_L10N_QRC})
+target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX} ${KEMAI_ICNS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} Qt::Widgets KemaiCore)
-add_dependencies(${PROJECT_NAME} l10n-qrc)

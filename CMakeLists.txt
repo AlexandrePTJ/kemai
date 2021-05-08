@@ -21,8 +21,13 @@ include_directories(${spdlog_SOURCE_DIR}/include)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_compile_definitions(UNICODE _UNICODE)
+
 # Setup Qt
-find_package(Qt5 COMPONENTS Widgets Network LinguistTools CONFIG REQUIRED)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+find_package(Qt5 COMPONENTS Widgets Network LinguistTools Quick CONFIG REQUIRED)
 
 # Common package configuration
 set(KEMAI_GUID "88815E44-85A0-469C-9740-B4887D456BAA")
@@ -62,15 +67,6 @@ else ()
     set(OS_BUNDLE)
     set(DEPLOY_DIR bin)
 endif ()
-
-# Localization
-include(LocalizationTools)
-set(KEMAI_TS_FILES
-        l10n/kemai_en.ts
-        l10n/kemai_fr.ts
-        l10n/kemai_nb_NO.ts)
-qt5_create_translation(KEMAI_QM_FILES ${CMAKE_SOURCE_DIR}/src ${KEMAI_TS_FILES})
-add_qm_files_to_qrc(KEMAI_L10N_QRC ${KEMAI_QM_FILES})
 
 # Project code
 add_subdirectory(src)

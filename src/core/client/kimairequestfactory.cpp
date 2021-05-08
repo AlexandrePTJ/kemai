@@ -29,6 +29,11 @@ KimaiRequest KimaiRequestFactory::customerAdd(const Customer& customer)
     return krq;
 }
 
+KimaiRequest KimaiRequestFactory::projects()
+{
+    return KimaiRequest(ApiMethod::Projects);
+}
+
 KimaiRequest KimaiRequestFactory::projects(int customerId)
 {
     auto krq = KimaiRequest(ApiMethod::Projects);
@@ -44,6 +49,11 @@ KimaiRequest KimaiRequestFactory::projectAdd(const Project& project)
     krq.setData(parser::toPostData(jsData));
 
     return krq;
+}
+
+KimaiRequest KimaiRequestFactory::activities()
+{
+    return KimaiRequest(ApiMethod::Activities);
 }
 
 KimaiRequest KimaiRequestFactory::activities(int projectId)
@@ -65,7 +75,7 @@ KimaiRequest KimaiRequestFactory::activityAdd(const Activity& activity)
 
 KimaiRequest KimaiRequestFactory::activeTimeSheets()
 {
-    return std::move(KimaiRequest(ApiMethod::ActiveTimeSheets));
+    return KimaiRequest(ApiMethod::ActiveTimeSheets);
 }
 
 KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, const QDateTime& beginAt, const QString& description, const QStringList& tags)
