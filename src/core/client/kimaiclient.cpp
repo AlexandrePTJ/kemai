@@ -6,6 +6,16 @@
 using namespace kemai::client;
 
 /*
+ * Static infos
+ */
+static const auto PluginsApiMethodKimaiMinimalVersion = QVersionNumber(1, 14); // TODO: set to 1.15 once released
+
+static const auto TaskPluginKimaiMinimalVersion  = QVersionNumber(1, 14); // TODO: set to 1.15 once released
+static const auto TaskPluginBundleMinimalVersion = QVersionNumber(1, 10);
+static const auto TaskPluginBundleName           = QString("TaskManagementBundle");
+static const auto TaskPluginApiMethods           = QVector{ApiMethod::Tasks};
+
+/*
  * Private impl
  */
 KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c) : networkAccessManager(new QNetworkAccessManager), mQ(c)
@@ -27,29 +37,52 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiReque
 
 bool KimaiClient::KimaiClientPrivate::isRequestAvailableForCurrentInstance(ApiMethod apiMethod) const
 {
-    switch (apiMethod)
+    // Requires Kimai >= 1.15
+    if (apiMethod == ApiMethod::Plugins)
     {
-    case ApiMethod::Tasks: // Requires Kimai >= 1.15 and TaskManagementBundle plugin >= 1.10
+        return !kimaiVersion.isNull() && kimaiVersion >= PluginsApiMethodKimaiMinimalVersion;
+    }
+
+    // Requires Kimai >= 1.15 and TaskManagementBundle plugin >= 1.10
+    if (TaskPluginApiMethods.contains(apiMethod))
     {
-        if (!kimaiVersion.isNull() && kimaiVersion >= QVersionNumber(1, 15))
+        if (!kimaiVersion.isNull() && kimaiVersion >= TaskPluginKimaiMinimalVersion)
         {
             for (const auto& plugin : kimaiPlugins)
             {
-                if (plugin.name == "TaskManagementBundle")
+                if (plugin.name == TaskPluginBundleName)
                 {
-                    return QVersionNumber::fromString(plugin.version) >= QVersionNumber(1, 10);
+                    return QVersionNumber::fromString(plugin.version) >= TaskPluginBundleMinimalVersion;
                 }
             }
         }
     }
-        return false;
 
-    case ApiMethod::Plugins: // Requires Kimai >= 1.15
-        return !kimaiVersion.isNull() && kimaiVersion >= QVersionNumber(1, 15);
+    return true;
+}
+
+void KimaiClient::KimaiClientPrivate::processReply(const KimaiReply& kimaiReply)
+{
+    // Keep some infos.
+    switch (kimaiReply.method())
+    {
+    case ApiMethod::Version: {
+        auto kVersion = kimaiReply.get<KimaiVersion>();
+        kimaiVersion  = QVersionNumber::fromString(kVersion.kimai);
+    }
+    break;
+
+    case ApiMethod::Plugins: {
+        kimaiPlugins = kimaiReply.get<Plugins>();
+    }
+    break;
 
     default:
-        return true;
+        break;
     }
+
+    // Send to GUI
+    emit mQ->replyReceived(kimaiReply);
 }
 
 void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
@@ -65,7 +98,7 @@ void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
         {
             auto replyData = reply->readAll();
             spdlog::debug("<=== {}", replyData.toStdString());
-            emit mQ->replyReceived({kimaiRequest->method(), replyData});
+            processReply({kimaiRequest->method(), replyData});
         }
     }
     else

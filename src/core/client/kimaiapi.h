@@ -24,8 +24,8 @@ enum class ApiMethod
     Users,
     MeUsers,
     Tags,
-    Tasks,
-    Plugins
+    Plugins,
+    Tasks
 };
 
 // available verbs

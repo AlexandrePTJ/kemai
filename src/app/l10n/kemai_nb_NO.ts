@@ -196,17 +196,17 @@
         <translation>Lukk til systemkurv</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="104"/>
+        <location filename="../settingswidget.ui" line="110"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="124"/>
+        <location filename="../settingswidget.ui" line="130"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="131"/>
+        <location filename="../settingswidget.ui" line="137"/>
         <source>Save</source>
         <translation>Lagre</translation>
     </message>

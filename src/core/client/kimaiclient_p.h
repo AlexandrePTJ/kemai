@@ -19,6 +19,7 @@ public:
 
     QNetworkRequest prepareRequest(const KimaiRequest& cmd) const;
     bool isRequestAvailableForCurrentInstance(ApiMethod apiMethod) const;
+    void processReply(const KimaiReply& kimaiReply);
 
 public:
     QString username, host, token;
