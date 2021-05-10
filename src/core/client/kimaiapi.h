@@ -24,7 +24,8 @@ enum class ApiMethod
     Users,
     MeUsers,
     Tags,
-    Tasks
+    Tasks,
+    Plugins
 };
 
 // available verbs
@@ -127,6 +128,13 @@ struct Task
     User user;
 };
 using Tasks = QVector<Task>;
+
+struct Plugin
+{
+    QString name;
+    QString version;
+};
+using Plugins = QVector<Plugin>;
 
 QString apiMethodToString(ApiMethod method);
 

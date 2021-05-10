@@ -8,8 +8,7 @@ using namespace kemai::client;
 /*
  * Private impl
  */
-KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c)
-    : networkAccessManager(new QNetworkAccessManager), mQ(c)
+KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c) : networkAccessManager(new QNetworkAccessManager), mQ(c)
 {
     connect(networkAccessManager.data(), &QNetworkAccessManager::finished, this, &KimaiClientPrivate::onNamFinished);
     connect(networkAccessManager.data(), &QNetworkAccessManager::sslErrors, this, &KimaiClientPrivate::onNamSslErrors);
@@ -26,6 +25,33 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiReque
     return r;
 }
 
+bool KimaiClient::KimaiClientPrivate::isRequestAvailableForCurrentInstance(ApiMethod apiMethod) const
+{
+    switch (apiMethod)
+    {
+    case ApiMethod::Tasks: // Requires Kimai >= 1.15 and TaskManagementBundle plugin >= 1.10
+    {
+        if (!kimaiVersion.isNull() && kimaiVersion >= QVersionNumber(1, 15))
+        {
+            for (const auto& plugin : kimaiPlugins)
+            {
+                if (plugin.name == "TaskManagementBundle")
+                {
+                    return QVersionNumber::fromString(plugin.version) >= QVersionNumber(1, 10);
+                }
+            }
+        }
+    }
+        return false;
+
+    case ApiMethod::Plugins: // Requires Kimai >= 1.15
+        return !kimaiVersion.isNull() && kimaiVersion >= QVersionNumber(1, 15);
+
+    default:
+        return true;
+    }
+}
+
 void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
 {
     auto kimaiRequest = runningRequests.take(reply);
@@ -33,8 +59,7 @@ void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
     {
         if (reply->error() != QNetworkReply::NoError)
         {
-            emit mQ->requestError(
-                tr("Error on request [%1]: %2").arg(apiMethodToString(kimaiRequest->method()), reply->errorString()));
+            emit mQ->requestError(tr("Error on request [%1]: %2").arg(apiMethodToString(kimaiRequest->method()), reply->errorString()));
         }
         else
         {
@@ -85,6 +110,12 @@ void KimaiClient::setToken(const QString& token)
 
 void KimaiClient::sendRequest(const KimaiRequest& rq)
 {
+    if (!mD->isRequestAvailableForCurrentInstance(rq.method()))
+    {
+        spdlog::error("Method {} is not available for your Kimai instance.", apiMethodToString(rq.method()).toStdString());
+        return;
+    }
+
     auto qreq = mD->prepareRequest(rq);
 
     QNetworkReply* reply = nullptr;

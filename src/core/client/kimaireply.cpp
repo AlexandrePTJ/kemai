@@ -183,3 +183,15 @@ template<> Tasks KimaiReply::get() const
     }
     return tasks;
 }
+
+template<> Plugins KimaiReply::get() const
+{
+    Plugins plugins;
+    for (const auto& jsPlugin : mD->jsonValue.toArray())
+    {
+        Plugin plugin;
+        if (parser::fromJson(jsPlugin.toObject(), plugin))
+            plugins << plugin;
+    }
+    return plugins;
+}

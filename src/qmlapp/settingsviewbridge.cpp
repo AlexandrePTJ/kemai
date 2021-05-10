@@ -76,7 +76,7 @@ void SettingsViewBridge::onClientError(const QString& errorMsg)
 
 void SettingsViewBridge::onClientReply(const client::KimaiReply& reply)
 {
-    if (not reply.isValid())
+    if (!reply.isValid())
     {
         emit testFinished(false, tr("Invalid reply."));
     }

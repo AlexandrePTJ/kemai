@@ -51,7 +51,7 @@ QAbstractListModel* KimaiClientBridge::activityDataModel()
 
 bool KimaiClientBridge::timeSheetRunning() const
 {
-    return not mCurrentTimeSheet.isNull();
+    return !mCurrentTimeSheet.isNull();
 }
 
 QString KimaiClientBridge::timeSheetDuration() const
@@ -84,7 +84,7 @@ void KimaiClientBridge::onClientError(const QString& errorMsg)
 
 void KimaiClientBridge::onClientReply(const KimaiReply& reply)
 {
-    if (not reply.isValid())
+    if (!reply.isValid())
         return;
 
     switch (reply.method())
@@ -109,7 +109,7 @@ void KimaiClientBridge::onClientReply(const KimaiReply& reply)
     case ApiMethod::ActiveTimeSheets: {
         const auto& timeSheets = reply.get<TimeSheets>();
 
-        if (not timeSheets.empty())
+        if (!timeSheets.empty())
         {
             const auto currentTimeSheet = timeSheets.first();
             if (mCurrentTimeSheet)
@@ -124,7 +124,7 @@ void KimaiClientBridge::onClientReply(const KimaiReply& reply)
             mSecondTimer.start();
             emit timeSheetRunningChanged();
         }
-        else if (timeSheets.empty() and not mCurrentTimeSheet)
+        else if (timeSheets.empty() && !mCurrentTimeSheet)
         {
             mCurrentTimeSheet.reset(nullptr);
             mSecondTimer.stop();

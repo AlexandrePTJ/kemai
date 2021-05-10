@@ -59,6 +59,9 @@ void ActivityWidget::refresh()
         connect(mClient.data(), &KimaiClient::requestError, this, &ActivityWidget::onClientError);
         connect(mClient.data(), &KimaiClient::replyReceived, this, &ActivityWidget::onClientReply);
 
+        // send some request to identify instance
+        mClient->sendRequest(KimaiRequestFactory::version());
+
         // check if we have running timesheet.
         // if one is running, it will re-fill combobox one by one, and set correct values
         // else it will only fill customer
@@ -85,6 +88,12 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
 
     switch (reply.method())
     {
+    case ApiMethod::Version: {
+        // Allow current client instance to get instance version and list of available plugins.
+        mClient->sendRequest(KimaiRequestFactory::plugins());
+    }
+    break;
+
     case ApiMethod::MeUsers: {
         mMe.reset(new User(reply.get<User>()));
     }

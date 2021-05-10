@@ -22,6 +22,7 @@ public:
     static KimaiRequest stopTimeSheet(int timeSheetId);
     static KimaiRequest tags();
     static KimaiRequest tasks();
+    static KimaiRequest plugins();
 };
 
 } // namespace kemai::client

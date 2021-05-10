@@ -147,6 +147,16 @@ bool fromJson(const QJsonObject& jso, Task& inst)
     return true;
 }
 
+bool fromJson(const QJsonObject& jso, Plugin& inst)
+{
+    if (!jso.contains("name") || !jso.contains("version"))
+        return false;
+
+    inst.name    = jso.value("name").toString();
+    inst.version = jso.value("version").toString();
+    return true;
+}
+
 QByteArray toPostData(const QJsonValue& jv)
 {
     QJsonDocument jdoc;

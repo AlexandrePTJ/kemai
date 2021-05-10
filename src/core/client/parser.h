@@ -27,6 +27,7 @@ bool fromJson(const QJsonObject& jso, Activity& inst);
 bool fromJson(const QJsonObject& jso, TimeSheet& inst);
 bool fromJson(const QJsonObject& jso, User& inst);
 bool fromJson(const QJsonObject& jso, Task& inst);
+bool fromJson(const QJsonObject& jso, Plugin& inst);
 
 QByteArray toPostData(const QJsonValue& jv);
 QJsonObject toJson(const TimeSheet& inst);

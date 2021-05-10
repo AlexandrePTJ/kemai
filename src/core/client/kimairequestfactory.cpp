@@ -111,3 +111,8 @@ KimaiRequest KimaiRequestFactory::tasks()
 {
     return KimaiRequest(ApiMethod::Tasks);
 }
+
+KimaiRequest KimaiRequestFactory::plugins()
+{
+    return KimaiRequest(ApiMethod::Plugins);
+}
