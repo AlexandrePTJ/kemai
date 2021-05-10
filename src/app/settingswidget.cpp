@@ -93,7 +93,7 @@ void SettingsWidget::onClientReply(const KimaiReply& reply)
     else
     {
         auto version = reply.get<KimaiVersion>();
-        mUi->lbTestResult->setText(tr("Connected to Kimai %1").arg(version.kimai));
+        mUi->lbTestResult->setText(tr("Connected to Kimai %1").arg(version.kimai.toString()));
     }
 }
 

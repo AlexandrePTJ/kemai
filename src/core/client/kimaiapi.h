@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QString>
 #include <QVector>
+#include <QVersionNumber>
 
 namespace kemai::client {
 
@@ -28,6 +29,11 @@ enum class ApiMethod
     Tasks
 };
 
+enum class ApiPlugin
+{
+    TaskManagement
+};
+
 // available verbs
 enum class HttpVerb
 {
@@ -39,7 +45,7 @@ enum class HttpVerb
 // reply structs
 struct KimaiVersion
 {
-    QString kimai = "0.0.0";
+    QVersionNumber kimai;
 };
 
 using Tags = QStringList;
@@ -132,7 +138,7 @@ using Tasks = QVector<Task>;
 struct Plugin
 {
     QString name;
-    QString version;
+    QVersionNumber version;
 };
 using Plugins = QVector<Plugin>;
 

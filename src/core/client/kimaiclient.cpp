@@ -8,7 +8,7 @@ using namespace kemai::client;
 /*
  * Static infos
  */
-static const auto PluginsApiMethodKimaiMinimalVersion = QVersionNumber(1, 14); // TODO: set to 1.15 once released
+static const auto PluginsMethodKimaiMinimalVersion = QVersionNumber(1, 14); // TODO: set to 1.15 once released
 
 static const auto TaskPluginKimaiMinimalVersion  = QVersionNumber(1, 14); // TODO: set to 1.15 once released
 static const auto TaskPluginBundleMinimalVersion = QVersionNumber(1, 10);
@@ -40,22 +40,14 @@ bool KimaiClient::KimaiClientPrivate::isRequestAvailableForCurrentInstance(ApiMe
     // Requires Kimai >= 1.15
     if (apiMethod == ApiMethod::Plugins)
     {
-        return !kimaiVersion.isNull() && kimaiVersion >= PluginsApiMethodKimaiMinimalVersion;
+        return !kimaiVersion.isNull() && kimaiVersion >= PluginsMethodKimaiMinimalVersion;
     }
 
     // Requires Kimai >= 1.15 and TaskManagementBundle plugin >= 1.10
     if (TaskPluginApiMethods.contains(apiMethod))
     {
-        if (!kimaiVersion.isNull() && kimaiVersion >= TaskPluginKimaiMinimalVersion)
-        {
-            for (const auto& plugin : kimaiPlugins)
-            {
-                if (plugin.name == TaskPluginBundleName)
-                {
-                    return QVersionNumber::fromString(plugin.version) >= TaskPluginBundleMinimalVersion;
-                }
-            }
-        }
+        return !kimaiVersion.isNull() && kimaiVersion >= TaskPluginKimaiMinimalVersion && kimaiPlugins.contains(ApiPlugin::TaskManagement) &&
+               kimaiPlugins.value(ApiPlugin::TaskManagement).version >= TaskPluginBundleMinimalVersion;
     }
 
     return true;
@@ -68,12 +60,19 @@ void KimaiClient::KimaiClientPrivate::processReply(const KimaiReply& kimaiReply)
     {
     case ApiMethod::Version: {
         auto kVersion = kimaiReply.get<KimaiVersion>();
-        kimaiVersion  = QVersionNumber::fromString(kVersion.kimai);
+        kimaiVersion  = kVersion.kimai;
     }
     break;
 
     case ApiMethod::Plugins: {
-        kimaiPlugins = kimaiReply.get<Plugins>();
+        kimaiPlugins.clear();
+        for (const auto& plugin : kimaiReply.get<Plugins>())
+        {
+            if (plugin.name == TaskPluginBundleName)
+            {
+                kimaiPlugins.insert(ApiPlugin::TaskManagement, plugin);
+            }
+        }
     }
     break;
 
@@ -172,6 +171,11 @@ void KimaiClient::sendRequest(const KimaiRequest& rq)
 
     if (reply)
         mD->runningRequests.insert(reply, QSharedPointer<KimaiRequest>::create(rq));
+}
+
+bool KimaiClient::isPluginAvailable(ApiPlugin plugin) const
+{
+    return mD->kimaiPlugins.contains(plugin);
 }
 
 void KimaiClient::addTrustedCertificates(const QStringList& trustedCertificates)

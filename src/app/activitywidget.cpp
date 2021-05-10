@@ -143,13 +143,13 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
     break;
 
     case ApiMethod::Activities: {
-        const auto& activites = reply.get<Activities>();
-        if (!activites.isEmpty())
+        const auto& activities = reply.get<Activities>();
+        if (!activities.isEmpty())
         {
             mUi->cbActivity->clear();
             mUi->cbActivity->addItem("");
 
-            for (const auto& activity : activites)
+            for (const auto& activity : activities)
                 mUi->cbActivity->addItem(activity.name, activity.id);
         }
 

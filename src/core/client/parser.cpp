@@ -10,7 +10,7 @@ bool fromJson(const QJsonObject& jso, KimaiVersion& inst)
     if (!jso.contains("version"))
         return false;
 
-    inst.kimai = jso.value("version").toString();
+    inst.kimai = QVersionNumber::fromString(jso.value("version").toString());
 
     return true;
 }
@@ -153,7 +153,7 @@ bool fromJson(const QJsonObject& jso, Plugin& inst)
         return false;
 
     inst.name    = jso.value("name").toString();
-    inst.version = jso.value("version").toString();
+    inst.version = QVersionNumber::fromString(jso.value("version").toString());
     return true;
 }
 

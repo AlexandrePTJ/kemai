@@ -38,14 +38,18 @@ private:
 
     // keep stacked widgets ids
     int mActivitySId;
+    int mTaskSId;
     int mSettingsSId;
     int mCurrentSId = -1;
 
     // Actions
-    QAction* mActQuit        = nullptr;
-    QAction* mActSettings    = nullptr;
-    QAction* mActCheckUpdate = nullptr;
-    QAction* mActOpenHost    = nullptr;
+    QAction* mActQuit           = nullptr;
+    QAction* mActSettings       = nullptr;
+    QAction* mActCheckUpdate    = nullptr;
+    QAction* mActOpenHost       = nullptr;
+    QAction* mActViewActivities = nullptr;
+    QAction* mActViewTasks      = nullptr;
+    QActionGroup* mActGroupView = nullptr;
 
     // Main menu
     QMenuBar* mMenuBar = nullptr;

@@ -21,6 +21,8 @@ public:
 
     void sendRequest(const KimaiRequest& rq);
 
+    bool isPluginAvailable(ApiPlugin plugin) const;
+
     static void addTrustedCertificates(const QStringList& trustedCertificates);
 
 signals:

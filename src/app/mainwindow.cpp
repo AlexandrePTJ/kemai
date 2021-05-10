@@ -32,13 +32,23 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     /*
      * Setup actions
      */
-    mActQuit        = new QAction(tr("&Quit"), this);
-    mActSettings    = new QAction(tr("&Settings"), this);
-    mActCheckUpdate = new QAction(tr("Check for updates..."), this);
-    mActOpenHost    = new QAction(tr("Open Kimai instance"), this);
+    mActQuit           = new QAction(tr("&Quit"), this);
+    mActSettings       = new QAction(tr("&Settings"), this);
+    mActCheckUpdate    = new QAction(tr("Check for updates..."), this);
+    mActOpenHost       = new QAction(tr("Open Kimai instance"), this);
+    mActViewActivities = new QAction(tr("Activities"), this);
+    mActViewTasks      = new QAction(tr("Tasks"), this);
+
+    mActViewActivities->setCheckable(true);
+    mActViewTasks->setCheckable(true);
+    mActViewActivities->setChecked(true);
+
+    mActGroupView = new QActionGroup(this);
+    mActGroupView->addAction(mActViewActivities);
+    mActGroupView->addAction(mActViewTasks);
 
     /*
-     * Setup systemtray
+     * Setup system tray
      */
     mTrayMenu = new QMenu(this);
     mTrayMenu->addAction(mActSettings);
@@ -60,6 +70,10 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     fileMenu->addSeparator();
     fileMenu->addAction(mActQuit);
 
+    auto viewMenu = new QMenu(tr("&View"), mMenuBar);
+    viewMenu->addAction(mActViewActivities);
+    viewMenu->addAction(mActViewTasks);
+
     auto helpMenu = new QMenu(tr("&Help"), mMenuBar);
     helpMenu->addAction(mActOpenHost);
     helpMenu->addSeparator();
@@ -68,6 +82,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     helpMenu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 
     mMenuBar->addMenu(fileMenu);
+    mMenuBar->addMenu(viewMenu);
     mMenuBar->addMenu(helpMenu);
     setMenuBar(mMenuBar);
 
@@ -177,10 +192,9 @@ void MainWindow::onNewVersionCheckFinished(const VersionDetails& details)
 {
     if (!details.vn.isNull())
     {
-        auto res = QMessageBox::information(
-            this, tr("New version available"),
-            tr("Version %1 is available.\n\n%2").arg(details.vn.toString(), details.description),
-            QMessageBox::Open | QMessageBox::Ignore | QMessageBox::Cancel, QMessageBox::Open);
+        auto res =
+            QMessageBox::information(this, tr("New version available"), tr("Version %1 is available.\n\n%2").arg(details.vn.toString(), details.description),
+                                     QMessageBox::Open | QMessageBox::Ignore | QMessageBox::Cancel, QMessageBox::Open);
 
         switch (res)
         {

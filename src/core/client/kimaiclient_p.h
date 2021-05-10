@@ -30,7 +30,7 @@ public:
     // Fetched from version and plugins request.
     // Kept here to filter requests.
     QVersionNumber kimaiVersion;
-    Plugins kimaiPlugins;
+    QMap<ApiPlugin, Plugin> kimaiPlugins;
 
 private slots:
     void onNamFinished(QNetworkReply* reply);
