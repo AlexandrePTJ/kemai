@@ -23,6 +23,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_compile_definitions(UNICODE _UNICODE)
 
+option(BUILD_QMLAPP "Build experimental QML application" OFF)
+
 # Setup Qt
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
