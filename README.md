@@ -32,7 +32,7 @@ Ideas, pull requests and translation are welcome.
 
 For the later, [Weblate]() is used. Here is the current status:
 
-[![Translation status](https://hosted.weblate.org/widgets/kemai/-/kemai/multi-green.svg)](https://hosted.weblate.org/engage/kemai/)
+[![Translation status](https://hosted.weblate.org/widgets/kemai/-/kemai/multi-auto.svg)](https://hosted.weblate.org/engage/kemai/)
 
 ## Why Kemai
 
