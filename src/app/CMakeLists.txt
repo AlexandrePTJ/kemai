@@ -36,6 +36,7 @@ include(LocalizationTools)
 set(KEMAI_TS_FILES
         l10n/kemai_en.ts
         l10n/kemai_fr.ts
+        l10n/kemai_hr.ts
         l10n/kemai_nb_NO.ts)
 qt_create_translation(KEMAI_QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${KEMAI_TS_FILES})
 add_qm_files_to_qrc(KEMAI_L10N_QRC ${KEMAI_QM_FILES})
