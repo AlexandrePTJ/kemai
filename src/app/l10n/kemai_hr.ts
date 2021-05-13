@@ -173,7 +173,7 @@
     <message>
         <location filename="../settingswidget.ui" line="25"/>
         <source>Host</source>
-        <translation>Host</translation>
+        <translation>Računalo</translation>
     </message>
     <message>
         <location filename="../settingswidget.ui" line="39"/>
