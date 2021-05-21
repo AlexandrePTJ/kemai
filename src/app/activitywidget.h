@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "client/kimaiclient.h"
+#include "kemaisession.h"
 
 namespace Ui {
 class ActivityWidget;
@@ -20,6 +21,7 @@ public:
     ~ActivityWidget() override;
 
     void setKimaiClient(QSharedPointer<client::KimaiClient> kimaiClient);
+    void setKemaiSession(QSharedPointer<core::KemaiSession> kemaiSession);
 
 signals:
     void currentActivityChanged(bool started);
@@ -45,8 +47,8 @@ private:
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;
     QSharedPointer<client::KimaiClient> mClient;
+    QSharedPointer<core::KemaiSession> mSession;
     QScopedPointer<client::TimeSheet> mCurrentTimeSheet;
-    QScopedPointer<client::User> mMe;
 };
 
 } // namespace kemai::app

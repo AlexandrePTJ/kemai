@@ -12,6 +12,7 @@ set(SRCS
         client/kimairequestfactory.cpp
         client/parser.cpp
         updater/kemaiupdater.cpp
+        kemaisession.cpp
         settings.cpp)
 
 set(PUB_HDRS
@@ -21,6 +22,7 @@ set(PUB_HDRS
         client/kimairequest.h
         client/kimairequestfactory.h
         updater/kemaiupdater.h
+        kemaisession.h
         settings.h)
 
 set(PRIV_HDRS

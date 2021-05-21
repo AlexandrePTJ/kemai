@@ -154,8 +154,9 @@ bool fromJson(const QJsonObject& jso, Plugin& inst)
     if (!jso.contains("name") || !jso.contains("version"))
         return false;
 
-    inst.name    = jso.value("name").toString();
-    inst.version = QVersionNumber::fromString(jso.value("version").toString());
+    inst.name      = jso.value("name").toString();
+    inst.version   = QVersionNumber::fromString(jso.value("version").toString());
+    inst.apiPlugin = pluginByName(inst.name);
     return true;
 }
 

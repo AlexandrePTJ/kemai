@@ -6,6 +6,7 @@
 #include <QSystemTrayIcon>
 
 #include "client/kimaiclient.h"
+#include "kemaisession.h"
 #include "updater/kemaiupdater.h"
 
 namespace Ui {
@@ -47,6 +48,7 @@ private:
     Ui::MainWindow* mUi;
     updater::KemaiUpdater mUpdater;
     QSharedPointer<client::KimaiClient> mClient;
+    QSharedPointer<core::KemaiSession> mSession;
 
     // Stacked widget (ownership is transferred, don't try to delete them)
     ActivityWidget* mActivityWidget = nullptr;

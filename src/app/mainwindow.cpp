@@ -164,13 +164,17 @@ void MainWindow::createKimaiClient()
         mClient->setUsername(settings.kimai.username);
         mClient->setToken(settings.kimai.token);
 
+        mSession = QSharedPointer<KemaiSession>::create();
+
         connect(mClient.data(), &KimaiClient::replyReceived, this, &MainWindow::onClientReply);
         connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
 
         // send some request to identify instance
         mClient->sendRequest(KimaiRequestFactory::version());
+        mClient->sendRequest(KimaiRequestFactory::me());
 
         mActivityWidget->setKimaiClient(mClient);
+        mActivityWidget->setKemaiSession(mSession);
     }
 }
 
@@ -195,7 +199,7 @@ void MainWindow::setViewActionsEnabled(bool enable)
     bool taskPluginEnabled = false;
     if (mClient)
     {
-        taskPluginEnabled = mClient->isPluginAvailable(ApiPlugin::TaskManagement);
+        taskPluginEnabled = mSession->isPluginAvailable(ApiPlugin::TaskManagement);
     }
     mActViewTasks->setEnabled(enable && taskPluginEnabled);
 }
@@ -213,14 +217,22 @@ void MainWindow::onClientReply(const KimaiReply& reply)
     switch (reply.method())
     {
     case ApiMethod::Version: {
-        // Allow current client instance to get instance version and list of available plugins.
-        mClient->sendRequest(KimaiRequestFactory::plugins());
+        auto kVersion          = reply.get<KimaiVersion>();
+        mSession->kimaiVersion = kVersion.kimai;
+        // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.2
+        if (mSession->kimaiVersion >= QVersionNumber(1, 14, 2))
+        {
+            mClient->sendRequest(KimaiRequestFactory::plugins());
+        }
     }
     break;
 
     case ApiMethod::Plugins: {
-        mActViewTasks->setEnabled(mClient->isPluginAvailable(ApiPlugin::TaskManagement));
-        if (mActViewTasks->isEnabled())
+        mSession->plugins = reply.get<Plugins>();
+
+        bool haveTaskPlugin = mSession->isPluginAvailable(ApiPlugin::TaskManagement);
+        mActViewTasks->setEnabled(haveTaskPlugin);
+        if (haveTaskPlugin)
         {
             mTaskWidget->setKimaiClient(mClient);
         }

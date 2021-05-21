@@ -18,19 +18,12 @@ public:
     explicit KimaiClientPrivate(KimaiClient* c);
 
     QNetworkRequest prepareRequest(const KimaiRequest& cmd) const;
-    bool isRequestAvailableForCurrentInstance(ApiMethod apiMethod) const;
-    void processReply(const KimaiReply& kimaiReply);
 
 public:
     QString username, host, token;
     QMap<QNetworkReply*, QSharedPointer<KimaiRequest>> runningRequests;
 
     QScopedPointer<QNetworkAccessManager> networkAccessManager;
-
-    // Fetched from version and plugins request.
-    // Kept here to filter requests.
-    QVersionNumber kimaiVersion;
-    QMap<ApiPlugin, Plugin> kimaiPlugins;
 
 private:
     void onNamFinished(QNetworkReply* reply);

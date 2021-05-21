@@ -272,12 +272,12 @@
         <translation>A propos de Qt</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="274"/>
+        <location filename="../mainwindow.cpp" line="286"/>
         <source>New version available</source>
         <translation>Nouvelle version disponible</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="274"/>
+        <location filename="../mainwindow.cpp" line="286"/>
         <source>Version %1 is available.
 
 %2</source>
@@ -286,12 +286,12 @@
 %2</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="296"/>
+        <location filename="../mainwindow.cpp" line="308"/>
         <source>No update</source>
         <translation>Aucune mise à jour</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="296"/>
+        <location filename="../mainwindow.cpp" line="308"/>
         <source>%1 is latest version.</source>
         <translation>%1 est la dernière version.</translation>
     </message>

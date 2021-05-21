@@ -6,16 +6,6 @@
 using namespace kemai::client;
 
 /*
- * Static infos
- */
-static const auto PluginsMethodKimaiMinimalVersion = QVersionNumber(1, 14); // TODO: set to 1.15 once released
-
-static const auto TaskPluginKimaiMinimalVersion  = QVersionNumber(1, 14); // TODO: set to 1.15 once released
-static const auto TaskPluginBundleMinimalVersion = QVersionNumber(1, 10);
-static const auto TaskPluginBundleName           = QString("TaskManagementBundle");
-static const auto TaskPluginApiMethods           = QVector{ApiMethod::Tasks};
-
-/*
  * Private impl
  */
 KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c) : networkAccessManager(new QNetworkAccessManager), mQ(c)
@@ -35,55 +25,6 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiReque
     return r;
 }
 
-bool KimaiClient::KimaiClientPrivate::isRequestAvailableForCurrentInstance(ApiMethod apiMethod) const
-{
-    // Requires Kimai >= 1.15
-    if (apiMethod == ApiMethod::Plugins)
-    {
-        return !kimaiVersion.isNull() && kimaiVersion >= PluginsMethodKimaiMinimalVersion;
-    }
-
-    // Requires Kimai >= 1.15 and TaskManagementBundle plugin >= 1.10
-    if (TaskPluginApiMethods.contains(apiMethod))
-    {
-        return !kimaiVersion.isNull() && kimaiVersion >= TaskPluginKimaiMinimalVersion && kimaiPlugins.contains(ApiPlugin::TaskManagement) &&
-               kimaiPlugins.value(ApiPlugin::TaskManagement).version >= TaskPluginBundleMinimalVersion;
-    }
-
-    return true;
-}
-
-void KimaiClient::KimaiClientPrivate::processReply(const KimaiReply& kimaiReply)
-{
-    // Keep some infos.
-    switch (kimaiReply.method())
-    {
-    case ApiMethod::Version: {
-        auto kVersion = kimaiReply.get<KimaiVersion>();
-        kimaiVersion  = kVersion.kimai;
-    }
-    break;
-
-    case ApiMethod::Plugins: {
-        kimaiPlugins.clear();
-        for (const auto& plugin : kimaiReply.get<Plugins>())
-        {
-            if (plugin.name == TaskPluginBundleName)
-            {
-                kimaiPlugins.insert(ApiPlugin::TaskManagement, plugin);
-            }
-        }
-    }
-    break;
-
-    default:
-        break;
-    }
-
-    // Send to GUI
-    emit mQ->replyReceived(kimaiReply);
-}
-
 void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
 {
     auto kimaiRequest = runningRequests.take(reply);
@@ -97,7 +38,7 @@ void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
         {
             auto replyData = reply->readAll();
             spdlog::debug("<=== {}", replyData.toStdString());
-            processReply({kimaiRequest->method(), replyData});
+            emit mQ->replyReceived({kimaiRequest->method(), replyData});
         }
     }
     else
@@ -142,12 +83,6 @@ void KimaiClient::setToken(const QString& token)
 
 void KimaiClient::sendRequest(const KimaiRequest& rq)
 {
-    if (!mD->isRequestAvailableForCurrentInstance(rq.method()))
-    {
-        spdlog::error("Method {} is not available for your Kimai instance.", apiMethodToString(rq.method()).toStdString());
-        return;
-    }
-
     auto qreq = mD->prepareRequest(rq);
 
     QNetworkReply* reply = nullptr;
@@ -171,11 +106,6 @@ void KimaiClient::sendRequest(const KimaiRequest& rq)
 
     if (reply)
         mD->runningRequests.insert(reply, QSharedPointer<KimaiRequest>::create(rq));
-}
-
-bool KimaiClient::isPluginAvailable(ApiPlugin plugin) const
-{
-    return mD->kimaiPlugins.contains(plugin);
 }
 
 void KimaiClient::addTrustedCertificates(const QStringList& trustedCertificates)

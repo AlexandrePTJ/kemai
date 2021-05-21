@@ -31,6 +31,7 @@ enum class ApiMethod
 
 enum class ApiPlugin
 {
+    Unknown,
     TaskManagement
 };
 
@@ -142,9 +143,11 @@ struct Plugin
 {
     QString name;
     QVersionNumber version;
+    ApiPlugin apiPlugin;
 };
 using Plugins = QVector<Plugin>;
 
 QString apiMethodToString(ApiMethod method);
+ApiPlugin pluginByName(const QString& pluginName);
 
 } // namespace kemai::client

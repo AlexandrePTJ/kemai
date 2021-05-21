@@ -61,6 +61,11 @@ void ActivityWidget::setKimaiClient(QSharedPointer<client::KimaiClient> kimaiCli
     setEnabled(mClient != nullptr);
 }
 
+void ActivityWidget::setKemaiSession(QSharedPointer<core::KemaiSession> kemaiSession)
+{
+    mSession = std::move(kemaiSession);
+}
+
 void ActivityWidget::onClientReply(const KimaiReply& reply)
 {
     if (!reply.isValid())
@@ -68,11 +73,6 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
 
     switch (reply.method())
     {
-    case ApiMethod::MeUsers: {
-        mMe.reset(new User(reply.get<User>()));
-    }
-    break;
-
     case ApiMethod::Customers: {
         const auto& customers = reply.get<Customers>();
         if (!customers.isEmpty())
@@ -156,7 +156,6 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
         updateControls();
 
         mClient->sendRequest(KimaiRequestFactory::customers());
-        mClient->sendRequest(KimaiRequestFactory::me());
     }
     break;
 
@@ -282,13 +281,10 @@ void ActivityWidget::onBtStartStopClicked()
         auto beginAt = mUi->dteStartedAt->dateTime();
 
         // Be sure to use expected timezone
-        if (mMe)
+        auto tz = QTimeZone(mSession->me.timezone.toLocal8Bit());
+        if (tz.isValid())
         {
-            auto tz = QTimeZone(mMe->timezone.toLocal8Bit());
-            if (tz.isValid())
-            {
-                beginAt = beginAt.toTimeZone(tz);
-            }
+            beginAt = beginAt.toTimeZone(tz);
         }
 
         auto projectId  = mUi->cbProject->currentData().toInt();
