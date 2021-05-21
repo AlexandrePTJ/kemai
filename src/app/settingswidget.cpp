@@ -66,19 +66,6 @@ SettingsWidget::~SettingsWidget()
     delete mUi;
 }
 
-void SettingsWidget::setActivityWidgetIndex(int idx)
-{
-    mActivityWidgetIndex = idx;
-}
-
-void SettingsWidget::backToActivity()
-{
-    if (auto stackedWidget = qobject_cast<QStackedWidget*>(parentWidget()))
-    {
-        stackedWidget->setCurrentIndex(mActivityWidgetIndex);
-    }
-}
-
 void SettingsWidget::onClientError(const QString& errorMsg)
 {
     mUi->lbTestResult->setText(errorMsg);
@@ -136,11 +123,11 @@ void SettingsWidget::onBtTestClicked()
 void SettingsWidget::onBtCancelClicked()
 {
     loadSettings();
-    backToActivity();
+    emit cancelled();
 }
 
 void SettingsWidget::onBtSaveClicked()
 {
     saveSettings();
-    backToActivity();
+    emit settingsSaved();
 }

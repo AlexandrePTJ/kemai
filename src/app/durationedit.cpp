@@ -17,25 +17,25 @@ void DurationEdit::setSeconds(int seconds)
 
 int DurationEdit::seconds() const
 {
-    int nsecs = 0;
+    int nSecs = 0;
 
     auto match = mDurationRx.match(text());
     if (match.hasMatch())
     {
         // hours
-        auto hourstr = match.captured(1);
-        if (!hourstr.isEmpty())
+        auto hourStr = match.captured(1);
+        if (!hourStr.isEmpty())
         {
-            nsecs += 3600 * hourstr.toInt();
+            nSecs += 3600 * hourStr.toInt();
         }
 
         // minutes
-        auto minstr = match.captured(3);
-        if (!minstr.isEmpty())
+        auto minStr = match.captured(3);
+        if (!minStr.isEmpty())
         {
-            nsecs += 60 * minstr.toInt();
+            nSecs += 60 * minStr.toInt();
         }
     }
 
-    return nsecs;
+    return nSecs;
 }

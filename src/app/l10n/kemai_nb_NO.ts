@@ -212,64 +212,72 @@
     </message>
 </context>
 <context>
+    <name>TaskWidget</name>
+    <message>
+        <location filename="../taskwidget.ui" line="14"/>
+        <source>TaskWidget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>kemai::app::MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="35"/>
+        <location filename="../mainwindow.cpp" line="37"/>
         <source>&amp;Quit</source>
         <translation>&amp;Avslutt</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="36"/>
+        <location filename="../mainwindow.cpp" line="38"/>
         <source>&amp;Settings</source>
         <translation>&amp;Innstillinger</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="37"/>
+        <location filename="../mainwindow.cpp" line="39"/>
         <source>Check for updates...</source>
         <translation type="unfinished">Se etter oppgraderinger …</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="38"/>
+        <location filename="../mainwindow.cpp" line="40"/>
         <source>Open Kimai instance</source>
         <translation type="unfinished">Åpne Kimai-instans</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="39"/>
+        <location filename="../mainwindow.cpp" line="41"/>
         <source>Activities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="40"/>
+        <location filename="../mainwindow.cpp" line="42"/>
         <source>Tasks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="68"/>
+        <location filename="../mainwindow.cpp" line="71"/>
         <source>&amp;File</source>
         <translation>&amp;Fil</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="73"/>
+        <location filename="../mainwindow.cpp" line="76"/>
         <source>&amp;View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="77"/>
+        <location filename="../mainwindow.cpp" line="80"/>
         <source>&amp;Help</source>
         <translation>&amp;Hjelp</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="82"/>
+        <location filename="../mainwindow.cpp" line="85"/>
         <source>About Qt</source>
         <translation>Om Qt</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="196"/>
+        <location filename="../mainwindow.cpp" line="274"/>
         <source>New version available</source>
         <translation>Ny versjon tilgjengelig</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="196"/>
+        <location filename="../mainwindow.cpp" line="274"/>
         <source>Version %1 is available.
 
 %2</source>
@@ -278,12 +286,12 @@
 %2</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="218"/>
+        <location filename="../mainwindow.cpp" line="296"/>
         <source>No update</source>
         <translation>Ingen oppgradering</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="218"/>
+        <location filename="../mainwindow.cpp" line="296"/>
         <source>%1 is latest version.</source>
         <translation>%1 er siste versjon.</translation>
     </message>
@@ -296,12 +304,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="91"/>
+        <location filename="../settingswidget.cpp" line="78"/>
         <source>Invalid reply.</source>
         <translation>Ugyldig svar.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="96"/>
+        <location filename="../settingswidget.cpp" line="83"/>
         <source>Connected to Kimai %1</source>
         <translation type="unfinished">Tilkoblet til Kimai %1</translation>
     </message>

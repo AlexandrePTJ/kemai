@@ -196,65 +196,88 @@
         <translation>Zatvori u programsku traku</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="104"/>
+        <location filename="../settingswidget.ui" line="110"/>
         <source>Test</source>
         <translation>Testiraj</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="124"/>
+        <location filename="../settingswidget.ui" line="130"/>
         <source>Cancel</source>
         <translation>Odustani</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="131"/>
+        <location filename="../settingswidget.ui" line="137"/>
         <source>Save</source>
         <translation>Spremi</translation>
     </message>
 </context>
 <context>
+    <name>TaskWidget</name>
+    <message>
+        <location filename="../taskwidget.ui" line="14"/>
+        <source>TaskWidget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>kemai::app::MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="35"/>
+        <location filename="../mainwindow.cpp" line="37"/>
         <source>&amp;Quit</source>
         <translation>&amp;Zatvori program</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="36"/>
+        <location filename="../mainwindow.cpp" line="38"/>
         <source>&amp;Settings</source>
         <translation>&amp;Postavke</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="37"/>
+        <location filename="../mainwindow.cpp" line="39"/>
         <source>Check for updates...</source>
         <translation>Traži nove verzije …</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="38"/>
+        <location filename="../mainwindow.cpp" line="40"/>
         <source>Open Kimai instance</source>
         <translation>Otvori primjerak Kemaia</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="58"/>
+        <location filename="../mainwindow.cpp" line="41"/>
+        <source>Activities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="42"/>
+        <source>Tasks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="71"/>
         <source>&amp;File</source>
         <translation>&amp;Datoteka</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="63"/>
+        <location filename="../mainwindow.cpp" line="76"/>
+        <source>&amp;View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="80"/>
         <source>&amp;Help</source>
         <translation>Po&amp;moć</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="68"/>
+        <location filename="../mainwindow.cpp" line="85"/>
         <source>About Qt</source>
         <translation>Qt informacije</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="181"/>
+        <location filename="../mainwindow.cpp" line="274"/>
         <source>New version available</source>
         <translation>Postoji nova verzija</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="182"/>
+        <location filename="../mainwindow.cpp" line="274"/>
         <source>Version %1 is available.
 
 %2</source>
@@ -263,12 +286,12 @@
 %2</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="204"/>
+        <location filename="../mainwindow.cpp" line="296"/>
         <source>No update</source>
         <translation>Nema nove verzije</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="204"/>
+        <location filename="../mainwindow.cpp" line="296"/>
         <source>%1 is latest version.</source>
         <translation>%1 je najnovija verzija.</translation>
     </message>
@@ -281,12 +304,12 @@
         <translation>Jezik je promijenjen. Program se mora ponovo pokrenuti.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="91"/>
+        <location filename="../settingswidget.cpp" line="78"/>
         <source>Invalid reply.</source>
         <translation>Neispravan odgovor.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="96"/>
+        <location filename="../settingswidget.cpp" line="83"/>
         <source>Connected to Kimai %1</source>
         <translation>Povezano s Kimai %1</translation>
     </message>
@@ -294,14 +317,12 @@
 <context>
     <name>kemai::client::KimaiClient::KimaiClientPrivate</name>
     <message>
-        <location filename="../src/core/client/kimaiclient.cpp" line="37"/>
         <source>Error on request [%1]: %2</source>
-        <translation>Greška u zahtjevu [%1]: %2</translation>
+        <translation type="vanished">Greška u zahtjevu [%1]: %2</translation>
     </message>
     <message>
-        <location filename="../src/core/client/kimaiclient.cpp" line="48"/>
         <source>Unknown request [%1]</source>
-        <translation>Nepoznat zahtjev [%1]</translation>
+        <translation type="vanished">Nepoznat zahtjev [%1]</translation>
     </message>
 </context>
 </TS>

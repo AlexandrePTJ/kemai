@@ -135,14 +135,16 @@ bool fromJson(const QJsonObject& jso, Task& inst)
     if (!jso.contains("id"))
         return false;
 
+    inst.id     = jso.value("id").toInt();
+    inst.title  = jso.value("title").toString();
+    inst.status = jso.value("status").toString();
+    safeGetJsonValue("todo", jso, inst.todo);
+    safeGetJsonValue("description", jso, inst.description);
     fromJson(jso.value("project").toObject(), inst.project);
     fromJson(jso.value("activity").toObject(), inst.activity);
     fromJson(jso.value("user").toObject(), inst.user);
-
-    inst.description = jso.value("description").toString();
-    inst.beginAt     = QDateTime::fromString(jso.value("begin").toString(), Qt::ISODate);
-    inst.endAt       = QDateTime::fromString(jso.value("end").toString(), Qt::ISODate);
-    inst.id          = jso.value("id").toInt();
+    inst.endAt = QDateTime::fromString(jso.value("end").toString(), Qt::ISODate);
+    safeGetJsonValue("estimation", jso, inst.estimation);
 
     return true;
 }

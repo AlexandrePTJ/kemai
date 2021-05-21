@@ -212,64 +212,72 @@
     </message>
 </context>
 <context>
+    <name>TaskWidget</name>
+    <message>
+        <location filename="../taskwidget.ui" line="14"/>
+        <source>TaskWidget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>kemai::app::MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="35"/>
+        <location filename="../mainwindow.cpp" line="37"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="36"/>
+        <location filename="../mainwindow.cpp" line="38"/>
         <source>&amp;Settings</source>
         <translation>&amp;Paramètres</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="37"/>
+        <location filename="../mainwindow.cpp" line="39"/>
         <source>Check for updates...</source>
         <translation>Vérifier les mises à jour...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="38"/>
+        <location filename="../mainwindow.cpp" line="40"/>
         <source>Open Kimai instance</source>
         <translation>Ouvrir Kimai</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="39"/>
+        <location filename="../mainwindow.cpp" line="41"/>
         <source>Activities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="40"/>
+        <location filename="../mainwindow.cpp" line="42"/>
         <source>Tasks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="68"/>
+        <location filename="../mainwindow.cpp" line="71"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="73"/>
+        <location filename="../mainwindow.cpp" line="76"/>
         <source>&amp;View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="77"/>
+        <location filename="../mainwindow.cpp" line="80"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="82"/>
+        <location filename="../mainwindow.cpp" line="85"/>
         <source>About Qt</source>
         <translation>A propos de Qt</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="196"/>
+        <location filename="../mainwindow.cpp" line="274"/>
         <source>New version available</source>
         <translation>Nouvelle version disponible</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="196"/>
+        <location filename="../mainwindow.cpp" line="274"/>
         <source>Version %1 is available.
 
 %2</source>
@@ -278,12 +286,12 @@
 %2</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="218"/>
+        <location filename="../mainwindow.cpp" line="296"/>
         <source>No update</source>
         <translation>Aucune mise à jour</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="218"/>
+        <location filename="../mainwindow.cpp" line="296"/>
         <source>%1 is latest version.</source>
         <translation>%1 est la dernière version.</translation>
     </message>
@@ -296,12 +304,12 @@
         <translation>La langue a changé. Le redémarrage de l&apos;application est requis.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="91"/>
+        <location filename="../settingswidget.cpp" line="78"/>
         <source>Invalid reply.</source>
         <translation>Réponse invalide.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="96"/>
+        <location filename="../settingswidget.cpp" line="83"/>
         <source>Connected to Kimai %1</source>
         <translation>Connecté à Kimai %1</translation>
     </message>

@@ -126,12 +126,15 @@ struct User
 struct Task
 {
     int id = 0;
+    QString title;
+    QString status;
+    QString todo;
     QString description;
-    QDateTime beginAt;
-    QDateTime endAt;
-    Activity activity;
     Project project;
+    Activity activity;
     User user;
+    QDateTime endAt;
+    int estimation = 0;
 };
 using Tasks = QVector<Task>;
 

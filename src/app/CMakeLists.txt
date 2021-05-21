@@ -11,7 +11,8 @@ set(SRCS
         main.cpp
         mainwindow.cpp
         projectdialog.cpp
-        settingswidget.cpp)
+        settingswidget.cpp
+        taskwidget.cpp)
 
 set(HDRS
         activitydialog.h
@@ -21,7 +22,8 @@ set(HDRS
         durationedit.h
         mainwindow.h
         projectdialog.h
-        settingswidget.h)
+        settingswidget.h
+        taskwidget.h)
 
 set(UIS
         activitydialog.ui
@@ -29,7 +31,8 @@ set(UIS
         customerdialog.ui
         mainwindow.ui
         projectdialog.ui
-        settingswidget.ui)
+        settingswidget.ui
+        taskwidget.ui)
 
 # Localization
 include(LocalizationTools)

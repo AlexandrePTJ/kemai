@@ -1,18 +1,20 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "kemai_version.h"
-
-#include "activitywidget.h"
-#include "settingswidget.h"
-
-#include "client/kimairequestfactory.h"
-#include "settings.h"
-
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QTimer>
+
+#include <spdlog/spdlog.h>
+
+#include "client/kimairequestfactory.h"
+#include "kemai_version.h"
+
+#include "activitywidget.h"
+#include "settings.h"
+#include "settingswidget.h"
+#include "taskwidget.h"
 
 using namespace kemai::app;
 using namespace kemai::client;
@@ -38,6 +40,7 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     mActOpenHost       = new QAction(tr("Open Kimai instance"), this);
     mActViewActivities = new QAction(tr("Activities"), this);
     mActViewTasks      = new QAction(tr("Tasks"), this);
+    mActViewTasks->setEnabled(false);
 
     mActViewActivities->setCheckable(true);
     mActViewTasks->setCheckable(true);
@@ -89,30 +92,37 @@ MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
     /*
      * Setup widgets
      */
-    auto activityWidget = new ActivityWidget;
-    mActivitySId        = mUi->stackedWidget->addWidget(activityWidget);
-    mCurrentSId         = mActivitySId;
+    mActivityWidget = new ActivityWidget;
+    mUi->stackedWidget->addWidget(mActivityWidget);
 
-    auto settingsWidget = new SettingsWidget;
-    settingsWidget->setActivityWidgetIndex(mActivitySId);
-    mSettingsSId = mUi->stackedWidget->addWidget(settingsWidget);
+    mSettingsWidget = new SettingsWidget;
+    mUi->stackedWidget->addWidget(mSettingsWidget);
+
+    mTaskWidget = new TaskWidget;
+    mUi->stackedWidget->addWidget(mTaskWidget);
 
     /*
      * Connections
      */
-    connect(mUi->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::onStackedCurrentChanged);
     connect(mActSettings, &QAction::triggered, this, &MainWindow::onActionSettingsTriggered);
     connect(mActQuit, &QAction::triggered, qApp, &QCoreApplication::quit);
+    connect(mActViewActivities, &QAction::triggered, this, &MainWindow::showSelectedView);
+    connect(mActViewTasks, &QAction::triggered, this, &MainWindow::showSelectedView);
     connect(mActCheckUpdate, &QAction::triggered, this, &MainWindow::onActionCheckUpdateTriggered);
     connect(mActOpenHost, &QAction::triggered, this, &MainWindow::onActionOpenHostTriggered);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
     connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
-    connect(activityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChange);
+    connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChange);
+    connect(mSettingsWidget, &SettingsWidget::cancelled, this, &MainWindow::showSelectedView);
+    connect(mSettingsWidget, &SettingsWidget::settingsSaved, [&]() {
+        createKimaiClient();
+        showSelectedView();
+    });
 
     /*
      * Delay first refresh and update check
      */
-    QTimer::singleShot(100, activityWidget, &ActivityWidget::refresh);
+    QTimer::singleShot(100, this, &MainWindow::createKimaiClient);
     QTimer::singleShot(100, [&]() {
         auto ignoreVersion  = QVersionNumber::fromString(Settings::load().kemai.ignoredVersion);
         auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
@@ -138,9 +148,94 @@ void MainWindow::closeEvent(QCloseEvent* event)
     Settings::save(settings);
 }
 
+void MainWindow::createKimaiClient()
+{
+    // Clear previous client usage
+    if (mClient)
+    {
+        mActivityWidget->setKimaiClient(nullptr);
+    }
+
+    auto settings = Settings::load();
+    if (settings.isReady())
+    {
+        mClient = QSharedPointer<KimaiClient>::create();
+        mClient->setHost(settings.kimai.host);
+        mClient->setUsername(settings.kimai.username);
+        mClient->setToken(settings.kimai.token);
+
+        connect(mClient.data(), &KimaiClient::replyReceived, this, &MainWindow::onClientReply);
+        connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
+
+        // send some request to identify instance
+        mClient->sendRequest(KimaiRequestFactory::version());
+
+        mActivityWidget->setKimaiClient(mClient);
+    }
+}
+
+void MainWindow::showSelectedView()
+{
+    setViewActionsEnabled(true);
+
+    if (mActViewTasks->isChecked())
+    {
+        mUi->stackedWidget->setCurrentWidget(mTaskWidget);
+    }
+    else
+    {
+        mUi->stackedWidget->setCurrentWidget(mActivityWidget);
+    }
+}
+
+void MainWindow::setViewActionsEnabled(bool enable)
+{
+    mActViewActivities->setEnabled(enable);
+
+    bool taskPluginEnabled = false;
+    if (mClient)
+    {
+        taskPluginEnabled = mClient->isPluginAvailable(ApiPlugin::TaskManagement);
+    }
+    mActViewTasks->setEnabled(enable && taskPluginEnabled);
+}
+
+void MainWindow::onClientError(const QString& errorMsg)
+{
+    spdlog::error("Client error: {}", errorMsg.toStdString());
+}
+
+void MainWindow::onClientReply(const KimaiReply& reply)
+{
+    if (!reply.isValid())
+        return;
+
+    switch (reply.method())
+    {
+    case ApiMethod::Version: {
+        // Allow current client instance to get instance version and list of available plugins.
+        mClient->sendRequest(KimaiRequestFactory::plugins());
+    }
+    break;
+
+    case ApiMethod::Plugins: {
+        mActViewTasks->setEnabled(mClient->isPluginAvailable(ApiPlugin::TaskManagement));
+        if (mActViewTasks->isEnabled())
+        {
+            mTaskWidget->setKimaiClient(mClient);
+        }
+    }
+    break;
+
+    default:
+        break;
+    }
+}
+
 void MainWindow::onActionSettingsTriggered()
 {
-    mUi->stackedWidget->setCurrentIndex(mSettingsSId);
+    setViewActionsEnabled(false);
+    mUi->stackedWidget->setCurrentWidget(mSettingsWidget);
 }
 
 void MainWindow::onActionCheckUpdateTriggered()
@@ -156,23 +251,6 @@ void MainWindow::onActionOpenHostTriggered()
     {
         QDesktopServices::openUrl(QUrl::fromUserInput(settings.kimai.host));
     }
-}
-
-void MainWindow::onStackedCurrentChanged(int id)
-{
-    // Check if we left settings stack
-    if (mCurrentSId == mSettingsSId)
-    {
-        if (id == mActivitySId)
-        {
-            if (auto activityWidget = qobject_cast<ActivityWidget*>(mUi->stackedWidget->widget(id)))
-            {
-                activityWidget->refresh();
-            }
-        }
-    }
-
-    mCurrentSId = id;
 }
 
 void MainWindow::onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason)

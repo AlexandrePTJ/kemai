@@ -40,27 +40,16 @@ ActivityWidget::~ActivityWidget()
     delete mUi;
 }
 
-void ActivityWidget::refresh()
+void ActivityWidget::setKimaiClient(QSharedPointer<client::KimaiClient> kimaiClient)
 {
     mUi->cbActivity->clear();
     mUi->cbProject->clear();
     mUi->cbCustomer->clear();
 
-    // reset client
-    auto settings = Settings::load();
-    if (settings.isReady())
+    mClient = std::move(kimaiClient);
+    if (mClient)
     {
-        mClient.reset(new KimaiClient);
-
-        mClient->setHost(settings.kimai.host);
-        mClient->setUsername(settings.kimai.username);
-        mClient->setToken(settings.kimai.token);
-
-        connect(mClient.data(), &KimaiClient::requestError, this, &ActivityWidget::onClientError);
-        connect(mClient.data(), &KimaiClient::replyReceived, this, &ActivityWidget::onClientReply);
-
-        // send some request to identify instance
-        mClient->sendRequest(KimaiRequestFactory::version());
+        connect(mClient.get(), &KimaiClient::replyReceived, this, &ActivityWidget::onClientReply);
 
         // check if we have running timesheet.
         // if one is running, it will re-fill combobox one by one, and set correct values
@@ -68,17 +57,8 @@ void ActivityWidget::refresh()
         mClient->sendRequest(KimaiRequestFactory::activeTimeSheets());
         mClient->sendRequest(KimaiRequestFactory::tags());
     }
-    else
-    {
-        mClient.reset(nullptr);
-    }
 
     setEnabled(mClient != nullptr);
-}
-
-void ActivityWidget::onClientError(const QString& errorMsg)
-{
-    spdlog::error("Client error: {}", errorMsg.toStdString());
 }
 
 void ActivityWidget::onClientReply(const KimaiReply& reply)
@@ -88,12 +68,6 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
 
     switch (reply.method())
     {
-    case ApiMethod::Version: {
-        // Allow current client instance to get instance version and list of available plugins.
-        mClient->sendRequest(KimaiRequestFactory::plugins());
-    }
-    break;
-
     case ApiMethod::MeUsers: {
         mMe.reset(new User(reply.get<User>()));
     }
@@ -201,10 +175,6 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
     }
     break;
 
-    case ApiMethod::Tags: {
-        auto tags = reply.get<Tags>();
-    }
-
     default:
         break;
     }
@@ -287,8 +257,8 @@ void ActivityWidget::onSecondTimeout()
     const auto& now = QDateTime::currentDateTime();
     if (mCurrentTimeSheet)
     {
-        auto nsecs        = mCurrentTimeSheet->beginAt.secsTo(now);
-        auto durationTime = QTime(0, 0).addSecs(nsecs);
+        auto nSecs        = mCurrentTimeSheet->beginAt.secsTo(now);
+        auto durationTime = QTime(0, 0).addSecs(static_cast<int>(nSecs));
         mUi->lbDurationTime->setText(durationTime.toString());
     }
     else

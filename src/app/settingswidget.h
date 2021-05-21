@@ -18,10 +18,11 @@ public:
     SettingsWidget(QWidget* parent = nullptr);
     ~SettingsWidget() override;
 
-    void setActivityWidgetIndex(int idx);
+signals:
+    void settingsSaved();
+    void cancelled();
 
-private slots:
-    void backToActivity();
+private:
     void loadSettings();
     void saveSettings();
 
@@ -33,7 +34,6 @@ private slots:
     void onBtSaveClicked();
 
 private:
-    int mActivityWidgetIndex        = 0;
     Ui::SettingsWidget* mUi         = nullptr;
     QAction* mActToggleTokenVisible = nullptr;
 

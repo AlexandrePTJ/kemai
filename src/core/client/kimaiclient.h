@@ -28,7 +28,7 @@ public:
 signals:
     void requestError(const QString& errorMsg);
     void sslError(const QString& msg, const QByteArray& certSN, const QByteArray& certPem);
-    void replyReceived(const KimaiReply& reply);
+    void replyReceived(const kemai::client::KimaiReply& reply);
 
 private:
     class KimaiClientPrivate;

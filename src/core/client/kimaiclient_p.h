@@ -32,11 +32,10 @@ public:
     QVersionNumber kimaiVersion;
     QMap<ApiPlugin, Plugin> kimaiPlugins;
 
-private slots:
+private:
     void onNamFinished(QNetworkReply* reply);
     void onNamSslErrors(QNetworkReply* reply, const QList<QSslError>& errors);
 
-private:
     KimaiClient* const mQ;
 };
 

@@ -11,8 +11,7 @@ using namespace kemai::updater;
 /*
  * Private impl
  */
-KemaiUpdater::KemaiUpdaterPrivate::KemaiUpdaterPrivate(KemaiUpdater* c)
-    : networkAccessManager(new QNetworkAccessManager), mQ(c)
+KemaiUpdater::KemaiUpdaterPrivate::KemaiUpdaterPrivate(KemaiUpdater* c) : networkAccessManager(new QNetworkAccessManager), mQ(c)
 {
     connect(networkAccessManager.data(), &QNetworkAccessManager::finished, this, &KemaiUpdaterPrivate::onNamFinished);
 }
@@ -43,7 +42,7 @@ void KemaiUpdater::KemaiUpdaterPrivate::onNamFinished(QNetworkReply* reply)
         auto jobj = jdoc.object();
 
         auto newVersion = QVersionNumber::fromString(jobj.value("tag_name").toString());
-        if (newVersion > currentChecksinceVersion)
+        if (newVersion > currentCheckSinceVersion)
         {
             VersionDetails vd;
             vd.vn          = newVersion;
@@ -68,7 +67,7 @@ KemaiUpdater::~KemaiUpdater() = default;
 
 void KemaiUpdater::checkAvailableNewVersion(const QVersionNumber& sinceVersion, bool silenceIfNoNew)
 {
-    mD->currentChecksinceVersion = sinceVersion;
+    mD->currentCheckSinceVersion = sinceVersion;
     mD->silenceIfNoNew           = silenceIfNoNew;
 
     auto rq = mD->prepareGithubRequest("/repos/AlexandrePTJ/kemai/releases/latest");

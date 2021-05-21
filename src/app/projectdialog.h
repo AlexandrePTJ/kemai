@@ -22,8 +22,6 @@ public:
 
 private:
     void enableSave(bool enable);
-
-private slots:
     void validateForm();
 
 private:

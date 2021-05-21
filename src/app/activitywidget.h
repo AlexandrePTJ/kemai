@@ -19,11 +19,12 @@ public:
     ActivityWidget(QWidget* parent = nullptr);
     ~ActivityWidget() override;
 
-public slots:
-    void refresh();
+    void setKimaiClient(QSharedPointer<client::KimaiClient> kimaiClient);
 
-private slots:
-    void onClientError(const QString& errorMsg);
+signals:
+    void currentActivityChanged(bool started);
+
+private:
     void onClientReply(const client::KimaiReply& reply);
 
     void onCbCustomerTextChanged(const QString& text);
@@ -40,13 +41,10 @@ private slots:
 
     void updateControls();
 
-signals:
-    void currentActivityChanged(bool started);
-
 private:
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;
-    QScopedPointer<client::KimaiClient> mClient;
+    QSharedPointer<client::KimaiClient> mClient;
     QScopedPointer<client::TimeSheet> mCurrentTimeSheet;
     QScopedPointer<client::User> mMe;
 };
