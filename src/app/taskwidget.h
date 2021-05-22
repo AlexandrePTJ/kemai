@@ -3,6 +3,7 @@
 #include <QWidget>
 
 #include "client/kimaiclient.h"
+#include "models/tasklistmodel.h"
 
 namespace Ui {
 class TaskWidget;
@@ -26,6 +27,7 @@ private:
 private:
     Ui::TaskWidget* mUi;
     QSharedPointer<client::KimaiClient> mClient;
+    models::TaskListModel mTaskModel;
 };
 
 } // namespace kemai::app

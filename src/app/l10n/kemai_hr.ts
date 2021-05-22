@@ -218,6 +218,21 @@
         <source>TaskWidget</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../taskwidget.ui" line="25"/>
+        <source>Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../taskwidget.ui" line="42"/>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../taskwidget.ui" line="49"/>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>kemai::app::MainWindow</name>

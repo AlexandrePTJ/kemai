@@ -11,6 +11,7 @@ using namespace kemai::client;
 TaskWidget::TaskWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::TaskWidget)
 {
     mUi->setupUi(this);
+    mUi->lvTasks->setModel(&mTaskModel);
 }
 
 TaskWidget::~TaskWidget()
@@ -38,6 +39,12 @@ void TaskWidget::onClientReply(const KimaiReply& reply)
 
     switch (reply.method())
     {
+    case ApiMethod::Tasks: {
+        auto tasks = reply.get<Tasks>();
+        mTaskModel.setTasks(tasks);
+    }
+    break;
+
     default:
         break;
     }

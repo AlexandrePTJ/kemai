@@ -170,8 +170,8 @@ void MainWindow::createKimaiClient()
         connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
 
         // send some request to identify instance
-        mClient->sendRequest(KimaiRequestFactory::version());
         mClient->sendRequest(KimaiRequestFactory::me());
+        mClient->sendRequest(KimaiRequestFactory::version());
 
         mActivityWidget->setKimaiClient(mClient);
         mActivityWidget->setKemaiSession(mSession);
@@ -220,7 +220,7 @@ void MainWindow::onClientReply(const KimaiReply& reply)
         auto kVersion          = reply.get<KimaiVersion>();
         mSession->kimaiVersion = kVersion.kimai;
         // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.2
-        if (mSession->kimaiVersion >= QVersionNumber(1, 14, 2))
+        if (mSession->kimaiVersion >= QVersionNumber(1, 14, 1))
         {
             mClient->sendRequest(KimaiRequestFactory::plugins());
         }
