@@ -9,5 +9,6 @@
         <file alias="visible-off">icons/visibility-off.svg</file>
         <file alias="update">icons/update.svg</file>
         <file alias="update-off">icons/update-off.svg</file>
+        <file alias="backspace">icons/backspace.svg</file>
     </qresource>
 </RCC>

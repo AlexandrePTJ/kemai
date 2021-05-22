@@ -11,6 +11,7 @@ set(SRCS
         client/kimairequest.cpp
         client/kimairequestfactory.cpp
         client/parser.cpp
+        models/taskfilterproxymodel.cpp
         models/tasklistmodel.cpp
         updater/kemaiupdater.cpp
         kemaisession.cpp
@@ -22,6 +23,7 @@ set(PUB_HDRS
         client/kimaireply.h
         client/kimairequest.h
         client/kimairequestfactory.h
+        models/taskfilterproxymodel.h
         models/tasklistmodel.h
         updater/kemaiupdater.h
         kemaisession.h

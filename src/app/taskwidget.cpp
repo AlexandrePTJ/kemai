@@ -1,9 +1,9 @@
 #include "taskwidget.h"
 #include "ui_taskwidget.h"
 
-#include "client/kimairequestfactory.h"
+#include <QAction>
 
-#include <spdlog/spdlog.h>
+#include "client/kimairequestfactory.h"
 
 using namespace kemai::app;
 using namespace kemai::client;
@@ -11,7 +11,14 @@ using namespace kemai::client;
 TaskWidget::TaskWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::TaskWidget)
 {
     mUi->setupUi(this);
-    mUi->lvTasks->setModel(&mTaskModel);
+
+    mTaskProxyModel.setSourceModel(&mTaskModel);
+    mUi->lvTasks->setModel(&mTaskProxyModel);
+
+    auto clearTextAction = mUi->leFilter->addAction(QIcon(":/icons/backspace"), QLineEdit::TrailingPosition);
+
+    connect(clearTextAction, &QAction::triggered, mUi->leFilter, &QLineEdit::clear);
+    connect(mUi->leFilter, &QLineEdit::textChanged, [&](const QString& text) { mTaskProxyModel.setFilterRegularExpression(QString(".*%1.*").arg(text)); });
 }
 
 TaskWidget::~TaskWidget()
