@@ -27,6 +27,9 @@ QVariant TaskListModel::data(const QModelIndex& index, int role) const
     case Qt::DisplayRole:
         return QString("%1\n- %2").arg(task.title, task.description);
 
+    case TaskIDRole:
+        return task.id;
+
     default:
         return QVariant();
     }

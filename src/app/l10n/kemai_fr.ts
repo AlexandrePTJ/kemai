@@ -224,12 +224,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../taskwidget.ui" line="42"/>
+        <location filename="../taskwidget.ui" line="52"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../taskwidget.ui" line="49"/>
+        <location filename="../taskwidget.ui" line="62"/>
         <source>Done</source>
         <translation type="unfinished"></translation>
     </message>

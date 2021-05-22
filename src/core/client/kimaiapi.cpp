@@ -37,6 +37,10 @@ QString apiMethodToString(ApiMethod method)
         return "tags";
 
     case ApiMethod::Tasks:
+    case ApiMethod::TaskLog:
+    case ApiMethod::TaskStart:
+    case ApiMethod::TaskStop:
+    case ApiMethod::TaskClose:
         return "tasks";
 
     case ApiMethod::Plugins:

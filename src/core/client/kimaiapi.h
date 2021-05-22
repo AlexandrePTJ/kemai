@@ -26,7 +26,11 @@ enum class ApiMethod
     MeUsers,
     Tags,
     Plugins,
-    Tasks
+    Tasks,
+    TaskLog,
+    TaskStart,
+    TaskStop,
+    TaskClose
 };
 
 enum class ApiPlugin

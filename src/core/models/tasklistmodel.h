@@ -9,6 +9,11 @@ namespace kemai::models {
 class TaskListModel : public QAbstractListModel
 {
 public:
+    enum TaskModelRole
+    {
+        TaskIDRole = Qt::UserRole + 1
+    };
+
     TaskListModel();
     ~TaskListModel() override;
 

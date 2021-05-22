@@ -24,6 +24,7 @@ public:
 
 private:
     void onClientReply(const client::KimaiReply& reply);
+    void onTaskItemChanged(const QModelIndex& current, const QModelIndex& previous);
 
 private:
     Ui::TaskWidget* mUi;
