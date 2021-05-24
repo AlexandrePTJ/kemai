@@ -112,14 +112,6 @@ KimaiRequest KimaiRequestFactory::tasks()
     return KimaiRequest(ApiMethod::Tasks);
 }
 
-KimaiRequest KimaiRequestFactory::taskLog(int taskId, const QDateTime& logBegin, const QDateTime& logEnd)
-{
-    auto krq = KimaiRequest(ApiMethod::TaskLog, HttpVerb::Patch);
-    krq.setPatchVerb(QString("%1/log").arg(taskId));
-    krq.setData(parser::toPostData(QJsonObject{{"start", logBegin.toString(Qt::ISODate)}, {"end", logEnd.toString(Qt::ISODate)}}));
-    return krq;
-}
-
 KimaiRequest KimaiRequestFactory::taskStart(int taskId)
 {
     auto krq = KimaiRequest(ApiMethod::TaskStart, HttpVerb::Patch);

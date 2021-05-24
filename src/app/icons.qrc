@@ -10,5 +10,6 @@
         <file alias="update">icons/update.svg</file>
         <file alias="update-off">icons/update-off.svg</file>
         <file alias="backspace">icons/backspace.svg</file>
+        <file alias="refresh">icons/refresh.svg</file>
     </qresource>
 </RCC>

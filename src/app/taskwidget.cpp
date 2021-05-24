@@ -23,6 +23,8 @@ TaskWidget::TaskWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::TaskWidge
     connect(clearTextAction, &QAction::triggered, mUi->leFilter, &QLineEdit::clear);
     connect(mUi->leFilter, &QLineEdit::textChanged, [&](const QString& text) { mTaskProxyModel.setFilterRegularExpression(QString(".*%1.*").arg(text)); });
     connect(mUi->lvTasks->selectionModel(), &QItemSelectionModel::currentChanged, this, &TaskWidget::onTaskItemChanged);
+    connect(mUi->btStartStop, &QPushButton::clicked, this, &TaskWidget::onStartStopClicked);
+    connect(mUi->tbRefresh, &QPushButton::clicked, this, &TaskWidget::onRefreshClicked);
 }
 
 TaskWidget::~TaskWidget()
@@ -53,6 +55,11 @@ void TaskWidget::onClientReply(const KimaiReply& reply)
     case ApiMethod::Tasks: {
         auto tasks = reply.get<Tasks>();
         mTaskModel.setTasks(tasks);
+
+        for (const auto& task : tasks)
+        {
+            spdlog::info("{} => {}", task.id, task.status.toStdString());
+        }
     }
     break;
 
@@ -66,3 +73,10 @@ void TaskWidget::onTaskItemChanged(const QModelIndex& current, const QModelIndex
     mUi->btDone->setEnabled(current.isValid());
     mUi->btStartStop->setEnabled(current.isValid());
 }
+
+void TaskWidget::onRefreshClicked()
+{
+    mClient->sendRequest(KimaiRequestFactory::tasks());
+}
+
+void TaskWidget::onStartStopClicked() {}

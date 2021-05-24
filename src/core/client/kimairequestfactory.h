@@ -22,7 +22,6 @@ public:
     static KimaiRequest stopTimeSheet(int timeSheetId);
     static KimaiRequest tags();
     static KimaiRequest tasks();
-    static KimaiRequest taskLog(int taskId, const QDateTime& logBegin, const QDateTime& logEnd);
     static KimaiRequest taskStart(int taskId);
     static KimaiRequest taskStop(int taskId);
     static KimaiRequest taskClose(int taskId);
