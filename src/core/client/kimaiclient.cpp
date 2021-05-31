@@ -20,6 +20,7 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiReque
     r.setUrl(cmd.url(host));
     r.setRawHeader("X-AUTH-USER", username.toLatin1());
     r.setRawHeader("X-AUTH-TOKEN", token.toLatin1());
+    r.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
     if (cmd.httpVerb() == HttpVerb::Post)
         r.setRawHeader("Content-Type", "application/json");
     return r;
