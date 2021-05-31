@@ -19,6 +19,7 @@ using namespace kemai::client;
 int main(int argc, char* argv[])
 {
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
     QApplication app(argc, argv);
     app.setApplicationName("Kemai");
