@@ -256,9 +256,22 @@ void ActivityWidget::onSecondTimeout()
     const auto& now = QDateTime::currentDateTime();
     if (mCurrentTimeSheet)
     {
-        auto nSecs        = mCurrentTimeSheet->beginAt.secsTo(now);
-        auto durationTime = QTime(0, 0).addSecs(static_cast<int>(nSecs));
-        mUi->lbDurationTime->setText(durationTime.toString());
+        auto nSecs = mCurrentTimeSheet->beginAt.secsTo(now);
+
+        auto nDays = nSecs / 86400;
+        nSecs -= nDays * 86400;
+
+        auto nHours = nSecs / 3600;
+        nSecs -= nHours * 3600;
+
+        auto nMins = nSecs / 60;
+        nSecs -= nMins * 60;
+
+        mUi->lbDurationTime->setText(QString("%1%2:%3:%4")
+                                         .arg(nDays > 0 ? QString::number(nDays) + "d " : "")
+                                         .arg(nHours, 2, 10, QChar('0'))
+                                         .arg(nMins, 2, 10, QChar('0'))
+                                         .arg(nSecs, 2, 10, QChar('0')));
     }
     else
     {
