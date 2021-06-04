@@ -46,7 +46,7 @@
         <location filename="../activitywidget.ui" line="110"/>
         <location filename="../activitywidget.ui" line="160"/>
         <source>...</source>
-        <translation>...</translation>
+        <translation>…</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="79"/>
@@ -66,7 +66,7 @@
     <message>
         <location filename="../activitywidget.ui" line="183"/>
         <source>Tags</source>
-        <translation>Tags</translation>
+        <translation>Étiquettes</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="193"/>
@@ -132,7 +132,7 @@
     <message>
         <location filename="../mainwindow.ui" line="48"/>
         <source>Settings...</source>
-        <translation>Paramètres...</translation>
+        <translation>Paramètres…</translation>
     </message>
 </context>
 <context>
@@ -216,27 +216,27 @@
     <message>
         <location filename="../taskwidget.ui" line="14"/>
         <source>TaskWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>TaskWidget</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="25"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtre</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="35"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>…</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="63"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="73"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Terminé</translation>
     </message>
 </context>
 <context>
