@@ -254,7 +254,7 @@
     <message>
         <location filename="../mainwindow.cpp" line="40"/>
         <source>Check for updates...</source>
-        <translation>Vérifier les mises à jour...</translation>
+        <translation>Vérifier les mises à jour…</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="41"/>
@@ -264,12 +264,12 @@
     <message>
         <location filename="../mainwindow.cpp" line="42"/>
         <source>Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Activités</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="43"/>
         <source>Tasks</source>
-        <translation type="unfinished"></translation>
+        <translation>Tâches</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="72"/>
@@ -279,7 +279,7 @@
     <message>
         <location filename="../mainwindow.cpp" line="77"/>
         <source>&amp;View</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Voir</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="81"/>
@@ -289,7 +289,7 @@
     <message>
         <location filename="../mainwindow.cpp" line="86"/>
         <source>About Qt</source>
-        <translation>A propos de Qt</translation>
+        <translation>À propos de Qt</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="287"/>
