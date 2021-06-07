@@ -188,7 +188,7 @@
     <message>
         <location filename="../settingswidget.ui" line="63"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Språk</translation>
     </message>
     <message>
         <location filename="../settingswidget.ui" line="70"/>
@@ -216,12 +216,12 @@
     <message>
         <location filename="../taskwidget.ui" line="14"/>
         <source>TaskWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjøremålsminiprogram</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="25"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filter</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="35"/>
@@ -231,12 +231,12 @@
     <message>
         <location filename="../taskwidget.ui" line="63"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="73"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Ferdig</translation>
     </message>
 </context>
 <context>
@@ -264,12 +264,12 @@
     <message>
         <location filename="../mainwindow.cpp" line="42"/>
         <source>Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviteter</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="43"/>
         <source>Tasks</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjøremål</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="72"/>
@@ -279,7 +279,7 @@
     <message>
         <location filename="../mainwindow.cpp" line="77"/>
         <source>&amp;View</source>
-        <translation type="unfinished"></translation>
+        <translation>%Vis</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="81"/>
@@ -321,7 +321,7 @@
     <message>
         <location filename="../settingswidget.cpp" line="57"/>
         <source>Language changed. Application restart is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Språk endret. Programmet må startes på ny.</translation>
     </message>
     <message>
         <location filename="../settingswidget.cpp" line="78"/>
