@@ -216,27 +216,27 @@
     <message>
         <location filename="../taskwidget.ui" line="14"/>
         <source>TaskWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>Programčić zadataka</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="25"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtar</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="35"/>
         <source>...</source>
-        <translation type="unfinished">…</translation>
+        <translation>…</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="63"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokreni</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="73"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Gotovo</translation>
     </message>
 </context>
 <context>
@@ -264,12 +264,12 @@
     <message>
         <location filename="../mainwindow.cpp" line="42"/>
         <source>Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivnosti</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="43"/>
         <source>Tasks</source>
-        <translation type="unfinished"></translation>
+        <translation>Zadaci</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="72"/>
@@ -279,7 +279,7 @@
     <message>
         <location filename="../mainwindow.cpp" line="77"/>
         <source>&amp;View</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Prikaz</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="81"/>
