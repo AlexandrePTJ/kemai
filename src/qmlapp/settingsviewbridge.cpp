@@ -83,6 +83,6 @@ void SettingsViewBridge::onClientReply(const client::KimaiReply& reply)
     else
     {
         auto version = reply.get<KimaiVersion>();
-        emit testFinished(true, tr("Connected to Kimai %1").arg(version.kimai));
+        emit testFinished(true, tr("Connected to Kimai %1").arg(version.kimai.toString()));
     }
 }

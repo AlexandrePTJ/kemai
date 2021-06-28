@@ -1,4 +1,4 @@
-version: 1.0.{build}-{branch}
+version: 1.1.{build}-{branch}
 
 image:
   - Visual Studio 2019
@@ -7,6 +7,9 @@ image:
 
 platform:
   - x64
+
+environment:
+  KEMAI_QT_VERSION: 6.0
 
 for:
   - matrix:
@@ -20,11 +23,11 @@ for:
       - chmod +x linuxdeployqt.AppImage
 
     build_script:
-      - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/5.15.2/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
+      - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
       - cmake --build build
 
     after_build:
-      - export PATH=$HOME/Qt/5.15.2/gcc_64/bin:$PATH
+      - export PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64/bin:$PATH
       - export VERSION=$(grep -oP "VERSION \K(\d+\.\d+\.\d+)" CMakeLists.txt)
       - cmake --build build --target install
       - cp dist/bin/Kemai dist/
@@ -43,7 +46,7 @@ for:
       - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=amd64
 
     build_script:
-      - cmake . -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\5.15\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64 -DCMAKE_INSTALL_PREFIX=dist
+      - cmake . -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\%KEMAI_QT_VERSION%\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64 -DCMAKE_INSTALL_PREFIX=dist
       - cmake --build build --config Release
 
     after_build:
@@ -57,11 +60,11 @@ for:
         - image: macOS
 
     build_script:
-      - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/5.15.2/clang_64
+      - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/clang_64
       - cmake --build build
 
     after_build:
-      - $HOME/Qt/5.15.2/clang_64/bin/macdeployqt build/src/app/Kemai.app
+      - $HOME/Qt/$KEMAI_QT_VERSION/clang_64/bin/macdeployqt build/src/app/Kemai.app
       - cmake --build build --target package
 
     artifacts:

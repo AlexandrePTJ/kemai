@@ -29,7 +29,15 @@ option(BUILD_QMLAPP "Build experimental QML application" OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
-find_package(Qt5 COMPONENTS Widgets Network LinguistTools Quick CONFIG REQUIRED)
+find_package(Qt6 QUIET COMPONENTS Widgets Network LinguistTools Quick)
+if (NOT Qt6_FOUND)
+    message(NOTICE "Qt6 not found. Fallback to Qt5")
+    find_package(Qt5 COMPONENTS Widgets Network LinguistTools Quick REQUIRED)
+    message(STATUS "Using Qt ${Qt5_VERSION}")
+else ()
+    message(STATUS "Using Qt ${Qt6_VERSION}")
+endif ()
+
 
 # Common package configuration
 set(KEMAI_GUID "88815E44-85A0-469C-9740-B4887D456BAA")
