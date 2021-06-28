@@ -10,9 +10,6 @@ using namespace kemai::qmlapp;
 
 int main(int argc, char* argv[])
 {
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
     QGuiApplication app(argc, argv);
     app.setApplicationName("Kemai");
     app.setOrganizationName("Kemai");

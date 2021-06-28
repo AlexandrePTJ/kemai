@@ -21,10 +21,6 @@ include_directories(${spdlog_SOURCE_DIR}/include)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_definitions(UNICODE _UNICODE)
-
-option(BUILD_QMLAPP "Build experimental QML application" OFF)
-
 # Setup Qt
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -32,10 +28,12 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 QUIET COMPONENTS Widgets Network LinguistTools Quick)
 if (NOT Qt6_FOUND)
     message(NOTICE "Qt6 not found. Fallback to Qt5")
-    find_package(Qt5 COMPONENTS Widgets Network LinguistTools Quick REQUIRED)
+    find_package(Qt5 COMPONENTS Widgets Network LinguistTools REQUIRED)
+    add_compile_definitions(UNICODE _UNICODE)
     message(STATUS "Using Qt ${Qt5_VERSION}")
 else ()
     message(STATUS "Using Qt ${Qt6_VERSION}")
+    option(BUILD_QMLAPP "Build experimental QML application" OFF)
 endif ()
 
 

@@ -40,7 +40,7 @@ public:
         int i = index.row();
         if (i < 0 || i >= mValues.size())
         {
-            return QVariant(QVariant::Invalid);
+            return QVariant();
         }
 
         const auto& value = mValues.at(i);
