@@ -292,12 +292,12 @@
         <translation>Qt informacije</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="287"/>
+        <location filename="../mainwindow.cpp" line="293"/>
         <source>New version available</source>
         <translation>Postoji nova verzija</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="287"/>
+        <location filename="../mainwindow.cpp" line="293"/>
         <source>Version %1 is available.
 
 %2</source>
@@ -306,12 +306,12 @@
 %2</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="309"/>
+        <location filename="../mainwindow.cpp" line="315"/>
         <source>No update</source>
         <translation>Nema nove verzije</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="309"/>
+        <location filename="../mainwindow.cpp" line="315"/>
         <source>%1 is latest version.</source>
         <translation>%1 je najnovija verzija.</translation>
     </message>
