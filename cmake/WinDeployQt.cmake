@@ -45,7 +45,6 @@ function(windeployqt target directory)
             COMMAND \"${CMAKE_COMMAND}\" -E
                 env PATH=\"${_qt_bin_dir}\" \"${WINDEPLOYQT_EXECUTABLE}\"
                     --no-compiler-runtime
-                    --no-angle
                     --no-opengl-sw
                     --dir \${CMAKE_INSTALL_PREFIX}/${directory}
                     \${_file}
