@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>main.qml</file>
-        <file>SettingsView.qml</file>
-        <file>qtquickcontrols2.conf</file>
-        <file>TimesheetView.qml</file>
-        <file>Customer.qml</file>
-    </qresource>
-</RCC>
