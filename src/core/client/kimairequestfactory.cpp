@@ -14,6 +14,11 @@ KimaiRequest KimaiRequestFactory::me()
     return KimaiRequest(ApiMethod::MeUsers);
 }
 
+KimaiRequest KimaiRequestFactory::timeSheetConfig()
+{
+    return KimaiRequest(ApiMethod::TimeSheetConfig);
+}
+
 KimaiRequest KimaiRequestFactory::customers()
 {
     return KimaiRequest(ApiMethod::Customers);
@@ -78,7 +83,8 @@ KimaiRequest KimaiRequestFactory::activeTimeSheets()
     return KimaiRequest(ApiMethod::ActiveTimeSheets);
 }
 
-KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, const QDateTime& beginAt, const QString& description, const QStringList& tags)
+KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, const QDateTime& beginAt, const QString& description, const QStringList& tags,
+                                                 TimeSheetConfig::TrackingMode trackingMode)
 {
     auto krq = KimaiRequest(ApiMethod::TimeSheets, HttpVerb::Post);
 
@@ -89,7 +95,7 @@ KimaiRequest KimaiRequestFactory::startTimeSheet(int projectId, int activityId, 
     ts.tags        = tags;
     ts.description = description;
 
-    auto jsData = parser::toJson(ts);
+    auto jsData = parser::toJson(ts, trackingMode);
     krq.setData(parser::toPostData(jsData));
 
     return krq;

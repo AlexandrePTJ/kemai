@@ -30,7 +30,8 @@ enum class ApiMethod
     TaskLog,
     TaskStart,
     TaskStop,
-    TaskClose
+    TaskClose,
+    TimeSheetConfig
 };
 
 enum class ApiPlugin
@@ -150,6 +151,19 @@ struct Plugin
     ApiPlugin apiPlugin;
 };
 using Plugins = QVector<Plugin>;
+
+struct TimeSheetConfig
+{
+    enum class TrackingMode
+    {
+        Default,
+        Punch,
+        DurationFixedBegin,
+        DurationOnly
+    };
+
+    TrackingMode trackingMode = TrackingMode::Default;
+};
 
 QString apiMethodToString(ApiMethod method);
 ApiPlugin pluginByName(const QString& pluginName);

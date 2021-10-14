@@ -305,7 +305,7 @@ void ActivityWidget::onBtStartStopClicked()
         auto desc       = mUi->pteDescription->toPlainText();
         auto tags       = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
 
-        mClient->sendRequest(KimaiRequestFactory::startTimeSheet(projectId, activityId, beginAt, desc, tags));
+        mClient->sendRequest(KimaiRequestFactory::startTimeSheet(projectId, activityId, beginAt, desc, tags, mSession->timeSheetConfig.trackingMode));
     }
 }
 

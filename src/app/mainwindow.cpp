@@ -173,6 +173,7 @@ void MainWindow::createKimaiClient()
         // send some request to identify instance
         mClient->sendRequest(KimaiRequestFactory::me());
         mClient->sendRequest(KimaiRequestFactory::version());
+        mClient->sendRequest(KimaiRequestFactory::timeSheetConfig());
 
         mActivityWidget->setKimaiClient(mClient);
         mActivityWidget->setKemaiSession(mSession);
@@ -237,6 +238,11 @@ void MainWindow::onClientReply(const KimaiReply& reply)
         {
             mTaskWidget->setKimaiClient(mClient);
         }
+    }
+    break;
+
+    case ApiMethod::TimeSheetConfig: {
+        mSession->timeSheetConfig = reply.get<TimeSheetConfig>();
     }
     break;
 

@@ -1,6 +1,10 @@
 #include "kimaiclient.h"
 #include "kimaiclient_p.h"
 
+#include "kemai_version.h"
+
+#include <QCoreApplication>
+
 #include <spdlog/spdlog.h>
 
 using namespace kemai::client;
@@ -20,9 +24,14 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiReque
     r.setUrl(cmd.url(host));
     r.setRawHeader("X-AUTH-USER", username.toLatin1());
     r.setRawHeader("X-AUTH-TOKEN", token.toLatin1());
+    r.setHeader(QNetworkRequest::UserAgentHeader, QString("%1/%2").arg(qApp->applicationName(), KEMAI_VERSION));
     r.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
     if (cmd.httpVerb() == HttpVerb::Post)
-        r.setRawHeader("Content-Type", "application/json");
+    {
+        r.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+        r.setHeader(QNetworkRequest::ContentLengthHeader, cmd.data().size());
+    }
+
     return r;
 }
 
@@ -33,7 +42,7 @@ void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
     {
         if (reply->error() != QNetworkReply::NoError)
         {
-            emit mQ->requestError(tr("Error on request [%1]: %2").arg(apiMethodToString(kimaiRequest->method()), reply->errorString()));
+            emit mQ->requestError(tr("Error on request [%1]: %2\n%3").arg(apiMethodToString(kimaiRequest->method()), reply->errorString(), reply->readAll()));
         }
         else
         {

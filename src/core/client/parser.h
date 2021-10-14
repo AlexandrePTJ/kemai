@@ -28,9 +28,10 @@ bool fromJson(const QJsonObject& jso, TimeSheet& inst);
 bool fromJson(const QJsonObject& jso, User& inst);
 bool fromJson(const QJsonObject& jso, Task& inst);
 bool fromJson(const QJsonObject& jso, Plugin& inst);
+bool fromJson(const QJsonObject& jso, TimeSheetConfig& inst);
 
 QByteArray toPostData(const QJsonValue& jv);
-QJsonObject toJson(const TimeSheet& inst);
+QJsonObject toJson(const TimeSheet& inst, TimeSheetConfig::TrackingMode trackingMode);
 QJsonObject toJson(const Customer& inst);
 QJsonObject toJson(const Project& inst);
 QJsonObject toJson(const Activity& inst);

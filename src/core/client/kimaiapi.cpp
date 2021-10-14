@@ -46,6 +46,9 @@ QString apiMethodToString(ApiMethod method)
     case ApiMethod::Plugins:
         return "plugins";
 
+    case ApiMethod::TimeSheetConfig:
+        return "config/timesheet";
+
     default:
         return "";
     }

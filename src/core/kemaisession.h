@@ -9,6 +9,7 @@ struct KemaiSession
     QVersionNumber kimaiVersion;
     client::Plugins plugins;
     client::User me;
+    client::TimeSheetConfig timeSheetConfig;
 
     /*
      * Helpers methods

@@ -195,3 +195,10 @@ template<> Plugins KimaiReply::get() const
     }
     return plugins;
 }
+
+template<> TimeSheetConfig KimaiReply::get() const
+{
+    TimeSheetConfig tsConfig;
+    parser::fromJson(mD->jsonValue.toObject(), tsConfig);
+    return tsConfig;
+}

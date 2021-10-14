@@ -5,6 +5,18 @@
 
 namespace kemai::client::parser {
 
+TimeSheetConfig::TrackingMode trackingModeFromString(const QString& trackingMode)
+{
+    if (trackingMode == "default")
+        return TimeSheetConfig::TrackingMode::Default;
+    if (trackingMode == "duration_fixed_begin")
+        return TimeSheetConfig::TrackingMode::DurationFixedBegin;
+    if (trackingMode == "duration_only")
+        return TimeSheetConfig::TrackingMode::DurationOnly;
+    if (trackingMode == "punch")
+        return TimeSheetConfig::TrackingMode::Punch;
+}
+
 bool fromJson(const QJsonObject& jso, KimaiVersion& inst)
 {
     if (!jso.contains("version"))
@@ -160,6 +172,14 @@ bool fromJson(const QJsonObject& jso, Plugin& inst)
     return true;
 }
 
+bool fromJson(const QJsonObject& jso, TimeSheetConfig& inst)
+{
+    if (!jso.contains("trackingMode"))
+        return false;
+
+    inst.trackingMode = trackingModeFromString(jso.value("trackingMode").toString());
+}
+
 QByteArray toPostData(const QJsonValue& jv)
 {
     QJsonDocument jdoc;
@@ -167,15 +187,18 @@ QByteArray toPostData(const QJsonValue& jv)
         jdoc = QJsonDocument(jv.toArray());
     else
         jdoc = QJsonDocument(jv.toObject());
-    return jdoc.toJson();
+    return jdoc.toJson(QJsonDocument::Compact);
 }
 
-QJsonObject toJson(const TimeSheet& inst)
+QJsonObject toJson(const TimeSheet& inst, TimeSheetConfig::TrackingMode trackingMode)
 {
     QJsonObject joTimeSheet;
-    joTimeSheet["begin"] = inst.beginAt.toString(Qt::ISODate);
-    if (inst.endAt.isValid())
-        joTimeSheet["end"] = inst.endAt.toString(Qt::ISODate);
+    if (trackingMode != TimeSheetConfig::TrackingMode::Punch)
+    {
+        joTimeSheet["begin"] = inst.beginAt.toString(Qt::ISODate);
+        if (inst.endAt.isValid())
+            joTimeSheet["end"] = inst.endAt.toString(Qt::ISODate);
+    }
     joTimeSheet["project"]     = inst.project.id;
     joTimeSheet["activity"]    = inst.activity.id;
     joTimeSheet["description"] = inst.description;
