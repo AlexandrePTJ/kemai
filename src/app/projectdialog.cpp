@@ -32,9 +32,10 @@ Project ProjectDialog::project() const
 
 void ProjectDialog::enableSave(bool enable)
 {
-    auto btn = mUi->buttonBox->button(QDialogButtonBox::Save);
-    if (btn)
+    if (auto btn = mUi->buttonBox->button(QDialogButtonBox::Save))
+    {
         btn->setEnabled(enable);
+    }
 }
 
 void ProjectDialog::validateForm()

@@ -14,9 +14,6 @@ public:
         TaskIDRole = Qt::UserRole + 1
     };
 
-    TaskListModel();
-    ~TaskListModel() override;
-
     void setTasks(const client::Tasks& tasks);
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;

@@ -29,7 +29,9 @@ CustomerDialog::CustomerDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::C
     }
 
     for (const auto& tz : QTimeZone::availableTimeZoneIds())
+    {
         mUi->cbTimezone->addItem(tz);
+    }
 }
 
 CustomerDialog::~CustomerDialog()
@@ -52,9 +54,10 @@ Customer CustomerDialog::customer() const
 
 void CustomerDialog::enableSave(bool enable)
 {
-    auto btn = mUi->buttonBox->button(QDialogButtonBox::Save);
-    if (btn)
+    if (auto btn = mUi->buttonBox->button(QDialogButtonBox::Save))
+    {
         btn->setEnabled(enable);
+    }
 }
 
 void CustomerDialog::validateForm()

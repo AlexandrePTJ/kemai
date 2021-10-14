@@ -2,7 +2,7 @@
 
 using namespace kemai::qmlapp;
 
-TimesheetViewBridge::TimesheetViewBridge() {}
+TimesheetViewBridge::TimesheetViewBridge() = default;
 
 void TimesheetViewBridge::setProjectModel(QAbstractListModel* model)
 {

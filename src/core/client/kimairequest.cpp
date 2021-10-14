@@ -80,14 +80,18 @@ QUrl KimaiRequest::url(const QString& host) const
 
     path += "api/" + apiMethodToString(mD->method);
     if (!mD->patchVerb.isEmpty())
+    {
         path += "/" + mD->patchVerb;
+    }
     url.setPath(path);
 
     if (!mD->parameters.isEmpty())
     {
         QUrlQuery query;
         for (auto it = mD->parameters.begin(); it != mD->parameters.end(); ++it)
+        {
             query.addQueryItem(it.key(), it.value());
+        }
         url.setQuery(query);
     }
 

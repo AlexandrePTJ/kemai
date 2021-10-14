@@ -8,19 +8,30 @@ namespace kemai::client::parser {
 TimeSheetConfig::TrackingMode trackingModeFromString(const QString& trackingMode)
 {
     if (trackingMode == "default")
+    {
         return TimeSheetConfig::TrackingMode::Default;
+    }
     if (trackingMode == "duration_fixed_begin")
+    {
         return TimeSheetConfig::TrackingMode::DurationFixedBegin;
+    }
     if (trackingMode == "duration_only")
+    {
         return TimeSheetConfig::TrackingMode::DurationOnly;
+    }
     if (trackingMode == "punch")
+    {
         return TimeSheetConfig::TrackingMode::Punch;
+    }
+    return TimeSheetConfig::TrackingMode::Default;
 }
 
 bool fromJson(const QJsonObject& jso, KimaiVersion& inst)
 {
     if (!jso.contains("version"))
+    {
         return false;
+    }
 
     inst.kimai = QVersionNumber::fromString(jso.value("version").toString());
 
@@ -30,7 +41,9 @@ bool fromJson(const QJsonObject& jso, KimaiVersion& inst)
 bool fromJson(const QJsonObject& jso, Customer& inst)
 {
     if (!jso.contains("id"))
+    {
         return false;
+    }
 
     inst.id = jso.value("id").toInt();
     safeGetJsonValue("name", jso, inst.name);
@@ -57,7 +70,9 @@ bool fromJson(const QJsonObject& jso, Customer& inst)
 bool fromJson(const QJsonObject& jso, Project& inst)
 {
     if (!jso.contains("id"))
+    {
         return false;
+    }
 
     inst.id = jso.value("id").toInt();
     safeGetJsonValue("name", jso, inst.name);
@@ -75,9 +90,13 @@ bool fromJson(const QJsonObject& jso, Project& inst)
     {
         const auto& jsvCustomer = jso.value("customer");
         if (jsvCustomer.isObject())
+        {
             fromJson(jsvCustomer.toObject(), inst.customer);
+        }
         else if (jsvCustomer.isDouble())
+        {
             inst.customer.id = jsvCustomer.toInt();
+        }
     }
 
     return true;
@@ -86,7 +105,9 @@ bool fromJson(const QJsonObject& jso, Project& inst)
 bool fromJson(const QJsonObject& jso, Activity& inst)
 {
     if (!jso.contains("id"))
+    {
         return false;
+    }
 
     inst.id = jso.value("id").toInt();
     safeGetJsonValue("name", jso, inst.name);
@@ -113,7 +134,9 @@ bool fromJson(const QJsonObject& jso, Activity& inst)
 bool fromJson(const QJsonObject& jso, TimeSheet& inst)
 {
     if (!jso.contains("id"))
+    {
         return false;
+    }
 
     fromJson(jso.value("project").toObject(), inst.project);
     fromJson(jso.value("activity").toObject(), inst.activity);
@@ -124,7 +147,9 @@ bool fromJson(const QJsonObject& jso, TimeSheet& inst)
     inst.id          = jso.value("id").toInt();
 
     for (const auto& jstag : jso.value("tags").toArray())
+    {
         inst.tags << jstag.toString();
+    }
 
     return true;
 }
@@ -132,7 +157,9 @@ bool fromJson(const QJsonObject& jso, TimeSheet& inst)
 bool fromJson(const QJsonObject& jso, User& inst)
 {
     if (!jso.contains("id"))
+    {
         return false;
+    }
 
     inst.id       = jso.value("id").toInt();
     inst.username = jso.value("username").toString();
@@ -145,7 +172,9 @@ bool fromJson(const QJsonObject& jso, User& inst)
 bool fromJson(const QJsonObject& jso, Task& inst)
 {
     if (!jso.contains("id"))
+    {
         return false;
+    }
 
     inst.id     = jso.value("id").toInt();
     inst.title  = jso.value("title").toString();
@@ -164,7 +193,9 @@ bool fromJson(const QJsonObject& jso, Task& inst)
 bool fromJson(const QJsonObject& jso, Plugin& inst)
 {
     if (!jso.contains("name") || !jso.contains("version"))
+    {
         return false;
+    }
 
     inst.name      = jso.value("name").toString();
     inst.version   = QVersionNumber::fromString(jso.value("version").toString());
@@ -175,18 +206,25 @@ bool fromJson(const QJsonObject& jso, Plugin& inst)
 bool fromJson(const QJsonObject& jso, TimeSheetConfig& inst)
 {
     if (!jso.contains("trackingMode"))
+    {
         return false;
+    }
 
     inst.trackingMode = trackingModeFromString(jso.value("trackingMode").toString());
+    return true;
 }
 
 QByteArray toPostData(const QJsonValue& jv)
 {
     QJsonDocument jdoc;
     if (jv.isArray())
+    {
         jdoc = QJsonDocument(jv.toArray());
+    }
     else
+    {
         jdoc = QJsonDocument(jv.toObject());
+    }
     return jdoc.toJson(QJsonDocument::Compact);
 }
 
@@ -197,7 +235,9 @@ QJsonObject toJson(const TimeSheet& inst, TimeSheetConfig::TrackingMode tracking
     {
         joTimeSheet["begin"] = inst.beginAt.toString(Qt::ISODate);
         if (inst.endAt.isValid())
+        {
             joTimeSheet["end"] = inst.endAt.toString(Qt::ISODate);
+        }
     }
     joTimeSheet["project"]     = inst.project.id;
     joTimeSheet["activity"]    = inst.activity.id;
@@ -211,7 +251,9 @@ QJsonObject toJson(const Customer& inst)
     QJsonObject joCustomer;
 
     if (inst.id > 0)
+    {
         joCustomer["id"] = inst.id;
+    }
 
     joCustomer["name"]     = inst.name;
     joCustomer["number"]   = inst.number;
@@ -239,7 +281,9 @@ QJsonObject toJson(const Project& inst)
     QJsonObject joProject;
 
     if (inst.id > 0)
+    {
         joProject["id"] = inst.id;
+    }
 
     joProject["name"]        = inst.name;
     joProject["visible"]     = inst.visible;

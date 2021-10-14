@@ -3,10 +3,6 @@
 using namespace kemai::client;
 using namespace kemai::models;
 
-TaskListModel::TaskListModel() : QAbstractListModel() {}
-
-TaskListModel::~TaskListModel() = default;
-
 void TaskListModel::setTasks(const Tasks& tasks)
 {
     beginResetModel();
@@ -18,7 +14,7 @@ QVariant TaskListModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid() || (index.row() > mTasks.size()))
     {
-        return QVariant();
+        return {};
     }
 
     const auto& task = mTasks.at(index.row());
@@ -31,11 +27,11 @@ QVariant TaskListModel::data(const QModelIndex& index, int role) const
         return task.id;
 
     default:
-        return QVariant();
+        return {};
     }
 }
 
 int TaskListModel::rowCount(const QModelIndex& /*parent*/) const
 {
-    return mTasks.size();
+    return static_cast<int>(mTasks.size());
 }

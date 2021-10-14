@@ -19,9 +19,13 @@ public:
         if (parseError.error == QJsonParseError::NoError)
         {
             if (jdoc.isArray())
+            {
                 jsonValue = jdoc.array();
+            }
             else if (jdoc.isObject())
+            {
                 jsonValue = jdoc.object();
+            }
         }
     }
 
@@ -93,7 +97,9 @@ template<> Customers KimaiReply::get() const
     {
         Customer customer;
         if (parser::fromJson(jscusto.toObject(), customer))
+        {
             customers << customer;
+        }
     }
     return customers;
 }
@@ -112,7 +118,9 @@ template<> Projects KimaiReply::get() const
     {
         Project project;
         if (parser::fromJson(jsproject.toObject(), project))
+        {
             projects << project;
+        }
     }
     return projects;
 }
@@ -131,7 +139,9 @@ template<> Activities KimaiReply::get() const
     {
         Activity activity;
         if (parser::fromJson(jsactivity.toObject(), activity))
+        {
             activities << activity;
+        }
     }
     return activities;
 }
@@ -150,7 +160,9 @@ template<> TimeSheets KimaiReply::get() const
     {
         TimeSheet timeSheet;
         if (parser::fromJson(jstimeSheet.toObject(), timeSheet))
+        {
             timeSheets << timeSheet;
+        }
     }
     return timeSheets;
 }
@@ -179,7 +191,9 @@ template<> Tasks KimaiReply::get() const
     {
         Task task;
         if (parser::fromJson(jsTask.toObject(), task))
+        {
             tasks << task;
+        }
     }
     return tasks;
 }
@@ -191,7 +205,9 @@ template<> Plugins KimaiReply::get() const
     {
         Plugin plugin;
         if (parser::fromJson(jsPlugin.toObject(), plugin))
+        {
             plugins << plugin;
+        }
     }
     return plugins;
 }

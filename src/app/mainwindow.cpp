@@ -22,7 +22,7 @@ using namespace kemai::client;
 using namespace kemai::core;
 using namespace kemai::updater;
 
-MainWindow::MainWindow() : QMainWindow(), mUi(new Ui::MainWindow)
+MainWindow::MainWindow() : mUi(new Ui::MainWindow)
 {
     mUi->setupUi(this);
 

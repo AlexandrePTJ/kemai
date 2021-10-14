@@ -114,8 +114,10 @@ void KimaiClient::sendRequest(const KimaiRequest& rq)
         break;
     }
 
-    if (reply)
+    if (reply != nullptr)
+    {
         mD->runningRequests.insert(reply, QSharedPointer<KimaiRequest>::create(rq));
+    }
 }
 
 void KimaiClient::addTrustedCertificates(const QStringList& trustedCertificates)

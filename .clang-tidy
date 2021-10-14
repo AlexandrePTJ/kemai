@@ -7,7 +7,9 @@ Checks: >
   -modernize-use-trailing-return-type,
   -modernize-redundant-void-arg,
   performance-*,
-  readability-*
+  readability-*,
+  -readability-convert-member-functions-to-static,
+  -readability-qualified-auto
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: none
