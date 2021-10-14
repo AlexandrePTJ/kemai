@@ -9,8 +9,7 @@ platform:
   - x64
 
 environment:
-  APPVEYOR_SSH_KEY:
-    secure: u4nZOCjHfXVfSasvtOQcimzNwH45v5oMHmrNXNkhlXybulkQHKx135u0rwsTAssjP75CyehuTm04tRjrP6xfjGn858MvWbJmnK3HFr4Y7kRxWvPwoNRp6/wSKk4PtzoZVXsNLyMm74zecOyqYXYa7xzs3ELV0TH66NAq+OSwPGEc4FFq5iJX2g1FMXVv2DnXBfhYgr73odOgZBbBfo/BIGldRnb8b3seuYjPgBEVliDnKZA5AYfuer3R0AxUxx2aLji/eCPfeQqfohRCfpi54wSs0vaA7oYdivycM82GKdkYpGEYCMCqZ03rv2ZS//nSF4xw/W7zyvxnaPfpSoMGsFCWWIzjVXVpzjI3+/khvvSUVPIaKl+SLvCUqTBhqzaEODqw78tVlXbe26nqOEZS9Ezbp6MdPW0lpwUAKrQs5+TcSOVUHu2IkK/BkmkYmldRlK4tqOPkeyn6hTARevKuGueLNcp4D5RDv2TJ0i8qDtsADvsdM/MRFZGuGNWfXuNeGmcXj9Cy+A0lmU5QySJbnsO/iKWKwbYbAX2RQAkWrpWOdHGfwXGm7+C1gHLj6B76jdXD5hpj6v1wlsUM0Xec9njENhB1k2zfwTmuXaONeJ8JeT5o6QtwYHlKZWFO/0s154i/Z4RsCIKcQWcaBr+QkxRM9Y94LaL0NNyAM9yLzR3baVee3jmwhhYDkMR/pRm/lYrjti8v9W+1noDF/8xunyvyJpnSrsaQyBs/b0QK/4UXUufqU4j+JEUIhtdRlr/FT025VtUh3pnYgIjwNSuBHw==
+  KEMAI_QT_VERSION: 6.1
 
 for:
   - matrix:
@@ -24,12 +23,12 @@ for:
       - chmod +x linuxdeployqt.AppImage
 
     build_script:
-      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.1/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
+      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
       - cmake --build build --target install
 
     after_build:
-      - export PATH=$HOME/Qt/6.1/gcc_64/bin:$PATH
-      - export LD_LIBRARY_PATH=$HOME/Qt/6.1/gcc_64/lib
+      - export PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64/bin:$PATH
+      - export LD_LIBRARY_PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64/lib
       - export VERSION=$(grep -oP "VERSION \K(\d+\.\d+\.\d+)" CMakeLists.txt)
       - cp dist/bin/Kemai dist/
       - cp -r bundle/linux/* dist/
@@ -47,7 +46,7 @@ for:
       - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=amd64
 
     build_script:
-      - cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\6.2\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64 -DCMAKE_INSTALL_PREFIX=dist
+      - cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\%KEMAI_QT_VERSION%\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64 -DCMAKE_INSTALL_PREFIX=dist
       - cmake --build build --config Release --target package
 
     artifacts:
@@ -57,20 +56,13 @@ for:
       only:
         - image: macOS
 
-    init:
-      - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
-
     build_script:
-      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.1/clang_64
+      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/macos
       - cmake --build build
 
     after_build:
-      - $HOME/Qt/6.1/clang_64/bin/macdeployqt build/src/app/Kemai.app
+      - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt build/src/app/Kemai.app
       - cmake --build build --target package
-    
-    on_finish:
-      - sh: export APPVEYOR_SSH_BLOCK=true
-      - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
 
     artifacts:
       - path: build/Kemai-*.dmg
