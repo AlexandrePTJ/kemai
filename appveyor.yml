@@ -8,10 +8,6 @@ image:
 platform:
   - x64
 
-environment:
-  KEMAI_QT_UNIX_VERSION: 6.1
-  KEMAI_QT_WIN_VERSION: 6.2
-
 for:
   - matrix:
       only:
@@ -24,17 +20,17 @@ for:
       - chmod +x linuxdeployqt.AppImage
 
     build_script:
-      - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_UNIX_VERSION/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
-      - cmake --build build
+      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.1/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
+      - cmake --build build --target install
 
     after_build:
-      - export PATH=$HOME/Qt/$KEMAI_QT_UNIX_VERSION/gcc_64/bin:$PATH
+      - export PATH=$HOME/Qt/6.1/gcc_64/bin:$PATH
+      - export LD_LIBRARY_PATH=$HOME/Qt/6.1/gcc_64/lib
       - export VERSION=$(grep -oP "VERSION \K(\d+\.\d+\.\d+)" CMakeLists.txt)
-      - cmake --build build --target install
       - cp dist/bin/Kemai dist/
       - cp -r bundle/linux/* dist/
       - cp src/app/icons/kimai.png dist/kemai.png
-      - ./linuxdeployqt.AppImage dist/Kemai -appimage -unsupported-allow-new-glibc --appimage-extract-and-run -qmake=$HOME/Qt/$KEMAI_QT_UNIX_VERSION/gcc_64/bin/qmake
+      - ./linuxdeployqt.AppImage dist/Kemai -appimage -unsupported-allow-new-glibc --appimage-extract-and-run
 
     artifacts:
       - path: Kemai-*.AppImage
@@ -47,10 +43,7 @@ for:
       - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=amd64
 
     build_script:
-      - cmake . -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\%KEMAI_QT_WIN_VERSION%\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64 -DCMAKE_INSTALL_PREFIX=dist
-      - cmake --build build --config Release
-
-    after_build:
+      - cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\6.2\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64 -DCMAKE_INSTALL_PREFIX=dist
       - cmake --build build --config Release --target package
 
     artifacts:
@@ -61,11 +54,11 @@ for:
         - image: macOS
 
     build_script:
-      - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${HOME}/Qt/${KEMAI_QT_UNIX_VERSION}/clang_64
+      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.1/clang_64
       - cmake --build build
 
     after_build:
-      - ${HOME}/Qt/${KEMAI_QT_UNIX_VERSION}/clang_64/bin/macdeployqt build/src/app/Kemai.app
+      - $HOME/Qt/6.1/clang_64/bin/macdeployqt build/src/app/Kemai.app
       - cmake --build build --target package
 
     artifacts:
@@ -75,6 +68,6 @@ deploy:
   - provider: GitHub
     draft: true
     auth_token:
-      secure: ZBA/qLsYwRJ9xw8sf1Q96NrJYNFdqAfDKVD7cA+okvEnjFSOt5aBk52bI+v++pIQ
+      secure: j3+ty+O3NBk4dHVw5CkGTtRuJRtOdgtaWTbOrCWkSnKVcevEbp6K35GcvFTik6OF
     on:
       APPVEYOR_REPO_TAG: true
