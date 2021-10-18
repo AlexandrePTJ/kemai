@@ -7,7 +7,6 @@
 #include <QAction>
 #include <QDir>
 #include <QMessageBox>
-#include <QStackedWidget>
 #include <QTranslator>
 
 using namespace kemai::app;
@@ -18,16 +17,24 @@ SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::S
 {
     mUi->setupUi(this);
 
+    auto addLanguage = [cbLanguage = mUi->cbLanguage](const QString& language) {
+        QLocale locale(language);
+        cbLanguage->addItem(QString("%1 [%2]").arg(QLocale::languageToString(locale.language()), QLocale::countryToString(locale.country())), locale);
+    };
+
     mActToggleTokenVisible = mUi->leToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
 
+    // Add default en_US language
+    addLanguage("en_US");
+
+    // Add available translations
     QDir l10nDir(":/l10n");
-    for (const auto& flang : l10nDir.entryList())
+    for (const auto& fLang : l10nDir.entryList())
     {
         QTranslator translator;
-        if (translator.load(l10nDir.absoluteFilePath(flang), "kemai", "_", ":/l10n"))
+        if (translator.load(l10nDir.absoluteFilePath(fLang), "kemai", "_", ":/l10n"))
         {
-            QLocale locale(translator.language());
-            mUi->cbLanguage->addItem(QString("%1 [%2]").arg(QLocale::languageToString(locale.language()), QLocale::countryToString(locale.country())), locale);
+            addLanguage(translator.language());
         }
     }
 

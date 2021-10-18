@@ -38,7 +38,6 @@ set(UIS
 include(LocalizationTools)
 set(KEMAI_TS_FILES
         l10n/kemai_de.ts
-        l10n/kemai_en.ts
         l10n/kemai_fr.ts
         l10n/kemai_hr.ts
         l10n/kemai_nb_NO.ts)
