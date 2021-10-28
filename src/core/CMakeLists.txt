@@ -37,4 +37,4 @@ set(PRIV_HDRS
 target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${PRIV_HDRS} ${PUB_HDRS})
 target_include_directories(${PROJECT_NAME}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-target_link_libraries(${PROJECT_NAME} Qt::Core Qt::Network)
+target_link_libraries(${PROJECT_NAME} Qt::Widgets Qt::Network)

@@ -111,7 +111,8 @@ using Activities = QVector<Activity>;
 
 struct TimeSheet
 {
-    int id = 0;
+    int id   = 0;
+    int user = 0;
     Activity activity;
     Project project;
     QString description;
@@ -131,9 +132,17 @@ struct User
 
 struct Task
 {
+    enum class Status
+    {
+        Undefined,
+        Pending,
+        Progress,
+        Closed
+    };
+
     int id = 0;
     QString title;
-    QString status;
+    Status status = Status::Undefined;
     QString todo;
     QString description;
     Project project;
@@ -141,6 +150,7 @@ struct Task
     User user;
     QDateTime endAt;
     int estimation = 0;
+    TimeSheets activeTimeSheets;
 };
 using Tasks = QVector<Task>;
 

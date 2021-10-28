@@ -42,7 +42,7 @@ private:
     void onActionOpenHostTriggered();
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
     void onNewVersionCheckFinished(const updater::VersionDetails& details);
-    void onActivityChange(bool started);
+    void onActivityChanged(bool started);
 
 private:
     Ui::MainWindow* mUi;

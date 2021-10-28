@@ -26,6 +26,23 @@ TimeSheetConfig::TrackingMode trackingModeFromString(const QString& trackingMode
     return TimeSheetConfig::TrackingMode::Default;
 }
 
+Task::Status taskStatusFromString(const QString& taskStatus)
+{
+    if (taskStatus == "pending")
+    {
+        return Task::Status::Pending;
+    }
+    if (taskStatus == "progress")
+    {
+        return Task::Status::Progress;
+    }
+    if (taskStatus == "closed")
+    {
+        return Task::Status::Closed;
+    }
+    return Task::Status::Undefined;
+}
+
 bool fromJson(const QJsonObject& jso, KimaiVersion& inst)
 {
     if (!jso.contains("version"))
@@ -145,6 +162,7 @@ bool fromJson(const QJsonObject& jso, TimeSheet& inst)
     inst.beginAt     = QDateTime::fromString(jso.value("begin").toString(), Qt::ISODate);
     inst.endAt       = QDateTime::fromString(jso.value("end").toString(), Qt::ISODate);
     inst.id          = jso.value("id").toInt();
+    inst.user        = jso.value("user").toInt();
 
     for (const auto& jstag : jso.value("tags").toArray())
     {
@@ -178,7 +196,7 @@ bool fromJson(const QJsonObject& jso, Task& inst)
 
     inst.id     = jso.value("id").toInt();
     inst.title  = jso.value("title").toString();
-    inst.status = jso.value("status").toString();
+    inst.status = taskStatusFromString(jso.value("status").toString());
     safeGetJsonValue("todo", jso, inst.todo);
     safeGetJsonValue("description", jso, inst.description);
     fromJson(jso.value("project").toObject(), inst.project);
@@ -186,6 +204,19 @@ bool fromJson(const QJsonObject& jso, Task& inst)
     fromJson(jso.value("user").toObject(), inst.user);
     inst.endAt = QDateTime::fromString(jso.value("end").toString(), Qt::ISODate);
     safeGetJsonValue("estimation", jso, inst.estimation);
+
+    if (jso.contains("activeTimesheets"))
+    {
+        const auto& jaTimesheets = jso.value("activeTimesheets").toArray();
+        for (const auto& jvTimesheet : jaTimesheets)
+        {
+            TimeSheet ts;
+            if (fromJson(jvTimesheet.toObject(), ts))
+            {
+                inst.activeTimeSheets << ts;
+            }
+        }
+    }
 
     return true;
 }

@@ -113,7 +113,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     connect(mActOpenHost, &QAction::triggered, this, &MainWindow::onActionOpenHostTriggered);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
     connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
-    connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChange);
+    connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChanged);
     connect(mSettingsWidget, &SettingsWidget::cancelled, this, &MainWindow::showSelectedView);
     connect(mSettingsWidget, &SettingsWidget::settingsSaved, [&]() {
         createKimaiClient();
@@ -177,6 +177,11 @@ void MainWindow::createKimaiClient()
 
         mActivityWidget->setKimaiClient(mClient);
         mActivityWidget->setKemaiSession(mSession);
+
+        if (mTaskWidget)
+        {
+            mTaskWidget->setKemaiSession(mSession);
+        }
     }
 }
 
@@ -214,7 +219,9 @@ void MainWindow::onClientError(const QString& errorMsg)
 void MainWindow::onClientReply(const KimaiReply& reply)
 {
     if (!reply.isValid())
+    {
         return;
+    }
 
     switch (reply.method())
     {
@@ -316,7 +323,7 @@ void MainWindow::onNewVersionCheckFinished(const VersionDetails& details)
     }
 }
 
-void MainWindow::onActivityChange(bool started)
+void MainWindow::onActivityChanged(bool started)
 {
     if (started)
     {

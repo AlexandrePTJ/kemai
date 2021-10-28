@@ -1,5 +1,8 @@
 #include "tasklistmodel.h"
 
+#include <QApplication>
+#include <QStyle>
+
 using namespace kemai::client;
 using namespace kemai::models;
 
@@ -20,11 +23,23 @@ QVariant TaskListModel::data(const QModelIndex& index, int role) const
     const auto& task = mTasks.at(index.row());
     switch (role)
     {
-    case Qt::DisplayRole:
-        return QString("%1\n- %2").arg(task.title, task.description);
-
     case TaskIDRole:
         return task.id;
+
+    case UserIdRole:
+        return task.user.id;
+
+    case Qt::DisplayRole: {
+        auto display = task.title;
+        if (!task.description.isEmpty())
+        {
+            display += "\n- " + task.description;
+        }
+        return display;
+    }
+
+    case Qt::DecorationRole:
+        return task.activeTimeSheets.isEmpty() ? QIcon() : qApp->style()->standardIcon(QStyle::SP_ArrowRight);
 
     default:
         return {};

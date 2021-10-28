@@ -3,6 +3,7 @@
 #include <QWidget>
 
 #include "client/kimaiclient.h"
+#include "kemaisession.h"
 #include "models/taskfilterproxymodel.h"
 #include "models/tasklistmodel.h"
 
@@ -21,14 +22,19 @@ public:
     ~TaskWidget() override;
 
     void setKimaiClient(QSharedPointer<client::KimaiClient> kimaiClient);
+    void setKemaiSession(QSharedPointer<core::KemaiSession> kemaiSession);
+
+signals:
+    void taskStarted();
+    void taskStopped();
 
 private:
     void onClientReply(const client::KimaiReply& reply);
     void onTaskItemChanged(const QModelIndex& current, const QModelIndex& previous);
     void onRefreshClicked();
     void onStartStopClicked();
+    void onCloseClicked();
 
-private:
     Ui::TaskWidget* mUi;
     QSharedPointer<client::KimaiClient> mClient;
     models::TaskListModel mTaskModel;

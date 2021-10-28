@@ -69,7 +69,9 @@ void ActivityWidget::setKemaiSession(QSharedPointer<core::KemaiSession> kemaiSes
 void ActivityWidget::onClientReply(const KimaiReply& reply)
 {
     if (!reply.isValid())
+    {
         return;
+    }
 
     switch (reply.method())
     {
@@ -80,11 +82,15 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
             mUi->cbCustomer->clear();
             mUi->cbCustomer->addItem("");
             for (const auto& customer : customers)
+            {
                 mUi->cbCustomer->addItem(customer.name, customer.id);
+            }
         }
 
         if (mCurrentTimeSheet)
+        {
             mUi->cbCustomer->setCurrentText(mCurrentTimeSheet->project.customer.name);
+        }
     }
     break;
 
@@ -102,11 +108,15 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
             mUi->cbProject->addItem("");
 
             for (const auto& project : projects)
+            {
                 mUi->cbProject->addItem(project.name, project.id);
+            }
         }
 
         if (mCurrentTimeSheet)
+        {
             mUi->cbProject->setCurrentText(mCurrentTimeSheet->project.name);
+        }
     }
     break;
 
@@ -124,11 +134,15 @@ void ActivityWidget::onClientReply(const KimaiReply& reply)
             mUi->cbActivity->addItem("");
 
             for (const auto& activity : activities)
+            {
                 mUi->cbActivity->addItem(activity.name, activity.id);
+            }
         }
 
         if (mCurrentTimeSheet)
+        {
             mUi->cbActivity->setCurrentText(mCurrentTimeSheet->activity.name);
+        }
     }
     break;
 

@@ -11,7 +11,8 @@ class TaskListModel : public QAbstractListModel
 public:
     enum TaskModelRole
     {
-        TaskIDRole = Qt::UserRole + 1
+        TaskIDRole = Qt::UserRole + 1,
+        UserIdRole
     };
 
     void setTasks(const client::Tasks& tasks);
