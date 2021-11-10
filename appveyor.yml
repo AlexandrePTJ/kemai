@@ -27,13 +27,12 @@ for:
       - cmake --build build --target install
 
     after_build:
-      - export PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64/bin:$PATH
-      - export LD_LIBRARY_PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64/lib
       - export VERSION=$(grep -oP "VERSION \K(\d+\.\d+\.\d+)" CMakeLists.txt)
-      - cp dist/bin/Kemai dist/
+      - mkdir -p dist/usr/bin
+      - mv dist/bin/Kemai dist/usr/bin/
       - cp -r bundle/linux/* dist/
-      - cp src/app/icons/kimai.png dist/kemai.png
-      - ./linuxdeployqt.AppImage dist/Kemai -appimage -unsupported-allow-new-glibc --appimage-extract-and-run
+      - rm -r dist/bin
+      - ./linuxdeployqt.AppImage dist/usr/share/applications/kemai.desktop -appimage -unsupported-allow-new-glibc -qmake=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64/bin/qmake -extra-plugins=platforms,iconengines,platformthemes/libqgtk3.so --appimage-extract-and-run
 
     artifacts:
       - path: Kemai-*.AppImage
