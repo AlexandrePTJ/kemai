@@ -72,6 +72,6 @@ deploy:
   - provider: GitHub
     draft: true
     auth_token:
-      secure: j3+ty+O3NBk4dHVw5CkGTtRuJRtOdgtaWTbOrCWkSnKVcevEbp6K35GcvFTik6OF
+      secure: O6wonn4AR0WCMLNkDjyHEMvpb40km9Sf0vtcsHpyU8SA1tqgoJ5gQsyABRVcvRyz
     on:
       APPVEYOR_REPO_TAG: true
