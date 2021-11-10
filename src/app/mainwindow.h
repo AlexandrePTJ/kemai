@@ -2,10 +2,12 @@
 
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QSharedPointer>
 #include <QSystemTrayIcon>
 
-#include "kemai/kemaiupdater.h"
-#include "kemai/kimaiclient.h"
+#include "client/kimaiclient.h"
+#include "kemaisession.h"
+#include "updater/kemaiupdater.h"
 
 namespace Ui {
 class MainWindow;
@@ -13,50 +15,54 @@ class MainWindow;
 
 namespace kemai::app {
 
+class ActivityWidget;
+class SettingsWidget;
+class TaskWidget;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     MainWindow();
-    ~MainWindow();
+    ~MainWindow() override;
 
 protected:
-    void closeEvent(QCloseEvent* event);
+    void closeEvent(QCloseEvent* event) override;
 
-private slots:
-    void refreshClient();
+private:
+    void createKimaiClient();
+    void showSelectedView();
+    void setViewActionsEnabled(bool enable);
+
     void onClientError(const QString& errorMsg);
     void onClientReply(const client::KimaiReply& reply);
     void onActionSettingsTriggered();
-    void onActionNewCustomerTriggered();
-    void onActionNewProjectTriggered();
-    void onActionNewActivityTriggered();
     void onActionCheckUpdateTriggered();
     void onActionOpenHostTriggered();
-    void onStackedCurrentChanged(int id);
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
     void onNewVersionCheckFinished(const updater::VersionDetails& details);
-    void onActivityChange(bool started);
+    void onActivityChanged(bool started);
 
 private:
     Ui::MainWindow* mUi;
-    QSharedPointer<client::KimaiClient> mClient;
     updater::KemaiUpdater mUpdater;
+    QSharedPointer<client::KimaiClient> mClient;
+    QSharedPointer<core::KemaiSession> mSession;
 
-    // keep stacked widgets ids
-    int mActivitySId;
-    int mSettingsSId;
-    int mCurrentSId = -1;
+    // Stacked widget (ownership is transferred, don't try to delete them)
+    ActivityWidget* mActivityWidget = nullptr;
+    SettingsWidget* mSettingsWidget = nullptr;
+    TaskWidget* mTaskWidget         = nullptr;
 
     // Actions
-    QAction* mActQuit        = nullptr;
-    QAction* mActSettings    = nullptr;
-    QAction* mActNewCustomer = nullptr;
-    QAction* mActNewProject  = nullptr;
-    QAction* mActNewActivity = nullptr;
-    QAction* mActCheckUpdate = nullptr;
-    QAction* mActOpenHost    = nullptr;
+    QAction* mActQuit           = nullptr;
+    QAction* mActSettings       = nullptr;
+    QAction* mActCheckUpdate    = nullptr;
+    QAction* mActOpenHost       = nullptr;
+    QAction* mActViewActivities = nullptr;
+    QAction* mActViewTasks      = nullptr;
+    QActionGroup* mActGroupView = nullptr;
 
     // Main menu
     QMenuBar* mMenuBar = nullptr;

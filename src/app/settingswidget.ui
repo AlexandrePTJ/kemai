@@ -57,12 +57,22 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Language</string>
+       </property>
+      </widget>
+     </item>
      <item row="3" column="0" colspan="2">
       <widget class="QCheckBox" name="cbCloseToSystemTray">
        <property name="text">
         <string>Close to system tray</string>
        </property>
       </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="cbLanguage"/>
      </item>
     </layout>
    </item>
@@ -83,6 +93,12 @@
     <widget class="QLabel" name="lbTestResult">
      <property name="text">
       <string/>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

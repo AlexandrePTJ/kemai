@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>297</width>
-    <height>197</height>
+    <width>300</width>
+    <height>179</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Customer</string>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

@@ -2,7 +2,7 @@
 
 #include <QDialog>
 
-#include "kemai/kimaiapi.h"
+#include "client/kimaiapi.h"
 
 namespace Ui {
 class CustomerDialog;
@@ -16,15 +16,12 @@ class CustomerDialog : public QDialog
 
 public:
     CustomerDialog(QWidget* parent = nullptr);
-    ~CustomerDialog();
+    ~CustomerDialog() override;
 
-    void setCustomer(const client::Customer& customer);
     client::Customer customer() const;
 
 private:
     void enableSave(bool enable);
-
-private slots:
     void validateForm();
 
 private:

@@ -1,10 +1,20 @@
 # Changelog
 
+## 0.6.0 (2021-11-11)
+
+- [23](https://github.com/AlexandrePTJ/kemai/issues/23) Add translations (de, fr, hr, nb_NO).
+- [21](https://github.com/AlexandrePTJ/kemai/issues/21) Setup connection to Kimai without the need to restart.
+- [27](https://github.com/AlexandrePTJ/kemai/issues/27) Migrate to Qt 6.
+- [37](https://github.com/AlexandrePTJ/kemai/issues/37) Support 'timetracking' mode.
+- [25](https://github.com/AlexandrePTJ/kemai/issues/25) Add preliminary support to Kimai TaskManagement plugin.
+
+
 ## 0.5.0 (2020-10-23)
 
 - [#17](https://github.com/AlexandrePTJ/kemai/issues/17) Provide AppImage for Linux.
 - [#16](https://github.com/AlexandrePTJ/kemai/issues/16) Save / Restore window geometry.
 - [#15](https://github.com/AlexandrePTJ/kemai/issues/15) Add description and tags to activity widget.
+
 
 ## 0.4.0 (2020-08-20)
 

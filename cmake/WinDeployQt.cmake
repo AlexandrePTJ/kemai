@@ -20,11 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-find_package(Qt5Core REQUIRED)
-
 # Retrieve the absolute path to qmake and then use that path to find
 # the windeployqt binary
-get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
+get_target_property(_qmake_executable Qt::qmake IMPORTED_LOCATION)
 get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
 
@@ -47,7 +45,6 @@ function(windeployqt target directory)
             COMMAND \"${CMAKE_COMMAND}\" -E
                 env PATH=\"${_qt_bin_dir}\" \"${WINDEPLOYQT_EXECUTABLE}\"
                     --no-compiler-runtime
-                    --no-angle
                     --no-opengl-sw
                     --dir \${CMAKE_INSTALL_PREFIX}/${directory}
                     \${_file}
@@ -56,9 +53,9 @@ function(windeployqt target directory)
         )
         "
             )
-    #    set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-    #    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/${directory})
-    #    include(InstallRequiredSystemLibraries)
+    set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ${directory})
+    include(InstallRequiredSystemLibraries)
 
 endfunction()
 

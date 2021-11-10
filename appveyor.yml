@@ -1,77 +1,77 @@
-version: 1.0.{build}-{branch}
+version: 1.1.{build}-{branch}
 
 image:
   - Visual Studio 2019
   - Ubuntu2004
-  - macos
+  - macOS
 
 platform:
   - x64
 
+environment:
+  KEMAI_QT_VERSION: 6.1
+
 for:
-- matrix:
-    only:
-      - image: Ubuntu2004
+  - matrix:
+      only:
+        - image: Ubuntu2004
 
-  install:
-    - sudo apt update
-    - sudo apt install -y qt5-default curl
-    - curl -L https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -o linuxdeployqt.AppImage
-    - chmod +x linuxdeployqt.AppImage
+    install:
+      - sudo apt update
+      - sudo apt install -y freeglut3-dev
+      - curl -L https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -o linuxdeployqt.AppImage
+      - chmod +x linuxdeployqt.AppImage
 
-  build_script:
-    - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=dist
-    - cmake --build build
+    build_script:
+      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
+      - cmake --build build --target install
 
-  after_build:
-    - cmake --build build --target install
-    - cp dist/bin/Kemai dist/
-    - cp -r bundle/linux/* dist/
-    - cp src/app/icons/kimai.png dist/kemai.png
-    - ./linuxdeployqt.AppImage dist/Kemai -appimage -unsupported-allow-new-glibc --appimage-extract-and-run
+    after_build:
+      - sudo apt install -y libxcb-shape0 libxcb-image0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libgtk3.0-cil libxcb-render0
+      - export LD_LIBRARY_PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64/lib
+      - export VERSION=$(grep -oP "VERSION \K(\d+\.\d+\.\d+)" CMakeLists.txt)
+      - export QT_EXTRA_PLUGINS=platforms,iconengines,wayland-decoration-client,wayland-graphics-integration-client,wayland-shell-integration,platformthemes
+      - cp -r bundle/linux/* dist/
+      - mv dist/bin/* dist/
+      - rmdir dist/bin
+      - ./linuxdeployqt.AppImage dist/Kemai -appimage -unsupported-allow-new-glibc -extra-plugins=$QT_EXTRA_PLUGINS --appimage-extract-and-run
 
-  artifacts:
-    - path: Kemai-*.AppImage
+    artifacts:
+      - path: Kemai-*.AppImage
 
-- matrix:
-    only:
-      - image: Visual Studio 2019
+  - matrix:
+      only:
+        - image: Visual Studio 2019
 
-  before_build:
-    - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=amd64
+    before_build:
+      - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=amd64
 
-  build_script:
-    - cmake . -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\5.15\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64
-    - cmake --build build --config Release
+    build_script:
+      - cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\%KEMAI_QT_VERSION%\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64 -DCMAKE_INSTALL_PREFIX=dist
+      - cmake --build build --config Release --target package
 
-  after_build:
-    - cmake --build build --config Release --target package
+    artifacts:
+      - path: build\Kemai-*.msi
 
-  artifacts:
-    - path: build\Kemai-*.msi
+  - matrix:
+      only:
+        - image: macOS
 
-- matrix:
-    only:
-      - image: macos
+    build_script:
+      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/macos
+      - cmake --build build
 
-  install:
-    - brew install qt
+    after_build:
+      - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt build/src/app/Kemai.app
+      - cmake --build build --target package
 
-  build_script:
-    - cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt
-    - cmake --build build --config Release
-
-  after_build:
-    - /usr/local/opt/qt/bin/macdeployqt build/src/app/Kemai.app
-    - cmake --build build --config Release --target package
-
-  artifacts:
-    - path: build/Kemai-*.dmg
+    artifacts:
+      - path: build/Kemai-*.dmg
 
 deploy:
   - provider: GitHub
     draft: true
     auth_token:
-      secure: ZBA/qLsYwRJ9xw8sf1Q96NrJYNFdqAfDKVD7cA+okvEnjFSOt5aBk52bI+v++pIQ
+      secure: j3+ty+O3NBk4dHVw5CkGTtRuJRtOdgtaWTbOrCWkSnKVcevEbp6K35GcvFTik6OF
     on:
       APPVEYOR_REPO_TAG: true

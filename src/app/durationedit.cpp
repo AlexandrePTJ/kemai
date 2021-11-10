@@ -12,30 +12,30 @@ DurationEdit::DurationEdit(QWidget* parent) : QLineEdit(parent), mDurationRx("^(
 
 void DurationEdit::setSeconds(int seconds)
 {
-    setText(QString("%1:%2").arg(seconds / 3600).arg(seconds % 3600));
+    setText(QString("%1:%2").arg(seconds / 3600, seconds % 3600));
 }
 
 int DurationEdit::seconds() const
 {
-    int nsecs = 0;
+    int nSecs = 0;
 
     auto match = mDurationRx.match(text());
     if (match.hasMatch())
     {
         // hours
-        auto hourstr = match.captured(1);
-        if (not hourstr.isEmpty())
+        auto hourStr = match.captured(1);
+        if (!hourStr.isEmpty())
         {
-            nsecs += 3600 * hourstr.toInt();
+            nSecs += 3600 * hourStr.toInt();
         }
 
         // minutes
-        auto minstr = match.captured(3);
-        if (not minstr.isEmpty())
+        auto minStr = match.captured(3);
+        if (!minStr.isEmpty())
         {
-            nsecs += 60 * minstr.toInt();
+            nSecs += 60 * minStr.toInt();
         }
     }
 
-    return nsecs;
+    return nSecs;
 }

@@ -29,18 +29,14 @@ CustomerDialog::CustomerDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::C
     }
 
     for (const auto& tz : QTimeZone::availableTimeZoneIds())
+    {
         mUi->cbTimezone->addItem(tz);
+    }
 }
 
 CustomerDialog::~CustomerDialog()
 {
     delete mUi;
-}
-
-void CustomerDialog::setCustomer(const Customer& customer)
-{
-    mUi->leName->setText(customer.name);
-    validateForm();
 }
 
 Customer CustomerDialog::customer() const
@@ -58,15 +54,16 @@ Customer CustomerDialog::customer() const
 
 void CustomerDialog::enableSave(bool enable)
 {
-    auto btn = mUi->buttonBox->button(QDialogButtonBox::Save);
-    if (btn)
+    if (auto btn = mUi->buttonBox->button(QDialogButtonBox::Save))
+    {
         btn->setEnabled(enable);
+    }
 }
 
 void CustomerDialog::validateForm()
 {
     const auto& name  = mUi->leName->text();
-    bool nameOk       = (not name.isEmpty()) and (name.size() > 1);
+    bool nameOk       = (!name.isEmpty()) && (name.size() > 1);
     bool timeBudgetOk = mUi->leTimeBudget->hasAcceptableInput();
-    enableSave(nameOk and timeBudgetOk);
+    enableSave(nameOk && timeBudgetOk);
 }

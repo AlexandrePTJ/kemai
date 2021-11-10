@@ -3,7 +3,8 @@
 #include <QTimer>
 #include <QWidget>
 
-#include "kemai/kimaiclient.h"
+#include "client/kimaiclient.h"
+#include "kemaisession.h"
 
 namespace Ui {
 class ActivityWidget;
@@ -17,18 +18,24 @@ class ActivityWidget : public QWidget
 
 public:
     ActivityWidget(QWidget* parent = nullptr);
-    ~ActivityWidget();
+    ~ActivityWidget() override;
 
-public slots:
-    void refresh();
+    void setKimaiClient(QSharedPointer<client::KimaiClient> kimaiClient);
+    void setKemaiSession(QSharedPointer<core::KemaiSession> kemaiSession);
 
-private slots:
-    void onClientError(const QString& errorMsg);
+signals:
+    void currentActivityChanged(bool started);
+
+private:
     void onClientReply(const client::KimaiReply& reply);
 
     void onCbCustomerTextChanged(const QString& text);
     void onCbProjectTextChanged(const QString& text);
     void onCbActivityTextChanged(const QString& text);
+
+    void onTbAddCustomerClicked();
+    void onTbAddProjectClicked();
+    void onTbAddActivityClicked();
 
     void onBtStartStopClicked();
 
@@ -36,15 +43,12 @@ private slots:
 
     void updateControls();
 
-signals:
-    void currentActivityChanged(bool started);
-
 private:
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;
     QSharedPointer<client::KimaiClient> mClient;
+    QSharedPointer<core::KemaiSession> mSession;
     QScopedPointer<client::TimeSheet> mCurrentTimeSheet;
-    QScopedPointer<client::User> mMe;
 };
 
 } // namespace kemai::app

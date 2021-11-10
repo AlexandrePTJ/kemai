@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(KemaiProject VERSION 0.5.0 LANGUAGES CXX)
+project(KemaiProject VERSION 0.6.0 LANGUAGES CXX)
 
 # Point CMake to the custom modules
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -9,7 +9,7 @@ include(FetchContent)
 FetchContent_Declare(
         spdlog
         GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.6.1)
+        GIT_TAG v1.9.2)
 FetchContent_GetProperties(spdlog)
 if (NOT spdlog_POPULATED)
     FetchContent_Populate(spdlog)
@@ -22,7 +22,19 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Setup Qt
-find_package(Qt5 COMPONENTS Widgets Network CONFIG REQUIRED)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+find_package(Qt6 QUIET COMPONENTS Widgets Network LinguistTools)
+if (NOT Qt6_FOUND)
+    message(NOTICE "Qt6 not found. Fallback to Qt5")
+    find_package(Qt5 COMPONENTS Widgets Network LinguistTools REQUIRED)
+    add_compile_definitions(UNICODE _UNICODE)
+    message(STATUS "Using Qt ${Qt5_VERSION}")
+else ()
+    message(STATUS "Using Qt ${Qt6_VERSION}")
+endif ()
+
 
 # Common package configuration
 set(KEMAI_GUID "88815E44-85A0-469C-9740-B4887D456BAA")
@@ -38,9 +50,6 @@ if (WIN32)
     if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
         set(OS_BUNDLE WIN32)
     endif ()
-
-    # Enable and/or/... keywords
-    add_compile_options("/permissive-")
 
     # Add Qt libs and installer for windows platform
     include(WinDeployQt)
