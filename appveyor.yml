@@ -9,7 +9,7 @@ platform:
   - x64
 
 environment:
-  KEMAI_QT_VERSION: 6.1
+  KEMAI_QT_VERSION: 6.2
 
 for:
   - matrix:
@@ -23,8 +23,8 @@ for:
       - chmod +x linuxdeployqt.AppImage
 
     build_script:
-      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64 -DCMAKE_INSTALL_PREFIX=dist
-      - cmake --build build --target install
+      - cmake --preset release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/gcc_64
+      - cmake --build --preset release --target install
 
     after_build:
       - sudo apt install -y libxcb-shape0 libxcb-image0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libgtk3.0-cil libxcb-render0
@@ -47,26 +47,26 @@ for:
       - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=amd64
 
     build_script:
-      - cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\%KEMAI_QT_VERSION%\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64 -DCMAKE_INSTALL_PREFIX=dist
-      - cmake --build build --config Release --target package
+      - cmake --preset release -DCMAKE_PREFIX_PATH=C:\Qt\%KEMAI_QT_VERSION%\msvc2019_64 -DOPENSSL_ROOT=C:\OpenSSL-v111-Win64
+      - cmake --build --preset release --target package
 
     artifacts:
-      - path: build\Kemai-*.msi
+      - path: cmake-build-release\Kemai-*.msi
 
   - matrix:
       only:
         - image: macOS
 
     build_script:
-      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/macos
-      - cmake --build build
+      - cmake --preset release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/macos
+      - cmake --build --preset release
 
     after_build:
-      - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt build/src/app/Kemai.app
-      - cmake --build build --target package
+      - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt cmake-build-release/src/app/Kemai.app
+      - cmake --build --preset release --target package
 
     artifacts:
-      - path: build/Kemai-*.dmg
+      - path: cmake-build-release/Kemai-*.dmg
 
 deploy:
   - provider: GitHub

@@ -1,0 +1,68 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "displayName": "Default Config",
+      "description": "Default build using Ninja generator",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/cmake-build-${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "dist"
+      }
+    },
+    {
+      "name": "default-windows",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "c:/Qt/6.2.3/msvc2019_64"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "debug-win",
+      "inherits": ["debug", "default-windows"]
+    },
+    {
+      "name": "release-win",
+      "inherits": ["release", "default-windows"]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "debug-win",
+      "configurePreset": "debug-win"
+    },
+    {
+      "name": "release-win",
+      "configurePreset": "release-win"
+    }
+  ]
+}
