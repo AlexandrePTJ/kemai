@@ -58,15 +58,15 @@ for:
         - image: macOS
 
     build_script:
-      - cmake --preset release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/macos
-      - cmake --build --preset release
+      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/macos
+      - cmake --build build
 
     after_build:
       - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt cmake-build-release/src/app/Kemai.app
-      - cmake --build --preset release --target package
+      - cmake --build build --target package
 
     artifacts:
-      - path: cmake-build-release/Kemai-*.dmg
+      - path: build/Kemai-*.dmg
 
 deploy:
   - provider: GitHub
