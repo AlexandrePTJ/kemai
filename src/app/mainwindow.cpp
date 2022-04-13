@@ -22,6 +22,15 @@ using namespace kemai::client;
 using namespace kemai::core;
 using namespace kemai::updater;
 
+/*
+ * Static helpers
+ */
+static const auto FirstRequestDelayMs                 = 100;
+static const auto MinimalKimaiVersionForPluginRequest = QVersionNumber(1, 14, 1);
+
+/*
+ * Class impl
+ */
 MainWindow::MainWindow() : mUi(new Ui::MainWindow)
 {
     mUi->setupUi(this);
@@ -123,8 +132,8 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     /*
      * Delay first refresh and update check
      */
-    QTimer::singleShot(100, this, &MainWindow::createKimaiClient);
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(FirstRequestDelayMs, this, &MainWindow::createKimaiClient);
+    QTimer::singleShot(FirstRequestDelayMs, [&]() {
         auto ignoreVersion  = QVersionNumber::fromString(Settings::load().kemai.ignoredVersion);
         auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
         mUpdater.checkAvailableNewVersion(currentVersion >= ignoreVersion ? currentVersion : ignoreVersion, true);
@@ -144,6 +153,21 @@ void MainWindow::closeEvent(QCloseEvent* event)
     {
         hide();
         event->ignore();
+    }
+    settings.kemai.geometry = saveGeometry();
+    Settings::save(settings);
+}
+
+void MainWindow::hideEvent(QHideEvent* event)
+{
+    auto settings = Settings::load();
+    if (settings.kemai.minimizeToSystemTray)
+    {
+        if (event->spontaneous() && isMinimized())
+        {
+            hide();
+            event->ignore();
+        }
     }
     settings.kemai.geometry = saveGeometry();
     Settings::save(settings);
@@ -178,7 +202,7 @@ void MainWindow::createKimaiClient()
         mActivityWidget->setKimaiClient(mClient);
         mActivityWidget->setKemaiSession(mSession);
 
-        if (mTaskWidget)
+        if (mTaskWidget != nullptr)
         {
             mTaskWidget->setKemaiSession(mSession);
         }
@@ -228,8 +252,8 @@ void MainWindow::onClientReply(const KimaiReply& reply)
     case ApiMethod::Version: {
         auto kVersion          = reply.get<KimaiVersion>();
         mSession->kimaiVersion = kVersion.kimai;
-        // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.2
-        if (mSession->kimaiVersion >= QVersionNumber(1, 14, 1))
+        // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.1
+        if (mSession->kimaiVersion >= MinimalKimaiVersionForPluginRequest)
         {
             mClient->sendRequest(KimaiRequestFactory::plugins());
         }
@@ -283,9 +307,22 @@ void MainWindow::onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason)
     {
-    case QSystemTrayIcon::Trigger:
-        showNormal();
-        break;
+    case QSystemTrayIcon::Trigger: {
+        auto settings = Settings::load();
+        if (isVisible() && (settings.kemai.minimizeToSystemTray || settings.kemai.closeToSystemTray))
+        {
+            hide();
+        }
+        else
+        {
+            showNormal();
+            if (!isActiveWindow())
+            {
+                activateWindow();
+            }
+        }
+    }
+    break;
 
     default:
         break;

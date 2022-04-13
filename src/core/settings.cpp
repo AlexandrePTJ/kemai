@@ -8,7 +8,7 @@ using namespace kemai::core;
 
 QSettings getQSettingsInstance()
 {
-    return QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName());
+    return {QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName()};
 }
 
 bool Settings::isReady() const
@@ -22,22 +22,28 @@ Settings Settings::load()
 
     Settings settings;
 
-    QString kimaiGrpPrefix, kemaiGrpPrefix;
+    QString kimaiGrpPrefix;
+    QString kemaiGrpPrefix;
 
     if (qset.childGroups().contains("kimai"))
+    {
         kimaiGrpPrefix = "kimai/";
+    }
     if (qset.childGroups().contains("kemai"))
+    {
         kemaiGrpPrefix = "kemai/";
+    }
 
     settings.kimai.host                = qset.value(kimaiGrpPrefix + "host").toString();
     settings.kimai.username            = qset.value(kimaiGrpPrefix + "username").toString();
     settings.kimai.token               = qset.value(kimaiGrpPrefix + "token").toString();
     settings.kimai.trustedCertificates = qset.value(kimaiGrpPrefix + "trustedCertificates", {}).toStringList();
 
-    settings.kemai.closeToSystemTray = qset.value(kemaiGrpPrefix + "closeToSystemTray", false).toBool();
-    settings.kemai.ignoredVersion    = qset.value(kemaiGrpPrefix + "ignoredVersion", "0.0.0").toString();
-    settings.kemai.geometry          = qset.value(kemaiGrpPrefix + "geometry").toByteArray();
-    settings.kemai.language          = qset.value(kemaiGrpPrefix + "language", QLocale::system()).toLocale();
+    settings.kemai.closeToSystemTray    = qset.value(kemaiGrpPrefix + "closeToSystemTray", false).toBool();
+    settings.kemai.minimizeToSystemTray = qset.value(kemaiGrpPrefix + "minimizeToSystemTray", false).toBool();
+    settings.kemai.ignoredVersion       = qset.value(kemaiGrpPrefix + "ignoredVersion", "0.0.0").toString();
+    settings.kemai.geometry             = qset.value(kemaiGrpPrefix + "geometry").toByteArray();
+    settings.kemai.language             = qset.value(kemaiGrpPrefix + "language", QLocale::system()).toLocale();
 
     return settings;
 }
@@ -50,6 +56,7 @@ void Settings::save(const Settings& settings)
     qset.setValue("kimai/token", settings.kimai.token);
     qset.setValue("kimai/trustedCertificates", settings.kimai.trustedCertificates);
     qset.setValue("kemai/closeToSystemTray", settings.kemai.closeToSystemTray);
+    qset.setValue("kemai/minimizeToSystemTray", settings.kemai.minimizeToSystemTray);
     qset.setValue("kemai/ignoredVersion", settings.kemai.ignoredVersion);
     qset.setValue("kemai/geometry", settings.kemai.geometry);
     qset.setValue("kemai/language", settings.kemai.language);

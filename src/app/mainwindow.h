@@ -29,6 +29,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent* event) override;
+    void hideEvent(QHideEvent* event) override;
 
 private:
     void createKimaiClient();

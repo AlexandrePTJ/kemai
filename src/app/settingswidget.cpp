@@ -98,6 +98,7 @@ void SettingsWidget::loadSettings()
     mUi->leUsername->setText(settings.kimai.username);
     mUi->leToken->setText(settings.kimai.token);
     mUi->cbCloseToSystemTray->setChecked(settings.kemai.closeToSystemTray);
+    mUi->cbMinimizeToSystemTray->setChecked(settings.kemai.minimizeToSystemTray);
 
     auto idLanguage = mUi->cbLanguage->findData(settings.kemai.language);
     if (idLanguage >= 0)
@@ -109,11 +110,12 @@ void SettingsWidget::loadSettings()
 void SettingsWidget::saveSettings()
 {
     Settings settings;
-    settings.kimai.host              = mUi->leHost->text();
-    settings.kimai.username          = mUi->leUsername->text();
-    settings.kimai.token             = mUi->leToken->text();
-    settings.kemai.closeToSystemTray = mUi->cbCloseToSystemTray->isChecked();
-    settings.kemai.language          = mUi->cbLanguage->currentData().toLocale();
+    settings.kimai.host                 = mUi->leHost->text();
+    settings.kimai.username             = mUi->leUsername->text();
+    settings.kimai.token                = mUi->leToken->text();
+    settings.kemai.closeToSystemTray    = mUi->cbCloseToSystemTray->isChecked();
+    settings.kemai.minimizeToSystemTray = mUi->cbMinimizeToSystemTray->isChecked();
+    settings.kemai.language             = mUi->cbLanguage->currentData().toLocale();
     Settings::save(settings);
 }
 

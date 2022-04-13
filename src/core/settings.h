@@ -18,6 +18,7 @@ struct Settings
     struct Kemai
     {
         bool closeToSystemTray;
+        bool minimizeToSystemTray;
         QString ignoredVersion;
         QByteArray geometry;
         QLocale language;
