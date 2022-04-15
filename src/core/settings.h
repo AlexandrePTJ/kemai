@@ -7,13 +7,16 @@ namespace kemai::core {
 
 struct Settings
 {
-    struct Kimai
+    struct Profile
     {
+        QString name;
         QString host;
         QString username;
         QString token;
-        QStringList trustedCertificates;
-    } kimai;
+    };
+    QList<Profile> profiles;
+
+    QStringList trustedCertificates;
 
     struct Kemai
     {

@@ -14,7 +14,7 @@
 
 #include "activitywidget.h"
 #include "settings.h"
-#include "settingswidget.h"
+#include "settingsdialog.h"
 #include "taskwidget.h"
 
 using namespace kemai::app;
@@ -105,9 +105,6 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     mActivityWidget = new ActivityWidget;
     mUi->stackedWidget->addWidget(mActivityWidget);
 
-    mSettingsWidget = new SettingsWidget;
-    mUi->stackedWidget->addWidget(mSettingsWidget);
-
     mTaskWidget = new TaskWidget;
     mUi->stackedWidget->addWidget(mTaskWidget);
 
@@ -123,11 +120,6 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
     connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
     connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChanged);
-    connect(mSettingsWidget, &SettingsWidget::cancelled, this, &MainWindow::showSelectedView);
-    connect(mSettingsWidget, &SettingsWidget::settingsSaved, [&]() {
-        createKimaiClient();
-        showSelectedView();
-    });
 
     /*
      * Delay first refresh and update check
@@ -185,9 +177,11 @@ void MainWindow::createKimaiClient()
     if (settings.isReady())
     {
         mClient = QSharedPointer<KimaiClient>::create();
-        mClient->setHost(settings.kimai.host);
-        mClient->setUsername(settings.kimai.username);
-        mClient->setToken(settings.kimai.token);
+
+        auto profile = settings.profiles.first();
+        mClient->setHost(profile.host);
+        mClient->setUsername(profile.username);
+        mClient->setToken(profile.token);
 
         mSession = QSharedPointer<KemaiSession>::create();
 
@@ -284,8 +278,15 @@ void MainWindow::onClientReply(const KimaiReply& reply)
 
 void MainWindow::onActionSettingsTriggered()
 {
-    setViewActionsEnabled(false);
-    mUi->stackedWidget->setCurrentWidget(mSettingsWidget);
+    app::SettingsDialog settingsDialog(this);
+    settingsDialog.setSettings(core::Settings::load());
+    if (settingsDialog.exec() == QDialog::Accepted)
+    {
+        core::Settings::save(settingsDialog.settings());
+
+        createKimaiClient();
+        showSelectedView();
+    }
 }
 
 void MainWindow::onActionCheckUpdateTriggered()
@@ -299,7 +300,7 @@ void MainWindow::onActionOpenHostTriggered()
     auto settings = Settings::load();
     if (settings.isReady())
     {
-        QDesktopServices::openUrl(QUrl::fromUserInput(settings.kimai.host));
+        QDesktopServices::openUrl(QUrl::fromUserInput(settings.profiles.first().host));
     }
 }
 

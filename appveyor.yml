@@ -62,7 +62,7 @@ for:
       - cmake --build build
 
     after_build:
-      - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt cmake-build-release/src/app/Kemai.app
+      - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt build/src/app/Kemai.app
       - cmake --build build --target package
 
     artifacts:

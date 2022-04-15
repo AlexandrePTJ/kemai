@@ -1,25 +1,31 @@
 #include "settings.h"
 
 #include <QCoreApplication>
+#include <QDir>
 #include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QSettings>
+#include <QStandardPaths>
 
 using namespace kemai::core;
 
+/*
+ * Static helpers
+ */
 QSettings getQSettingsInstance()
 {
     return {QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName()};
 }
 
-bool Settings::isReady() const
+QString getJsonSettingsPath()
 {
-    return !kimai.host.isEmpty() && !kimai.username.isEmpty() && !kimai.token.isEmpty();
+    return QDir(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).absoluteFilePath("settings.json");
 }
 
-Settings Settings::load()
+void migrateIniToJson(const QSettings& qset)
 {
-    auto qset = getQSettingsInstance();
-
     Settings settings;
 
     QString kimaiGrpPrefix;
@@ -34,10 +40,14 @@ Settings Settings::load()
         kemaiGrpPrefix = "kemai/";
     }
 
-    settings.kimai.host                = qset.value(kimaiGrpPrefix + "host").toString();
-    settings.kimai.username            = qset.value(kimaiGrpPrefix + "username").toString();
-    settings.kimai.token               = qset.value(kimaiGrpPrefix + "token").toString();
-    settings.kimai.trustedCertificates = qset.value(kimaiGrpPrefix + "trustedCertificates", {}).toStringList();
+    Settings::Profile defaultProfile;
+    defaultProfile.name     = "default";
+    defaultProfile.host     = qset.value(kimaiGrpPrefix + "host").toString();
+    defaultProfile.username = qset.value(kimaiGrpPrefix + "username").toString();
+    defaultProfile.token    = qset.value(kimaiGrpPrefix + "token").toString();
+    settings.profiles.push_back(defaultProfile);
+
+    settings.trustedCertificates = qset.value(kimaiGrpPrefix + "trustedCertificates", {}).toStringList();
 
     settings.kemai.closeToSystemTray    = qset.value(kemaiGrpPrefix + "closeToSystemTray", false).toBool();
     settings.kemai.minimizeToSystemTray = qset.value(kemaiGrpPrefix + "minimizeToSystemTray", false).toBool();
@@ -45,19 +55,103 @@ Settings Settings::load()
     settings.kemai.geometry             = qset.value(kemaiGrpPrefix + "geometry").toByteArray();
     settings.kemai.language             = qset.value(kemaiGrpPrefix + "language", QLocale::system()).toLocale();
 
+    // Save to json format
+    Settings::save(settings);
+}
+
+/*
+ * Class impl
+ */
+
+bool Settings::isReady() const
+{
+    if (profiles.size() > 0)
+    {
+        auto profile = profiles.first();
+        return !profile.host.isEmpty() && !profile.username.isEmpty() && !profile.token.isEmpty();
+    }
+    return false;
+}
+
+Settings Settings::load()
+{
+    auto qset             = getQSettingsInstance();
+    auto jsonSettingsPath = getJsonSettingsPath();
+
+    // Migrate from ini settings to json
+    if (QFile::exists(qset.fileName()) && !QFile::exists(jsonSettingsPath))
+    {
+        migrateIniToJson(qset);
+    }
+
+    QFile jsonFile(jsonSettingsPath);
+    jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    auto jsonDocument = QJsonDocument::fromJson(jsonFile.readAll());
+    auto root         = jsonDocument.object();
+    jsonFile.close();
+
+    Settings settings;
+
+    for (const auto& certificationValue : root.value("trustedCertificates").toArray())
+    {
+        settings.trustedCertificates.append(certificationValue.toString());
+    }
+
+    auto kemaiObject                    = root.value("kemai").toObject();
+    settings.kemai.closeToSystemTray    = kemaiObject.value("closeToSystemTray").toBool();
+    settings.kemai.minimizeToSystemTray = kemaiObject.value("minimizeToSystemTray").toBool();
+    settings.kemai.ignoredVersion       = kemaiObject.value("ignoredVersion").toString();
+    settings.kemai.geometry             = QByteArray::fromBase64(kemaiObject.value("geometry").toString().toLocal8Bit());
+    settings.kemai.language             = QLocale(kemaiObject.value("language").toString());
+
+    for (const auto& profileValue : root.value("profiles").toArray())
+    {
+        const auto profileObject = profileValue.toObject();
+
+        Settings::Profile profile;
+        profile.name     = profileObject.value("name").toString();
+        profile.host     = profileObject.value("host").toString();
+        profile.username = profileObject.value("username").toString();
+        profile.token    = profileObject.value("token").toString();
+        settings.profiles << profile;
+    }
+
     return settings;
 }
 
 void Settings::save(const Settings& settings)
 {
-    auto qset = getQSettingsInstance();
-    qset.setValue("kimai/host", settings.kimai.host);
-    qset.setValue("kimai/username", settings.kimai.username);
-    qset.setValue("kimai/token", settings.kimai.token);
-    qset.setValue("kimai/trustedCertificates", settings.kimai.trustedCertificates);
-    qset.setValue("kemai/closeToSystemTray", settings.kemai.closeToSystemTray);
-    qset.setValue("kemai/minimizeToSystemTray", settings.kemai.minimizeToSystemTray);
-    qset.setValue("kemai/ignoredVersion", settings.kemai.ignoredVersion);
-    qset.setValue("kemai/geometry", settings.kemai.geometry);
-    qset.setValue("kemai/language", settings.kemai.language);
+    QJsonArray profilesArray;
+    for (const auto& profile : settings.profiles)
+    {
+        QJsonObject profileObject;
+        profileObject["name"]     = profile.name;
+        profileObject["host"]     = profile.host;
+        profileObject["username"] = profile.username;
+        profileObject["token"]    = profile.token;
+        profilesArray.append(profileObject);
+    }
+
+    QJsonObject kemaiObject;
+    kemaiObject["closeToSystemTray"]    = settings.kemai.closeToSystemTray;
+    kemaiObject["minimizeToSystemTray"] = settings.kemai.minimizeToSystemTray;
+    kemaiObject["ignoredVersion"]       = settings.kemai.ignoredVersion;
+    kemaiObject["geometry"]             = QString(settings.kemai.geometry.toBase64());
+    kemaiObject["language"]             = settings.kemai.language.name();
+
+    QJsonObject root;
+    root["version"]             = 1;
+    root["profiles"]            = profilesArray;
+    root["trustedCertificates"] = QJsonArray::fromStringList(settings.trustedCertificates);
+    root["kemai"]               = kemaiObject;
+
+    QJsonDocument jsonDocument(root);
+
+    QFile jsonFile(getJsonSettingsPath());
+    jsonFile.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    QTextStream ts(&jsonFile);
+    ts << jsonDocument.toJson();
+
+    jsonFile.close();
 }

@@ -16,7 +16,6 @@ class MainWindow;
 namespace kemai::app {
 
 class ActivityWidget;
-class SettingsWidget;
 class TaskWidget;
 
 class MainWindow : public QMainWindow
@@ -53,7 +52,6 @@ private:
 
     // Stacked widget (ownership is transferred, don't try to delete them)
     ActivityWidget* mActivityWidget = nullptr;
-    SettingsWidget* mSettingsWidget = nullptr;
     TaskWidget* mTaskWidget         = nullptr;
 
     // Actions
