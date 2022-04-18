@@ -73,6 +73,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::S
     connect(mUi->leHost, &QLineEdit::textChanged, this, &SettingsDialog::onProfileFieldValueChanged);
     connect(mUi->leUsername, &QLineEdit::textChanged, this, &SettingsDialog::onProfileFieldValueChanged);
     connect(mUi->leToken, &QLineEdit::textChanged, this, &SettingsDialog::onProfileFieldValueChanged);
+    connect(mUi->addProfileButton, &QToolButton::clicked, this, &SettingsDialog::onProfileAddButtonClicked);
+    connect(mUi->delProfileButton, &QToolButton::clicked, this, &SettingsDialog::onProfileDelButtonClicked);
 
     // show dialog if language changes from settings
     connect(mUi->cbLanguage, &QComboBox::currentTextChanged, [&](const QString&) {
@@ -142,6 +144,8 @@ void SettingsDialog::onProfilesListCurrentItemChanged(QListWidgetItem* current, 
     mUi->leHost->setText(profile.host);
     mUi->leUsername->setText(profile.username);
     mUi->leToken->setText(profile.token);
+
+    mUi->delProfileButton->setEnabled(current != nullptr);
 }
 
 void SettingsDialog::onBtTestClicked()
@@ -182,6 +186,23 @@ void SettingsDialog::onProfileFieldValueChanged()
     profile.token    = mUi->leToken->text();
 
     profileToItemList(profile, item);
+}
+
+void SettingsDialog::onProfileAddButtonClicked()
+{
+    Settings::Profile profile;
+    profile.name = "Default";
+
+    auto item = new QListWidgetItem;
+    profileToItemList(profile, item);
+    mUi->profilesListWidget->addItem(item);
+
+    mUi->profilesListWidget->setCurrentItem(item);
+}
+
+void SettingsDialog::onProfileDelButtonClicked()
+{
+    delete mUi->profilesListWidget->takeItem(mUi->profilesListWidget->currentRow());
 }
 
 Settings::Profile SettingsDialog::profileFromItemList(QListWidgetItem* item) const

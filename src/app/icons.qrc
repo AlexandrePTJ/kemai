@@ -11,5 +11,6 @@
         <file alias="update-off">icons/update-off.svg</file>
         <file alias="backspace">icons/backspace.svg</file>
         <file alias="refresh">icons/refresh.svg</file>
+        <file alias="remove">icons/remove.svg</file>
     </qresource>
 </RCC>

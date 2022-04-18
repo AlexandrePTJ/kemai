@@ -27,6 +27,8 @@ private:
     void onClientError(const QString& errorMsg);
     void onClientReply(const client::KimaiReply& reply);
     void onProfileFieldValueChanged();
+    void onProfileAddButtonClicked();
+    void onProfileDelButtonClicked();
     core::Settings::Profile profileFromItemList(QListWidgetItem* item) const;
     void profileToItemList(const core::Settings::Profile& profile, QListWidgetItem* item);
 
