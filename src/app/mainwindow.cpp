@@ -60,6 +60,8 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     mActGroupView->addAction(mActViewActivities);
     mActGroupView->addAction(mActViewTasks);
 
+    mActGroupProfiles = new QActionGroup(this);
+
     /*
      * Setup system tray
      */
@@ -83,6 +85,8 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     fileMenu->addSeparator();
     fileMenu->addAction(mActQuit);
 
+    mProfileMenu = new QMenu(tr("&Profile"), mMenuBar);
+
     auto viewMenu = new QMenu(tr("&View"), mMenuBar);
     viewMenu->addAction(mActViewActivities);
     viewMenu->addAction(mActViewTasks);
@@ -95,6 +99,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     helpMenu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 
     mMenuBar->addMenu(fileMenu);
+    mMenuBar->addMenu(mProfileMenu);
     mMenuBar->addMenu(viewMenu);
     mMenuBar->addMenu(helpMenu);
     setMenuBar(mMenuBar);
@@ -108,6 +113,8 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     mTaskWidget = new TaskWidget;
     mUi->stackedWidget->addWidget(mTaskWidget);
 
+    updateProfilesMenu();
+
     /*
      * Connections
      */
@@ -120,11 +127,12 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
     connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
     connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChanged);
+    connect(mActGroupProfiles, &QActionGroup::triggered, this, &MainWindow::onProfilesActionGroupTriggered);
 
     /*
      * Delay first refresh and update check
      */
-    QTimer::singleShot(FirstRequestDelayMs, this, &MainWindow::createKimaiClient);
+    QTimer::singleShot(FirstRequestDelayMs, this, &MainWindow::processAutoConnect);
     QTimer::singleShot(FirstRequestDelayMs, [&]() {
         auto ignoreVersion  = QVersionNumber::fromString(Settings::load().kemai.ignoredVersion);
         auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
@@ -165,7 +173,7 @@ void MainWindow::hideEvent(QHideEvent* event)
     Settings::save(settings);
 }
 
-void MainWindow::createKimaiClient()
+void MainWindow::createKimaiClient(const Settings::Profile& profile)
 {
     // Clear previous client usage
     if (mClient)
@@ -178,7 +186,6 @@ void MainWindow::createKimaiClient()
     {
         mClient = QSharedPointer<KimaiClient>::create();
 
-        auto profile = settings.profiles.first();
         mClient->setHost(profile.host);
         mClient->setUsername(profile.username);
         mClient->setToken(profile.token);
@@ -200,6 +207,10 @@ void MainWindow::createKimaiClient()
         {
             mTaskWidget->setKemaiSession(mSession);
         }
+
+        // Save profile connection
+        settings.kemai.lastConnectedProfile = profile.id;
+        Settings::save(settings);
     }
 }
 
@@ -227,6 +238,67 @@ void MainWindow::setViewActionsEnabled(bool enable)
         taskPluginEnabled = mSession->isPluginAvailable(ApiPlugin::TaskManagement);
     }
     mActViewTasks->setEnabled(enable && taskPluginEnabled);
+}
+
+void MainWindow::updateProfilesMenu()
+{
+    auto settings = Settings::load();
+
+    // Removes obsoletes profiles
+    for (auto action : mActGroupProfiles->actions())
+    {
+        if (settings.findProfileRef(action->data().toUuid()) == settings.profiles.end())
+        {
+            mProfileMenu->removeAction(action);
+            mActGroupProfiles->removeAction(action);
+            action->deleteLater();
+        }
+    }
+
+    // Adds new profiles
+    for (const auto& profile : settings.profiles)
+    {
+        bool profileExists = false;
+        for (auto action : mActGroupProfiles->actions())
+        {
+            if (action->data().toUuid() == profile.id)
+            {
+                profileExists = true;
+            }
+        }
+
+        if (!profileExists)
+        {
+            auto action = mProfileMenu->addAction(profile.name);
+            action->setCheckable(true);
+            action->setData(profile.id);
+            mActGroupProfiles->addAction(action);
+        }
+    }
+}
+
+void MainWindow::processAutoConnect()
+{
+    auto settings = Settings::load();
+    if (settings.profiles.isEmpty())
+    {
+        return;
+    }
+
+    auto profileIt = settings.findProfileRef(settings.kemai.lastConnectedProfile);
+    if (profileIt == settings.profiles.end())
+    {
+        profileIt = settings.profiles.begin();
+    }
+
+    for (auto& action : mActGroupProfiles->actions())
+    {
+        if (action->data().toUuid() == profileIt->id)
+        {
+            action->setChecked(true);
+        }
+    }
+    createKimaiClient(*profileIt);
 }
 
 void MainWindow::onClientError(const QString& errorMsg)
@@ -284,8 +356,8 @@ void MainWindow::onActionSettingsTriggered()
     {
         core::Settings::save(settingsDialog.settings());
 
-        createKimaiClient();
         showSelectedView();
+        updateProfilesMenu();
     }
 }
 
@@ -372,5 +444,22 @@ void MainWindow::onActivityChanged(bool started)
     {
         setWindowIcon(QIcon(":/icons/kemai-red"));
         mSystemTrayIcon->setIcon(QIcon(":/icons/kemai-red"));
+    }
+}
+
+void MainWindow::onProfilesActionGroupTriggered(QAction* action)
+{
+    if (action != nullptr)
+    {
+        if (action->isChecked())
+        {
+            auto settings  = Settings::load();
+            auto profileId = action->data().toUuid();
+            auto profile   = settings.findProfileRef(profileId);
+            if (profile != settings.profiles.end())
+            {
+                createKimaiClient(*profile);
+            }
+        }
     }
 }

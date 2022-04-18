@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QActionGroup>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QSharedPointer>
@@ -7,6 +8,7 @@
 
 #include "client/kimaiclient.h"
 #include "kemaisession.h"
+#include "settings.h"
 #include "updater/kemaiupdater.h"
 
 namespace Ui {
@@ -31,9 +33,11 @@ protected:
     void hideEvent(QHideEvent* event) override;
 
 private:
-    void createKimaiClient();
+    void createKimaiClient(const core::Settings::Profile& profile);
     void showSelectedView();
     void setViewActionsEnabled(bool enable);
+    void updateProfilesMenu();
+    void processAutoConnect();
 
     void onClientError(const QString& errorMsg);
     void onClientReply(const client::KimaiReply& reply);
@@ -43,8 +47,8 @@ private:
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
     void onNewVersionCheckFinished(const updater::VersionDetails& details);
     void onActivityChanged(bool started);
+    void onProfilesActionGroupTriggered(QAction* action);
 
-private:
     Ui::MainWindow* mUi;
     updater::KemaiUpdater mUpdater;
     QSharedPointer<client::KimaiClient> mClient;
@@ -55,16 +59,18 @@ private:
     TaskWidget* mTaskWidget         = nullptr;
 
     // Actions
-    QAction* mActQuit           = nullptr;
-    QAction* mActSettings       = nullptr;
-    QAction* mActCheckUpdate    = nullptr;
-    QAction* mActOpenHost       = nullptr;
-    QAction* mActViewActivities = nullptr;
-    QAction* mActViewTasks      = nullptr;
-    QActionGroup* mActGroupView = nullptr;
+    QAction* mActQuit               = nullptr;
+    QAction* mActSettings           = nullptr;
+    QAction* mActCheckUpdate        = nullptr;
+    QAction* mActOpenHost           = nullptr;
+    QAction* mActViewActivities     = nullptr;
+    QAction* mActViewTasks          = nullptr;
+    QActionGroup* mActGroupView     = nullptr;
+    QActionGroup* mActGroupProfiles = nullptr;
 
-    // Main menu
-    QMenuBar* mMenuBar = nullptr;
+    // Menus
+    QMenuBar* mMenuBar  = nullptr;
+    QMenu* mProfileMenu = nullptr;
 
     // Tray
     QMenu* mTrayMenu                 = nullptr;

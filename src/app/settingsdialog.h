@@ -29,10 +29,7 @@ private:
     void onProfileFieldValueChanged();
     void onProfileAddButtonClicked();
     void onProfileDelButtonClicked();
-    core::Settings::Profile profileFromItemList(QListWidgetItem* item) const;
-    void profileToItemList(const core::Settings::Profile& profile, QListWidgetItem* item);
 
-private:
     QScopedPointer<Ui::SettingsDialog> mUi;
     QAction* mActToggleTokenVisible = nullptr;
 

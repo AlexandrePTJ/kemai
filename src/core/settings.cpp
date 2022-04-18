@@ -41,6 +41,7 @@ void migrateIniToJson(const QSettings& qset)
     }
 
     Settings::Profile defaultProfile;
+    defaultProfile.id       = QUuid::createUuid();
     defaultProfile.name     = "default";
     defaultProfile.host     = qset.value(kimaiGrpPrefix + "host").toString();
     defaultProfile.username = qset.value(kimaiGrpPrefix + "username").toString();
@@ -65,12 +66,17 @@ void migrateIniToJson(const QSettings& qset)
 
 bool Settings::isReady() const
 {
-    if (profiles.size() > 0)
+    if (!profiles.isEmpty())
     {
         auto profile = profiles.first();
         return !profile.host.isEmpty() && !profile.username.isEmpty() && !profile.token.isEmpty();
     }
     return false;
+}
+
+QList<Settings::Profile>::iterator Settings::findProfileRef(const QUuid& profileId)
+{
+    return std::find_if(profiles.begin(), profiles.end(), [&profileId](const Settings::Profile& profile) { return profile.id == profileId; });
 }
 
 Settings Settings::load()
@@ -103,12 +109,17 @@ Settings Settings::load()
     settings.kemai.ignoredVersion       = kemaiObject.value("ignoredVersion").toString();
     settings.kemai.geometry             = QByteArray::fromBase64(kemaiObject.value("geometry").toString().toLocal8Bit());
     settings.kemai.language             = QLocale(kemaiObject.value("language").toString());
+    if (kemaiObject.contains("lastConnectedProfile"))
+    {
+        settings.kemai.lastConnectedProfile = QUuid(kemaiObject.value("lastConnectedProfile").toString());
+    }
 
     for (const auto& profileValue : root.value("profiles").toArray())
     {
         const auto profileObject = profileValue.toObject();
 
         Settings::Profile profile;
+        profile.id       = QUuid(profileObject.value("id").toString());
         profile.name     = profileObject.value("name").toString();
         profile.host     = profileObject.value("host").toString();
         profile.username = profileObject.value("username").toString();
@@ -125,6 +136,7 @@ void Settings::save(const Settings& settings)
     for (const auto& profile : settings.profiles)
     {
         QJsonObject profileObject;
+        profileObject["id"]       = profile.id.toString();
         profileObject["name"]     = profile.name;
         profileObject["host"]     = profile.host;
         profileObject["username"] = profile.username;
@@ -138,6 +150,7 @@ void Settings::save(const Settings& settings)
     kemaiObject["ignoredVersion"]       = settings.kemai.ignoredVersion;
     kemaiObject["geometry"]             = QString(settings.kemai.geometry.toBase64());
     kemaiObject["language"]             = settings.kemai.language.name();
+    kemaiObject["lastConnectedProfile"] = settings.kemai.lastConnectedProfile.toString();
 
     QJsonObject root;
     root["version"]             = 1;
@@ -150,8 +163,8 @@ void Settings::save(const Settings& settings)
     QFile jsonFile(getJsonSettingsPath());
     jsonFile.open(QIODevice::WriteOnly | QIODevice::Text);
 
-    QTextStream ts(&jsonFile);
-    ts << jsonDocument.toJson();
+    QTextStream testStream(&jsonFile);
+    testStream << jsonDocument.toJson();
 
     jsonFile.close();
 }

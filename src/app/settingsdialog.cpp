@@ -13,19 +13,6 @@ using namespace kemai::app;
 using namespace kemai::client;
 using namespace kemai::core;
 
-/*
- * Static helper
- */
-enum EProfileItemRole
-{
-    PIR_Host = Qt::UserRole + 1,
-    PIR_User,
-    PIR_Token
-};
-
-/*
- *
- */
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::SettingsDialog), mKimaiClient(new KimaiClient)
 {
     mUi->setupUi(this);
@@ -111,7 +98,8 @@ void SettingsDialog::setSettings(const Settings& settings)
     for (const auto& profile : m_settings.profiles)
     {
         auto item = new QListWidgetItem;
-        profileToItemList(profile, item);
+        item->setText(profile.name);
+        item->setData(Qt::UserRole, profile.id);
         mUi->profilesListWidget->addItem(item);
     }
 }
@@ -124,28 +112,40 @@ Settings SettingsDialog::settings() const
     settings.kemai.minimizeToSystemTray = mUi->cbMinimizeToSystemTray->isChecked();
     settings.kemai.language             = mUi->cbLanguage->currentData().toLocale();
 
-    settings.profiles.clear();
-    for (int i = 0; i < mUi->profilesListWidget->count(); ++i)
-    {
-        auto profile = profileFromItemList(mUi->profilesListWidget->item(i));
-        if (!profile.name.isEmpty())
-        {
-            settings.profiles << profile;
-        }
-    }
+    // Profiles are directly managed from buttons on fields updates.
 
     return settings;
 }
 
 void SettingsDialog::onProfilesListCurrentItemChanged(QListWidgetItem* current, QListWidgetItem* /*previous*/)
 {
-    auto profile = profileFromItemList(current);
-    mUi->leName->setText(profile.name);
-    mUi->leHost->setText(profile.host);
-    mUi->leUsername->setText(profile.username);
-    mUi->leToken->setText(profile.token);
+    QSignalBlocker nameSignalBlocker(mUi->leName);
+    QSignalBlocker hostSignalBlocker(mUi->leHost);
+    QSignalBlocker usernameSignalBlocker(mUi->leUsername);
+    QSignalBlocker tokenSignalBlocker(mUi->leToken);
 
-    mUi->delProfileButton->setEnabled(current != nullptr);
+    if (current != nullptr)
+    {
+        auto profile = m_settings.findProfileRef(current->data(Qt::UserRole).toUuid());
+        if (profile != m_settings.profiles.end())
+        {
+            mUi->leName->setText(profile->name);
+            mUi->leHost->setText(profile->host);
+            mUi->leUsername->setText(profile->username);
+            mUi->leToken->setText(profile->token);
+
+            mUi->delProfileButton->setEnabled(true);
+
+            return;
+        }
+    }
+
+    mUi->leName->clear();
+    mUi->leHost->clear();
+    mUi->leUsername->clear();
+    mUi->leToken->clear();
+
+    mUi->delProfileButton->setEnabled(false);
 }
 
 void SettingsDialog::onBtTestClicked()
@@ -179,22 +179,32 @@ void SettingsDialog::onClientReply(const KimaiReply& reply)
 void SettingsDialog::onProfileFieldValueChanged()
 {
     auto item = mUi->profilesListWidget->currentItem();
-    Settings::Profile profile;
-    profile.name     = mUi->leName->text();
-    profile.host     = mUi->leHost->text();
-    profile.username = mUi->leUsername->text();
-    profile.token    = mUi->leToken->text();
+    if (item != nullptr)
+    {
+        auto profile = m_settings.findProfileRef(item->data(Qt::UserRole).toUuid());
+        if (profile != m_settings.profiles.end())
+        {
+            profile->name     = mUi->leName->text();
+            profile->host     = mUi->leHost->text();
+            profile->username = mUi->leUsername->text();
+            profile->token    = mUi->leToken->text();
 
-    profileToItemList(profile, item);
+            item->setText(profile->name);
+        }
+    }
 }
 
 void SettingsDialog::onProfileAddButtonClicked()
 {
     Settings::Profile profile;
+    profile.id   = QUuid::createUuid();
     profile.name = "Default";
 
+    m_settings.profiles.push_back(profile);
+
     auto item = new QListWidgetItem;
-    profileToItemList(profile, item);
+    item->setText(profile.name);
+    item->setData(Qt::UserRole, profile.id);
     mUi->profilesListWidget->addItem(item);
 
     mUi->profilesListWidget->setCurrentItem(item);
@@ -202,33 +212,11 @@ void SettingsDialog::onProfileAddButtonClicked()
 
 void SettingsDialog::onProfileDelButtonClicked()
 {
-    delete mUi->profilesListWidget->takeItem(mUi->profilesListWidget->currentRow());
-}
-
-Settings::Profile SettingsDialog::profileFromItemList(QListWidgetItem* item) const
-{
-    if (item == nullptr)
+    auto item = mUi->profilesListWidget->takeItem(mUi->profilesListWidget->currentRow());
+    if (item != nullptr)
     {
-        return {};
+        m_settings.profiles.removeIf([profileId = item->data(Qt::UserRole).toUuid()](const Settings::Profile& profile) { return profile.id == profileId; });
+
+        delete item;
     }
-
-    Settings::Profile profile;
-    profile.name     = item->text();
-    profile.host     = item->data(PIR_Host).toString();
-    profile.username = item->data(PIR_User).toString();
-    profile.token    = item->data(PIR_Token).toString();
-    return profile;
-}
-
-void SettingsDialog::profileToItemList(const Settings::Profile& profile, QListWidgetItem* item)
-{
-    if (item == nullptr)
-    {
-        return;
-    }
-
-    item->setText(profile.name);
-    item->setData(PIR_Host, profile.host);
-    item->setData(PIR_User, profile.username);
-    item->setData(PIR_Token, profile.token);
 }
