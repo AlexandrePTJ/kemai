@@ -275,6 +275,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cbCustomer</tabstop>
+  <tabstop>tbAddCustomer</tabstop>
+  <tabstop>cbProject</tabstop>
+  <tabstop>tbAddProject</tabstop>
+  <tabstop>cbActivity</tabstop>
+  <tabstop>tbAddActivity</tabstop>
+  <tabstop>pteDescription</tabstop>
+  <tabstop>leTags</tabstop>
+  <tabstop>btStartStop</tabstop>
+  <tabstop>dteStartedAt</tabstop>
+  <tabstop>tbEnableStartedAtEdit</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

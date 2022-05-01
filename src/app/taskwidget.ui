@@ -78,6 +78,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>leFilter</tabstop>
+  <tabstop>tbRefresh</tabstop>
+  <tabstop>lvTasks</tabstop>
+  <tabstop>btStartStop</tabstop>
+  <tabstop>btClose</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>
