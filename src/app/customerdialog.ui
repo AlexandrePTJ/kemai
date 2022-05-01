@@ -164,6 +164,14 @@
    <header>durationedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leName</tabstop>
+  <tabstop>cbCountry</tabstop>
+  <tabstop>cbTimezone</tabstop>
+  <tabstop>cbCurrency</tabstop>
+  <tabstop>sbBudget</tabstop>
+  <tabstop>leTimeBudget</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
