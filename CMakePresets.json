@@ -21,7 +21,8 @@
       "name": "default-windows",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "c:/Qt/6.2.3/msvc2019_64"
+        "CMAKE_PREFIX_PATH": "c:/Qt/6.2.3/msvc2019_64",
+        "OPENSSL_ROOT": "c:/Qt/Tools/OpenSSL/Win_x64"
       }
     },
     {
