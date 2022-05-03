@@ -90,6 +90,12 @@ Settings Settings::load()
         migrateIniToJson(qset);
     }
 
+    // First run
+    if (!QFile::exists(jsonSettingsPath))
+    {
+        return {};
+    }
+
     QFile jsonFile(jsonSettingsPath);
     jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
     auto jsonDocument = QJsonDocument::fromJson(jsonFile.readAll());

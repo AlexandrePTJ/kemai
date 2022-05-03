@@ -153,6 +153,9 @@
            </item>
            <item row="0" column="1">
             <widget class="QLineEdit" name="leName">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -170,6 +173,9 @@
            </item>
            <item row="1" column="1">
             <widget class="QLineEdit" name="leHost">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="inputMethodHints">
               <set>Qt::ImhUrlCharactersOnly</set>
              </property>
@@ -183,7 +189,11 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="leUsername"/>
+            <widget class="QLineEdit" name="leUsername">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
            <item row="3" column="0">
             <widget class="QLabel" name="lbToken">
@@ -194,6 +204,9 @@
            </item>
            <item row="3" column="1">
             <widget class="QLineEdit" name="leToken">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="echoMode">
               <enum>QLineEdit::Password</enum>
              </property>
@@ -216,6 +229,9 @@
              </item>
              <item>
               <widget class="QPushButton" name="testButton">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>

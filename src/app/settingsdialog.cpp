@@ -124,28 +124,29 @@ void SettingsDialog::onProfilesListCurrentItemChanged(QListWidgetItem* current, 
     QSignalBlocker usernameSignalBlocker(mUi->leUsername);
     QSignalBlocker tokenSignalBlocker(mUi->leToken);
 
+    Settings::Profile profile;
+
     if (current != nullptr)
     {
-        auto profile = m_settings.findProfileRef(current->data(Qt::UserRole).toUuid());
-        if (profile != m_settings.profiles.end())
+        auto profileIt = m_settings.findProfileRef(current->data(Qt::UserRole).toUuid());
+        if (profileIt != m_settings.profiles.end())
         {
-            mUi->leName->setText(profile->name);
-            mUi->leHost->setText(profile->host);
-            mUi->leUsername->setText(profile->username);
-            mUi->leToken->setText(profile->token);
-
-            mUi->delProfileButton->setEnabled(true);
-
-            return;
+            profile = *profileIt;
         }
     }
 
-    mUi->leName->clear();
-    mUi->leHost->clear();
-    mUi->leUsername->clear();
-    mUi->leToken->clear();
+    auto hasProfile = !profile.id.isNull();
+    mUi->leName->setText(profile.name);
+    mUi->leHost->setText(profile.host);
+    mUi->leUsername->setText(profile.username);
+    mUi->leToken->setText(profile.token);
 
-    mUi->delProfileButton->setEnabled(false);
+    mUi->delProfileButton->setEnabled(hasProfile);
+    mUi->leName->setEnabled(hasProfile);
+    mUi->leHost->setEnabled(hasProfile);
+    mUi->leUsername->setEnabled(hasProfile);
+    mUi->leToken->setEnabled(hasProfile);
+    mUi->testButton->setEnabled(hasProfile);
 }
 
 void SettingsDialog::onBtTestClicked()
