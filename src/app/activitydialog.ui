@@ -120,6 +120,11 @@
    <header>durationedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leName</tabstop>
+  <tabstop>sbBudget</tabstop>
+  <tabstop>leTimeBudget</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     }
 
     // Setup trusted certificates
-    KimaiClient::addTrustedCertificates(kemaiSettings.kimai.trustedCertificates);
+    KimaiClient::addTrustedCertificates(kemaiSettings.trustedCertificates);
 
     // Startup
     MainWindow w;
