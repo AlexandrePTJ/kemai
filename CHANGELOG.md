@@ -1,12 +1,19 @@
 # Changelog
 
+## 0.7.0 (2022-06-19)
+
+- [#50](https://github.com/AlexandrePTJ/kemai/issues/50) Fix tab order (Thanks to @sdreilinger)
+- [#46](https://github.com/AlexandrePTJ/kemai/issues/46) Use connection profiles to allow several kimai endpoints.
+- [#47](https://github.com/AlexandrePTJ/kemai/issues/47) Minimize to tray.
+- Add greek translations (Thanks to @dkstiler)
+
 ## 0.6.0 (2021-11-11)
 
-- [23](https://github.com/AlexandrePTJ/kemai/issues/23) Add translations (de, fr, hr, nb_NO).
-- [21](https://github.com/AlexandrePTJ/kemai/issues/21) Setup connection to Kimai without the need to restart.
-- [27](https://github.com/AlexandrePTJ/kemai/issues/27) Migrate to Qt 6.
-- [37](https://github.com/AlexandrePTJ/kemai/issues/37) Support 'timetracking' mode.
-- [25](https://github.com/AlexandrePTJ/kemai/issues/25) Add preliminary support to Kimai TaskManagement plugin.
+- [#23](https://github.com/AlexandrePTJ/kemai/issues/23) Add translations (de, fr, hr, nb_NO).
+- [#21](https://github.com/AlexandrePTJ/kemai/issues/21) Setup connection to Kimai without the need to restart.
+- [#27](https://github.com/AlexandrePTJ/kemai/issues/27) Migrate to Qt 6.
+- [#37](https://github.com/AlexandrePTJ/kemai/issues/37) Support 'timetracking' mode.
+- [#25](https://github.com/AlexandrePTJ/kemai/issues/25) Add preliminary support to Kimai TaskManagement plugin.
 
 
 ## 0.5.0 (2020-10-23)
