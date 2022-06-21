@@ -3,6 +3,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -166,7 +167,16 @@ void Settings::save(const Settings& settings)
 
     QJsonDocument jsonDocument(root);
 
-    QFile jsonFile(getJsonSettingsPath());
+    QFileInfo jsonFileInfo(getJsonSettingsPath());
+    if (!jsonFileInfo.exists())
+    {
+        if (!jsonFileInfo.absoluteDir().exists())
+        {
+            jsonFileInfo.absoluteDir().mkpath(".");
+        }
+    }
+
+    QFile jsonFile(jsonFileInfo.filePath());
     jsonFile.open(QIODevice::WriteOnly | QIODevice::Text);
 
     QTextStream testStream(&jsonFile);

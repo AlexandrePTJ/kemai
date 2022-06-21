@@ -164,51 +164,61 @@
     </message>
 </context>
 <context>
-    <name>SettingsWidget</name>
+    <name>SettingsDialog</name>
     <message>
-        <location filename="../settingswidget.ui" line="14"/>
+        <location filename="../settingsdialog.ui" line="14"/>
         <source>Settings</source>
         <translation>Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="25"/>
-        <source>Host</source>
-        <translation>Όνομα κεντρικού υπολογιστή</translation>
+        <location filename="../settingsdialog.ui" line="41"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="39"/>
-        <source>Username</source>
-        <translation>Όνομα χρήστη</translation>
+        <location filename="../settingsdialog.ui" line="46"/>
+        <source>Profiles</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="49"/>
-        <source>Token</source>
-        <translation>Κλειδί ασφαλούς επικοινωνίας</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="63"/>
-        <source>Language</source>
-        <translation>Γλώσσα</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="70"/>
+        <location filename="../settingsdialog.ui" line="61"/>
         <source>Close to system tray</source>
         <translation>Ελαχιστοποίηση στο παρασκήνιο του συστήματος</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="110"/>
+        <location filename="../settingsdialog.ui" line="68"/>
+        <source>Minimize to system tray</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="75"/>
+        <source>Language</source>
+        <translation>Γλώσσα</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="150"/>
+        <source>Name</source>
+        <translation>Όνομα</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="170"/>
+        <source>Host</source>
+        <translation>Όνομα κεντρικού υπολογιστή</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="187"/>
+        <source>Username</source>
+        <translation>Όνομα χρήστη</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="201"/>
+        <source>Token</source>
+        <translation>Κλειδί ασφαλούς επικοινωνίας</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="242"/>
         <source>Test</source>
         <translation>Δοκιμή</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="130"/>
-        <source>Cancel</source>
-        <translation>Ακύρωση</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="137"/>
-        <source>Save</source>
-        <translation>Αποθήκευση</translation>
     </message>
 </context>
 <context>
@@ -235,69 +245,74 @@
     </message>
     <message>
         <location filename="../taskwidget.ui" line="73"/>
-        <source>Done</source>
-        <translation>Ολοκληρώθηκε</translation>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>kemai::app::MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="38"/>
+        <location filename="../mainwindow.cpp" line="47"/>
         <source>&amp;Quit</source>
         <translation>&amp;Έξοδος</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="39"/>
+        <location filename="../mainwindow.cpp" line="48"/>
         <source>&amp;Settings</source>
         <translation>&amp;Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="40"/>
+        <location filename="../mainwindow.cpp" line="49"/>
         <source>Check for updates...</source>
         <translation>Έλεγχος για ενημερώσεις...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="41"/>
+        <location filename="../mainwindow.cpp" line="50"/>
         <source>Open Kimai instance</source>
         <translation>Άνοιγμα περιβάλοντος Kimai</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="42"/>
+        <location filename="../mainwindow.cpp" line="51"/>
         <source>Activities</source>
         <translation>Δραστηριότητες</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="43"/>
+        <location filename="../mainwindow.cpp" line="52"/>
         <source>Tasks</source>
         <translation>Εργασίες</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="72"/>
+        <location filename="../mainwindow.cpp" line="83"/>
         <source>&amp;File</source>
         <translation>&amp;Αρχείο</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="77"/>
+        <location filename="../mainwindow.cpp" line="88"/>
+        <source>&amp;Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="90"/>
         <source>&amp;View</source>
         <translation>&amp;Προβολή</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="81"/>
+        <location filename="../mainwindow.cpp" line="94"/>
         <source>&amp;Help</source>
         <translation>&amp;Βοήθεια</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="86"/>
+        <location filename="../mainwindow.cpp" line="99"/>
         <source>About Qt</source>
         <translation>Σχετικά με το Qt</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="410"/>
         <source>New version available</source>
         <translation>Υπάρχει νεότερη έκδοση</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="410"/>
         <source>Version %1 is available.
 
 %2</source>
@@ -306,43 +321,32 @@
 %2</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="315"/>
+        <location filename="../mainwindow.cpp" line="432"/>
         <source>No update</source>
         <translation>Δεν υπάρχει ενημέρωση</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="315"/>
+        <location filename="../mainwindow.cpp" line="432"/>
         <source>%1 is latest version.</source>
         <translation>%1 είναι η τελευταία έκδοση.</translation>
     </message>
 </context>
 <context>
-    <name>kemai::app::SettingsWidget</name>
+    <name>kemai::app::SettingsDialog</name>
     <message>
-        <location filename="../settingswidget.cpp" line="57"/>
+        <location filename="../settingsdialog.cpp" line="71"/>
         <source>Language changed. Application restart is required.</source>
         <translation>Η γλώσσα άλαξε. Απαιτείται επανεκκίνηση της εφαρμογής.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="78"/>
+        <location filename="../settingsdialog.cpp" line="171"/>
         <source>Invalid reply.</source>
         <translation>Μη έγκυρη απάντηση.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="83"/>
+        <location filename="../settingsdialog.cpp" line="176"/>
         <source>Connected to Kimai %1</source>
         <translation>Συνδέθηκε στο Kimai %1</translation>
-    </message>
-</context>
-<context>
-    <name>kemai::client::KimaiClient::KimaiClientPrivate</name>
-    <message>
-        <source>Error on request [%1]: %2</source>
-        <translation type="vanished">Erreur sur la requête [%1] : %2</translation>
-    </message>
-    <message>
-        <source>Unknown request [%1]</source>
-        <translation type="vanished">Requête inconnue [%1]</translation>
     </message>
 </context>
 </TS>

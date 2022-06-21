@@ -8,8 +8,7 @@
 
 ## How to use
 
-_Kemai_ connect to your _Kimai_ instance through its API. As credentials for API are not the same as login, here is how
-to create them:
+_Kemai_ connects to your _Kimai_ instance through its API. As credentials for API are not the same as login, here is how to create them:
 
 ![API password](https://github.com/AlexandrePTJ/kemai/blob/master/docs/api_password.gif)
 
@@ -19,7 +18,7 @@ Then, you can set this credentials to _Kemai_ settings :
 
 ## How to build
 
-_Kemai_ is Qt5 based application and it uses CMake to build. So regular cmake process will work.
+_Kemai_ is Qt6 based application and it uses CMake to build. So regular cmake process will work.
 
 ```shell script
 > cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=<path to Qt installation>
