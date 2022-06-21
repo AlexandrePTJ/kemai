@@ -132,7 +132,7 @@
     <message>
         <location filename="../mainwindow.ui" line="48"/>
         <source>Settings...</source>
-        <translation type="unfinished">Innstillinger …</translation>
+        <translation>Innstillinger …</translation>
     </message>
 </context>
 <context>
@@ -164,51 +164,61 @@
     </message>
 </context>
 <context>
-    <name>SettingsWidget</name>
+    <name>SettingsDialog</name>
     <message>
-        <location filename="../settingswidget.ui" line="14"/>
+        <location filename="../settingsdialog.ui" line="14"/>
         <source>Settings</source>
         <translation>Innstillinger</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="25"/>
-        <source>Host</source>
-        <translation>Vert</translation>
+        <location filename="../settingsdialog.ui" line="41"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="39"/>
-        <source>Username</source>
-        <translation>Brukernavn</translation>
+        <location filename="../settingsdialog.ui" line="46"/>
+        <source>Profiles</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="49"/>
-        <source>Token</source>
-        <translation>Symbol</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="63"/>
-        <source>Language</source>
-        <translation>Språk</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="70"/>
+        <location filename="../settingsdialog.ui" line="61"/>
         <source>Close to system tray</source>
         <translation>Lukk til systemkurv</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="110"/>
+        <location filename="../settingsdialog.ui" line="68"/>
+        <source>Minimize to system tray</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="75"/>
+        <source>Language</source>
+        <translation>Språk</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="150"/>
+        <source>Name</source>
+        <translation>Navn</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="170"/>
+        <source>Host</source>
+        <translation>Vert</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="187"/>
+        <source>Username</source>
+        <translation>Brukernavn</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="201"/>
+        <source>Token</source>
+        <translation>Symbol</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="242"/>
         <source>Test</source>
         <translation>Test</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="130"/>
-        <source>Cancel</source>
-        <translation>Avbryt</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="137"/>
-        <source>Save</source>
-        <translation>Lagre</translation>
     </message>
 </context>
 <context>
@@ -221,12 +231,12 @@
     <message>
         <location filename="../taskwidget.ui" line="25"/>
         <source>Filter</source>
-        <translation type="unfinished">Filter</translation>
+        <translation>Filter</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="35"/>
         <source>...</source>
-        <translation type="unfinished">…</translation>
+        <translation>…</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="63"/>
@@ -235,69 +245,74 @@
     </message>
     <message>
         <location filename="../taskwidget.ui" line="73"/>
-        <source>Done</source>
-        <translation>Ferdig</translation>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>kemai::app::MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="38"/>
+        <location filename="../mainwindow.cpp" line="47"/>
         <source>&amp;Quit</source>
         <translation>&amp;Avslutt</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="39"/>
+        <location filename="../mainwindow.cpp" line="48"/>
         <source>&amp;Settings</source>
         <translation>&amp;Innstillinger</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="40"/>
+        <location filename="../mainwindow.cpp" line="49"/>
         <source>Check for updates...</source>
-        <translation type="unfinished">Se etter oppgraderinger …</translation>
+        <translation>Se etter oppgraderinger …</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="41"/>
+        <location filename="../mainwindow.cpp" line="50"/>
         <source>Open Kimai instance</source>
-        <translation type="unfinished">Åpne Kimai-instans</translation>
+        <translation>Åpne Kimai-instans</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="42"/>
+        <location filename="../mainwindow.cpp" line="51"/>
         <source>Activities</source>
         <translation>Aktiviteter</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="43"/>
+        <location filename="../mainwindow.cpp" line="52"/>
         <source>Tasks</source>
         <translation>Gjøremål</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="72"/>
+        <location filename="../mainwindow.cpp" line="83"/>
         <source>&amp;File</source>
         <translation>&amp;Fil</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="77"/>
+        <location filename="../mainwindow.cpp" line="88"/>
+        <source>&amp;Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="90"/>
         <source>&amp;View</source>
         <translation>%Vis</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="81"/>
+        <location filename="../mainwindow.cpp" line="94"/>
         <source>&amp;Help</source>
         <translation>&amp;Hjelp</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="86"/>
+        <location filename="../mainwindow.cpp" line="99"/>
         <source>About Qt</source>
         <translation>Om Qt</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="410"/>
         <source>New version available</source>
         <translation>Ny versjon tilgjengelig</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="410"/>
         <source>Version %1 is available.
 
 %2</source>
@@ -306,43 +321,32 @@
 %2</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="315"/>
+        <location filename="../mainwindow.cpp" line="432"/>
         <source>No update</source>
         <translation>Ingen oppgradering</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="315"/>
+        <location filename="../mainwindow.cpp" line="432"/>
         <source>%1 is latest version.</source>
         <translation>%1 er siste versjon.</translation>
     </message>
 </context>
 <context>
-    <name>kemai::app::SettingsWidget</name>
+    <name>kemai::app::SettingsDialog</name>
     <message>
-        <location filename="../settingswidget.cpp" line="57"/>
+        <location filename="../settingsdialog.cpp" line="71"/>
         <source>Language changed. Application restart is required.</source>
         <translation>Språk endret. Programmet må startes på ny.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="78"/>
+        <location filename="../settingsdialog.cpp" line="171"/>
         <source>Invalid reply.</source>
         <translation>Ugyldig svar.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="83"/>
+        <location filename="../settingsdialog.cpp" line="176"/>
         <source>Connected to Kimai %1</source>
-        <translation type="unfinished">Tilkoblet til Kimai %1</translation>
-    </message>
-</context>
-<context>
-    <name>kemai::client::KimaiClient::KimaiClientPrivate</name>
-    <message>
-        <source>Error on request [%1]: %2</source>
-        <translation type="vanished">Feil ved forespørsel [%1]: %2</translation>
-    </message>
-    <message>
-        <source>Unknown request [%1]</source>
-        <translation type="vanished">Ukjent forespørsel [%1]</translation>
+        <translation>Tilkoblet til Kimai %1</translation>
     </message>
 </context>
 </TS>
