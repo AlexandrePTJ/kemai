@@ -164,51 +164,61 @@
     </message>
 </context>
 <context>
-    <name>SettingsWidget</name>
+    <name>SettingsDialog</name>
     <message>
-        <location filename="../settingswidget.ui" line="14"/>
+        <location filename="../settingsdialog.ui" line="14"/>
         <source>Settings</source>
         <translation>Paramètres</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="25"/>
-        <source>Host</source>
-        <translation>Hôte</translation>
+        <location filename="../settingsdialog.ui" line="41"/>
+        <source>General</source>
+        <translation>Général</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="39"/>
-        <source>Username</source>
-        <translation>Utilisateur</translation>
+        <location filename="../settingsdialog.ui" line="46"/>
+        <source>Profiles</source>
+        <translation>Profiles</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="49"/>
-        <source>Token</source>
-        <translation>Jeton</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="63"/>
-        <source>Language</source>
-        <translation>Langue</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="70"/>
+        <location filename="../settingsdialog.ui" line="61"/>
         <source>Close to system tray</source>
         <translation>Fermer dans la barre des tâches</translation>
     </message>
     <message>
-        <location filename="../settingswidget.ui" line="110"/>
+        <location filename="../settingsdialog.ui" line="68"/>
+        <source>Minimize to system tray</source>
+        <translation>Minimiser_dans_la_barre_des_tâches</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="75"/>
+        <source>Language</source>
+        <translation>Langue</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="150"/>
+        <source>Name</source>
+        <translation>Nom</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="170"/>
+        <source>Host</source>
+        <translation>Hôte</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="187"/>
+        <source>Username</source>
+        <translation>Utilisateur</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="201"/>
+        <source>Token</source>
+        <translation>Jeton</translation>
+    </message>
+    <message>
+        <location filename="../settingsdialog.ui" line="242"/>
         <source>Test</source>
         <translation>Test</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="130"/>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <location filename="../settingswidget.ui" line="137"/>
-        <source>Save</source>
-        <translation>Sauvegarder</translation>
     </message>
 </context>
 <context>
@@ -235,69 +245,74 @@
     </message>
     <message>
         <location filename="../taskwidget.ui" line="73"/>
-        <source>Done</source>
-        <translation>Terminé</translation>
+        <source>Close</source>
+        <translation>Fermer</translation>
     </message>
 </context>
 <context>
     <name>kemai::app::MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="38"/>
+        <location filename="../mainwindow.cpp" line="47"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="39"/>
+        <location filename="../mainwindow.cpp" line="48"/>
         <source>&amp;Settings</source>
         <translation>&amp;Paramètres</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="40"/>
+        <location filename="../mainwindow.cpp" line="49"/>
         <source>Check for updates...</source>
         <translation>Vérifier les mises à jour…</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="41"/>
+        <location filename="../mainwindow.cpp" line="50"/>
         <source>Open Kimai instance</source>
         <translation>Ouvrir Kimai</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="42"/>
+        <location filename="../mainwindow.cpp" line="51"/>
         <source>Activities</source>
         <translation>Activités</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="43"/>
+        <location filename="../mainwindow.cpp" line="52"/>
         <source>Tasks</source>
         <translation>Tâches</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="72"/>
+        <location filename="../mainwindow.cpp" line="83"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="77"/>
+        <location filename="../mainwindow.cpp" line="88"/>
+        <source>&amp;Profile</source>
+        <translation>&amp;Profile</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="90"/>
         <source>&amp;View</source>
         <translation>&amp;Voir</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="81"/>
+        <location filename="../mainwindow.cpp" line="94"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="86"/>
+        <location filename="../mainwindow.cpp" line="99"/>
         <source>About Qt</source>
         <translation>À propos de Qt</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="410"/>
         <source>New version available</source>
         <translation>Nouvelle version disponible</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="410"/>
         <source>Version %1 is available.
 
 %2</source>
@@ -306,43 +321,32 @@
 %2</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="315"/>
+        <location filename="../mainwindow.cpp" line="432"/>
         <source>No update</source>
         <translation>Aucune mise à jour</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="315"/>
+        <location filename="../mainwindow.cpp" line="432"/>
         <source>%1 is latest version.</source>
         <translation>%1 est la dernière version.</translation>
     </message>
 </context>
 <context>
-    <name>kemai::app::SettingsWidget</name>
+    <name>kemai::app::SettingsDialog</name>
     <message>
-        <location filename="../settingswidget.cpp" line="57"/>
+        <location filename="../settingsdialog.cpp" line="71"/>
         <source>Language changed. Application restart is required.</source>
         <translation>La langue a changé. Le redémarrage de l&apos;application est requis.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="78"/>
+        <location filename="../settingsdialog.cpp" line="171"/>
         <source>Invalid reply.</source>
         <translation>Réponse invalide.</translation>
     </message>
     <message>
-        <location filename="../settingswidget.cpp" line="83"/>
+        <location filename="../settingsdialog.cpp" line="176"/>
         <source>Connected to Kimai %1</source>
         <translation>Connecté à Kimai %1</translation>
-    </message>
-</context>
-<context>
-    <name>kemai::client::KimaiClient::KimaiClientPrivate</name>
-    <message>
-        <source>Error on request [%1]: %2</source>
-        <translation type="vanished">Erreur sur la requête [%1] : %2</translation>
-    </message>
-    <message>
-        <source>Unknown request [%1]</source>
-        <translation type="vanished">Requête inconnue [%1]</translation>
     </message>
 </context>
 </TS>
