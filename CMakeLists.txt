@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(KemaiProject VERSION 0.7.0 LANGUAGES CXX)
+project(KemaiProject VERSION 0.7.1 LANGUAGES CXX)
 
 # Point CMake to the custom modules
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -9,7 +9,7 @@ include(FetchContent)
 FetchContent_Declare(
         spdlog
         GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.9.2)
+        GIT_TAG v1.10.0)
 FetchContent_GetProperties(spdlog)
 if (NOT spdlog_POPULATED)
     FetchContent_Populate(spdlog)
