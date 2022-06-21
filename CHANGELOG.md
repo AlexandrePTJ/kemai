@@ -1,11 +1,19 @@
 # Changelog
 
+
+## 0.7.1 (2022-06-21)
+
+- [#51](https://github.com/AlexandrePTJ/kemai/issues/51) Fix settings not saved.
+- [#52](https://github.com/AlexandrePTJ/kemai/issues/52) Fix missing translations.
+
+
 ## 0.7.0 (2022-06-19)
 
 - [#50](https://github.com/AlexandrePTJ/kemai/issues/50) Fix tab order (Thanks to @sdreilinger)
 - [#46](https://github.com/AlexandrePTJ/kemai/issues/46) Use connection profiles to allow several kimai endpoints.
 - [#47](https://github.com/AlexandrePTJ/kemai/issues/47) Minimize to tray.
 - Add greek translations (Thanks to @dkstiler)
+
 
 ## 0.6.0 (2021-11-11)
 
