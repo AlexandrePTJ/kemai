@@ -9,7 +9,17 @@ platform:
   - x64
 
 environment:
-  KEMAI_QT_VERSION: 6.2
+  matrix:
+    - KEMAI_QT_VERSION: 6.2
+    - KEMAI_QT_VERSION: 5.15
+
+matrix:
+  fast_finish: true
+  exclude:
+    - image: Ubuntu2004
+      KEMAI_QT_VERSION: 5.15
+    - image: macOS
+      KEMAI_QT_VERSION: 5.15
 
 for:
   - matrix:

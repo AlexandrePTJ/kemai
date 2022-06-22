@@ -26,6 +26,14 @@
       }
     },
     {
+      "name": "default-windows-qt5",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "c:/Qt/5.15.2/msvc2019_64",
+        "OPENSSL_ROOT": "c:/Qt/Tools/OpenSSL/Win_x64"
+      }
+    },
+    {
       "name": "debug",
       "inherits": "default",
       "cacheVariables": {
@@ -46,6 +54,14 @@
     {
       "name": "release-win",
       "inherits": ["release", "default-windows"]
+    },
+    {
+      "name": "debug-win-qt5",
+      "inherits": ["debug", "default-windows-qt5"]
+    },
+    {
+      "name": "release-win-qt5",
+      "inherits": ["release", "default-windows-qt5"]
     }
   ],
   "buildPresets": [
@@ -64,6 +80,14 @@
     {
       "name": "release-win",
       "configurePreset": "release-win"
+    },
+    {
+      "name": "debug-win-qt5",
+      "configurePreset": "debug-win-qt5"
+    },
+    {
+      "name": "release-win-qt5",
+      "configurePreset": "release-win-qt5"
     }
   ]
 }

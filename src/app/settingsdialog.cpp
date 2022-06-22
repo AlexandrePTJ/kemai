@@ -216,7 +216,12 @@ void SettingsDialog::onProfileDelButtonClicked()
     auto item = mUi->profilesListWidget->takeItem(mUi->profilesListWidget->currentRow());
     if (item != nullptr)
     {
-        m_settings.profiles.removeIf([profileId = item->data(Qt::UserRole).toUuid()](const Settings::Profile& profile) { return profile.id == profileId; });
+        auto it = std::find_if(m_settings.profiles.begin(), m_settings.profiles.end(), [profileId = item->data(Qt::UserRole).toUuid()](const Settings::Profile& profile) { return profile.id == profileId; });
+        if (it != m_settings.profiles.end())
+        {
+            auto pos = std::distance(m_settings.profiles.begin(), it);
+            m_settings.profiles.removeAt(pos);
+        }
 
         delete item;
     }
