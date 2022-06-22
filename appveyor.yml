@@ -14,7 +14,6 @@ environment:
     - KEMAI_QT_VERSION: 5.15
 
 matrix:
-  fast_finish: true
   exclude:
     - image: Ubuntu2004
       KEMAI_QT_VERSION: 5.15
@@ -85,3 +84,4 @@ deploy:
       secure: O6wonn4AR0WCMLNkDjyHEMvpb40km9Sf0vtcsHpyU8SA1tqgoJ5gQsyABRVcvRyz
     on:
       APPVEYOR_REPO_TAG: true
+      KEMAI_QT_VERSION: 6.2
