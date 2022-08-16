@@ -66,16 +66,19 @@ for:
       only:
         - image: macOS
 
+    before_build:
+      - brew install create-dmg ninja
+
     build_script:
-      - cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/macos
-      - cmake --build build
+      - cmake --preset release -DCMAKE_PREFIX_PATH=$HOME/Qt/$KEMAI_QT_VERSION/macos
+      - cmake --build --preset release --target install
 
     after_build:
-      - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt build/src/app/Kemai.app
-      - cmake --build build --target package
+      - cd dist
+      - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt Kemai.app -executable=Kemai.app/Contents/MacOS/Kemai -always-overwrite
 
     artifacts:
-      - path: build/Kemai-*.dmg
+      - path: dist/Kemai-*.dmg
 
 deploy:
   - provider: GitHub
