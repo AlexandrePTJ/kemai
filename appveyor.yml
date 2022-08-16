@@ -77,7 +77,7 @@ for:
       - export VERSION=$(perl -nle 'print $1 if /VERSION (\d+\.\d+\.\d+)/' CMakeLists.txt)
       - cd dist
       - $HOME/Qt/$KEMAI_QT_VERSION/macos/bin/macdeployqt Kemai.app -executable=Kemai.app/Contents/MacOS/Kemai -always-overwrite
-      - create-dmg --volicon Kemai.app/Contents/Resources/kemai.icns --app-drop-link 0 0 Kemai-$VERSION.dmg Kemai.app
+      - create-dmg --volicon Kemai.app/Contents/Resources/kemai.icns --app-drop-link 0 0 --skip-jenkins Kemai-$VERSION.dmg Kemai.app
 
     artifacts:
       - path: dist/Kemai-*.dmg
