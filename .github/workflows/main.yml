@@ -18,7 +18,7 @@ jobs:
       - uses: actions@checkout@v3
 
       # Setup dependencies
-      - uses: lukka@get-cmake@latest
+      - uses: lukka/get-cmake@latest
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: jurpel/install-qt-action@v3
         with:
