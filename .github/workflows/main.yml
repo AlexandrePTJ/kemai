@@ -36,6 +36,6 @@ jobs:
           cmake --build --preset release
 
       # Package Windows
-      - if: contains(matrix.os, 'windows') && qt_version == '6.2.4'
+      - if: contains(matrix.os, 'windows') && matrix.qt_version == '6.2.4'
         run: |
           cmake --build --preset release --target package
