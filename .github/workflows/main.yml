@@ -9,10 +9,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        qt_version: [6.2.4]
+        qt_version: [6.2.4, 5.15.2]
         include:
           - os: windows-latest
-            qt_version: 5.15.2
+            cmake_configure_opt: -DOPENSSL_ROOT=${{ env.IQTA_TOOLS }}/OpenSSL/Win_x64
+            qt_tools: 'tools_openssl_x64'
 
     steps:
       - uses: actions/checkout@v3
@@ -23,17 +24,18 @@ jobs:
       - uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt_version }}
+          tools: ${{ matrix.qt_tools }}
 
       # Build
       - name: Configure
         run: |
-          cmake --preset release
+          cmake --preset release ${{ matrix.cmake_configure_opt }}
 
-      - name: Build (Release)
+      - name: Build
         run: |
           cmake --build --preset release
 
       # Package Windows
-      - if: ${{ contains(matrix.os, 'windows') }}
+      - if: contains(matrix.os, 'windows') && qt_version == '6.2.4'
         run: |
           cmake --build --preset release --target package
