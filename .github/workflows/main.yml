@@ -3,7 +3,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   job:
-    name: build-${{ matrix.os }}
+    name: ${{ matrix.os }}-${{ matrix.qt_version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -16,12 +16,19 @@ jobs:
             qt_tools: 'tools_openssl_x64'
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       # Setup dependencies
-      - uses: lukka/get-cmake@latest
-      - uses: ilammy/msvc-dev-cmd@v1
-      - uses: jurplel/install-qt-action@v3
+      - name: Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+
+      - if: contains(matrix.os, 'windows')
+        name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install Qt ${{ matrix.qt_version }}
+        uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt_version }}
           tools: ${{ matrix.qt_tools }}
