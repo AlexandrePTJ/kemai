@@ -32,3 +32,8 @@ jobs:
       - name: Build (Release)
         run: |
           cmake --build --preset release
+
+      # Package Windows
+      - if: ${{ contains(matrix.os, 'windows') }}
+        run: |
+          cmake --build --preset release --target package
