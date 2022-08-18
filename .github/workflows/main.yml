@@ -12,7 +12,6 @@ jobs:
         qt_version: [6.2.4, 5.15.2]
         include:
           - os: windows-latest
-            cmake_configure_opt: -DOPENSSL_ROOT=%IQTA_TOOLS%/OpenSSL/Win_x64
             qt_tools: 'tools_openssl_x64'
 
     steps:
@@ -36,13 +35,14 @@ jobs:
       # Build
       - name: Configure
         run: |
-          cmake --preset release ${{ matrix.cmake_configure_opt }}
+          cmake --preset release
 
       - name: Build
         run: |
           cmake --build --preset release
 
       # Package Windows
-      - if: contains(matrix.os, 'windows') && matrix.qt_version == '6.2.4'
+      - name: Create Windows package
+        if: contains(matrix.os, 'windows') && startsWith(matrix.qt_version, '6')
         run: |
           cmake --build --preset release --target package

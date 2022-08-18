@@ -1,20 +1,33 @@
-message("Looking for OpenSSL in ${OPENSSL_ROOT}")
+#
+# Looking for OpenSSL
+# 
 
-find_file(WINDEPLOYOPENSSL_CRYPTO
-	NAMES libcrypto-1_1-x64.dll
-	PATHS ${OPENSSL_ROOT} ${OPENSSL_ROOT}/bin
-	NO_DEFAULT_PATH)
-find_file(WINDEPLOYOPENSSL_SSL
-	NAMES libssl-1_1-x64.dll
-	PATHS ${OPENSSL_ROOT} ${OPENSSL_ROOT}/bin
-	NO_DEFAULT_PATH)
+function(kemai_find_openssl directory)
 
-if(WINDEPLOYOPENSSL_CRYPTO)
-	message("-- Found ${WINDEPLOYOPENSSL_CRYPTO}")
-endif()
-if(WINDEPLOYOPENSSL_SSL)
-	message("-- Found ${WINDEPLOYOPENSSL_SSL}")
-endif()
+	message("Looking for OpenSSL in ${directory}")
+
+	find_file(_WINDEPLOYOPENSSL_CRYPTO
+		NAMES libcrypto-1_1-x64.dll
+		PATHS ${directory} ${directory}/bin
+		NO_DEFAULT_PATH)
+	find_file(_WINDEPLOYOPENSSL_SSL
+		NAMES libssl-1_1-x64.dll
+		PATHS ${directory} ${directory}/bin
+		NO_DEFAULT_PATH)
+
+	if(_WINDEPLOYOPENSSL_CRYPTO)
+		message("-- Found ${_WINDEPLOYOPENSSL_CRYPTO}")
+		set(WINDEPLOYOPENSSL_CRYPTO ${_WINDEPLOYOPENSSL_CRYPTO} PARENT_SCOPE)
+		mark_as_advanced(WINDEPLOYOPENSSL_CRYPTO)
+	endif()
+
+	if(_WINDEPLOYOPENSSL_SSL)
+		message("-- Found ${_WINDEPLOYOPENSSL_SSL}")
+		set(WINDEPLOYOPENSSL_SSL ${_WINDEPLOYOPENSSL_SSL} PARENT_SCOPE)
+		mark_as_advanced(WINDEPLOYOPENSSL_SSL)
+	endif()
+
+endfunction()
 
 function(windeployopenssl directory)
 	install(
@@ -22,5 +35,11 @@ function(windeployopenssl directory)
 		DESTINATION ${directory})
 endfunction()
 
-mark_as_advanced(WINDEPLOYOPENSSL_CRYPTO)
-mark_as_advanced(WINDEPLOYOPENSSL_SSL)
+# Try to find from user dir
+kemai_find_openssl(${OPENSSL_ROOT})
+if (NOT WINDEPLOYOPENSSL_CRYPTO)
+	# Try to find from github actions
+	if ($ENV{IQTA_TOOLS})
+		kemai_find_openssl($ENV{IQTA_TOOLS})
+	endif()
+endif()
