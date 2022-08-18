@@ -12,7 +12,7 @@ jobs:
         qt_version: [6.2.4, 5.15.2]
         include:
           - os: windows-latest
-            cmake_configure_opt: -DOPENSSL_ROOT=${{ env.IQTA_TOOLS }}/OpenSSL/Win_x64
+            cmake_configure_opt: -DOPENSSL_ROOT=$IQTA_TOOLS/OpenSSL/Win_x64
             qt_tools: 'tools_openssl_x64'
 
     steps:
