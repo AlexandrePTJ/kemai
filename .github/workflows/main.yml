@@ -5,6 +5,8 @@ jobs:
   job:
     name: ${{ matrix.os }}_qt-${{ matrix.qt_version }}
     runs-on: ${{ matrix.os }}
+    outputs:
+      kemai_version: ${{ steps.get_version.outputs.version }}
     strategy:
       fail-fast: false
       matrix:
@@ -41,8 +43,35 @@ jobs:
         run: |
           cmake --build --preset release
 
+      # As Linux and Mac, do not use cpack, get version from file
+      - if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
+        name: Get Version
+        uses: mathiasvr/command-output@v1
+        id: get_version
+        with:
+          run: cat cmake-build-release/version.txt
+
+      - if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
+        run: echo ${{ steps.get_version.outputs.version }}
+
       # Package Windows
-      - name: Create Windows package
-        if: contains(matrix.os, 'windows') && startsWith(matrix.qt_version, '6')
+      - if: contains(matrix.os, 'windows') && startsWith(matrix.qt_version, '6')
+        name: Create Windows package
         run: |
           cmake --build --preset release --target package
+
+      # Package Linux
+#      - if: contains(matrix.os, 'ubuntu')
+#        name: Create Linux package
+#        uses: AppImageCrafters/build-appimage@master
+#        with:
+#          recipes: './bundle/linux/appimage-builder.yml'
+
+      # Uploads artifacts
+      - name: Save Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            **/Kemai-*.msi
+            **/Kemai-*.AppImage
+            **/Kemai-*.dmg

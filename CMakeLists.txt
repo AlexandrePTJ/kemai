@@ -35,6 +35,8 @@ else ()
     message(STATUS "Using Qt ${Qt6_VERSION}")
 endif ()
 
+# Write version to file to ease packaging
+file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${PROJECT_VERSION})
 
 # Common package configuration
 set(KEMAI_GUID "88815E44-85A0-469C-9740-B4887D456BAA")
