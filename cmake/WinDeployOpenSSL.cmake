@@ -36,9 +36,12 @@ function(windeployopenssl directory)
 endfunction()
 
 # Try to find from user dir
-kemai_find_openssl(${OPENSSL_ROOT})
+if(OPENSSL_ROOT)
+	kemai_find_openssl(${OPENSSL_ROOT})
+endif()
+
+# Try to find from github actions
 if (NOT WINDEPLOYOPENSSL_CRYPTO)
-	# Try to find from github actions
 	if ($ENV{IQTA_TOOLS})
 		kemai_find_openssl($ENV{IQTA_TOOLS})
 	endif()
