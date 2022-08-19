@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -x
+set -e
+
 # Run this script once Kemai is built. Install and AppImage will be handle here.
 # It just path to Qt and to build directory.
 
