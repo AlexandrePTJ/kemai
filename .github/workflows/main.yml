@@ -13,6 +13,9 @@ jobs:
         include:
           - os: windows-latest
             qt_tools: 'tools_openssl_x64'
+            cmake_preset: 'release-win'
+          - os: [ubuntu-latest, macos-latest]
+            cmake_preset: 'release'
 
     steps:
       - name: Checkout repo
@@ -35,17 +38,17 @@ jobs:
       # Build
       - name: Configure
         run: |
-          cmake --preset release
+          cmake --preset ${{ matrix.cmake_preset }}
 
       - name: Build
         run: |
-          cmake --build --preset release
+          cmake --build --preset ${{ matrix.cmake_preset }}
 
       # Package Windows
       - if: contains(matrix.os, 'windows') && startsWith(matrix.qt_version, '6')
         name: Create Windows package
         run: |
-          cmake --build --preset release --target package
+          cmake --build --preset ${{ matrix.cmake_preset }} --target package
 
       # Package Linux
       - if: contains(matrix.os, 'ubuntu') && startsWith(matrix.qt_version, '6')

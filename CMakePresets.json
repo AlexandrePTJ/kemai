@@ -14,7 +14,7 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/cmake-build-${presetName}",
       "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "dist"
+        "CMAKE_INSTALL_PREFIX": "/usr"
       }
     },
     {
@@ -22,15 +22,8 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_PREFIX_PATH": "c:/Qt/6.2.4/msvc2019_64",
-        "OPENSSL_ROOT": "c:/Qt/Tools/OpenSSL/Win_x64"
-      }
-    },
-    {
-      "name": "default-windows-qt5",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "c:/Qt/5.15.2/msvc2019_64",
-        "OPENSSL_ROOT": "c:/Qt/Tools/OpenSSL/Win_x64"
+        "OPENSSL_ROOT": "c:/Qt/Tools/OpenSSL/Win_x64",
+        "CMAKE_INSTALL_PREFIX": "dist"
       }
     },
     {
@@ -49,19 +42,11 @@
     },
     {
       "name": "debug-win",
-      "inherits": ["debug", "default-windows"]
+      "inherits": ["default-windows", "debug"]
     },
     {
       "name": "release-win",
-      "inherits": ["release", "default-windows"]
-    },
-    {
-      "name": "debug-win-qt5",
-      "inherits": ["debug", "default-windows-qt5"]
-    },
-    {
-      "name": "release-win-qt5",
-      "inherits": ["release", "default-windows-qt5"]
+      "inherits": ["default-windows", "release"]
     }
   ],
   "buildPresets": [
@@ -80,14 +65,6 @@
     {
       "name": "release-win",
       "configurePreset": "release-win"
-    },
-    {
-      "name": "debug-win-qt5",
-      "configurePreset": "debug-win-qt5"
-    },
-    {
-      "name": "release-win-qt5",
-      "configurePreset": "release-win-qt5"
     }
   ]
 }

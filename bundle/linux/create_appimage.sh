@@ -20,7 +20,7 @@ while [ $# -gt 0 ]; do
 done
 
 # Cleanup
-rm $build_path/*.AppImage*
+rm $build_path/*.AppImage* || true
 
 # Run install to AppDir and add linux files
 DESTDIR=AppDir cmake --build $build_path --target install
