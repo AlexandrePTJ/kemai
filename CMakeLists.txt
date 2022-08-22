@@ -35,6 +35,8 @@ else ()
     message(STATUS "Using Qt ${Qt6_VERSION}")
 endif ()
 
+# Write version to file to ease packaging
+file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${PROJECT_VERSION})
 
 # Common package configuration
 set(KEMAI_GUID "88815E44-85A0-469C-9740-B4887D456BAA")
@@ -67,7 +69,7 @@ if (WIN32)
     set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt)
 elseif (APPLE)
     set(OS_BUNDLE MACOSX_BUNDLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
+#    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
     set(DEPLOY_DIR .)
     set(CPACK_GENERATOR DragNDrop)
 else ()

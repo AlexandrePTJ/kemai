@@ -121,3 +121,4 @@ tests/kimai_server/data/kimai.sqlite
 .DS_Store
 
 /build/
+/dist/
