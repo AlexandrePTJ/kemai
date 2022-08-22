@@ -36,6 +36,7 @@ jobs:
         with:
           version: ${{ matrix.qt_version }}
           tools: ${{ matrix.qt_tools }}
+          cache: true
 
       # Build
       - name: Configure
@@ -58,6 +59,13 @@ jobs:
         run: |
           chmod +x bundle/linux/create_appimage.sh
           ./bundle/linux/create_appimage.sh --qt_path $Qt6_DIR --build_path cmake-build-release
+
+      # Package Mac
+      - if: contains(matrix.os, 'macos') && startsWith(matrix.qt_version, '6')
+        name: Create Linux package
+        run: |
+          chmod +x bundle/macos/create_dmg.sh
+          ./bundle/macos/create_dmg.sh --qt_path $Qt6_DIR --build_path cmake-build-release
 
       # Uploads artifacts
       - name: Save Artifacts
