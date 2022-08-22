@@ -23,7 +23,7 @@ done
 rm dist/*.dmg || true
 
 # Run install to dist
-DESTDIR=dist cmake --build $build_path --target install
+cmake --build $build_path --target install
 
 # Gets create-dmg tools
 brew install create-dmg
