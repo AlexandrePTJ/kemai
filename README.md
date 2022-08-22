@@ -4,7 +4,7 @@
 
 |Develop|Master|Translation|
 |:--:|:--:|:--:|
-|![Build status](https://ci.appveyor.com/api/projects/status/github/AlexandrePTJ/Kemai?branch=develop&svg=true)|![Build status](https://ci.appveyor.com/api/projects/status/github/AlexandrePTJ/Kemai?branch=master&svg=true)|[![Translation status](https://hosted.weblate.org/widgets/kemai/-/kemai/svg-badge.svg)](https://hosted.weblate.org/engage/kemai/)|
+|![Build status](https://github.com/AlexandrePTJ/kemai/actions/workflows/main.yml/badge.svg?branch=develop)|![Build status](https://github.com/AlexandrePTJ/kemai/actions/workflows/main.yml/badge.svg?branch=master)|[![Translation status](https://hosted.weblate.org/widgets/kemai/-/kemai/svg-badge.svg)](https://hosted.weblate.org/engage/kemai/)|
 
 ## How to use
 
