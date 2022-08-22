@@ -14,10 +14,13 @@ jobs:
           - os: windows-latest
             qt_tools: 'tools_openssl_x64'
             cmake_preset: 'release-win'
+            artifact_path: 'cmake-build-release-win/Kemai-*.msi'
           - os: ubuntu-latest
             cmake_preset: 'release'
+            artifact_path: 'cmake-build-release/Kemai-*.AppImage'
           - os: macos-latest
             cmake_preset: 'release-macos'
+            artifact_path: 'dist/Kemai-*.dmg'
 
     steps:
       - name: Checkout repo
@@ -68,10 +71,9 @@ jobs:
           ./bundle/macos/create_dmg.sh --qt_path $Qt6_DIR --build_path cmake-build-release-macos
 
       # Uploads artifacts
-      - name: Save Artifacts
+      - if: startsWith(matrix.qt_version, '6')
+        name: Save Artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: |
-            **/Kemai-*.msi
-            **/Kemai-*.AppImage
-            **/Kemai-*.dmg
+          name: Kemai ${{ matrix.os }}
+          path: ${{ matrix.artifact_path }}
