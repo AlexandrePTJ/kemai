@@ -70,10 +70,11 @@ jobs:
           chmod +x bundle/macos/create_dmg.sh
           ./bundle/macos/create_dmg.sh --qt_path $Qt6_DIR --build_path cmake-build-release-macos
 
-      # Uploads artifacts
-      - if: startsWith(matrix.qt_version, '6')
-        name: Save Artifacts
-        uses: actions/upload-artifact@v3
+      # Create release if on built on a tag
+      - if: startsWith(matrix.qt_version, '6') && startsWith(github.ref, 'refs/tags/')
+        name: Create/Update release
+        uses: ncipollo/release-action@v1
         with:
-          name: Kemai ${{ matrix.os }}
-          path: ${{ matrix.artifact_path }}
+          allowUpdates: true
+          draft: true
+          artifacts: ${{ matrix.artifact_path }}
