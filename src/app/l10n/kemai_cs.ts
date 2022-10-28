@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="hr">
+<TS version="2.1" language="cs">
 <context>
     <name>ActivityDialog</name>
     <message>
         <location filename="../activitydialog.ui" line="14"/>
         <source>Activity</source>
-        <translation>Aktivnost</translation>
+        <translation>Aktivita</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="25"/>
@@ -16,17 +16,17 @@
     <message>
         <location filename="../activitydialog.ui" line="35"/>
         <source>Budget</source>
-        <translation>Proračun</translation>
+        <translation>Rozpočet</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="62"/>
         <source>Name</source>
-        <translation>Ime</translation>
+        <translation>Jméno</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="85"/>
         <source>Time Budget</source>
-        <translation>Vremenski proračun</translation>
+        <translation>Časový fond</translation>
     </message>
 </context>
 <context>
@@ -34,19 +34,19 @@
     <message>
         <location filename="../activitywidget.ui" line="14"/>
         <source>ActivityWidget</source>
-        <translation>Programčić aktivnosti</translation>
+        <translation>Aktivity</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="29"/>
         <source>Customer</source>
-        <translation>Kupac</translation>
+        <translation>Zákazník</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="60"/>
         <location filename="../activitywidget.ui" line="110"/>
         <location filename="../activitywidget.ui" line="160"/>
         <source>...</source>
-        <translation>…</translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="79"/>
@@ -56,22 +56,22 @@
     <message>
         <location filename="../activitywidget.ui" line="129"/>
         <source>Activity</source>
-        <translation>Aktivnost</translation>
+        <translation>Aktivita</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="173"/>
         <source>Description</source>
-        <translation>Opis</translation>
+        <translation>Popis</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="183"/>
         <source>Tags</source>
-        <translation>Oznake</translation>
+        <translation>Štítky</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="193"/>
         <source>Started at</source>
-        <translation>Pokrenuto</translation>
+        <translation>Začátek v</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="240"/>
@@ -84,37 +84,37 @@
     <message>
         <location filename="../customerdialog.ui" line="14"/>
         <source>Customer</source>
-        <translation>Kupac</translation>
+        <translation>Zákazník</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="25"/>
         <source>Country</source>
-        <translation>Zemlja</translation>
+        <translation>Země</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="55"/>
         <source>Currency</source>
-        <translation>Valuta</translation>
+        <translation>Měna</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="62"/>
         <source>Name</source>
-        <translation>Ime</translation>
+        <translation>Jméno</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="69"/>
         <source>Time Budget</source>
-        <translation>Vremenski proračun</translation>
+        <translation>Časový fond</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="93"/>
         <source>Timezone</source>
-        <translation>Vremenska zona</translation>
+        <translation>Časová zóna</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="103"/>
         <source>Budget</source>
-        <translation>Proračun</translation>
+        <translation>Rozpočet</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="126"/>
@@ -127,12 +127,12 @@
     <message>
         <location filename="../mainwindow.ui" line="14"/>
         <source>Kemai - Kimai client</source>
-        <translation>Kemai – Kimai klijent</translation>
+        <translation>Kemai - Kimai klient</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="48"/>
         <source>Settings...</source>
-        <translation>Postavke …</translation>
+        <translation>Nastavení...</translation>
     </message>
 </context>
 <context>
@@ -145,17 +145,17 @@
     <message>
         <location filename="../projectdialog.ui" line="25"/>
         <source>Name</source>
-        <translation>Ime</translation>
+        <translation>Jméno</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="32"/>
         <source>Budget</source>
-        <translation>Proračun</translation>
+        <translation>Rozpočet</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="68"/>
         <source>Time Budget</source>
-        <translation>Vremenski proračun</translation>
+        <translation>Časový fond</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="75"/>
@@ -164,61 +164,51 @@
     </message>
 </context>
 <context>
-    <name>SettingsDialog</name>
+    <name>SettingsWidget</name>
     <message>
-        <location filename="../settingsdialog.ui" line="14"/>
+        <location filename="../settingswidget.ui" line="14"/>
         <source>Settings</source>
-        <translation>Postavke</translation>
+        <translation>Nastavení</translation>
     </message>
     <message>
-        <location filename="../settingsdialog.ui" line="41"/>
-        <source>General</source>
-        <translation>Opće</translation>
-    </message>
-    <message>
-        <location filename="../settingsdialog.ui" line="46"/>
-        <source>Profiles</source>
-        <translation>Profili</translation>
-    </message>
-    <message>
-        <location filename="../settingsdialog.ui" line="61"/>
-        <source>Close to system tray</source>
-        <translation>Zatvori u programsku traku</translation>
-    </message>
-    <message>
-        <location filename="../settingsdialog.ui" line="68"/>
-        <source>Minimize to system tray</source>
-        <translation>Sklopi u programsku traku</translation>
-    </message>
-    <message>
-        <location filename="../settingsdialog.ui" line="75"/>
-        <source>Language</source>
-        <translation>Jezik</translation>
-    </message>
-    <message>
-        <location filename="../settingsdialog.ui" line="150"/>
-        <source>Name</source>
-        <translation>Ime</translation>
-    </message>
-    <message>
-        <location filename="../settingsdialog.ui" line="170"/>
+        <location filename="../settingswidget.ui" line="25"/>
         <source>Host</source>
-        <translation>Računalo</translation>
+        <translation>Server</translation>
     </message>
     <message>
-        <location filename="../settingsdialog.ui" line="187"/>
+        <location filename="../settingswidget.ui" line="39"/>
         <source>Username</source>
-        <translation>Korisničko ime</translation>
+        <translation>Uživatelské jméno</translation>
     </message>
     <message>
-        <location filename="../settingsdialog.ui" line="201"/>
+        <location filename="../settingswidget.ui" line="49"/>
         <source>Token</source>
-        <translation>Token</translation>
+        <translation>Klíč</translation>
     </message>
     <message>
-        <location filename="../settingsdialog.ui" line="242"/>
+        <location filename="../settingswidget.ui" line="63"/>
+        <source>Language</source>
+        <translation>Jazyk</translation>
+    </message>
+    <message>
+        <location filename="../settingswidget.ui" line="70"/>
+        <source>Close to system tray</source>
+        <translation>Zavřením minimalizovat na lištu</translation>
+    </message>
+    <message>
+        <location filename="../settingswidget.ui" line="110"/>
         <source>Test</source>
-        <translation>Testiraj</translation>
+        <translation>Otestovat</translation>
+    </message>
+    <message>
+        <location filename="../settingswidget.ui" line="130"/>
+        <source>Cancel</source>
+        <translation>Zrušit</translation>
+    </message>
+    <message>
+        <location filename="../settingswidget.ui" line="137"/>
+        <source>Save</source>
+        <translation>Uložit</translation>
     </message>
 </context>
 <context>
@@ -226,127 +216,133 @@
     <message>
         <location filename="../taskwidget.ui" line="14"/>
         <source>TaskWidget</source>
-        <translation>Programčić zadataka</translation>
+        <translation>Úlohy</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="25"/>
         <source>Filter</source>
-        <translation>Filtar</translation>
+        <translation>Filtr</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="35"/>
         <source>...</source>
-        <translation>…</translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="63"/>
         <source>Start</source>
-        <translation>Pokreni</translation>
+        <translation>Start</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="73"/>
-        <source>Close</source>
-        <translation>Zatvori</translation>
+        <source>Done</source>
+        <translation>Hotovo</translation>
     </message>
 </context>
 <context>
     <name>kemai::app::MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="47"/>
+        <location filename="../mainwindow.cpp" line="38"/>
         <source>&amp;Quit</source>
-        <translation>&amp;Zatvori program</translation>
+        <translation>&amp;Ukončit</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="48"/>
+        <location filename="../mainwindow.cpp" line="39"/>
         <source>&amp;Settings</source>
-        <translation>&amp;Postavke</translation>
+        <translation>&amp;Nastavení</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="49"/>
+        <location filename="../mainwindow.cpp" line="40"/>
         <source>Check for updates...</source>
-        <translation>Traži nove verzije …</translation>
+        <translation>Zkontrolovat aktualizace...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="50"/>
+        <location filename="../mainwindow.cpp" line="41"/>
         <source>Open Kimai instance</source>
-        <translation>Otvori primjerak Kemaia</translation>
+        <translation>Přejít na server</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="51"/>
+        <location filename="../mainwindow.cpp" line="42"/>
         <source>Activities</source>
-        <translation>Aktivnosti</translation>
+        <translation>Aktivity</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="52"/>
+        <location filename="../mainwindow.cpp" line="43"/>
         <source>Tasks</source>
-        <translation>Zadaci</translation>
+        <translation>Úkoly</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="83"/>
+        <location filename="../mainwindow.cpp" line="72"/>
         <source>&amp;File</source>
-        <translation>&amp;Datoteka</translation>
+        <translation>&amp;Soubor</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="88"/>
-        <source>&amp;Profile</source>
-        <translation>Pro&amp;fil</translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="90"/>
+        <location filename="../mainwindow.cpp" line="77"/>
         <source>&amp;View</source>
-        <translation>&amp;Prikaz</translation>
+        <translation>&amp;Zobrazit</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="94"/>
+        <location filename="../mainwindow.cpp" line="81"/>
         <source>&amp;Help</source>
-        <translation>Po&amp;moć</translation>
+        <translation>&amp;Pomoc</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="99"/>
+        <location filename="../mainwindow.cpp" line="86"/>
         <source>About Qt</source>
-        <translation>Qt informacije</translation>
+        <translation>O programu</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="410"/>
+        <location filename="../mainwindow.cpp" line="293"/>
         <source>New version available</source>
-        <translation>Postoji nova verzija</translation>
+        <translation>K dispozici je nová verze programu</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="410"/>
+        <location filename="../mainwindow.cpp" line="293"/>
         <source>Version %1 is available.
 
 %2</source>
-        <translation>Dostupna je verzija %1.
+        <translation>Verze %1 je k dispozici.
 
 %2</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="432"/>
+        <location filename="../mainwindow.cpp" line="315"/>
         <source>No update</source>
-        <translation>Nema nove verzije</translation>
+        <translation>Máte nejnovější verzi</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="432"/>
+        <location filename="../mainwindow.cpp" line="315"/>
         <source>%1 is latest version.</source>
-        <translation>%1 je najnovija verzija.</translation>
+        <translation>%1 je poslední verze.</translation>
     </message>
 </context>
 <context>
-    <name>kemai::app::SettingsDialog</name>
+    <name>kemai::app::SettingsWidget</name>
     <message>
-        <location filename="../settingsdialog.cpp" line="71"/>
+        <location filename="../settingswidget.cpp" line="57"/>
         <source>Language changed. Application restart is required.</source>
-        <translation>Jezik je promijenjen. Program se mora ponovo pokrenuti.</translation>
+        <translation>Jazyk byl změněn. Je vyžadován restart aplikace.</translation>
     </message>
     <message>
-        <location filename="../settingsdialog.cpp" line="171"/>
+        <location filename="../settingswidget.cpp" line="78"/>
         <source>Invalid reply.</source>
-        <translation>Neispravan odgovor.</translation>
+        <translation>Špatná odpověď.</translation>
     </message>
     <message>
-        <location filename="../settingsdialog.cpp" line="176"/>
+        <location filename="../settingswidget.cpp" line="83"/>
         <source>Connected to Kimai %1</source>
-        <translation>Povezano s Kimai %1</translation>
+        <translation>Připojeno ke Kimai %1</translation>
+    </message>
+</context>
+<context>
+    <name>kemai::client::KimaiClient::KimaiClientPrivate</name>
+    <message>
+        <source>Error on request [%1]: %2</source>
+        <translation type="vanished">Erreur sur la requête [%1] : %2</translation>
+    </message>
+    <message>
+        <source>Unknown request [%1]</source>
+        <translation type="vanished">Requête inconnue [%1]</translation>
     </message>
 </context>
 </TS>
