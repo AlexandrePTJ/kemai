@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Czech translation (Thanks to @office256) 
+
 ### Fixed
 - Enhance MacOSX generated dmg [#54](https://github.com/AlexandrePTJ/kemai/issues/54).
 
