@@ -78,3 +78,12 @@ jobs:
           allowUpdates: true
           draft: true
           artifacts: ${{ matrix.artifact_path }}
+
+      # Update packages on continuous 'release'
+      - if: startsWith(matrix.qt_version, '6') && github.ref_name == 'develop'
+        name: Create/Update release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          name: Continuous
+          artifacts: ${{ matrix.artifact_path }}

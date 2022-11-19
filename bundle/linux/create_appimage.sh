@@ -4,7 +4,7 @@ set -x
 set -e
 
 # Run this script once Kemai is built. Install and AppImage will be handle here.
-# It just path to Qt and to build directory.
+# It just need path to Qt and to build directory.
 
 
 # Read args
@@ -37,7 +37,7 @@ chmod +x linuxdeploy*.AppImage
 export QMAKE=$qt_path/bin/qmake
 export LD_LIBRARY_PATH=$qt_path/lib
 export VERSION=$(cat version.txt)
-export EXTRA_QT_PLUGINS=platforms,iconengines,wayland-decoration-client,wayland-graphics-integration-client,wayland-shell-integration,platformthemes
+export EXTRA_QT_PLUGINS=platforms,iconengines,wayland-decoration-client,wayland-graphics-integration-client,wayland-shell-integration,platformthemes,tls
 
 # Run appimage builder
 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage
