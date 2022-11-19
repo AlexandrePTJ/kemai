@@ -40,5 +40,9 @@ export VERSION=$(cat version.txt)
 export EXTRA_QT_PLUGINS=platforms,iconengines,wayland-decoration-client,wayland-graphics-integration-client,wayland-shell-integration,platformthemes,tls
 
 # Run appimage builder
-./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage
-
+./linuxdeploy-x86_64.AppImage \
+  --appdir AppDir \
+  --plugin qt \
+  -d $build_path/AppDir/kemai.desktop \
+  -i $build_path/AppDir/kemai.png \
+  --output appimage

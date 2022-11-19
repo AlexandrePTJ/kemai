@@ -81,9 +81,10 @@ jobs:
 
       # Update packages on continuous 'release'
       - if: startsWith(matrix.qt_version, '6') && github.ref_name == 'develop'
-        name: Create/Update release
+        name: Create/Update Continuous
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
+          tag: Continuous
           name: Continuous
           artifacts: ${{ matrix.artifact_path }}
