@@ -6,27 +6,27 @@
     <message>
         <location filename="../activitydialog.ui" line="14"/>
         <source>Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Attività</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="25"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="35"/>
         <source>Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Budget</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="62"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="85"/>
         <source>Time Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Budget Tempo</translation>
     </message>
 </context>
 <context>
@@ -39,7 +39,7 @@
     <message>
         <location filename="../activitywidget.ui" line="29"/>
         <source>Customer</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliente</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="60"/>
@@ -51,17 +51,17 @@
     <message>
         <location filename="../activitywidget.ui" line="79"/>
         <source>Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Progetto</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="129"/>
         <source>Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Attività</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="173"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Descrizione</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="183"/>
@@ -71,7 +71,7 @@
     <message>
         <location filename="../activitywidget.ui" line="193"/>
         <source>Started at</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniziato alle</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="240"/>
@@ -84,32 +84,32 @@
     <message>
         <location filename="../customerdialog.ui" line="14"/>
         <source>Customer</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliente</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="25"/>
         <source>Country</source>
-        <translation type="unfinished"></translation>
+        <translation>Paese</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="55"/>
         <source>Currency</source>
-        <translation type="unfinished"></translation>
+        <translation>Valuta</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="62"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="69"/>
         <source>Time Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Budget Tempo</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="93"/>
         <source>Timezone</source>
-        <translation type="unfinished"></translation>
+        <translation>Fuso orario</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="103"/>
@@ -132,7 +132,7 @@
     <message>
         <location filename="../mainwindow.ui" line="48"/>
         <source>Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni...</translation>
     </message>
 </context>
 <context>
@@ -140,12 +140,12 @@
     <message>
         <location filename="../projectdialog.ui" line="14"/>
         <source>Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Progetto</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="25"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="32"/>
@@ -155,7 +155,7 @@
     <message>
         <location filename="../projectdialog.ui" line="68"/>
         <source>Time Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Budget Tempo</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="75"/>
@@ -168,17 +168,17 @@
     <message>
         <location filename="../settingsdialog.ui" line="14"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="41"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Generale</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="46"/>
         <source>Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Profili</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="61"/>
