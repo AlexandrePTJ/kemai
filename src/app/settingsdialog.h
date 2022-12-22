@@ -26,8 +26,6 @@ public:
 private:
     void onProfilesListCurrentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
     void onBtTestClicked();
-    void onClientError(const QString& errorMsg);
-    void onClientReply(const client::KimaiReply& reply);
     void onProfileFieldValueChanged();
     void onProfileAddButtonClicked();
     void onProfileDelButtonClicked();
@@ -39,6 +37,7 @@ private:
 
     // for connection testing
     QScopedPointer<client::KimaiClient> mKimaiClient;
+    std::shared_ptr<client::VersionRequestResult> mVersionResult;
 };
 
 } // namespace kemai::app

@@ -54,6 +54,9 @@ private:
     QSharedPointer<client::KimaiClient> mClient;
     QSharedPointer<core::KemaiSession> mSession;
 
+    // Request result: because scoped in lambda to process response, instance is 'overwritten', so destructor is called.
+    std::shared_ptr<client::VersionRequestResult> mVersionResult;
+
     // Stacked widget (ownership is transferred, don't try to delete them)
     ActivityWidget* mActivityWidget = nullptr;
     TaskWidget* mTaskWidget         = nullptr;

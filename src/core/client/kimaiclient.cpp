@@ -2,8 +2,10 @@
 #include "kimaiclient_p.h"
 
 #include "kemai_version.h"
+#include "parser.h"
 
 #include <QCoreApplication>
+#include <QUrlQuery>
 
 #include <spdlog/spdlog.h>
 
@@ -33,6 +35,49 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(const KimaiReque
     }
 
     return r;
+}
+
+QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method, const std::map<QString, QString>& parameters, const QByteArray& data,
+                                                                const QString& subPath) const
+{
+    /*
+     * Create url
+     */
+    auto url = QUrl::fromUserInput(host);
+
+    // Update existing path to work with custom path instances
+    auto path = QString("%1/api/%2").arg(url.path(), apiMethodToString(method));
+    url.setPath(path);
+
+    QUrlQuery query;
+    for (const auto& [key, value] : parameters)
+    {
+        query.addQueryItem(key, value);
+    }
+    url.setQuery(query);
+
+    /*
+     * Create request
+     */
+    QNetworkRequest networkRequest;
+    networkRequest.setUrl(url);
+    networkRequest.setRawHeader("X-AUTH-USER", username.toUtf8());
+    networkRequest.setRawHeader("X-AUTH-TOKEN", token.toUtf8());
+    networkRequest.setHeader(QNetworkRequest::UserAgentHeader, QString("%1/%2").arg(qApp->applicationName(), KEMAI_VERSION));
+    networkRequest.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+    if (!data.isEmpty())
+    {
+        networkRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+        networkRequest.setHeader(QNetworkRequest::ContentLengthHeader, data.size());
+    }
+
+    return networkRequest;
+}
+
+QNetworkReply* KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkRequest& networkRequest)
+{
+    spdlog::debug("===> [GET] {}", networkRequest.url().toString().toStdString());
+    return networkAccessManager->get(networkRequest);
 }
 
 void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
@@ -89,6 +134,39 @@ void KimaiClient::setUsername(const QString& username)
 void KimaiClient::setToken(const QString& token)
 {
     mD->token = token;
+}
+
+std::shared_ptr<VersionRequestResult> KimaiClient::requestKimaiVersion()
+{
+    auto request = mD->prepareRequest(ApiMethod::Version);
+    auto reply   = mD->sendGetRequest(request);
+    auto result  = std::make_shared<VersionRequestResult>();
+
+    // clang-format off
+	QObject::connect(reply, &QNetworkReply::finished, this, [reply, result]()
+	{
+		if (reply->error() == QNetworkReply::NoError)
+		{
+			try
+			{
+				KimaiApiTypesParser parser(reply->readAll());
+				auto kimaiVersion = parser.getValueOf<KimaiVersion>();
+				result->setResult(kimaiVersion);
+			}
+			catch (std::runtime_error &ex)
+			{
+				result->setError(ex.what());
+			}
+		}
+		else
+		{
+			result->setError(reply->errorString());
+		}
+		reply->deleteLater();
+	});
+    // clang-format on
+
+    return result;
 }
 
 void KimaiClient::sendRequest(const KimaiRequest& rq)

@@ -1,11 +1,40 @@
 #include "kimaireply.h"
 
+#include <iostream>
+
 #include "parser.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
 
 using namespace kemai::client;
+
+bool KimaiApiBaseResult::isReady() const
+{
+    return mIsReady;
+}
+
+bool KimaiApiBaseResult::hasError() const
+{
+    return mError.has_value();
+}
+
+bool KimaiApiBaseResult::isPending() const
+{
+    return !isReady() && !hasError();
+}
+
+void KimaiApiBaseResult::markAsReady()
+{
+    mIsReady = true;
+    emit ready();
+}
+
+void KimaiApiBaseResult::setError(const QString &errorMessage)
+{
+    mError = errorMessage;
+    emit error(errorMessage);
+}
 
 class KimaiReply::KimaiReplyPrivate
 {

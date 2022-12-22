@@ -3,9 +3,11 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
+using namespace kemai::client;
+
 namespace kemai::client::parser {
 
-TimeSheetConfig::TrackingMode trackingModeFromString(const QString& trackingMode)
+static TimeSheetConfig::TrackingMode trackingModeFromString(const QString& trackingMode)
 {
     if (trackingMode == "default")
     {
@@ -26,7 +28,7 @@ TimeSheetConfig::TrackingMode trackingModeFromString(const QString& trackingMode
     return TimeSheetConfig::TrackingMode::Default;
 }
 
-Task::Status taskStatusFromString(const QString& taskStatus)
+static Task::Status taskStatusFromString(const QString& taskStatus)
 {
     if (taskStatus == "pending")
     {
@@ -350,3 +352,34 @@ QJsonObject toJson(const Activity& inst)
 }
 
 } // namespace kemai::client::parser
+
+static void checkKeysOrThrow(const QString& objectName, const QJsonObject& jsonObject, const QStringList& requiredKeys)
+{
+    for (const auto& key : requiredKeys)
+    {
+        if (!jsonObject.contains(key))
+        {
+            throw std::runtime_error(QString("Invalid %1 object. Key '%2' is missing").arg(objectName, key).toStdString());
+        }
+    }
+}
+
+KimaiApiTypesParser::KimaiApiTypesParser(const QByteArray& data)
+{
+    QJsonParseError parseError;
+    m_jsonDocument = QJsonDocument::fromJson(data, &parseError);
+    if (parseError.error != QJsonParseError::NoError)
+    {
+        throw std::runtime_error(QString("Data is not a valid json: %1").arg(parseError.errorString()).toStdString());
+    }
+}
+
+template<> KimaiVersion KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject) const
+{
+    checkKeysOrThrow("KimaiVersion", jsonObject, {"version"});
+
+    KimaiVersion kimaiVersion;
+    kimaiVersion.kimai = QVersionNumber::fromString(jsonObject.value("version").toString());
+
+    return kimaiVersion;
+}

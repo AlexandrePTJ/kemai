@@ -18,6 +18,10 @@ public:
     explicit KimaiClientPrivate(KimaiClient* c);
 
     QNetworkRequest prepareRequest(const KimaiRequest& cmd) const;
+    QNetworkRequest prepareRequest(ApiMethod method, const std::map<QString, QString>& parameters = {}, const QByteArray& data = {},
+                                   const QString& subPath = "") const;
+
+    QNetworkReply* sendGetRequest(const QNetworkRequest& networkRequest);
 
 public:
     QString username, host, token;

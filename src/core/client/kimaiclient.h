@@ -7,6 +7,8 @@
 
 namespace kemai::client {
 
+using VersionRequestResult = KimaiApiResult<KimaiVersion>;
+
 class KimaiClient : public QObject
 {
     Q_OBJECT
@@ -20,6 +22,8 @@ public:
     void setToken(const QString& token);
 
     void sendRequest(const KimaiRequest& rq);
+
+    std::shared_ptr<VersionRequestResult> requestKimaiVersion();
 
     static void addTrustedCertificates(const QStringList& trustedCertificates);
 

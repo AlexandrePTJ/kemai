@@ -197,7 +197,18 @@ void MainWindow::createKimaiClient(const Settings::Profile& profile)
 
         // send some request to identify instance
         mClient->sendRequest(KimaiRequestFactory::me());
-        mClient->sendRequest(KimaiRequestFactory::version());
+
+        mVersionResult = mClient->requestKimaiVersion();
+        connect(mVersionResult.get(), &KimaiApiBaseResult::ready, this, [this]() {
+            mSession->kimaiVersion = mVersionResult->getResult().kimai;
+            // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.1
+            if (mSession->kimaiVersion >= MinimalKimaiVersionForPluginRequest)
+            {
+                mClient->sendRequest(KimaiRequestFactory::plugins());
+            }
+        });
+        connect(mVersionResult.get(), &KimaiApiBaseResult::error, this, &MainWindow::onClientError);
+
         mClient->sendRequest(KimaiRequestFactory::timeSheetConfig());
 
         mActivityWidget->setKimaiClient(mClient);
@@ -315,17 +326,6 @@ void MainWindow::onClientReply(const KimaiReply& reply)
 
     switch (reply.method())
     {
-    case ApiMethod::Version: {
-        auto kVersion          = reply.get<KimaiVersion>();
-        mSession->kimaiVersion = kVersion.kimai;
-        // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.1
-        if (mSession->kimaiVersion >= MinimalKimaiVersionForPluginRequest)
-        {
-            mClient->sendRequest(KimaiRequestFactory::plugins());
-        }
-    }
-    break;
-
     case ApiMethod::Plugins: {
         mSession->plugins = reply.get<Plugins>();
 

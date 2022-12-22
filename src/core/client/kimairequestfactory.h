@@ -7,7 +7,6 @@ namespace kemai::client {
 class KimaiRequestFactory
 {
 public:
-    static KimaiRequest version();
     static KimaiRequest me(); // me as user
     static KimaiRequest timeSheetConfig();
     static KimaiRequest customers();

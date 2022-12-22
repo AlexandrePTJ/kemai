@@ -4,11 +4,6 @@
 
 using namespace kemai::client;
 
-KimaiRequest KimaiRequestFactory::version()
-{
-    return KimaiRequest(ApiMethod::Version);
-}
-
 KimaiRequest KimaiRequestFactory::me()
 {
     return KimaiRequest(ApiMethod::MeUsers);
