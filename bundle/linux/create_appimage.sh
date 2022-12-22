@@ -41,6 +41,7 @@ export EXTRA_QT_PLUGINS=platforms,iconengines,wayland-decoration-client,wayland-
 
 # Run appimage builder
 ./linuxdeploy-x86_64.AppImage \
+  --appimage-extract-and-run \
   --appdir AppDir \
   --plugin qt \
   -d AppDir/kemai.desktop \
