@@ -160,7 +160,7 @@ struct Plugin
     QVersionNumber version;
     ApiPlugin apiPlugin;
 };
-using Plugins = QVector<Plugin>;
+using Plugins = std::vector<Plugin>;
 
 struct TimeSheetConfig
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <QObject>
 
 #include "kimaireply.h"
@@ -7,7 +9,10 @@
 
 namespace kemai::client {
 
-using VersionRequestResult = KimaiApiResult<KimaiVersion>;
+using VersionRequestResult  = KimaiApiResult<KimaiVersion>;
+using MeRequestResult       = KimaiApiResult<User>;
+using TimeSheetConfigResult = KimaiApiResult<TimeSheetConfig>;
+using PluginsResult         = KimaiApiResult<std::vector<Plugin>>;
 
 class KimaiClient : public QObject
 {
@@ -24,6 +29,9 @@ public:
     void sendRequest(const KimaiRequest& rq);
 
     std::shared_ptr<VersionRequestResult> requestKimaiVersion();
+    std::shared_ptr<MeRequestResult> requestMeUserInfo();
+    std::shared_ptr<TimeSheetConfigResult> requestTimeSheetConfig();
+    std::shared_ptr<PluginsResult> requestPlugins();
 
     static void addTrustedCertificates(const QStringList& trustedCertificates);
 

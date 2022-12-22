@@ -105,13 +105,6 @@ bool KimaiReply::isValid() const
 }
 
 // parsers
-template<> KimaiVersion KimaiReply::get() const
-{
-    KimaiVersion kv;
-    parser::fromJson(mD->jsonValue.toObject(), kv);
-    return kv;
-}
-
 template<> Customer KimaiReply::get() const
 {
     Customer ts;
@@ -225,25 +218,4 @@ template<> Tasks KimaiReply::get() const
         }
     }
     return tasks;
-}
-
-template<> Plugins KimaiReply::get() const
-{
-    Plugins plugins;
-    for (const auto& jsPlugin : mD->jsonValue.toArray())
-    {
-        Plugin plugin;
-        if (parser::fromJson(jsPlugin.toObject(), plugin))
-        {
-            plugins << plugin;
-        }
-    }
-    return plugins;
-}
-
-template<> TimeSheetConfig KimaiReply::get() const
-{
-    TimeSheetConfig tsConfig;
-    parser::fromJson(mD->jsonValue.toObject(), tsConfig);
-    return tsConfig;
 }

@@ -2,7 +2,6 @@
 #include "kimaiclient_p.h"
 
 #include "kemai_version.h"
-#include "parser.h"
 
 #include <QCoreApplication>
 #include <QUrlQuery>
@@ -16,7 +15,6 @@ using namespace kemai::client;
  */
 KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c) : networkAccessManager(new QNetworkAccessManager), mQ(c)
 {
-    connect(networkAccessManager.data(), &QNetworkAccessManager::finished, this, &KimaiClientPrivate::onNamFinished);
     connect(networkAccessManager.data(), &QNetworkAccessManager::sslErrors, this, &KimaiClientPrivate::onNamSslErrors);
 }
 
@@ -80,28 +78,6 @@ QNetworkReply* KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkReq
     return networkAccessManager->get(networkRequest);
 }
 
-void KimaiClient::KimaiClientPrivate::onNamFinished(QNetworkReply* reply)
-{
-    auto kimaiRequest = runningRequests.take(reply);
-    if (kimaiRequest)
-    {
-        if (reply->error() != QNetworkReply::NoError)
-        {
-            emit mQ->requestError(tr("Error on request [%1]: %2\n%3").arg(apiMethodToString(kimaiRequest->method()), reply->errorString(), reply->readAll()));
-        }
-        else
-        {
-            auto replyData = reply->readAll();
-            spdlog::debug("<=== {}", replyData.toStdString());
-            emit mQ->replyReceived({kimaiRequest->method(), replyData});
-        }
-    }
-    else
-    {
-        emit mQ->requestError(tr("Unknown request [%1]").arg(reply->errorString()));
-    }
-}
-
 void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* /*reply*/, const QList<QSslError>& errors)
 {
     for (const auto& error : errors)
@@ -140,33 +116,28 @@ std::shared_ptr<VersionRequestResult> KimaiClient::requestKimaiVersion()
 {
     auto request = mD->prepareRequest(ApiMethod::Version);
     auto reply   = mD->sendGetRequest(request);
-    auto result  = std::make_shared<VersionRequestResult>();
+    return mD->processApiNetworkReplySingleObject<VersionRequestResult, KimaiVersion>(ApiMethod::Version, reply);
+}
 
-    // clang-format off
-	QObject::connect(reply, &QNetworkReply::finished, this, [reply, result]()
-	{
-		if (reply->error() == QNetworkReply::NoError)
-		{
-			try
-			{
-				KimaiApiTypesParser parser(reply->readAll());
-				auto kimaiVersion = parser.getValueOf<KimaiVersion>();
-				result->setResult(kimaiVersion);
-			}
-			catch (std::runtime_error &ex)
-			{
-				result->setError(ex.what());
-			}
-		}
-		else
-		{
-			result->setError(reply->errorString());
-		}
-		reply->deleteLater();
-	});
-    // clang-format on
+std::shared_ptr<MeRequestResult> KimaiClient::requestMeUserInfo()
+{
+    auto request = mD->prepareRequest(ApiMethod::MeUsers);
+    auto reply   = mD->sendGetRequest(request);
+    return mD->processApiNetworkReplySingleObject<MeRequestResult, User>(ApiMethod::MeUsers, reply);
+}
 
-    return result;
+std::shared_ptr<TimeSheetConfigResult> KimaiClient::requestTimeSheetConfig()
+{
+    auto request = mD->prepareRequest(ApiMethod::TimeSheetConfig);
+    auto reply   = mD->sendGetRequest(request);
+    return mD->processApiNetworkReplySingleObject<TimeSheetConfigResult, TimeSheetConfig>(ApiMethod::TimeSheetConfig, reply);
+}
+
+std::shared_ptr<PluginsResult> KimaiClient::requestPlugins()
+{
+    auto request = mD->prepareRequest(ApiMethod::Plugins);
+    auto reply   = mD->sendGetRequest(request);
+    return mD->processApiNetworkReplyArray<PluginsResult, Plugin>(ApiMethod::Plugins, reply);
 }
 
 void KimaiClient::sendRequest(const KimaiRequest& rq)

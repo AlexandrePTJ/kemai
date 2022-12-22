@@ -7,14 +7,10 @@ namespace kemai::client {
 class KimaiRequestFactory
 {
 public:
-    static KimaiRequest me(); // me as user
-    static KimaiRequest timeSheetConfig();
     static KimaiRequest customers();
     static KimaiRequest customerAdd(const Customer& customer);
-    static KimaiRequest projects();
     static KimaiRequest projects(int customerId);
     static KimaiRequest projectAdd(const Project& project);
-    static KimaiRequest activities();
     static KimaiRequest activities(int projectId);
     static KimaiRequest activityAdd(const Activity& activity);
     static KimaiRequest activeTimeSheets();
@@ -26,7 +22,6 @@ public:
     static KimaiRequest taskStart(int taskId);
     static KimaiRequest taskStop(int taskId);
     static KimaiRequest taskClose(int taskId);
-    static KimaiRequest plugins();
 };
 
 } // namespace kemai::client

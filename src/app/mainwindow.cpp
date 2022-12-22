@@ -192,11 +192,12 @@ void MainWindow::createKimaiClient(const Settings::Profile& profile)
 
         mSession = QSharedPointer<KemaiSession>::create();
 
-        connect(mClient.data(), &KimaiClient::replyReceived, this, &MainWindow::onClientReply);
         connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
 
         // send some request to identify instance
-        mClient->sendRequest(KimaiRequestFactory::me());
+        mMeResult = mClient->requestMeUserInfo();
+        connect(mMeResult.get(), &KimaiApiBaseResult::ready, this, [this]() { mSession->me = mMeResult->getResult(); });
+        connect(mMeResult.get(), &KimaiApiBaseResult::error, this, &MainWindow::onClientError);
 
         mVersionResult = mClient->requestKimaiVersion();
         connect(mVersionResult.get(), &KimaiApiBaseResult::ready, this, [this]() {
@@ -204,12 +205,14 @@ void MainWindow::createKimaiClient(const Settings::Profile& profile)
             // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.1
             if (mSession->kimaiVersion >= MinimalKimaiVersionForPluginRequest)
             {
-                mClient->sendRequest(KimaiRequestFactory::plugins());
+                requestPlugins();
             }
         });
         connect(mVersionResult.get(), &KimaiApiBaseResult::error, this, &MainWindow::onClientError);
 
-        mClient->sendRequest(KimaiRequestFactory::timeSheetConfig());
+        mTimeSheetConfigResult = mClient->requestTimeSheetConfig();
+        connect(mTimeSheetConfigResult.get(), &KimaiApiBaseResult::ready, this, [this]() { mSession->timeSheetConfig = mTimeSheetConfigResult->getResult(); });
+        connect(mTimeSheetConfigResult.get(), &KimaiApiBaseResult::error, this, &MainWindow::onClientError);
 
         mActivityWidget->setKimaiClient(mClient);
         mActivityWidget->setKemaiSession(mSession);
@@ -312,22 +315,12 @@ void MainWindow::processAutoConnect()
     createKimaiClient(*profileIt);
 }
 
-void MainWindow::onClientError(const QString& errorMsg)
+void MainWindow::requestPlugins()
 {
-    spdlog::error("Client error: {}", errorMsg.toStdString());
-}
+    mPluginsResult = mClient->requestPlugins();
 
-void MainWindow::onClientReply(const KimaiReply& reply)
-{
-    if (!reply.isValid())
-    {
-        return;
-    }
-
-    switch (reply.method())
-    {
-    case ApiMethod::Plugins: {
-        mSession->plugins = reply.get<Plugins>();
+    connect(mPluginsResult.get(), &KimaiApiBaseResult::ready, this, [this]() {
+        mSession->plugins   = mPluginsResult->getResult();
 
         bool haveTaskPlugin = mSession->isPluginAvailable(ApiPlugin::TaskManagement);
         mActViewTasks->setEnabled(haveTaskPlugin);
@@ -335,17 +328,14 @@ void MainWindow::onClientReply(const KimaiReply& reply)
         {
             mTaskWidget->setKimaiClient(mClient);
         }
-    }
-    break;
+    });
 
-    case ApiMethod::TimeSheetConfig: {
-        mSession->timeSheetConfig = reply.get<TimeSheetConfig>();
-    }
-    break;
+    connect(mPluginsResult.get(), &KimaiApiBaseResult::error, this, &MainWindow::onClientError);
+}
 
-    default:
-        break;
-    }
+void MainWindow::onClientError(const QString& errorMsg)
+{
+    spdlog::error("Client error: {}", errorMsg.toStdString());
 }
 
 void MainWindow::onActionSettingsTriggered()

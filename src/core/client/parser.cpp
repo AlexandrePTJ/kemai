@@ -5,8 +5,6 @@
 
 using namespace kemai::client;
 
-namespace kemai::client::parser {
-
 static TimeSheetConfig::TrackingMode trackingModeFromString(const QString& trackingMode)
 {
     if (trackingMode == "default")
@@ -45,17 +43,7 @@ static Task::Status taskStatusFromString(const QString& taskStatus)
     return Task::Status::Undefined;
 }
 
-bool fromJson(const QJsonObject& jso, KimaiVersion& inst)
-{
-    if (!jso.contains("version"))
-    {
-        return false;
-    }
-
-    inst.kimai = QVersionNumber::fromString(jso.value("version").toString());
-
-    return true;
-}
+namespace kemai::client::parser {
 
 bool fromJson(const QJsonObject& jso, Customer& inst)
 {
@@ -223,19 +211,6 @@ bool fromJson(const QJsonObject& jso, Task& inst)
     return true;
 }
 
-bool fromJson(const QJsonObject& jso, Plugin& inst)
-{
-    if (!jso.contains("name") || !jso.contains("version"))
-    {
-        return false;
-    }
-
-    inst.name      = jso.value("name").toString();
-    inst.version   = QVersionNumber::fromString(jso.value("version").toString());
-    inst.apiPlugin = pluginByName(inst.name);
-    return true;
-}
-
 bool fromJson(const QJsonObject& jso, TimeSheetConfig& inst)
 {
     if (!jso.contains("trackingMode"))
@@ -382,4 +357,39 @@ template<> KimaiVersion KimaiApiTypesParser::parseObject(const QJsonObject& json
     kimaiVersion.kimai = QVersionNumber::fromString(jsonObject.value("version").toString());
 
     return kimaiVersion;
+}
+
+template<> User KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject) const
+{
+    checkKeysOrThrow("User", jsonObject, {"id"});
+
+    User user;
+    user.id       = jsonObject.value("id").toInt();
+    user.username = jsonObject.value("username").toString();
+    user.language = jsonObject.value("language").toString();
+    user.timezone = jsonObject.value("timezone").toString();
+
+    return user;
+}
+
+template<> TimeSheetConfig KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject) const
+{
+    checkKeysOrThrow("TimeSheetConfig", jsonObject, {"trackingMode"});
+
+    TimeSheetConfig timeSheetConfig;
+    timeSheetConfig.trackingMode = trackingModeFromString(jsonObject.value("trackingMode").toString());
+
+    return timeSheetConfig;
+}
+
+template<> Plugin KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject) const
+{
+    checkKeysOrThrow("Plugin", jsonObject, {"name", "version"});
+
+    Plugin plugin;
+    plugin.name      = jsonObject.value("name").toString();
+    plugin.version   = QVersionNumber::fromString(jsonObject.value("version").toString());
+    plugin.apiPlugin = pluginByName(plugin.name);
+
+    return plugin;
 }

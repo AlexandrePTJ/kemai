@@ -38,9 +38,9 @@ private:
     void setViewActionsEnabled(bool enable);
     void updateProfilesMenu();
     void processAutoConnect();
+    void requestPlugins();
 
     void onClientError(const QString& errorMsg);
-    void onClientReply(const client::KimaiReply& reply);
     void onActionSettingsTriggered();
     void onActionCheckUpdateTriggered();
     void onActionOpenHostTriggered();
@@ -56,6 +56,9 @@ private:
 
     // Request result: because scoped in lambda to process response, instance is 'overwritten', so destructor is called.
     std::shared_ptr<client::VersionRequestResult> mVersionResult;
+    std::shared_ptr<client::MeRequestResult> mMeResult;
+    std::shared_ptr<client::TimeSheetConfigResult> mTimeSheetConfigResult;
+    std::shared_ptr<client::PluginsResult> mPluginsResult;
 
     // Stacked widget (ownership is transferred, don't try to delete them)
     ActivityWidget* mActivityWidget = nullptr;

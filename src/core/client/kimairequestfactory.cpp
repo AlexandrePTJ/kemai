@@ -4,16 +4,6 @@
 
 using namespace kemai::client;
 
-KimaiRequest KimaiRequestFactory::me()
-{
-    return KimaiRequest(ApiMethod::MeUsers);
-}
-
-KimaiRequest KimaiRequestFactory::timeSheetConfig()
-{
-    return KimaiRequest(ApiMethod::TimeSheetConfig);
-}
-
 KimaiRequest KimaiRequestFactory::customers()
 {
     return KimaiRequest(ApiMethod::Customers);
@@ -27,11 +17,6 @@ KimaiRequest KimaiRequestFactory::customerAdd(const Customer& customer)
     krq.setData(parser::toPostData(jsData));
 
     return krq;
-}
-
-KimaiRequest KimaiRequestFactory::projects()
-{
-    return KimaiRequest(ApiMethod::Projects);
 }
 
 KimaiRequest KimaiRequestFactory::projects(int customerId)
@@ -49,11 +34,6 @@ KimaiRequest KimaiRequestFactory::projectAdd(const Project& project)
     krq.setData(parser::toPostData(jsData));
 
     return krq;
-}
-
-KimaiRequest KimaiRequestFactory::activities()
-{
-    return KimaiRequest(ApiMethod::Activities);
 }
 
 KimaiRequest KimaiRequestFactory::activities(int projectId)
@@ -132,9 +112,4 @@ KimaiRequest KimaiRequestFactory::taskClose(int taskId)
     auto krq = KimaiRequest(ApiMethod::TaskClose, HttpVerb::Patch);
     krq.setPatchVerb(QString("%1/close").arg(taskId));
     return krq;
-}
-
-KimaiRequest KimaiRequestFactory::plugins()
-{
-    return KimaiRequest(ApiMethod::Plugins);
 }
