@@ -37,7 +37,6 @@ private:
 
     // for connection testing
     QScopedPointer<client::KimaiClient> mKimaiClient;
-    std::shared_ptr<client::VersionRequestResult> mVersionResult;
 };
 
 } // namespace kemai::app

@@ -9,7 +9,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include "client/kimairequestfactory.h"
 #include "kemai_version.h"
 
 #include "activitywidget.h"
@@ -195,24 +194,40 @@ void MainWindow::createKimaiClient(const Settings::Profile& profile)
         connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
 
         // send some request to identify instance
-        mMeResult = mClient->requestMeUserInfo();
-        connect(mMeResult.get(), &KimaiApiBaseResult::ready, this, [this]() { mSession->me = mMeResult->getResult(); });
-        connect(mMeResult.get(), &KimaiApiBaseResult::error, this, &MainWindow::onClientError);
+        auto meResult = mClient->requestMeUserInfo();
+        connect(meResult, &KimaiApiBaseResult::ready, this, [this, meResult]() {
+            mSession->me = meResult->getResult();
+            meResult->deleteLater();
+        });
+        connect(meResult, &KimaiApiBaseResult::error, this, [this, meResult]() {
+            onClientError(meResult->errorMessage());
+            meResult->deleteLater();
+        });
 
-        mVersionResult = mClient->requestKimaiVersion();
-        connect(mVersionResult.get(), &KimaiApiBaseResult::ready, this, [this]() {
-            mSession->kimaiVersion = mVersionResult->getResult().kimai;
+        auto versionResult = mClient->requestKimaiVersion();
+        connect(versionResult, &KimaiApiBaseResult::ready, this, [this, versionResult]() {
+            mSession->kimaiVersion = versionResult->getResult().kimai;
             // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.1
             if (mSession->kimaiVersion >= MinimalKimaiVersionForPluginRequest)
             {
                 requestPlugins();
             }
+            versionResult->deleteLater();
         });
-        connect(mVersionResult.get(), &KimaiApiBaseResult::error, this, &MainWindow::onClientError);
+        connect(versionResult, &KimaiApiBaseResult::error, this, [this, versionResult]() {
+            onClientError(versionResult->errorMessage());
+            versionResult->deleteLater();
+        });
 
-        mTimeSheetConfigResult = mClient->requestTimeSheetConfig();
-        connect(mTimeSheetConfigResult.get(), &KimaiApiBaseResult::ready, this, [this]() { mSession->timeSheetConfig = mTimeSheetConfigResult->getResult(); });
-        connect(mTimeSheetConfigResult.get(), &KimaiApiBaseResult::error, this, &MainWindow::onClientError);
+        auto timeSheetConfigResult = mClient->requestTimeSheetConfig();
+        connect(timeSheetConfigResult, &KimaiApiBaseResult::ready, this, [this, timeSheetConfigResult]() {
+            mSession->timeSheetConfig = timeSheetConfigResult->getResult();
+            timeSheetConfigResult->deleteLater();
+        });
+        connect(timeSheetConfigResult, &KimaiApiBaseResult::error, this, [this, timeSheetConfigResult]() {
+            onClientError(timeSheetConfigResult->errorMessage());
+            timeSheetConfigResult->deleteLater();
+        });
 
         mActivityWidget->setKimaiClient(mClient);
         mActivityWidget->setKemaiSession(mSession);
@@ -317,10 +332,10 @@ void MainWindow::processAutoConnect()
 
 void MainWindow::requestPlugins()
 {
-    mPluginsResult = mClient->requestPlugins();
+    auto pluginsResult = mClient->requestPlugins();
 
-    connect(mPluginsResult.get(), &KimaiApiBaseResult::ready, this, [this]() {
-        mSession->plugins   = mPluginsResult->getResult();
+    connect(pluginsResult, &KimaiApiBaseResult::ready, this, [this, pluginsResult]() {
+        mSession->plugins = pluginsResult->getResult();
 
         bool haveTaskPlugin = mSession->isPluginAvailable(ApiPlugin::TaskManagement);
         mActViewTasks->setEnabled(haveTaskPlugin);
@@ -328,9 +343,13 @@ void MainWindow::requestPlugins()
         {
             mTaskWidget->setKimaiClient(mClient);
         }
+        pluginsResult->deleteLater();
     });
 
-    connect(mPluginsResult.get(), &KimaiApiBaseResult::error, this, &MainWindow::onClientError);
+    connect(pluginsResult, &KimaiApiBaseResult::error, this, [this, pluginsResult]() {
+        onClientError(pluginsResult->errorMessage());
+        pluginsResult->deleteLater();
+    });
 }
 
 void MainWindow::onClientError(const QString& errorMsg)

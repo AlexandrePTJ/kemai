@@ -1,41 +1,21 @@
 #pragma once
 
 #include <stdexcept>
+#include <vector>
 
-#include <QJsonObject>
-#include <QVariant>
+#include <QByteArray>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QVariant>
 
 #include "kimaiapi.h"
 
 namespace kemai::client::parser {
 
-template<typename T> void safeGetJsonValue(const QString& key, const QJsonObject& obj, T& dest)
-{
-    auto jsval = obj.value(key);
-    if (!jsval.isUndefined())
-    {
-        auto var = jsval.toVariant();
-        if (var.canConvert<T>())
-        {
-            dest = var.value<T>();
-        }
-    }
-}
-
 bool fromJson(const QJsonObject& jso, Customer& inst);
-bool fromJson(const QJsonObject& jso, Project& inst);
-bool fromJson(const QJsonObject& jso, Activity& inst);
-bool fromJson(const QJsonObject& jso, TimeSheet& inst);
-bool fromJson(const QJsonObject& jso, User& inst);
-bool fromJson(const QJsonObject& jso, Task& inst);
 
 QByteArray toPostData(const QJsonValue& jv);
-QJsonObject toJson(const TimeSheet& inst, TimeSheetConfig::TrackingMode trackingMode);
-QJsonObject toJson(const Customer& inst);
-QJsonObject toJson(const Project& inst);
-QJsonObject toJson(const Activity& inst);
 
 } // namespace kemai::client::parser
 
@@ -50,7 +30,7 @@ public:
      */
     KimaiApiTypesParser(const QByteArray& data);
 
-   template<class T> std::vector<T> getArrayOf() const
+    template<class T> std::vector<T> getArrayOf() const
     {
         if (!m_jsonDocument.isArray())
         {
@@ -68,8 +48,12 @@ public:
         return parseObject<T>(m_jsonDocument.object());
     }
 
-private:
+    static QJsonValue toJson(const TimeSheet& inst, TimeSheetConfig::TrackingMode trackingMode);
+    static QJsonValue toJson(const Customer& inst);
+    static QJsonValue toJson(const Project& inst);
+    static QJsonValue toJson(const Activity& inst);
 
+private:
     template<class T> T parseObject(const QJsonObject& jsonObject) const;
 
     template<class T> std::vector<T> parseArrayOf(const QJsonArray& jsonArray) const

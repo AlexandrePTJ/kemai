@@ -5,13 +5,37 @@
 #include <QMap>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QObject>
 #include <QVersionNumber>
 
 #include "kimaiclient.h"
 #include "parser.h"
 
 namespace kemai::client {
+
+// available requests
+enum class ApiMethod
+{
+    Version,
+    Customers,
+    CustomerAdd,
+    Projects,
+    ProjectAdd,
+    Activities,
+    ActivityAdd,
+    ActiveTimeSheets,
+    TimeSheets,
+    Users,
+    MeUsers,
+    Tags,
+    Plugins,
+    Tasks,
+    TaskLog,
+    TaskStart,
+    TaskStop,
+    TaskClose,
+    TimeSheetConfig
+};
+QString apiMethodToString(ApiMethod method);
 
 class KimaiClient::KimaiClientPrivate : public QObject
 {
@@ -20,15 +44,16 @@ class KimaiClient::KimaiClientPrivate : public QObject
 public:
     explicit KimaiClientPrivate(KimaiClient* c);
 
-    QNetworkRequest prepareRequest(const KimaiRequest& cmd) const;
     QNetworkRequest prepareRequest(ApiMethod method, const std::map<QString, QString>& parameters = {}, const QByteArray& data = {},
                                    const QString& subPath = "") const;
 
     QNetworkReply* sendGetRequest(const QNetworkRequest& networkRequest);
+    QNetworkReply* sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data);
+    QNetworkReply* sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data);
 
-    template<class R, class T> std::shared_ptr<R> processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply* networkReply)
+    template<class ResultType> KimaiApiResult<ResultType>* processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply* networkReply)
     {
-        auto result = std::make_shared<R>();
+        auto result = new KimaiApiResult<ResultType>;
 
         QObject::connect(networkReply, &QNetworkReply::finished, this, [networkReply, result, method]() {
             if (networkReply->error() == QNetworkReply::NoError)
@@ -39,9 +64,7 @@ public:
                     spdlog::debug("<=== {}", replyData.toStdString());
 
                     KimaiApiTypesParser parser(replyData);
-                    // TODO: find a way to deduct type from R
-                    auto resultValue = parser.getValueOf<T>();
-                    result->setResult(resultValue);
+                    result->setResult(parser.getValueOf<ResultType>());
                 }
                 catch (std::runtime_error& ex)
                 {
@@ -59,9 +82,9 @@ public:
         return result;
     }
 
-    template<class R, class T> std::shared_ptr<R> processApiNetworkReplyArray(ApiMethod method, QNetworkReply* networkReply)
+    template<class ResultType> KimaiApiResult<std::vector<ResultType>>* processApiNetworkReplyArray(ApiMethod method, QNetworkReply* networkReply)
     {
-        auto result = std::make_shared<R>();
+        auto result = new KimaiApiResult<std::vector<ResultType>>;
 
         QObject::connect(networkReply, &QNetworkReply::finished, this, [networkReply, result, method]() {
             if (networkReply->error() == QNetworkReply::NoError)
@@ -72,9 +95,7 @@ public:
                     spdlog::debug("<=== {}", replyData.toStdString());
 
                     KimaiApiTypesParser parser(replyData);
-                    // TODO: find a way to deduct type from R
-                    auto resultValue = parser.getArrayOf<T>();
-                    result->setResult(resultValue);
+                    result->setResult(parser.getArrayOf<ResultType>());
                 }
                 catch (std::runtime_error& ex)
                 {
@@ -91,15 +112,13 @@ public:
 
         return result;
     }
+
+    void onNamSslErrors(QNetworkReply* reply, const QList<QSslError>& errors);
 
     QString username, host, token;
-    QMap<QNetworkReply*, QSharedPointer<KimaiRequest>> runningRequests;
-
     QScopedPointer<QNetworkAccessManager> networkAccessManager;
 
 private:
-    void onNamSslErrors(QNetworkReply* reply, const QList<QSslError>& errors);
-
     KimaiClient* const mQ;
 };
 

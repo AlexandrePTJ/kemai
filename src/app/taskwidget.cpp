@@ -6,8 +6,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include "client/kimairequestfactory.h"
-
 using namespace kemai::app;
 using namespace kemai::core;
 using namespace kemai::client;
@@ -27,7 +25,7 @@ TaskWidget::TaskWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::TaskWidge
     connect(mUi->lvTasks->selectionModel(), &QItemSelectionModel::currentChanged, this, &TaskWidget::onTaskItemChanged);
     connect(mUi->btStartStop, &QPushButton::clicked, this, &TaskWidget::onStartStopClicked);
     connect(mUi->btClose, &QPushButton::clicked, this, &TaskWidget::onCloseClicked);
-    connect(mUi->tbRefresh, &QPushButton::clicked, this, &TaskWidget::onRefreshClicked);
+    connect(mUi->tbRefresh, &QPushButton::clicked, this, &TaskWidget::updateTasks);
 }
 
 TaskWidget::~TaskWidget()
@@ -40,9 +38,7 @@ void TaskWidget::setKimaiClient(QSharedPointer<KimaiClient> kimaiClient)
     mClient = std::move(kimaiClient);
     if (mClient)
     {
-        connect(mClient.get(), &KimaiClient::replyReceived, this, &TaskWidget::onClientReply);
-
-        mClient->sendRequest(KimaiRequestFactory::tasks());
+        updateTasks();
     }
 
     setEnabled(mClient != nullptr);
@@ -53,30 +49,15 @@ void TaskWidget::setKemaiSession(QSharedPointer<KemaiSession> kemaiSession)
     mTaskProxyModel.setUserId(kemaiSession->me.id);
 }
 
-void TaskWidget::onClientReply(const KimaiReply& reply)
+void TaskWidget::updateTasks()
 {
-    if (!reply.isValid())
-    {
-        return;
-    }
+    auto tasksResult = mClient->requestTasks();
 
-    switch (reply.method())
-    {
-    case ApiMethod::Tasks: {
-        auto tasks = reply.get<Tasks>();
-        mTaskModel.setTasks(tasks);
-    }
-    break;
-
-    case ApiMethod::TaskStart:
-    case ApiMethod::TaskClose:
-    case ApiMethod::TimeSheets:
-        mClient->sendRequest(KimaiRequestFactory::tasks());
-        break;
-
-    default:
-        break;
-    }
+    connect(tasksResult, &KimaiApiBaseResult::ready, this, [this, tasksResult] {
+        mTaskModel.setTasks(tasksResult->getResult());
+        tasksResult->deleteLater();
+    });
+    connect(tasksResult, &KimaiApiBaseResult::error, [tasksResult] { tasksResult->deleteLater(); });
 }
 
 void TaskWidget::onTaskItemChanged(const QModelIndex& current, const QModelIndex& /*previous*/)
@@ -85,25 +66,26 @@ void TaskWidget::onTaskItemChanged(const QModelIndex& current, const QModelIndex
     mUi->btClose->setEnabled(current.isValid());
 }
 
-void TaskWidget::onRefreshClicked()
-{
-    mClient->sendRequest(KimaiRequestFactory::tasks());
-}
-
 void TaskWidget::onStartStopClicked()
 {
     auto taskId = mTaskModel.data(mTaskProxyModel.mapToSource(mUi->lvTasks->currentIndex()), TaskListModel::TaskIDRole).toInt();
-    mClient->sendRequest(KimaiRequestFactory::taskStart(taskId));
 
-    // Delay update request to let kimai update status.
-    QTimer::singleShot(500, [&]() {
-        mClient->sendRequest(KimaiRequestFactory::tasks());
-        mClient->sendRequest(KimaiRequestFactory::activeTimeSheets());
+    auto taskResult = mClient->startTask(taskId);
+    connect(taskResult, &KimaiApiBaseResult::ready, this, [this, taskResult] {
+        updateTasks();
+        taskResult->deleteLater();
     });
+    connect(taskResult, &KimaiApiBaseResult::error, [taskResult] { taskResult->deleteLater(); });
 }
 
 void TaskWidget::onCloseClicked()
 {
     auto taskId = mTaskModel.data(mTaskProxyModel.mapToSource(mUi->lvTasks->currentIndex()), TaskListModel::TaskIDRole).toInt();
-    mClient->sendRequest(KimaiRequestFactory::taskClose(taskId));
+
+    auto taskResult = mClient->closeTask(taskId);
+    connect(taskResult, &KimaiApiBaseResult::ready, this, [this, taskResult] {
+        updateTasks();
+        taskResult->deleteLater();
+    });
+    connect(taskResult, &KimaiApiBaseResult::error, [taskResult] { taskResult->deleteLater(); });
 }

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <QScopedPointer>
-#include <QString>
+#include <atomic>
+#include <optional>
 
-#include "kimaiapi.h"
+#include <QObject>
+#include <QString>
 
 namespace kemai::client {
 
@@ -17,15 +18,6 @@ class KimaiApiBaseResult : public QObject
     Q_OBJECT
 
 public:
-    bool isReady() const;
-    bool hasError() const;
-
-    /*!
-     * Alias to not ready and no error
-     * \return
-     */
-    bool isPending() const;
-
     /*!
      * Mark the request result as ready
      * It will emit the ready finished
@@ -38,9 +30,11 @@ public:
      */
     void setError(const QString& errorMessage);
 
+    QString errorMessage() const;
+
 signals:
     void ready();
-    void error(const QString& errorMessage);
+    void error();
 
 private:
     std::atomic<bool> mIsReady = false;
@@ -81,33 +75,8 @@ public:
         this->markAsReady();
     }
 
-    template<class Q = ResultType> typename std::enable_if<std::is_move_constructible<ResultType>::value, Q>::type takeResult() { return std::move(m_result); }
-
 private:
     ResultType m_result;
-};
-
-class KimaiReply
-{
-public:
-    KimaiReply(ApiMethod method, const QByteArray& data);
-    virtual ~KimaiReply();
-
-    KimaiReply(const KimaiReply& rhs);
-    KimaiReply(KimaiReply&& rhs) noexcept;
-
-    KimaiReply& operator=(const KimaiReply& rhs);
-    KimaiReply& operator=(KimaiReply&& rhs) noexcept;
-
-    ApiMethod method() const;
-
-    bool isValid() const;
-
-    template<class T> T get() const;
-
-private:
-    class KimaiReplyPrivate;
-    QScopedPointer<KimaiReplyPrivate> mD;
 };
 
 } // namespace kemai::client

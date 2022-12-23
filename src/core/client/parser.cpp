@@ -43,6 +43,19 @@ static Task::Status taskStatusFromString(const QString& taskStatus)
     return Task::Status::Undefined;
 }
 
+template<typename T> void safeGetJsonValue(const QString& key, const QJsonObject& obj, T& dest)
+{
+    auto jsval = obj.value(key);
+    if (!jsval.isUndefined())
+    {
+        auto var = jsval.toVariant();
+        if (var.canConvert<T>())
+        {
+            dest = var.value<T>();
+        }
+    }
+}
+
 namespace kemai::client::parser {
 
 bool fromJson(const QJsonObject& jso, Customer& inst)
@@ -74,257 +87,6 @@ bool fromJson(const QJsonObject& jso, Customer& inst)
     return true;
 }
 
-bool fromJson(const QJsonObject& jso, Project& inst)
-{
-    if (!jso.contains("id"))
-    {
-        return false;
-    }
-
-    inst.id = jso.value("id").toInt();
-    safeGetJsonValue("name", jso, inst.name);
-    safeGetJsonValue("comment", jso, inst.comment);
-    safeGetJsonValue("orderNumber", jso, inst.orderNumber);
-    safeGetJsonValue("orderDate", jso, inst.orderDate);
-    safeGetJsonValue("start", jso, inst.start);
-    safeGetJsonValue("end", jso, inst.end);
-    //    safeGetJsonValue("color", jso, inst.color);
-    safeGetJsonValue("budget", jso, inst.budget);
-    safeGetJsonValue("timeBudget", jso, inst.timeBudget);
-    safeGetJsonValue("visible", jso, inst.visible);
-
-    if (jso.contains("customer"))
-    {
-        const auto& jsvCustomer = jso.value("customer");
-        if (jsvCustomer.isObject())
-        {
-            fromJson(jsvCustomer.toObject(), inst.customer);
-        }
-        else if (jsvCustomer.isDouble())
-        {
-            inst.customer.id = jsvCustomer.toInt();
-        }
-    }
-
-    return true;
-}
-
-bool fromJson(const QJsonObject& jso, Activity& inst)
-{
-    if (!jso.contains("id"))
-    {
-        return false;
-    }
-
-    inst.id = jso.value("id").toInt();
-    safeGetJsonValue("name", jso, inst.name);
-    safeGetJsonValue("comment", jso, inst.comment);
-    //    safeGetJsonValue("color", jso, inst.color);
-    safeGetJsonValue("budget", jso, inst.budget);
-    safeGetJsonValue("timeBudget", jso, inst.timeBudget);
-    safeGetJsonValue("visible", jso, inst.visible);
-
-    // handle project-less activity
-    if (jso.contains("project"))
-    {
-        if (!jso.value("project").isNull())
-        {
-            Project project;
-            project.id   = jso.value("project").toInt();
-            inst.project = project;
-        }
-    }
-
-    return true;
-}
-
-bool fromJson(const QJsonObject& jso, TimeSheet& inst)
-{
-    if (!jso.contains("id"))
-    {
-        return false;
-    }
-
-    fromJson(jso.value("project").toObject(), inst.project);
-    fromJson(jso.value("activity").toObject(), inst.activity);
-
-    inst.description = jso.value("description").toString();
-    inst.beginAt     = QDateTime::fromString(jso.value("begin").toString(), Qt::ISODate);
-    inst.endAt       = QDateTime::fromString(jso.value("end").toString(), Qt::ISODate);
-    inst.id          = jso.value("id").toInt();
-    inst.user        = jso.value("user").toInt();
-
-    for (const auto& jstag : jso.value("tags").toArray())
-    {
-        inst.tags << jstag.toString();
-    }
-
-    return true;
-}
-
-bool fromJson(const QJsonObject& jso, User& inst)
-{
-    if (!jso.contains("id"))
-    {
-        return false;
-    }
-
-    inst.id       = jso.value("id").toInt();
-    inst.username = jso.value("username").toString();
-    inst.language = jso.value("language").toString();
-    inst.timezone = jso.value("timezone").toString();
-
-    return true;
-}
-
-bool fromJson(const QJsonObject& jso, Task& inst)
-{
-    if (!jso.contains("id"))
-    {
-        return false;
-    }
-
-    inst.id     = jso.value("id").toInt();
-    inst.title  = jso.value("title").toString();
-    inst.status = taskStatusFromString(jso.value("status").toString());
-    safeGetJsonValue("todo", jso, inst.todo);
-    safeGetJsonValue("description", jso, inst.description);
-    fromJson(jso.value("project").toObject(), inst.project);
-    fromJson(jso.value("activity").toObject(), inst.activity);
-    fromJson(jso.value("user").toObject(), inst.user);
-    inst.endAt = QDateTime::fromString(jso.value("end").toString(), Qt::ISODate);
-    safeGetJsonValue("estimation", jso, inst.estimation);
-
-    if (jso.contains("activeTimesheets"))
-    {
-        const auto& jaTimesheets = jso.value("activeTimesheets").toArray();
-        for (const auto& jvTimesheet : jaTimesheets)
-        {
-            TimeSheet ts;
-            if (fromJson(jvTimesheet.toObject(), ts))
-            {
-                inst.activeTimeSheets << ts;
-            }
-        }
-    }
-
-    return true;
-}
-
-bool fromJson(const QJsonObject& jso, TimeSheetConfig& inst)
-{
-    if (!jso.contains("trackingMode"))
-    {
-        return false;
-    }
-
-    inst.trackingMode = trackingModeFromString(jso.value("trackingMode").toString());
-    return true;
-}
-
-QByteArray toPostData(const QJsonValue& jv)
-{
-    QJsonDocument jdoc;
-    if (jv.isArray())
-    {
-        jdoc = QJsonDocument(jv.toArray());
-    }
-    else
-    {
-        jdoc = QJsonDocument(jv.toObject());
-    }
-    return jdoc.toJson(QJsonDocument::Compact);
-}
-
-QJsonObject toJson(const TimeSheet& inst, TimeSheetConfig::TrackingMode trackingMode)
-{
-    QJsonObject joTimeSheet;
-    if (trackingMode != TimeSheetConfig::TrackingMode::Punch)
-    {
-        joTimeSheet["begin"] = inst.beginAt.toString(Qt::ISODate);
-        if (inst.endAt.isValid())
-        {
-            joTimeSheet["end"] = inst.endAt.toString(Qt::ISODate);
-        }
-    }
-    joTimeSheet["project"]     = inst.project.id;
-    joTimeSheet["activity"]    = inst.activity.id;
-    joTimeSheet["description"] = inst.description;
-    joTimeSheet["tags"]        = inst.tags.join(',');
-    return joTimeSheet;
-}
-
-QJsonObject toJson(const Customer& inst)
-{
-    QJsonObject joCustomer;
-
-    if (inst.id > 0)
-    {
-        joCustomer["id"] = inst.id;
-    }
-
-    joCustomer["name"]     = inst.name;
-    joCustomer["number"]   = inst.number;
-    joCustomer["comment"]  = inst.comment;
-    joCustomer["company"]  = inst.company;
-    joCustomer["address"]  = inst.address;
-    joCustomer["country"]  = inst.countryKey;
-    joCustomer["currency"] = inst.currencyKey;
-    joCustomer["phone"]    = inst.phone;
-    joCustomer["fax"]      = inst.fax;
-    joCustomer["mobile"]   = inst.mobile;
-    joCustomer["email"]    = inst.email;
-    joCustomer["homepage"] = inst.homepage;
-    joCustomer["timezone"] = inst.timezone;
-    //    joCustomer["color"]       = inst.color;
-    joCustomer["budget"]     = inst.budget;
-    joCustomer["timeBudget"] = inst.timeBudget;
-    joCustomer["visible"]    = inst.visible;
-
-    return joCustomer;
-}
-
-QJsonObject toJson(const Project& inst)
-{
-    QJsonObject joProject;
-
-    if (inst.id > 0)
-    {
-        joProject["id"] = inst.id;
-    }
-
-    joProject["name"]        = inst.name;
-    joProject["visible"]     = inst.visible;
-    joProject["comment"]     = inst.comment;
-    joProject["orderNumber"] = inst.orderNumber;
-    joProject["orderDate"]   = inst.orderDate;
-    joProject["start"]       = inst.start;
-    joProject["end"]         = inst.end;
-    joProject["color"]       = inst.color;
-    joProject["customer"]    = inst.customer.id;
-    joProject["budget"]      = inst.budget;
-    joProject["timeBudget"]  = inst.timeBudget;
-
-    return joProject;
-}
-
-QJsonObject toJson(const Activity& inst)
-{
-    QJsonObject joActivity;
-
-    joActivity["name"]    = inst.name;
-    joActivity["visible"] = inst.visible;
-    joActivity["comment"] = inst.comment;
-    if (inst.project)
-    {
-        joActivity["project"] = inst.project->id;
-    }
-    //    joCustomer["color"]       = inst.color;
-    joActivity["budget"]     = inst.budget;
-    joActivity["timeBudget"] = inst.timeBudget;
-
-    return joActivity;
-}
 
 } // namespace kemai::client::parser
 
@@ -392,4 +154,231 @@ template<> Plugin KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject
     plugin.apiPlugin = pluginByName(plugin.name);
 
     return plugin;
+}
+
+template<> Customer KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject) const
+{
+    checkKeysOrThrow("Customer", jsonObject, {"id"});
+
+    Customer customer;
+    customer.id = jsonObject.value("id").toInt();
+    safeGetJsonValue("name", jsonObject, customer.name);
+    safeGetJsonValue("number", jsonObject, customer.number);
+    safeGetJsonValue("comment", jsonObject, customer.comment);
+    safeGetJsonValue("company", jsonObject, customer.company);
+    safeGetJsonValue("address", jsonObject, customer.address);
+    safeGetJsonValue("country", jsonObject, customer.countryKey);
+    safeGetJsonValue("currency", jsonObject, customer.currencyKey);
+    safeGetJsonValue("phone", jsonObject, customer.phone);
+    safeGetJsonValue("fax", jsonObject, customer.fax);
+    safeGetJsonValue("mobile", jsonObject, customer.mobile);
+    safeGetJsonValue("email", jsonObject, customer.email);
+    safeGetJsonValue("homepage", jsonObject, customer.homepage);
+    safeGetJsonValue("timezone", jsonObject, customer.timezone);
+    //    parser::safeGetJsonValue("jsonObject", jsonObject, customer.color);
+    safeGetJsonValue("budget", jsonObject, customer.budget);
+    safeGetJsonValue("timeBudget", jsonObject, customer.timeBudget);
+    safeGetJsonValue("visible", jsonObject, customer.visible);
+
+    return customer;
+}
+
+template<> Project KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject) const
+{
+    checkKeysOrThrow("Project", jsonObject, {"id"});
+
+    Project project;
+    project.id = jsonObject.value("id").toInt();
+    safeGetJsonValue("name", jsonObject, project.name);
+    safeGetJsonValue("comment", jsonObject, project.comment);
+    safeGetJsonValue("orderNumber", jsonObject, project.orderNumber);
+    safeGetJsonValue("orderDate", jsonObject, project.orderDate);
+    safeGetJsonValue("start", jsonObject, project.start);
+    safeGetJsonValue("end", jsonObject, project.end);
+    //    safeGetJsonValue("jsonObject", jsonObject, project.color);
+    safeGetJsonValue("budget", jsonObject, project.budget);
+    safeGetJsonValue("timeBudget", jsonObject, project.timeBudget);
+    safeGetJsonValue("visible", jsonObject, project.visible);
+
+    if (jsonObject.contains("customer"))
+    {
+        const auto& jsvCustomer = jsonObject.value("customer");
+        if (jsvCustomer.isObject())
+        {
+            project.customer = parseObject<Customer>(jsvCustomer.toObject());
+        }
+        else if (jsvCustomer.isDouble())
+        {
+            project.customer.id = jsvCustomer.toInt();
+        }
+    }
+
+    return project;
+}
+
+template<> Activity KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject) const
+{
+    checkKeysOrThrow("Activity", jsonObject, {"id"});
+
+    Activity activity;
+    activity.id = jsonObject.value("id").toInt();
+    safeGetJsonValue("name", jsonObject, activity.name);
+    safeGetJsonValue("comment", jsonObject, activity.comment);
+    //    safeGetJsonValue("color", jsonObject, activity.color);
+    safeGetJsonValue("budget", jsonObject, activity.budget);
+    safeGetJsonValue("timeBudget", jsonObject, activity.timeBudget);
+    safeGetJsonValue("visible", jsonObject, activity.visible);
+
+    // handle project-less activity
+    if (jsonObject.contains("project"))
+    {
+        if (!jsonObject.value("project").isNull())
+        {
+            Project project;
+            project.id       = jsonObject.value("project").toInt();
+            activity.project = project;
+        }
+    }
+
+    return activity;
+}
+
+template<> TimeSheet KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject) const
+{
+    checkKeysOrThrow("TimeSheet", jsonObject, {"id"});
+
+    TimeSheet timeSheet;
+
+    timeSheet.project     = parseObject<Project>(jsonObject.value("project").toObject());
+    timeSheet.activity    = parseObject<Activity>(jsonObject.value("activity").toObject());
+    timeSheet.description = jsonObject.value("description").toString();
+    timeSheet.beginAt     = QDateTime::fromString(jsonObject.value("begin").toString(), Qt::ISODate);
+    timeSheet.endAt       = QDateTime::fromString(jsonObject.value("end").toString(), Qt::ISODate);
+    timeSheet.id          = jsonObject.value("id").toInt();
+    timeSheet.user        = jsonObject.value("user").toInt();
+
+    for (const auto& jsTag : jsonObject.value("tags").toArray())
+    {
+        timeSheet.tags.push_back(jsTag.toString());
+    }
+
+    return timeSheet;
+}
+
+template<> Task KimaiApiTypesParser::parseObject(const QJsonObject& jsonObject) const
+{
+    checkKeysOrThrow("Task", jsonObject, {"id"});
+
+    Task task;
+    task.id     = jsonObject.value("id").toInt();
+    task.title  = jsonObject.value("title").toString();
+    task.status = taskStatusFromString(jsonObject.value("status").toString());
+    safeGetJsonValue("todo", jsonObject, task.todo);
+    safeGetJsonValue("description", jsonObject, task.description);
+    task.project  = parseObject<Project>(jsonObject.value("project").toObject());
+    task.activity = parseObject<Activity>(jsonObject.value("activity").toObject());
+    task.user     = parseObject<User>(jsonObject.value("user").toObject());
+    task.endAt    = QDateTime::fromString(jsonObject.value("end").toString(), Qt::ISODate);
+    safeGetJsonValue("estimation", jsonObject, task.estimation);
+
+    if (jsonObject.contains("activeTimesheets"))
+    {
+        const auto& jaTimeSheets = jsonObject.value("activeTimesheets").toArray();
+        for (const auto& jvTimeSheet : jaTimeSheets)
+        {
+            task.activeTimeSheets.push_back(parseObject<TimeSheet>(jvTimeSheet.toObject()));
+        }
+    }
+
+    return task;
+}
+
+QJsonValue KimaiApiTypesParser::toJson(const TimeSheet& inst, TimeSheetConfig::TrackingMode trackingMode)
+{
+    QJsonObject joTimeSheet;
+    if (trackingMode != TimeSheetConfig::TrackingMode::Punch)
+    {
+        joTimeSheet["begin"] = inst.beginAt.toString(Qt::ISODate);
+        if (inst.endAt.isValid())
+        {
+            joTimeSheet["end"] = inst.endAt.toString(Qt::ISODate);
+        }
+    }
+    joTimeSheet["project"]     = inst.project.id;
+    joTimeSheet["activity"]    = inst.activity.id;
+    joTimeSheet["description"] = inst.description;
+    joTimeSheet["tags"]        = inst.tags.join(',');
+    return joTimeSheet;
+}
+
+QJsonValue KimaiApiTypesParser::toJson(const Customer& inst)
+{
+    QJsonObject joCustomer;
+
+    if (inst.id > 0)
+    {
+        joCustomer["id"] = inst.id;
+    }
+
+    joCustomer["name"]     = inst.name;
+    joCustomer["number"]   = inst.number;
+    joCustomer["comment"]  = inst.comment;
+    joCustomer["company"]  = inst.company;
+    joCustomer["address"]  = inst.address;
+    joCustomer["country"]  = inst.countryKey;
+    joCustomer["currency"] = inst.currencyKey;
+    joCustomer["phone"]    = inst.phone;
+    joCustomer["fax"]      = inst.fax;
+    joCustomer["mobile"]   = inst.mobile;
+    joCustomer["email"]    = inst.email;
+    joCustomer["homepage"] = inst.homepage;
+    joCustomer["timezone"] = inst.timezone;
+    //    joCustomer["color"]       = inst.color;
+    joCustomer["budget"]     = inst.budget;
+    joCustomer["timeBudget"] = inst.timeBudget;
+    joCustomer["visible"]    = inst.visible;
+
+    return joCustomer;
+}
+
+QJsonValue KimaiApiTypesParser::toJson(const Project& inst)
+{
+    QJsonObject joProject;
+
+    if (inst.id > 0)
+    {
+        joProject["id"] = inst.id;
+    }
+
+    joProject["name"]        = inst.name;
+    joProject["visible"]     = inst.visible;
+    joProject["comment"]     = inst.comment;
+    joProject["orderNumber"] = inst.orderNumber;
+    joProject["orderDate"]   = inst.orderDate;
+    joProject["start"]       = inst.start;
+    joProject["end"]         = inst.end;
+    joProject["color"]       = inst.color;
+    joProject["customer"]    = inst.customer.id;
+    joProject["budget"]      = inst.budget;
+    joProject["timeBudget"]  = inst.timeBudget;
+
+    return joProject;
+}
+
+QJsonValue KimaiApiTypesParser::toJson(const Activity& inst)
+{
+    QJsonObject joActivity;
+
+    joActivity["name"]    = inst.name;
+    joActivity["visible"] = inst.visible;
+    joActivity["comment"] = inst.comment;
+    if (inst.project)
+    {
+        joActivity["project"] = inst.project->id;
+    }
+    //    joCustomer["color"]       = inst.color;
+    joActivity["budget"]     = inst.budget;
+    joActivity["timeBudget"] = inst.timeBudget;
+
+    return joActivity;
 }

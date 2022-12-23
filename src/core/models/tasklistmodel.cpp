@@ -39,7 +39,7 @@ QVariant TaskListModel::data(const QModelIndex& index, int role) const
     }
 
     case Qt::DecorationRole:
-        return task.activeTimeSheets.isEmpty() ? QIcon() : qApp->style()->standardIcon(QStyle::SP_ArrowRight);
+        return task.activeTimeSheets.empty() ? QIcon() : qApp->style()->standardIcon(QStyle::SP_ArrowRight);
 
     default:
         return {};

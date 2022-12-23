@@ -1,7 +1,6 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 
-#include "client/kimairequestfactory.h"
 #include "settings.h"
 
 #include <QAction>
@@ -155,10 +154,15 @@ void SettingsDialog::onBtTestClicked()
     mKimaiClient->setUsername(mUi->leUsername->text());
     mKimaiClient->setToken(mUi->leToken->text());
 
-    mVersionResult = mKimaiClient->requestKimaiVersion();
-    connect(mVersionResult.get(), &KimaiApiBaseResult::ready, this,
-            [this]() { mUi->testResultLabel->setText(tr("Connected to Kimai %1").arg(mVersionResult->getResult().kimai.toString())); });
-    connect(mVersionResult.get(), &KimaiApiBaseResult::error, this, [this](const QString& error) { mUi->testResultLabel->setText(error); });
+    auto versionResult = mKimaiClient->requestKimaiVersion();
+    connect(versionResult, &KimaiApiBaseResult::ready, this, [this, versionResult]() {
+        mUi->testResultLabel->setText(tr("Connected to Kimai %1").arg(versionResult->getResult().kimai.toString()));
+        versionResult->deleteLater();
+    });
+    connect(versionResult, &KimaiApiBaseResult::error, this, [this, versionResult]() {
+        mUi->testResultLabel->setText(versionResult->errorMessage());
+        versionResult->deleteLater();
+    });
 }
 
 void SettingsDialog::onProfileFieldValueChanged()

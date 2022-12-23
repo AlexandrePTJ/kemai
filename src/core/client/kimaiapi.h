@@ -9,43 +9,10 @@
 
 namespace kemai::client {
 
-// available requests
-enum class ApiMethod
-{
-    Undefined,
-    Version,
-    Customers,
-    CustomerAdd,
-    Projects,
-    ProjectAdd,
-    Activities,
-    ActivityAdd,
-    ActiveTimeSheets,
-    TimeSheets,
-    Users,
-    MeUsers,
-    Tags,
-    Plugins,
-    Tasks,
-    TaskLog,
-    TaskStart,
-    TaskStop,
-    TaskClose,
-    TimeSheetConfig
-};
-
 enum class ApiPlugin
 {
     Unknown,
     TaskManagement
-};
-
-// available verbs
-enum class HttpVerb
-{
-    Get,
-    Post,
-    Patch
 };
 
 // reply structs
@@ -77,7 +44,7 @@ struct Customer
     double budget  = 0.0;
     int timeBudget = 0; // seconds
 };
-using Customers = QVector<Customer>;
+using Customers = std::vector<Customer>;
 
 struct Project
 {
@@ -94,7 +61,7 @@ struct Project
     double budget  = 0.0;
     int timeBudget = 0;
 };
-using Projects = QVector<Project>;
+using Projects = std::vector<Project>;
 
 struct Activity
 {
@@ -107,7 +74,7 @@ struct Activity
     int timeBudget = 0;
     std::optional<Project> project;
 };
-using Activities = QVector<Activity>;
+using Activities = std::vector<Activity>;
 
 struct TimeSheet
 {
@@ -120,7 +87,7 @@ struct TimeSheet
     QDateTime endAt;
     Tags tags;
 };
-using TimeSheets = QVector<TimeSheet>;
+using TimeSheets = std::vector<TimeSheet>;
 
 struct User
 {
@@ -152,7 +119,7 @@ struct Task
     int estimation = 0;
     TimeSheets activeTimeSheets;
 };
-using Tasks = QVector<Task>;
+using Tasks = std::vector<Task>;
 
 struct Plugin
 {
@@ -175,7 +142,6 @@ struct TimeSheetConfig
     TrackingMode trackingMode = TrackingMode::Default;
 };
 
-QString apiMethodToString(ApiMethod method);
 ApiPlugin pluginByName(const QString& pluginName);
 
 } // namespace kemai::client
