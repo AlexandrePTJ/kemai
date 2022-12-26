@@ -47,9 +47,9 @@ public:
     QNetworkRequest prepareRequest(ApiMethod method, const std::map<QString, QString>& parameters = {}, const QByteArray& data = {},
                                    const QString& subPath = "") const;
 
-    QNetworkReply* sendGetRequest(const QNetworkRequest& networkRequest);
-    QNetworkReply* sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data);
-    QNetworkReply* sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data);
+    QNetworkReply* sendGetRequest(const QNetworkRequest& networkRequest) const;
+    QNetworkReply* sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const;
+    QNetworkReply* sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const;
 
     template<class ResultType> KimaiApiResult<ResultType>* processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply* networkReply)
     {

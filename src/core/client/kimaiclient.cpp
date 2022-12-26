@@ -96,7 +96,11 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
     auto url = QUrl::fromUserInput(host);
 
     // Update existing path to work with custom path instances
-    auto path = QString("%1/api/%2/%3").arg(url.path(), apiMethodToString(method), subPath);
+    auto path = QString("%1/api/%2").arg(url.path(), apiMethodToString(method));
+    if (!subPath.isEmpty())
+    {
+        path = QString("%1/%2").arg(path, subPath);
+    }
     url.setPath(path);
 
     QUrlQuery query;
@@ -124,19 +128,19 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
     return networkRequest;
 }
 
-QNetworkReply* KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkRequest& networkRequest)
+QNetworkReply* KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkRequest& networkRequest) const
 {
     spdlog::debug("===> [GET] {}", networkRequest.url().toString().toStdString());
     return networkAccessManager->get(networkRequest);
 }
 
-QNetworkReply* KimaiClient::KimaiClientPrivate::sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data)
+QNetworkReply* KimaiClient::KimaiClientPrivate::sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const
 {
     spdlog::debug("===> [POST] {}", networkRequest.url().toString().toStdString());
     return networkAccessManager->post(networkRequest, data);
 }
 
-QNetworkReply* KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data)
+QNetworkReply* KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const
 {
     spdlog::debug("===> [PATCH] {}", networkRequest.url().toString().toStdString());
     return networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);

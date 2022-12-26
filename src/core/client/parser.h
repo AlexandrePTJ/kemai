@@ -11,14 +11,6 @@
 
 #include "kimaiapi.h"
 
-namespace kemai::client::parser {
-
-bool fromJson(const QJsonObject& jso, Customer& inst);
-
-QByteArray toPostData(const QJsonValue& jv);
-
-} // namespace kemai::client::parser
-
 namespace kemai::client {
 
 class KimaiApiTypesParser
@@ -45,7 +37,7 @@ public:
         {
             throw std::runtime_error("JSON value is not an object");
         }
-        return parseObject<T>(m_jsonDocument.object());
+        return parseValue<T>(m_jsonDocument.object());
     }
 
     static QJsonValue toJson(const TimeSheet& inst, TimeSheetConfig::TrackingMode trackingMode);
@@ -54,18 +46,14 @@ public:
     static QJsonValue toJson(const Activity& inst);
 
 private:
-    template<class T> T parseObject(const QJsonObject& jsonObject) const;
+    template<class T> T parseValue(const QJsonValue& jsonValue) const;
 
     template<class T> std::vector<T> parseArrayOf(const QJsonArray& jsonArray) const
     {
         std::vector<T> values;
         for (const auto& jsonValue : jsonArray)
         {
-            if (!jsonValue.isObject())
-            {
-                throw std::runtime_error("Unexpected json value type");
-            }
-            values.push_back(parseObject<T>(jsonValue.toObject()));
+            values.push_back(parseValue<T>(jsonValue));
         }
         return values;
     }

@@ -1,5 +1,7 @@
 #include "kimaireply.h"
 
+#include <spdlog/spdlog.h>
+
 using namespace kemai::client;
 
 void KimaiApiBaseResult::markAsReady()
@@ -11,6 +13,7 @@ void KimaiApiBaseResult::markAsReady()
 void KimaiApiBaseResult::setError(const QString &errorMessage)
 {
     mError = errorMessage;
+    spdlog::error("<=== {}", errorMessage.toStdString());
     emit error();
 }
 
