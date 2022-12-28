@@ -41,8 +41,8 @@ private:
 
     void updateControls();
 
-    void processCustomersResult(client::CustomersResult customersResult);
     void processActiveTimeSheetsResult(client::TimeSheetsResult timeSheetsResult);
+    void processCustomersResult(client::CustomersResult customersResult);
     void processProjectsResult(client::ProjectsResult projectsResult);
     void processActivitiesResult(client::ActivitiesResult activitiesResult);
     void processTimeSheetResult(client::TimeSheetResult timeSheetResult);
@@ -55,4 +55,3 @@ private:
 };
 
 } // namespace kemai::app
-

@@ -13,7 +13,7 @@ using namespace kemai::client;
 /*
  * Static helpers
  */
-QByteArray toPostData(const QJsonValue& jsonValue)
+static QByteArray toPostData(const QJsonValue& jsonValue)
 {
     QJsonDocument jdoc;
     if (jsonValue.isArray())
@@ -27,7 +27,7 @@ QByteArray toPostData(const QJsonValue& jsonValue)
     return jdoc.toJson(QJsonDocument::Compact);
 }
 
-QString kemai::client::apiMethodToString(ApiMethod method)
+static QString kemai::client::apiMethodToString(ApiMethod method)
 {
     switch (method)
     {

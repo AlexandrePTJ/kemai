@@ -259,26 +259,6 @@ void ActivityWidget::updateControls()
     emit currentActivityChanged(enable);
 }
 
-void ActivityWidget::processCustomersResult(CustomersResult customersResult)
-{
-    const auto& customers = customersResult->getResult();
-    if (!customers.empty())
-    {
-        mUi->cbCustomer->clear();
-        mUi->cbCustomer->addItem("");
-        for (const auto& customer : customers)
-        {
-            mUi->cbCustomer->addItem(customer.name, customer.id);
-        }
-    }
-
-    if (mCurrentTimeSheet)
-    {
-        mUi->cbCustomer->setCurrentText(mCurrentTimeSheet->project.customer.name);
-    }
-    customersResult->deleteLater();
-}
-
 void ActivityWidget::processActiveTimeSheetsResult(TimeSheetsResult timeSheetsResult)
 {
     const auto& timeSheets = timeSheetsResult->getResult();
@@ -304,6 +284,34 @@ void ActivityWidget::processActiveTimeSheetsResult(TimeSheetsResult timeSheetsRe
     timeSheetsResult->deleteLater();
 }
 
+void ActivityWidget::processCustomersResult(CustomersResult customersResult)
+{
+    const auto& customers = customersResult->getResult();
+    if (!customers.empty())
+    {
+        mUi->cbCustomer->clear();
+        mUi->cbCustomer->addItem("");
+        for (const auto& customer : customers)
+        {
+            mUi->cbCustomer->addItem(customer.name, customer.id);
+        }
+    }
+
+    if (mCurrentTimeSheet)
+    {
+        auto customerIndex = mUi->cbCustomer->findData(mCurrentTimeSheet->project.customer.id);
+        if (customerIndex >= 0)
+        {
+            mUi->cbCustomer->setCurrentIndex(customerIndex);
+        }
+        else
+        {
+            spdlog::error("Cannot find '{}' customer", mCurrentTimeSheet->project.customer.name.toStdString());
+        }
+    }
+    customersResult->deleteLater();
+}
+
 void ActivityWidget::processProjectsResult(ProjectsResult projectsResult)
 {
     const auto& projects = projectsResult->getResult();
@@ -320,7 +328,15 @@ void ActivityWidget::processProjectsResult(ProjectsResult projectsResult)
 
     if (mCurrentTimeSheet)
     {
-        mUi->cbProject->setCurrentText(mCurrentTimeSheet->project.name);
+        auto projectIndex = mUi->cbProject->findData(mCurrentTimeSheet->project.id);
+        if (projectIndex >= 0)
+        {
+            mUi->cbProject->setCurrentIndex(projectIndex);
+        }
+        else
+        {
+            spdlog::error("Cannot find '{}' project", mCurrentTimeSheet->project.name.toStdString());
+        }
     }
 
     projectsResult->deleteLater();
@@ -342,7 +358,15 @@ void ActivityWidget::processActivitiesResult(ActivitiesResult activitiesResult)
 
     if (mCurrentTimeSheet)
     {
-        mUi->cbActivity->setCurrentText(mCurrentTimeSheet->activity.name);
+        auto activityIndex = mUi->cbActivity->findData(mCurrentTimeSheet->activity.id);
+        if (activityIndex >= 0)
+        {
+            mUi->cbActivity->setCurrentIndex(activityIndex);
+        }
+        else
+        {
+            spdlog::error("Cannot find '{}' activity", mCurrentTimeSheet->activity.name.toStdString());
+        }
     }
     activitiesResult->deleteLater();
 }

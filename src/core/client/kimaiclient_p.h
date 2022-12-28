@@ -61,7 +61,7 @@ public:
                 try
                 {
                     auto replyData = networkReply->readAll();
-                    spdlog::debug("<=== {}", replyData.toStdString());
+                    spdlog::debug("<=== [{}]: {}", apiMethodToString(method).toStdString(), replyData.toStdString());
 
                     KimaiApiTypesParser parser(replyData);
                     result->setResult(parser.getValueOf<ResultType>());
@@ -92,7 +92,7 @@ public:
                 try
                 {
                     auto replyData = networkReply->readAll();
-                    spdlog::debug("<=== {}", replyData.toStdString());
+                    spdlog::debug("<=== [{}]: {}", apiMethodToString(method).toStdString(), replyData.toStdString());
 
                     KimaiApiTypesParser parser(replyData);
                     result->setResult(parser.getArrayOf<ResultType>());
