@@ -27,7 +27,7 @@ static QByteArray toPostData(const QJsonValue& jsonValue)
     return jdoc.toJson(QJsonDocument::Compact);
 }
 
-static QString kemai::client::apiMethodToString(ApiMethod method)
+QString kemai::client::apiMethodToString(ApiMethod method)
 {
     switch (method)
     {
