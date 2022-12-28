@@ -29,7 +29,7 @@ signals:
     void taskStopped();
 
 private:
-    void onClientReply(const client::KimaiReply& reply);
+    void updateTasks();
     void onTaskItemChanged(const QModelIndex& current, const QModelIndex& previous);
     void onRefreshClicked();
     void onStartStopClicked();

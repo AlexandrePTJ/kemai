@@ -26,8 +26,6 @@ public:
 private:
     void onProfilesListCurrentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
     void onBtTestClicked();
-    void onClientError(const QString& errorMsg);
-    void onClientReply(const client::KimaiReply& reply);
     void onProfileFieldValueChanged();
     void onProfileAddButtonClicked();
     void onProfileDelButtonClicked();

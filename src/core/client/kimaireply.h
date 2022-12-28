@@ -1,33 +1,82 @@
 #pragma once
 
-#include <QScopedPointer>
-#include <QString>
+#include <atomic>
+#include <optional>
 
-#include "kimaiapi.h"
+#include <QObject>
+#include <QString>
 
 namespace kemai::client {
 
-class KimaiReply
+/*!
+ * API Request result base class
+ * This class is just here because of Q_OBJECT limitation : This macro can't be used in template class
+ * So we define a base class that just defines the signal that we want to emit in the templated class
+ */
+class KimaiApiBaseResult : public QObject
 {
+    Q_OBJECT
+
 public:
-    KimaiReply(ApiMethod method, const QByteArray& data);
-    virtual ~KimaiReply();
+    /*!
+     * Mark the request result as ready
+     * It will emit the ready finished
+     */
+    void markAsReady();
 
-    KimaiReply(const KimaiReply& rhs);
-    KimaiReply(KimaiReply&& rhs) noexcept;
+    /*!
+     * Mark the request result as ready
+     * It will emit the ready finished
+     */
+    void setError(const QString& errorMessage);
 
-    KimaiReply& operator=(const KimaiReply& rhs);
-    KimaiReply& operator=(KimaiReply&& rhs) noexcept;
+    QString errorMessage() const;
 
-    ApiMethod method() const;
-
-    bool isValid() const;
-
-    template<class T> T get() const;
+signals:
+    void ready();
+    void error();
 
 private:
-    class KimaiReplyPrivate;
-    QScopedPointer<KimaiReplyPrivate> mD;
+    std::atomic<bool> mIsReady = false;
+    std::optional<QString> mError;
+};
+
+template<class ResultType> class KimaiApiResult : public KimaiApiBaseResult
+{
+public:
+    /*!
+     * Return the wrapped result
+     * Note that the return result is undefined before ready signal receiving
+     * \return						A reference on the request result
+     */
+    const ResultType& getResult() const { return m_result; }
+
+    /*!
+     * Set the request result
+     * Calling this method lead to the ready signal emission
+     * \param[in]	result   		Reference on the request result
+     */
+    void setResult(const ResultType& result)
+    {
+        m_result = result;
+
+        this->markAsReady();
+    }
+
+    /*!
+     * Set the request result (move version)
+     * Calling this method lead to the ready signal emission
+     * \param[in]	result   		Reference on the request result
+     */
+    void setResult(ResultType&& result)
+    {
+        m_result = std::move(result);
+
+        this->markAsReady();
+    }
+
+private:
+    ResultType m_result;
 };
 
 } // namespace kemai::client

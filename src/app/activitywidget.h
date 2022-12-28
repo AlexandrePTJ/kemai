@@ -27,8 +27,6 @@ signals:
     void currentActivityChanged(bool started);
 
 private:
-    void onClientReply(const client::KimaiReply& reply);
-
     void onCbCustomerTextChanged(const QString& text);
     void onCbProjectTextChanged(const QString& text);
     void onCbActivityTextChanged(const QString& text);
@@ -43,7 +41,12 @@ private:
 
     void updateControls();
 
-private:
+    void processActiveTimeSheetsResult(client::TimeSheetsResult timeSheetsResult);
+    void processCustomersResult(client::CustomersResult customersResult);
+    void processProjectsResult(client::ProjectsResult projectsResult);
+    void processActivitiesResult(client::ActivitiesResult activitiesResult);
+    void processTimeSheetResult(client::TimeSheetResult timeSheetResult);
+
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;
     QSharedPointer<client::KimaiClient> mClient;

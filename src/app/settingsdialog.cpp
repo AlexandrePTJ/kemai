@@ -1,7 +1,6 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 
-#include "client/kimairequestfactory.h"
 #include "settings.h"
 
 #include <QAction>
@@ -38,8 +37,6 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::S
         }
     }
 
-    connect(mKimaiClient.data(), &KimaiClient::requestError, this, &SettingsDialog::onClientError);
-    connect(mKimaiClient.data(), &KimaiClient::replyReceived, this, &SettingsDialog::onClientReply);
     connect(mUi->testButton, &QPushButton::clicked, this, &SettingsDialog::onBtTestClicked);
 
     connect(mActToggleTokenVisible, &QAction::triggered, [&]() {
@@ -156,25 +153,16 @@ void SettingsDialog::onBtTestClicked()
     mKimaiClient->setHost(mUi->leHost->text());
     mKimaiClient->setUsername(mUi->leUsername->text());
     mKimaiClient->setToken(mUi->leToken->text());
-    mKimaiClient->sendRequest(KimaiRequestFactory::version());
-}
 
-void SettingsDialog::onClientError(const QString& errorMsg)
-{
-    mUi->testResultLabel->setText(errorMsg);
-}
-
-void SettingsDialog::onClientReply(const KimaiReply& reply)
-{
-    if (!reply.isValid())
-    {
-        mUi->testResultLabel->setText(tr("Invalid reply."));
-    }
-    else
-    {
-        auto version = reply.get<KimaiVersion>();
-        mUi->testResultLabel->setText(tr("Connected to Kimai %1").arg(version.kimai.toString()));
-    }
+    auto versionResult = mKimaiClient->requestKimaiVersion();
+    connect(versionResult, &KimaiApiBaseResult::ready, this, [this, versionResult]() {
+        mUi->testResultLabel->setText(tr("Connected to Kimai %1").arg(versionResult->getResult().kimai.toString()));
+        versionResult->deleteLater();
+    });
+    connect(versionResult, &KimaiApiBaseResult::error, this, [this, versionResult]() {
+        mUi->testResultLabel->setText(versionResult->errorMessage());
+        versionResult->deleteLater();
+    });
 }
 
 void SettingsDialog::onProfileFieldValueChanged()
@@ -216,7 +204,8 @@ void SettingsDialog::onProfileDelButtonClicked()
     auto item = mUi->profilesListWidget->takeItem(mUi->profilesListWidget->currentRow());
     if (item != nullptr)
     {
-        auto it = std::find_if(m_settings.profiles.begin(), m_settings.profiles.end(), [profileId = item->data(Qt::UserRole).toUuid()](const Settings::Profile& profile) { return profile.id == profileId; });
+        auto it = std::find_if(m_settings.profiles.begin(), m_settings.profiles.end(),
+                               [profileId = item->data(Qt::UserRole).toUuid()](const Settings::Profile& profile) { return profile.id == profileId; });
         if (it != m_settings.profiles.end())
         {
             auto pos = std::distance(m_settings.profiles.begin(), it);

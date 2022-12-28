@@ -38,9 +38,9 @@ private:
     void setViewActionsEnabled(bool enable);
     void updateProfilesMenu();
     void processAutoConnect();
+    void requestPlugins();
 
     void onClientError(const QString& errorMsg);
-    void onClientReply(const client::KimaiReply& reply);
     void onActionSettingsTriggered();
     void onActionCheckUpdateTriggered();
     void onActionOpenHostTriggered();
