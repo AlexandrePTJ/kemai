@@ -60,6 +60,8 @@ jobs:
       - if: contains(matrix.os, 'ubuntu') && startsWith(matrix.qt_version, '6')
         name: Create Linux package
         run: |
+          sudo add-apt-repository universe
+          sudo apt install libfuse2
           chmod +x bundle/linux/create_appimage.sh
           ./bundle/linux/create_appimage.sh --qt_path $Qt6_DIR --build_path cmake-build-release
 
