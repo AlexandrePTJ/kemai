@@ -10,42 +10,42 @@ set(SRCS
         client/kimaiclient.cpp
         client/kimaireply.cpp
         client/parser.cpp
-        models/taskfilterproxymodel.cpp
-        models/tasklistmodel.cpp
-        updater/kemaiupdater.cpp
         context/kemaisession.cpp
-        settings/settings.cpp
         gui/activitydialog.cpp
         gui/activitywidget.cpp
         gui/customerdialog.cpp
-        gui/datareader.cpp
         gui/durationedit.cpp
-        main.cpp
         gui/mainwindow.cpp
         gui/projectdialog.cpp
         gui/settingsdialog.cpp
-        gui/taskwidget.cpp)
+        gui/taskwidget.cpp
+        main.cpp
+        misc/datareader.cpp
+        models/taskfilterproxymodel.cpp
+        models/tasklistmodel.cpp
+        settings/settings.cpp
+        updater/kemaiupdater.cpp)
 
-set(PUB_HDRS
+set(HDRS
         client/kimaiapi.h
         client/kimaiclient.h
+        client/kimaiclient_p.h
         client/kimaireply.h
-        models/taskfilterproxymodel.h
-        models/tasklistmodel.h
-        updater/kemaiupdater.h
+        client/parser.h
         context/kemaisession.h
-        settings/settings.h
         gui/activitydialog.h
         gui/activitywidget.h
         gui/customerdialog.h
-        gui/datareader.h
         gui/durationedit.h
         gui/mainwindow.h
         gui/projectdialog.h
         gui/settingsdialog.h
         gui/taskwidget.h
-        client/kimaiclient_p.h
-        client/parser.h
+        misc/datareader.h
+        models/taskfilterproxymodel.h
+        models/tasklistmodel.h
+        settings/settings.h
+        updater/kemaiupdater.h
         updater/kemaiupdater_p.h)
 
 # Forms
