@@ -161,7 +161,7 @@
   <customwidget>
    <class>kemai::DurationEdit</class>
    <extends>QLineEdit</extends>
-   <header>durationedit.h</header>
+   <header>gui/durationedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
