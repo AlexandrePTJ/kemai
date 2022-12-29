@@ -263,7 +263,13 @@ void ActivityWidget::processActiveTimeSheetsResult(TimeSheetsResult timeSheetsRe
 
     if (!timeSheets.empty())
     {
-        mCurrentTimeSheet.reset(new TimeSheet(timeSheets.at(0)));
+        auto receivedTimeSheet = timeSheets.at(0);
+        if (mCurrentTimeSheet && receivedTimeSheet.id == mCurrentTimeSheet->id)
+        {
+            return;
+        }
+
+        mCurrentTimeSheet.reset(new TimeSheet(receivedTimeSheet));
         mUi->dteStartedAt->setDateTime(mCurrentTimeSheet->beginAt);
         mUi->pteDescription->setPlainText(mCurrentTimeSheet->description);
         mUi->leTags->setText(mCurrentTimeSheet->tags.join(','));

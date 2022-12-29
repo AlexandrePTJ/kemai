@@ -10,11 +10,6 @@ struct KemaiSession
     Plugins plugins;
     User me;
     TimeSheetConfig timeSheetConfig;
-
-    /*
-     * Helpers methods
-     */
-    bool isPluginAvailable(ApiPlugin apiPlugin);
 };
 
 } // namespace kemai

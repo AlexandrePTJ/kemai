@@ -24,6 +24,11 @@ using namespace kemai;
 static const auto FirstRequestDelayMs                 = 100;
 static const auto MinimalKimaiVersionForPluginRequest = QVersionNumber(1, 14, 1);
 
+static bool hasPlugin(const Plugins& plugins, ApiPlugin apiPlugin)
+{
+    return std::any_of(plugins.begin(), plugins.end(), [apiPlugin](const Plugin& plugin) { return plugin.apiPlugin == apiPlugin; });
+}
+
 /*
  * Class impl
  */
@@ -261,7 +266,7 @@ void MainWindow::setViewActionsEnabled(bool enable)
     bool taskPluginEnabled = false;
     if (mClient)
     {
-        taskPluginEnabled = mSession->isPluginAvailable(ApiPlugin::TaskManagement);
+        taskPluginEnabled = hasPlugin(mSession->plugins, ApiPlugin::TaskManagement);
     }
     mActViewTasks->setEnabled(enable && taskPluginEnabled);
 }
@@ -334,7 +339,7 @@ void MainWindow::requestPlugins()
     connect(pluginsResult, &KimaiApiBaseResult::ready, this, [this, pluginsResult]() {
         mSession->plugins = pluginsResult->getResult();
 
-        bool haveTaskPlugin = mSession->isPluginAvailable(ApiPlugin::TaskManagement);
+        bool haveTaskPlugin = hasPlugin(mSession->plugins, ApiPlugin::TaskManagement);
         mActViewTasks->setEnabled(haveTaskPlugin);
         if (haveTaskPlugin)
         {
