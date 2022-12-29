@@ -21,8 +21,7 @@ public:
     TaskWidget(QWidget* parent = nullptr);
     ~TaskWidget() override;
 
-    void setKimaiClient(QSharedPointer<KimaiClient> kimaiClient);
-    void setKemaiSession(QSharedPointer<KemaiSession> kemaiSession);
+    void setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession);
 
 signals:
     void taskStarted();
@@ -36,7 +35,7 @@ private:
     void onCloseClicked();
 
     Ui::TaskWidget* mUi;
-    QSharedPointer<KimaiClient> mClient;
+    std::shared_ptr<KemaiSession> mSession;
     TaskListModel mTaskModel;
     TaskFilterProxyModel mTaskProxyModel;
 };

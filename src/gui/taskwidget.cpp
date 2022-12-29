@@ -30,25 +30,21 @@ TaskWidget::~TaskWidget()
     delete mUi;
 }
 
-void TaskWidget::setKimaiClient(QSharedPointer<KimaiClient> kimaiClient)
+void TaskWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
 {
-    mClient = std::move(kimaiClient);
-    if (mClient)
+    mSession = std::move(kemaiSession);
+    if (mSession)
     {
+        mTaskProxyModel.setUserId(mSession->me().id);
         updateTasks();
     }
 
-    setEnabled(mClient != nullptr);
-}
-
-void TaskWidget::setKemaiSession(QSharedPointer<KemaiSession> kemaiSession)
-{
-    mTaskProxyModel.setUserId(kemaiSession->me.id);
+    setEnabled(mSession != nullptr);
 }
 
 void TaskWidget::updateTasks()
 {
-    auto tasksResult = mClient->requestTasks();
+    auto tasksResult = mSession->client()->requestTasks();
 
     connect(tasksResult, &KimaiApiBaseResult::ready, this, [this, tasksResult] {
         mTaskModel.setTasks(tasksResult->getResult());
@@ -67,7 +63,7 @@ void TaskWidget::onStartStopClicked()
 {
     auto taskId = mTaskModel.data(mTaskProxyModel.mapToSource(mUi->lvTasks->currentIndex()), TaskListModel::TaskIDRole).toInt();
 
-    auto taskResult = mClient->startTask(taskId);
+    auto taskResult = mSession->client()->startTask(taskId);
     connect(taskResult, &KimaiApiBaseResult::ready, this, [this, taskResult] {
         updateTasks();
         taskResult->deleteLater();
@@ -79,7 +75,7 @@ void TaskWidget::onCloseClicked()
 {
     auto taskId = mTaskModel.data(mTaskProxyModel.mapToSource(mUi->lvTasks->currentIndex()), TaskListModel::TaskIDRole).toInt();
 
-    auto taskResult = mClient->closeTask(taskId);
+    auto taskResult = mSession->client()->closeTask(taskId);
     connect(taskResult, &KimaiApiBaseResult::ready, this, [this, taskResult] {
         updateTasks();
         taskResult->deleteLater();

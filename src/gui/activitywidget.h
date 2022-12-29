@@ -20,8 +20,7 @@ public:
     ActivityWidget(QWidget* parent = nullptr);
     ~ActivityWidget() override;
 
-    void setKimaiClient(QSharedPointer<KimaiClient> kimaiClient);
-    void setKemaiSession(QSharedPointer<KemaiSession> kemaiSession);
+    void setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession);
 
 signals:
     void currentActivityChanged(bool started);
@@ -39,9 +38,10 @@ private:
 
     void onSecondTimeout();
 
+    void onSessionCurrentTimeSheetChanged();
+
     void updateControls();
 
-    void processActiveTimeSheetsResult(TimeSheetsResult timeSheetsResult);
     void processCustomersResult(CustomersResult customersResult);
     void processProjectsResult(ProjectsResult projectsResult);
     void processActivitiesResult(ActivitiesResult activitiesResult);
@@ -49,9 +49,7 @@ private:
 
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;
-    QSharedPointer<KimaiClient> mClient;
-    QSharedPointer<KemaiSession> mSession;
-    QScopedPointer<TimeSheet> mCurrentTimeSheet;
+    std::shared_ptr<KemaiSession> mSession;
 };
 
 } // namespace kemai

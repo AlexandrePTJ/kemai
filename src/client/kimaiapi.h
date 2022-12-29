@@ -1,10 +1,10 @@
 #pragma once
 
 #include <optional>
+#include <vector>
 
 #include <QDateTime>
 #include <QString>
-#include <QVector>
 #include <QVersionNumber>
 
 namespace kemai {

@@ -3,7 +3,7 @@
 #include <QActionGroup>
 #include <QMainWindow>
 #include <QMenuBar>
-#include <QSharedPointer>
+
 #include <QSystemTrayIcon>
 
 #include "client/kimaiclient.h"
@@ -33,14 +33,13 @@ protected:
     void hideEvent(QHideEvent* event) override;
 
 private:
-    void createKimaiClient(const Settings::Profile& profile);
+    void createKemaiSession(const Settings::Profile& profile);
     void showSelectedView();
     void setViewActionsEnabled(bool enable);
     void updateProfilesMenu();
     void processAutoConnect();
-    void requestPlugins();
 
-    void onClientError(const QString& errorMsg);
+    void onPluginsChanged();
     void onActionSettingsTriggered();
     void onActionCheckUpdateTriggered();
     void onActionOpenHostTriggered();
@@ -51,8 +50,7 @@ private:
 
     Ui::MainWindow* mUi;
     KemaiUpdater mUpdater;
-    QSharedPointer<KimaiClient> mClient;
-    QSharedPointer<KemaiSession> mSession;
+    std::shared_ptr<KemaiSession> mSession;
 
     // Stacked widget (ownership is transferred, don't try to delete them)
     ActivityWidget* mActivityWidget = nullptr;

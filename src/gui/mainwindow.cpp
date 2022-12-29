@@ -21,13 +21,7 @@ using namespace kemai;
 /*
  * Static helpers
  */
-static const auto FirstRequestDelayMs                 = 100;
-static const auto MinimalKimaiVersionForPluginRequest = QVersionNumber(1, 14, 1);
-
-static bool hasPlugin(const Plugins& plugins, ApiPlugin apiPlugin)
-{
-    return std::any_of(plugins.begin(), plugins.end(), [apiPlugin](const Plugin& plugin) { return plugin.apiPlugin == apiPlugin; });
-}
+static const auto FirstRequestDelayMs = 100;
 
 /*
  * Class impl
@@ -111,9 +105,6 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     mActivityWidget = new ActivityWidget;
     mUi->stackedWidget->addWidget(mActivityWidget);
 
-    mTaskWidget = new TaskWidget;
-    mUi->stackedWidget->addWidget(mTaskWidget);
-
     updateProfilesMenu();
 
     /*
@@ -174,70 +165,37 @@ void MainWindow::hideEvent(QHideEvent* event)
     Settings::save(settings);
 }
 
-void MainWindow::createKimaiClient(const Settings::Profile& profile)
+void MainWindow::createKemaiSession(const Settings::Profile& profile)
 {
-    // Clear previous client usage
-    if (mClient)
+    // Clear previous session
+    if (mSession)
     {
-        mActivityWidget->setKimaiClient(nullptr);
+        mActivityWidget->setKemaiSession(nullptr);
+        if (mTaskWidget != nullptr)
+        {
+            mUi->stackedWidget->removeWidget(mTaskWidget);
+
+            mTaskWidget->deleteLater();
+            mTaskWidget = nullptr;
+        }
     }
 
     auto settings = Settings::load();
     if (settings.isReady())
     {
-        mClient = QSharedPointer<KimaiClient>::create();
+        auto kimaiClient = std::make_shared<KimaiClient>();
 
-        mClient->setHost(profile.host);
-        mClient->setUsername(profile.username);
-        mClient->setToken(profile.token);
+        kimaiClient->setHost(profile.host);
+        kimaiClient->setUsername(profile.username);
+        kimaiClient->setToken(profile.token);
 
-        mSession = QSharedPointer<KemaiSession>::create();
+        mSession = std::make_shared<KemaiSession>(kimaiClient);
+        connect(mSession.get(), &KemaiSession::pluginsChanged, this, &MainWindow::onPluginsChanged);
 
-        connect(mClient.data(), &KimaiClient::requestError, this, &MainWindow::onClientError);
-
-        // send some request to identify instance
-        auto meResult = mClient->requestMeUserInfo();
-        connect(meResult, &KimaiApiBaseResult::ready, this, [this, meResult]() {
-            mSession->me = meResult->getResult();
-            meResult->deleteLater();
-        });
-        connect(meResult, &KimaiApiBaseResult::error, this, [this, meResult]() {
-            onClientError(meResult->errorMessage());
-            meResult->deleteLater();
-        });
-
-        auto versionResult = mClient->requestKimaiVersion();
-        connect(versionResult, &KimaiApiBaseResult::ready, this, [this, versionResult]() {
-            mSession->kimaiVersion = versionResult->getResult().kimai;
-            // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.1
-            if (mSession->kimaiVersion >= MinimalKimaiVersionForPluginRequest)
-            {
-                requestPlugins();
-            }
-            versionResult->deleteLater();
-        });
-        connect(versionResult, &KimaiApiBaseResult::error, this, [this, versionResult]() {
-            onClientError(versionResult->errorMessage());
-            versionResult->deleteLater();
-        });
-
-        auto timeSheetConfigResult = mClient->requestTimeSheetConfig();
-        connect(timeSheetConfigResult, &KimaiApiBaseResult::ready, this, [this, timeSheetConfigResult]() {
-            mSession->timeSheetConfig = timeSheetConfigResult->getResult();
-            timeSheetConfigResult->deleteLater();
-        });
-        connect(timeSheetConfigResult, &KimaiApiBaseResult::error, this, [this, timeSheetConfigResult]() {
-            onClientError(timeSheetConfigResult->errorMessage());
-            timeSheetConfigResult->deleteLater();
-        });
-
-        mActivityWidget->setKimaiClient(mClient);
         mActivityWidget->setKemaiSession(mSession);
 
-        if (mTaskWidget != nullptr)
-        {
-            mTaskWidget->setKemaiSession(mSession);
-        }
+        mSession->refreshSessionInfos();
+        mSession->refreshCurrentTimeSheet();
 
         // Save profile connection
         settings.kemai.lastConnectedProfile = profile.id;
@@ -264,9 +222,9 @@ void MainWindow::setViewActionsEnabled(bool enable)
     mActViewActivities->setEnabled(enable);
 
     bool taskPluginEnabled = false;
-    if (mClient)
+    if (mSession)
     {
-        taskPluginEnabled = hasPlugin(mSession->plugins, ApiPlugin::TaskManagement);
+        taskPluginEnabled = mSession->hasPlugin(ApiPlugin::TaskManagement);
     }
     mActViewTasks->setEnabled(enable && taskPluginEnabled);
 }
@@ -329,34 +287,23 @@ void MainWindow::processAutoConnect()
             action->setChecked(true);
         }
     }
-    createKimaiClient(*profileIt);
+    createKemaiSession(*profileIt);
 }
 
-void MainWindow::requestPlugins()
+void MainWindow::onPluginsChanged()
 {
-    auto pluginsResult = mClient->requestPlugins();
-
-    connect(pluginsResult, &KimaiApiBaseResult::ready, this, [this, pluginsResult]() {
-        mSession->plugins = pluginsResult->getResult();
-
-        bool haveTaskPlugin = hasPlugin(mSession->plugins, ApiPlugin::TaskManagement);
-        mActViewTasks->setEnabled(haveTaskPlugin);
-        if (haveTaskPlugin)
+    bool haveTaskPlugin = mSession->hasPlugin(ApiPlugin::TaskManagement);
+    mActViewTasks->setEnabled(haveTaskPlugin);
+    if (haveTaskPlugin)
+    {
+        if (mTaskWidget == nullptr)
         {
-            mTaskWidget->setKimaiClient(mClient);
+            mTaskWidget = new TaskWidget;
+            mUi->stackedWidget->addWidget(mTaskWidget);
         }
-        pluginsResult->deleteLater();
-    });
 
-    connect(pluginsResult, &KimaiApiBaseResult::error, this, [this, pluginsResult]() {
-        onClientError(pluginsResult->errorMessage());
-        pluginsResult->deleteLater();
-    });
-}
-
-void MainWindow::onClientError(const QString& errorMsg)
-{
-    spdlog::error("Client error: {}", errorMsg.toStdString());
+        mTaskWidget->setKemaiSession(mSession);
+    }
 }
 
 void MainWindow::onActionSettingsTriggered()
@@ -469,7 +416,7 @@ void MainWindow::onProfilesActionGroupTriggered(QAction* action)
             auto profile   = settings.findProfileRef(profileId);
             if (profile != settings.profiles.end())
             {
-                createKimaiClient(*profile);
+                createKemaiSession(*profile);
             }
         }
     }
