@@ -45,7 +45,6 @@ private:
     void processCustomersResult(CustomersResult customersResult);
     void processProjectsResult(ProjectsResult projectsResult);
     void processActivitiesResult(ActivitiesResult activitiesResult);
-    void processTimeSheetResult(TimeSheetResult timeSheetResult);
 
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;

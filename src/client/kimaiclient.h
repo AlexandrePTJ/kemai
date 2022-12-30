@@ -51,6 +51,7 @@ public:
 
     TimeSheetResult startTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode);
     TimeSheetResult stopTimeSheet(const TimeSheet& timeSheet);
+    TimeSheetResult updateTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode);
 
     TasksResult requestTasks();
     TaskResult startTask(int taskId);

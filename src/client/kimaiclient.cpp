@@ -279,6 +279,15 @@ TimeSheetResult KimaiClient::stopTimeSheet(const TimeSheet& timeSheet)
     return mD->processApiNetworkReplySingleObject<TimeSheet>(ApiMethod::TimeSheets, reply);
 }
 
+TimeSheetResult KimaiClient::updateTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode)
+{
+    auto json    = KimaiApiTypesParser::toJson(timeSheet, trackingMode);
+    auto data    = toPostData(json);
+    auto request = mD->prepareRequest(ApiMethod::TimeSheets, {}, data, QString::number(timeSheet.id));
+    auto reply   = mD->sendPatchRequest(request,data);
+    return mD->processApiNetworkReplySingleObject<TimeSheet>(ApiMethod::TimeSheets, reply);
+}
+
 TasksResult KimaiClient::requestTasks()
 {
     auto request = mD->prepareRequest(ApiMethod::Tasks);

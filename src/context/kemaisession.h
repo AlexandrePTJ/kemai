@@ -31,6 +31,7 @@ public:
 
     std::optional<TimeSheet> currentTimeSheet() const;
     bool hasCurrentTimeSheet() const;
+    QDateTime computeTZDateTime(const QDateTime& dateTime) const;
 
 signals:
     void pluginsChanged();

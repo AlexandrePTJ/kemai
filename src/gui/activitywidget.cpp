@@ -1,14 +1,12 @@
 #include "activitywidget.h"
 #include "ui_activitywidget.h"
 
+#include <spdlog/spdlog.h>
+
 #include "activitydialog.h"
 #include "customerdialog.h"
 #include "projectdialog.h"
 #include "settings/settings.h"
-
-#include <QTimeZone>
-
-#include <spdlog/spdlog.h>
 
 using namespace kemai;
 
@@ -205,21 +203,19 @@ void ActivityWidget::onBtStartStopClicked()
 
     if (mSession->hasCurrentTimeSheet())
     {
-        timeSheetResult = mSession->client()->stopTimeSheet(mSession->currentTimeSheet().value());
+        auto timeSheet = mSession->currentTimeSheet().value();
+
+        timeSheet.endAt       = mSession->computeTZDateTime(QDateTime::currentDateTime());
+        timeSheet.description = mUi->pteDescription->toPlainText();
+        timeSheet.tags        = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
+
+        timeSheetResult = mSession->client()->updateTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
     }
     else
     {
         TimeSheet timeSheet;
 
-        timeSheet.beginAt = mUi->dteStartedAt->dateTime();
-
-        // Be sure to use expected timezone
-        auto timeZone = QTimeZone(mSession->me().timezone.toLocal8Bit());
-        if (timeZone.isValid())
-        {
-            timeSheet.beginAt = timeSheet.beginAt.toTimeZone(timeZone);
-        }
-
+        timeSheet.beginAt     = mSession->computeTZDateTime(mUi->dteStartedAt->dateTime());
         timeSheet.project.id  = mUi->cbProject->currentData().toInt();
         timeSheet.activity.id = mUi->cbActivity->currentData().toInt();
         timeSheet.description = mUi->pteDescription->toPlainText();
@@ -230,7 +226,10 @@ void ActivityWidget::onBtStartStopClicked()
 
     if (timeSheetResult != nullptr)
     {
-        connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] { processTimeSheetResult(timeSheetResult); });
+        connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] {
+            mSession->refreshCurrentTimeSheet();
+            timeSheetResult->deleteLater();
+        });
         connect(timeSheetResult, &KimaiApiBaseResult::error, [timeSheetResult]() { timeSheetResult->deleteLater(); });
     }
 }
@@ -356,10 +355,4 @@ void ActivityWidget::processActivitiesResult(ActivitiesResult activitiesResult)
         }
     }
     activitiesResult->deleteLater();
-}
-
-void ActivityWidget::processTimeSheetResult(TimeSheetResult timeSheetResult)
-{
-    mSession->refreshCurrentTimeSheet();
-    timeSheetResult->deleteLater();
 }

@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <QTimeZone>
+
 using namespace kemai;
 
 /*
@@ -87,6 +89,17 @@ std::optional<TimeSheet> KemaiSession::currentTimeSheet() const
 bool KemaiSession::hasCurrentTimeSheet() const
 {
     return mCurrentTimeSheet.has_value();
+}
+
+QDateTime KemaiSession::computeTZDateTime(const QDateTime& dateTime) const
+{
+    // Be sure to use expected timezone
+    auto timeZone = QTimeZone(mMe.timezone.toLocal8Bit());
+    if (timeZone.isValid())
+    {
+        return dateTime.toTimeZone(timeZone);
+    }
+    return dateTime;
 }
 
 void KemaiSession::clearCurrentTimeSheet()
