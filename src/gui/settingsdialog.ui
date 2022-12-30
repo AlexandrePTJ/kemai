@@ -106,7 +106,7 @@
              <item>
               <widget class="QToolButton" name="addProfileButton">
                <property name="icon">
-                <iconset resource="icons.qrc">
+                <iconset resource="../resources/icons.qrc">
                  <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
                </property>
               </widget>
@@ -133,7 +133,7 @@
                 <bool>false</bool>
                </property>
                <property name="icon">
-                <iconset resource="icons.qrc">
+                <iconset resource="../resources/icons.qrc">
                  <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
                </property>
               </widget>
@@ -279,7 +279,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="icons.qrc"/>
+  <include location="../resources/icons.qrc"/>
  </resources>
  <connections>
   <connection>

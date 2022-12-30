@@ -35,7 +35,7 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset resource="icons.qrc">
+        <iconset resource="../resources/icons.qrc">
          <normaloff>:/icons/refresh</normaloff>:/icons/refresh</iconset>
        </property>
       </widget>
@@ -86,7 +86,7 @@
   <tabstop>btClose</tabstop>
  </tabstops>
  <resources>
-  <include location="icons.qrc"/>
+  <include location="../resources/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
