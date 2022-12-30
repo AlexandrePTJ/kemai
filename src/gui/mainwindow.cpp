@@ -108,6 +108,15 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     updateProfilesMenu();
 
     /*
+     * Desktop events monitor
+     */
+    mDesktopEventsMonitor = DesktopEventsMonitor::create();
+    if (mDesktopEventsMonitor)
+    {
+        mDesktopEventsMonitor->initialize(Settings::load().events);
+    }
+
+    /*
      * Connections
      */
     connect(mActSettings, &QAction::triggered, this, &MainWindow::onActionSettingsTriggered);
@@ -308,7 +317,7 @@ void MainWindow::onPluginsChanged()
 
 void MainWindow::onActionSettingsTriggered()
 {
-    SettingsDialog settingsDialog(this);
+    SettingsDialog settingsDialog(mDesktopEventsMonitor, this);
     settingsDialog.setSettings(Settings::load());
     if (settingsDialog.exec() == QDialog::Accepted)
     {
@@ -316,6 +325,11 @@ void MainWindow::onActionSettingsTriggered()
 
         showSelectedView();
         updateProfilesMenu();
+
+        if (mDesktopEventsMonitor)
+        {
+            mDesktopEventsMonitor->initialize(settingsDialog.settings().events);
+        }
     }
 }
 

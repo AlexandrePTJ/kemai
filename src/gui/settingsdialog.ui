@@ -43,6 +43,11 @@
        </item>
        <item>
         <property name="text">
+         <string>Events</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>Profiles</string>
         </property>
        </item>
@@ -78,6 +83,70 @@
          </item>
          <item row="2" column="1">
           <widget class="QComboBox" name="cbLanguage"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="eventsPage">
+        <layout class="QFormLayout" name="formLayout_3">
+         <item row="0" column="0" colspan="2">
+          <widget class="QCheckBox" name="cbStopOnLock">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Stop current timesheet on session lock (windows only)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="cbStopOnIdle">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Stop current timesheet when system idle (windows only)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Idle delay (minutes)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QSpinBox" name="sbIdleDelay">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>720</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
@@ -289,8 +358,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>120</x>
-     <y>449</y>
+     <x>129</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -305,8 +374,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>146</x>
-     <y>449</y>
+     <x>155</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -327,6 +396,38 @@
     <hint type="destinationlabel">
      <x>328</x>
      <y>106</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbStopOnIdle</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_3</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>194</x>
+     <y>56</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>191</x>
+     <y>84</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbStopOnIdle</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>sbIdleDelay</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>272</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>261</x>
+     <y>82</y>
     </hint>
    </hints>
   </connection>

@@ -8,7 +8,8 @@
 
 using namespace kemai;
 
-SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::SettingsDialog), mKimaiClient(new KimaiClient)
+SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desktopEventsMonitor, QWidget* parent)
+    : QDialog(parent), mUi(new Ui::SettingsDialog), mKimaiClient(std::make_unique<KimaiClient>())
 {
     mUi->setupUi(this);
 
@@ -64,6 +65,13 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::S
             QMessageBox::warning(this, tr(""), tr("Language changed. Application restart is required."));
         }
     });
+
+    // Enable events depending on platform
+    if (desktopEventsMonitor)
+    {
+        mUi->cbStopOnLock->setEnabled(desktopEventsMonitor->hasLockSupport());
+        mUi->cbStopOnIdle->setEnabled(desktopEventsMonitor->hasIdleSupport());
+    }
 }
 
 SettingsDialog::~SettingsDialog() = default;
@@ -95,6 +103,13 @@ void SettingsDialog::setSettings(const Settings& settings)
         item->setData(Qt::UserRole, profile.id);
         mUi->profilesListWidget->addItem(item);
     }
+
+    /*
+     * Events
+     */
+    mUi->cbStopOnLock->setChecked(m_settings.events.stopOnLock);
+    mUi->cbStopOnIdle->setChecked(m_settings.events.stopOnIdle);
+    mUi->sbIdleDelay->setValue(m_settings.events.idleDelayMinutes);
 }
 
 Settings SettingsDialog::settings() const
@@ -104,6 +119,10 @@ Settings SettingsDialog::settings() const
     settings.kemai.closeToSystemTray    = mUi->cbCloseToSystemTray->isChecked();
     settings.kemai.minimizeToSystemTray = mUi->cbMinimizeToSystemTray->isChecked();
     settings.kemai.language             = mUi->cbLanguage->currentData().toLocale();
+
+    settings.events.stopOnLock       = mUi->cbStopOnLock->isChecked();
+    settings.events.stopOnIdle       = mUi->cbStopOnIdle->isChecked();
+    settings.events.idleDelayMinutes = mUi->sbIdleDelay->value();
 
     // Profiles are directly managed from buttons on fields updates.
 

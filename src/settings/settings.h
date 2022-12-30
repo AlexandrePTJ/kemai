@@ -30,6 +30,13 @@ struct Settings
         QUuid lastConnectedProfile;
     } kemai;
 
+    struct Events
+    {
+        bool stopOnLock      = false;
+        bool stopOnIdle      = false;
+        int idleDelayMinutes = 1;
+    } events;
+
     bool isReady() const;
     QList<Profile>::iterator findProfileRef(const QUuid& profileId);
 

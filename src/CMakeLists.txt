@@ -23,6 +23,7 @@ set(SRCS
         misc/datareader.cpp
         models/taskfilterproxymodel.cpp
         models/tasklistmodel.cpp
+        monitor/desktopEventsMonitor.cpp
         settings/settings.cpp
         updater/kemaiupdater.cpp)
 
@@ -44,6 +45,7 @@ set(HDRS
         misc/datareader.h
         models/taskfilterproxymodel.h
         models/tasklistmodel.h
+        monitor/desktopEventsMonitor.h
         settings/settings.h
         updater/kemaiupdater.h
         updater/kemaiupdater_p.h)
@@ -86,7 +88,12 @@ set(RESX
 
 # OS Specifics
 if (WIN32)
-    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/bundle/windows/kemai.rc)
+    list(APPEND SRCS
+            ${CMAKE_SOURCE_DIR}/bundle/windows/kemai.rc
+            monitor/windowsDesktopEventsMonitor.cpp)
+    list(APPEND HDRS
+            monitor/windowsDesktopEventsMonitor.h)
+    target_link_libraries(${PROJECT_NAME} Wtsapi32)
 elseif (APPLE)
     set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/kemai.icns")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")

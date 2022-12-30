@@ -8,6 +8,7 @@
 
 #include "client/kimaiclient.h"
 #include "context/kemaisession.h"
+#include "monitor/desktopEventsMonitor.h"
 #include "settings/settings.h"
 #include "updater/kemaiupdater.h"
 
@@ -51,6 +52,7 @@ private:
     Ui::MainWindow* mUi;
     KemaiUpdater mUpdater;
     std::shared_ptr<KemaiSession> mSession;
+    std::shared_ptr<DesktopEventsMonitor> mDesktopEventsMonitor;
 
     // Stacked widget (ownership is transferred, don't try to delete them)
     ActivityWidget* mActivityWidget = nullptr;

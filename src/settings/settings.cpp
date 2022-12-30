@@ -134,6 +134,14 @@ Settings Settings::load()
         settings.profiles << profile;
     }
 
+    if (root.contains("events"))
+    {
+        auto eventsObject                = root.value("events").toObject();
+        settings.events.stopOnLock       = eventsObject.value("stopOnLock").toBool();
+        settings.events.stopOnIdle       = eventsObject.value("stopOnIdle").toBool();
+        settings.events.idleDelayMinutes = eventsObject.value("idleDelayMinutes").toInt();
+    }
+
     return settings;
 }
 
@@ -159,11 +167,17 @@ void Settings::save(const Settings& settings)
     kemaiObject["language"]             = settings.kemai.language.name();
     kemaiObject["lastConnectedProfile"] = settings.kemai.lastConnectedProfile.toString();
 
+    QJsonObject eventsObject;
+    eventsObject["stopOnLock"]       = settings.events.stopOnLock;
+    eventsObject["stopOnIdle"]       = settings.events.stopOnIdle;
+    eventsObject["idleDelayMinutes"] = settings.events.idleDelayMinutes;
+
     QJsonObject root;
     root["version"]             = 1;
     root["profiles"]            = profilesArray;
     root["trustedCertificates"] = QJsonArray::fromStringList(settings.trustedCertificates);
     root["kemai"]               = kemaiObject;
+    root["events"]              = eventsObject;
 
     QJsonDocument jsonDocument(root);
 

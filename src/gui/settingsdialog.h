@@ -1,9 +1,12 @@
 #pragma once
 
+#include <memory>
+
 #include <QDialog>
 #include <QListWidget>
 
 #include "client/kimaiclient.h"
+#include "monitor/desktopEventsMonitor.h"
 #include "settings/settings.h"
 
 namespace Ui {
@@ -17,7 +20,7 @@ class SettingsDialog : public QDialog
     Q_OBJECT
 
 public:
-    SettingsDialog(QWidget* parent = nullptr);
+    SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desktopEventsMonitor, QWidget* parent = nullptr);
     ~SettingsDialog() override;
 
     void setSettings(const Settings& settings);
@@ -36,7 +39,7 @@ private:
     Settings m_settings;
 
     // for connection testing
-    QScopedPointer<KimaiClient> mKimaiClient;
+    std::unique_ptr<KimaiClient> mKimaiClient;
 };
 
 } // namespace kemai
