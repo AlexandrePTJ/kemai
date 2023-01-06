@@ -173,12 +173,12 @@
     <message>
         <location filename="../settingsdialog.ui" line="41"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Generelt</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="46"/>
         <source>Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Profiler</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="61"/>
@@ -188,7 +188,7 @@
     <message>
         <location filename="../settingsdialog.ui" line="68"/>
         <source>Minimize to system tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimer til systemkurv</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="75"/>
@@ -246,7 +246,7 @@
     <message>
         <location filename="../taskwidget.ui" line="73"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Lukk</translation>
     </message>
 </context>
 <context>
@@ -289,7 +289,7 @@
     <message>
         <location filename="../mainwindow.cpp" line="88"/>
         <source>&amp;Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Profil</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="90"/>
