@@ -26,6 +26,8 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
     mSecondTimer.setInterval(std::chrono::seconds(1));
     mSecondTimer.setTimerType(Qt::PreciseTimer);
     mSecondTimer.start();
+
+    updateControls();
 }
 
 ActivityWidget::~ActivityWidget()
@@ -152,7 +154,7 @@ void ActivityWidget::onTbAddActivityClicked()
 void ActivityWidget::onSecondTimeout()
 {
     const auto& now = QDateTime::currentDateTime();
-    if (mSession->hasCurrentTimeSheet())
+    if (mSession && mSession->hasCurrentTimeSheet())
     {
         auto nSecs = mSession->currentTimeSheet()->beginAt.secsTo(now);
 
