@@ -2,24 +2,24 @@ cmake_minimum_required(VERSION 3.11)
 project(KemaiProject VERSION 0.8.0 LANGUAGES CXX)
 
 # Point CMake to the custom modules
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-# Install spdlog
-include(FetchContent)
-FetchContent_Declare(
-        spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.10.0)
-FetchContent_GetProperties(spdlog)
-if (NOT spdlog_POPULATED)
-    FetchContent_Populate(spdlog)
-    add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
-endif ()
-include_directories(${spdlog_SOURCE_DIR}/include)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
 # Common configuration
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Setup Conan
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+    message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+    file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
+            "${CMAKE_BINARY_DIR}/conan.cmake"
+            TLS_VERIFY ON)
+endif()
+include(${CMAKE_BINARY_DIR}/conan.cmake)
+
+conan_cmake_autodetect(settings)
+conan_cmake_install(PATH_OR_REFERENCE ${CMAKE_SOURCE_DIR} BUILD missing SETTINGS ${settings})
 
 # Setup Qt
 set(CMAKE_AUTOMOC ON)
@@ -34,6 +34,10 @@ if (NOT Qt6_FOUND)
 else ()
     message(STATUS "Using Qt ${Qt6_VERSION}")
 endif ()
+
+# Setup other dependencies
+find_package(spdlog REQUIRED)
+find_package(magic_enum REQUIRED)
 
 # Write version to file to ease packaging
 file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${PROJECT_VERSION})

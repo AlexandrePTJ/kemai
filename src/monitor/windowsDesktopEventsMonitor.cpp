@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include <wtsapi32.h>
+#include <Windows.h>
 
 using namespace kemai;
 

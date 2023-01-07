@@ -41,6 +41,9 @@ jobs:
           tools: ${{ matrix.qt_tools }}
           cache: true
 
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
+
       # Build
       - name: Configure
         run: |
