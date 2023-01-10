@@ -16,6 +16,8 @@ WindowsDesktopEventsMonitor::WindowsDesktopEventsMonitor()
 
 void WindowsDesktopEventsMonitor::initialize(const Settings::Events& eventsSettings)
 {
+    mEventsSettings = eventsSettings;
+
     if (eventsSettings.stopOnIdle)
     {
         mPollTimer.start(std::chrono::seconds(1));
@@ -32,5 +34,10 @@ void WindowsDesktopEventsMonitor::onPollTimeout()
     lastInputInfo.cbSize = sizeof(LASTINPUTINFO);
 
     GetLastInputInfo(&lastInputInfo);
-    spdlog::warn("onPollTimeout {}", lastInputInfo.dwTime);
+    auto idleSinceNMilliSecs = std::chrono::milliseconds(GetTickCount() - lastInputInfo.dwTime);
+    
+    if (mEventsSettings.stopOnIdle && mEventsSettings.idleDelayMinutes <= std::chrono::duration_cast<std::chrono::minutes>(idleSinceNMilliSecs).count())
+    {
+        emit idleDetected();
+    }
 }

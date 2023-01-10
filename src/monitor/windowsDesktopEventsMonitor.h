@@ -18,6 +18,7 @@ private:
     void onPollTimeout();
 
     QTimer mPollTimer;
+    Settings::Events mEventsSettings;
 };
 
 } // namespace kemai
