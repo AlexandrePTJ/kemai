@@ -1,6 +1,6 @@
 #include "macDesktopEventsMonitor.h"
 
-#import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 using namespace kemai;
 
@@ -34,7 +34,7 @@ void MacDesktopEventsMonitor::stop()
 
 void MacDesktopEventsMonitor::onPollTimeout()
 {
-    auto interval = CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateCombinedSessionState, kCGAnyInputEventType);
+    auto interval = CGEventSourceSecondsSinceLastEventType(CGEventSourceStateID::kCGEventSourceStateCombinedSessionState, kCGAnyInputEventType);
 
     auto idleSinceNSecs = std::chrono::seconds(static_cast<int>(interval));
 
