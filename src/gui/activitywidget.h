@@ -21,6 +21,7 @@ public:
     ~ActivityWidget() override;
 
     void setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession);
+    void stopCurrentTimeSheet();
 
 signals:
     void currentActivityChanged(bool started);

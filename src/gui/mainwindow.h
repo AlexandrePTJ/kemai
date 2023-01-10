@@ -40,6 +40,7 @@ private:
     void updateProfilesMenu();
     void processAutoConnect();
 
+    void onCurrentTimeSheetChanged();
     void onPluginsChanged();
     void onActionSettingsTriggered();
     void onActionCheckUpdateTriggered();
@@ -48,6 +49,7 @@ private:
     void onNewVersionCheckFinished(const VersionDetails& details);
     void onActivityChanged(bool started);
     void onProfilesActionGroupTriggered(QAction* action);
+    void onDesktopIdleDetected();
 
     Ui::MainWindow* mUi;
     KemaiUpdater mUpdater;

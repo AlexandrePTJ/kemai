@@ -114,6 +114,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     if (mDesktopEventsMonitor)
     {
         mDesktopEventsMonitor->initialize(Settings::load().events);
+        connect(mDesktopEventsMonitor.get(), &DesktopEventsMonitor::idleDetected, this, &MainWindow::onDesktopIdleDetected);
     }
 
     /*
@@ -199,6 +200,7 @@ void MainWindow::createKemaiSession(const Settings::Profile& profile)
         kimaiClient->setToken(profile.token);
 
         mSession = std::make_shared<KemaiSession>(kimaiClient);
+        connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &MainWindow::onCurrentTimeSheetChanged);
         connect(mSession.get(), &KemaiSession::pluginsChanged, this, &MainWindow::onPluginsChanged);
 
         mActivityWidget->setKemaiSession(mSession);
@@ -297,6 +299,20 @@ void MainWindow::processAutoConnect()
         }
     }
     createKemaiSession(*profileIt);
+}
+
+void MainWindow::onCurrentTimeSheetChanged()
+{
+    if (mSession && mSession->hasCurrentTimeSheet())
+    {
+        spdlog::debug("Start desktop monitor");
+        mDesktopEventsMonitor->start();
+    }
+    else
+    {
+        spdlog::debug("Stop desktop monitor");
+        mDesktopEventsMonitor->stop();
+    }
 }
 
 void MainWindow::onPluginsChanged()
@@ -434,4 +450,10 @@ void MainWindow::onProfilesActionGroupTriggered(QAction* action)
             }
         }
     }
+}
+
+void MainWindow::onDesktopIdleDetected()
+{
+    spdlog::info("System is idle since {} minutes. Stop current TimeSheet.", Settings::load().events.idleDelayMinutes);
+    mActivityWidget->stopCurrentTimeSheet();
 }

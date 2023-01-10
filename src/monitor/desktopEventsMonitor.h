@@ -17,6 +17,8 @@ public:
     static std::shared_ptr<DesktopEventsMonitor> create();
 
     virtual void initialize(const Settings::Events& eventsSettings) = 0;
+    virtual void start()                                            = 0;
+    virtual void stop()                                             = 0;
 
     bool hasLockSupport() const;
     bool hasIdleSupport() const;

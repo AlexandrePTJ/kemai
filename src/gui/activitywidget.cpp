@@ -52,6 +52,29 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
     setEnabled(mSession != nullptr);
 }
 
+void ActivityWidget::stopCurrentTimeSheet()
+{
+    if (mSession)
+    {
+        if (mSession->hasCurrentTimeSheet())
+        {
+            auto timeSheet = mSession->currentTimeSheet().value();
+
+            timeSheet.endAt       = mSession->computeTZDateTime(QDateTime::currentDateTime());
+            timeSheet.description = mUi->pteDescription->toPlainText();
+            timeSheet.tags        = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
+
+            auto timeSheetResult = mSession->client()->updateTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
+
+            connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] {
+                mSession->refreshCurrentTimeSheet();
+                timeSheetResult->deleteLater();
+            });
+            connect(timeSheetResult, &KimaiApiBaseResult::error, [timeSheetResult]() { timeSheetResult->deleteLater(); });
+        }
+    }
+}
+
 void ActivityWidget::onCbCustomerTextChanged(const QString& text)
 {
     mUi->cbProject->clear();
@@ -201,17 +224,9 @@ void ActivityWidget::onSessionCurrentTimeSheetChanged()
 
 void ActivityWidget::onBtStartStopClicked()
 {
-    TimeSheetResult timeSheetResult = nullptr;
-
     if (mSession->hasCurrentTimeSheet())
     {
-        auto timeSheet = mSession->currentTimeSheet().value();
-
-        timeSheet.endAt       = mSession->computeTZDateTime(QDateTime::currentDateTime());
-        timeSheet.description = mUi->pteDescription->toPlainText();
-        timeSheet.tags        = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
-
-        timeSheetResult = mSession->client()->updateTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
+        stopCurrentTimeSheet();
     }
     else
     {
@@ -223,11 +238,8 @@ void ActivityWidget::onBtStartStopClicked()
         timeSheet.description = mUi->pteDescription->toPlainText();
         timeSheet.tags        = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
 
-        timeSheetResult = mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
-    }
+        auto timeSheetResult = mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
 
-    if (timeSheetResult != nullptr)
-    {
         connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] {
             mSession->refreshCurrentTimeSheet();
             timeSheetResult->deleteLater();

@@ -13,6 +13,8 @@ public:
     ~WindowsDesktopEventsMonitor() override = default;
 
     void initialize(const Settings::Events& eventsSettings) override;
+    void start() override;
+    void stop() override;
 
 private:
     void onPollTimeout();
