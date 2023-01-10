@@ -1,7 +1,5 @@
 #include "windowsDesktopEventsMonitor.h"
 
-#include <spdlog/spdlog.h>
-
 #include <Windows.h>
 
 using namespace kemai;

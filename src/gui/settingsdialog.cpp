@@ -70,6 +70,7 @@ SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desk
     if (desktopEventsMonitor)
     {
         mUi->cbStopOnLock->setEnabled(desktopEventsMonitor->hasLockSupport());
+        mUi->cbStopOnLock->setVisible(false);
         mUi->cbStopOnIdle->setEnabled(desktopEventsMonitor->hasIdleSupport());
     }
 }

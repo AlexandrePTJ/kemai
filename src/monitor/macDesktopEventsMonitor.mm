@@ -1,0 +1,45 @@
+#include "macDesktopEventsMonitor.h"
+
+#import <Foundation/Foundation.h>
+
+using namespace kemai;
+
+MacDesktopEventsMonitor::MacDesktopEventsMonitor()
+{
+    mHasLockSupport = false;
+    mHasIdleSupport = true;
+
+    connect(&mPollTimer, &QTimer::timeout, this, &MacDesktopEventsMonitor::onPollTimeout);
+}
+
+void MacDesktopEventsMonitor::initialize(const Settings::Events& eventsSettings)
+{
+    stop();
+
+    mEventsSettings = eventsSettings;
+}
+
+void MacDesktopEventsMonitor::start()
+{
+    if (mEventsSettings.stopOnIdle)
+    {
+        mPollTimer.start(std::chrono::seconds(1));
+    }
+}
+
+void MacDesktopEventsMonitor::stop()
+{
+    mPollTimer.stop();
+}
+
+void MacDesktopEventsMonitor::onPollTimeout()
+{
+    auto interval = CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateCombinedSessionState, kCGAnyInputEventType);
+
+    auto idleSinceNSecs = std::chrono::seconds(static_cast<int>(interval));
+
+    if (mEventsSettings.stopOnIdle && mEventsSettings.idleDelayMinutes <= std::chrono::duration_cast<std::chrono::minutes>(idleSinceNSecs).count())
+    {
+        emit idleDetected();
+    }
+}

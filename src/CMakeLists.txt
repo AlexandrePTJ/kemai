@@ -95,6 +95,10 @@ if (WIN32)
             monitor/windowsDesktopEventsMonitor.h)
     target_link_libraries(${PROJECT_NAME} Wtsapi32)
 elseif (APPLE)
+    list(APPEND SRCS
+            monitor/macDesktopEventsMonitor.mm)
+    list(APPEND HDRS
+            monitor/macDesktopEventsMonitor.h)
     set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/kemai.icns")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/bundle/macos/Info.plist)
