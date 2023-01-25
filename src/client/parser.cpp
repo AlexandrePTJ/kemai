@@ -3,6 +3,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
+#include <magic_enum.hpp>
+
 using namespace kemai;
 
 /*
@@ -61,7 +63,8 @@ static void checkTypeOrThrow(const QString& objectName, const QJsonValue& jsonVa
 {
     if (std::none_of(allowedTypes.begin(), allowedTypes.end(), [jsonValue](QJsonValue::Type type) { return type == jsonValue.type(); }))
     {
-        throw std::runtime_error(QString("Invalid type for %1: %2").arg(objectName, jsonValue.type()).toStdString());
+        throw std::runtime_error(
+            QString("Invalid type for %1: %2").arg(objectName, QString::fromStdString(std::string(magic_enum::enum_name(jsonValue.type())))).toStdString());
     }
 }
 
@@ -93,7 +96,14 @@ template<> KimaiVersion KimaiApiTypesParser::parseValue(const QJsonValue& jsonVa
 
 template<> User KimaiApiTypesParser::parseValue(const QJsonValue& jsonValue) const
 {
-    checkTypeOrThrow("User", jsonValue, {QJsonValue::Object});
+    checkTypeOrThrow("User", jsonValue, {QJsonValue::Object, QJsonValue::Double});
+
+    if (jsonValue.isDouble())
+    {
+        User user;
+        user.id = jsonValue.toInt();
+        return user;
+    }
 
     auto jsonObject = jsonValue.toObject();
     checkKeysOrThrow("User", jsonObject, {"id", "username", "memberships"});
@@ -296,7 +306,7 @@ template<> Task KimaiApiTypesParser::parseValue(const QJsonValue& jsonValue) con
     task.description = jsonObject.value("description").toString();
     task.project     = parseValue<Project>(jsonObject.value("project"));
     task.activity    = parseValue<Activity>(jsonObject.value("activity"));
-    task.user        = parseValue<User>(jsonObject.value("user"));
+//    task.user        = parseValue<User>(jsonObject.value("user"));
     task.endAt       = QDateTime::fromString(jsonObject.value("end").toString(), Qt::ISODate);
     task.estimation  = jsonObject.value("estimation").toInt();
 

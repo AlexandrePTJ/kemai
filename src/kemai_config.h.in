@@ -1,3 +1,4 @@
 #pragma once
 
 #define KEMAI_VERSION "@KemaiProject_VERSION@"
+#cmakedefine KEMAI_ENABLE_UPDATE_CHECK

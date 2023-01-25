@@ -1,7 +1,7 @@
 #include "kimaiclient.h"
 #include "kimaiclient_p.h"
 
-#include "kemai_version.h"
+#include "kemai_config.h"
 
 #include <QCoreApplication>
 #include <QUrlQuery>

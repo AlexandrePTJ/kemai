@@ -9,7 +9,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "kemai_version.h"
+#include "kemai_config.h"
 
 #include "activitywidget.h"
 #include "settings/settings.h"
@@ -29,6 +29,8 @@ static const auto FirstRequestDelayMs = 100;
 MainWindow::MainWindow() : mUi(new Ui::MainWindow)
 {
     mUi->setupUi(this);
+
+    auto settings = Settings::load();
 
     /*
      * Setup icon
@@ -89,8 +91,10 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     auto helpMenu = new QMenu(tr("&Help"), mMenuBar);
     helpMenu->addAction(mActOpenHost);
     helpMenu->addSeparator();
+#ifdef KEMAI_ENABLE_UPDATE_CHECK
     helpMenu->addAction(mActCheckUpdate);
     helpMenu->addSeparator();
+#endif // KEMAI_ENABLE_UPDATE_CHECK
     helpMenu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
 
     mMenuBar->addMenu(fileMenu);
@@ -113,7 +117,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     mDesktopEventsMonitor = DesktopEventsMonitor::create();
     if (mDesktopEventsMonitor)
     {
-        mDesktopEventsMonitor->initialize(Settings::load().events);
+        mDesktopEventsMonitor->initialize(settings.events);
         connect(mDesktopEventsMonitor.get(), &DesktopEventsMonitor::idleDetected, this, &MainWindow::onDesktopIdleDetected);
     }
 
@@ -135,11 +139,17 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
      * Delay first refresh and update check
      */
     QTimer::singleShot(FirstRequestDelayMs, this, &MainWindow::processAutoConnect);
-    QTimer::singleShot(FirstRequestDelayMs, [&]() {
-        auto ignoreVersion  = QVersionNumber::fromString(Settings::load().kemai.ignoredVersion);
-        auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
-        mUpdater.checkAvailableNewVersion(currentVersion >= ignoreVersion ? currentVersion : ignoreVersion, true);
-    });
+
+#ifdef KEMAI_ENABLE_UPDATE_CHECK
+    if (settings.kemai.checkUpdateAtStartup)
+    {
+        QTimer::singleShot(FirstRequestDelayMs, [&]() {
+            auto ignoreVersion  = QVersionNumber::fromString(Settings::load().kemai.ignoredVersion);
+            auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
+            mUpdater.checkAvailableNewVersion(currentVersion >= ignoreVersion ? currentVersion : ignoreVersion, true);
+        });
+    }
+#endif // KEMAI_ENABLE_UPDATE_CHECK
 }
 
 MainWindow::~MainWindow()

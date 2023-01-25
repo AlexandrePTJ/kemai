@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QTranslator>
 
+#include "kemai_config.h"
+
 using namespace kemai;
 
 SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desktopEventsMonitor, QWidget* parent)
@@ -73,6 +75,12 @@ SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desk
         mUi->cbStopOnLock->setVisible(false);
         mUi->cbStopOnIdle->setEnabled(desktopEventsMonitor->hasIdleSupport());
     }
+
+    // Disable check update checkbox when disabled at build-time
+#ifndef KEMAI_ENABLE_UPDATE_CHECK
+    mUi->cbCheckUpdateAtStartup->setChecked(false);
+    mUi->cbCheckUpdateAtStartup->setEnabled(false);
+#endif // KEMAI_ENABLE_UPDATE_CHECK
 }
 
 SettingsDialog::~SettingsDialog() = default;
@@ -86,6 +94,11 @@ void SettingsDialog::setSettings(const Settings& settings)
      */
     mUi->cbCloseToSystemTray->setChecked(m_settings.kemai.closeToSystemTray);
     mUi->cbMinimizeToSystemTray->setChecked(m_settings.kemai.minimizeToSystemTray);
+#ifdef KEMAI_ENABLE_UPDATE_CHECK
+    mUi->cbCheckUpdateAtStartup->setChecked(m_settings.kemai.checkUpdateAtStartup);
+#else
+    mUi->cbCheckUpdateAtStartup->setChecked(false);
+#endif // KEMAI_ENABLE_UPDATE_CHECK
 
     auto idLanguage = mUi->cbLanguage->findData(m_settings.kemai.language);
     if (idLanguage >= 0)
@@ -119,6 +132,7 @@ Settings SettingsDialog::settings() const
 
     settings.kemai.closeToSystemTray    = mUi->cbCloseToSystemTray->isChecked();
     settings.kemai.minimizeToSystemTray = mUi->cbMinimizeToSystemTray->isChecked();
+    settings.kemai.checkUpdateAtStartup = mUi->cbCheckUpdateAtStartup->isChecked();
     settings.kemai.language             = mUi->cbLanguage->currentData().toLocale();
 
     settings.events.stopOnLock       = mUi->cbStopOnLock->isChecked();

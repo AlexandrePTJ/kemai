@@ -2,7 +2,7 @@ project(Kemai)
 
 add_executable(${PROJECT_NAME} ${OS_BUNDLE})
 
-configure_file(kemai_version.h.in ${PROJECT_BINARY_DIR}/kemai_version.h)
+configure_file(kemai_config.h.in ${PROJECT_BINARY_DIR}/kemai_config.h)
 
 # Sources
 set(SRCS

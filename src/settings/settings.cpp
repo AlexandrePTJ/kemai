@@ -113,6 +113,7 @@ Settings Settings::load()
     auto kemaiObject                    = root.value("kemai").toObject();
     settings.kemai.closeToSystemTray    = kemaiObject.value("closeToSystemTray").toBool();
     settings.kemai.minimizeToSystemTray = kemaiObject.value("minimizeToSystemTray").toBool();
+    settings.kemai.checkUpdateAtStartup = kemaiObject.value("checkUpdateAtStartup").toBool();
     settings.kemai.ignoredVersion       = kemaiObject.value("ignoredVersion").toString();
     settings.kemai.geometry             = QByteArray::fromBase64(kemaiObject.value("geometry").toString().toLocal8Bit());
     settings.kemai.language             = QLocale(kemaiObject.value("language").toString());
@@ -162,6 +163,7 @@ void Settings::save(const Settings& settings)
     QJsonObject kemaiObject;
     kemaiObject["closeToSystemTray"]    = settings.kemai.closeToSystemTray;
     kemaiObject["minimizeToSystemTray"] = settings.kemai.minimizeToSystemTray;
+    kemaiObject["checkUpdateAtStartup"] = settings.kemai.checkUpdateAtStartup;
     kemaiObject["ignoredVersion"]       = settings.kemai.ignoredVersion;
     kemaiObject["geometry"]             = QString(settings.kemai.geometry.toBase64());
     kemaiObject["language"]             = settings.kemai.language.name();
