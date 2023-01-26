@@ -111,7 +111,7 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Stop current timesheet when system idle (windows and osx only)</string>
+            <string>Stop current timesheet when system idle</string>
            </property>
           </widget>
          </item>

@@ -108,6 +108,7 @@ elseif (UNIX)
             monitor/linuxDesktopEventsMonitor.cpp)
     list(APPEND HDRS
             monitor/linuxDesktopEventsMonitor.h)
+    target_link_libraries(${PROJECT_NAME} Xss X11)
 endif ()
 
 # Target configuration
