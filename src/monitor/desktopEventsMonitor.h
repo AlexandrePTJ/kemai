@@ -17,7 +17,7 @@ protected:
     DesktopEventsMonitor(bool hasLockSupport, bool hasIdleSupport);
 
 public:
-    static std::shared_ptr<DesktopEventsMonitor> create();
+    static std::shared_ptr<DesktopEventsMonitor> create(QWidget* widget = nullptr);
 
     virtual void initialize(const Settings::Events& eventsSettings) = 0;
     virtual void start()                                            = 0;

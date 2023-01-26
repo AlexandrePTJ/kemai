@@ -50,6 +50,7 @@ private:
     void onActivityChanged(bool started);
     void onProfilesActionGroupTriggered(QAction* action);
     void onDesktopIdleDetected();
+    void onDesktopLockDetected();
 
     Ui::MainWindow* mUi;
     KemaiUpdater mUpdater;

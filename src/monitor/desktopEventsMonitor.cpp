@@ -12,10 +12,10 @@ using namespace kemai;
 
 DesktopEventsMonitor::DesktopEventsMonitor(bool hasLockSupport, bool hasIdleSupport) : mHasLockSupport(hasLockSupport), mHasIdleSupport(hasIdleSupport) {}
 
-std::shared_ptr<DesktopEventsMonitor> DesktopEventsMonitor::create()
+std::shared_ptr<DesktopEventsMonitor> DesktopEventsMonitor::create(QWidget* widget)
 {
 #ifdef Q_OS_WINDOWS
-    return std::make_shared<WindowsDesktopEventsMonitor>();
+    return std::make_shared<WindowsDesktopEventsMonitor>(widget);
 #elif defined Q_OS_MAC
     return std::make_shared<MacDesktopEventsMonitor>();
 #elif defined Q_OS_LINUX

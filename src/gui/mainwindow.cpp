@@ -114,11 +114,12 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     /*
      * Desktop events monitor
      */
-    mDesktopEventsMonitor = DesktopEventsMonitor::create();
+    mDesktopEventsMonitor = DesktopEventsMonitor::create(this);
     if (mDesktopEventsMonitor)
     {
         mDesktopEventsMonitor->initialize(settings.events);
         connect(mDesktopEventsMonitor.get(), &DesktopEventsMonitor::idleDetected, this, &MainWindow::onDesktopIdleDetected);
+        connect(mDesktopEventsMonitor.get(), &DesktopEventsMonitor::lockDetected, this, &MainWindow::onDesktopLockDetected);
     }
 
     /*
@@ -465,5 +466,11 @@ void MainWindow::onProfilesActionGroupTriggered(QAction* action)
 void MainWindow::onDesktopIdleDetected()
 {
     spdlog::info("System is idle since {} minutes. Stop current TimeSheet.", Settings::load().events.idleDelayMinutes);
+    mActivityWidget->stopCurrentTimeSheet();
+}
+
+void MainWindow::onDesktopLockDetected()
+{
+    spdlog::info("System is locked. Stop current TimeSheet.");
     mActivityWidget->stopCurrentTimeSheet();
 }
