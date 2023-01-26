@@ -4,11 +4,8 @@
 
 using namespace kemai;
 
-WindowsDesktopEventsMonitor::WindowsDesktopEventsMonitor()
+WindowsDesktopEventsMonitor::WindowsDesktopEventsMonitor() : DesktopEventsMonitor(true, true)
 {
-    mHasLockSupport = false;
-    mHasIdleSupport = true;
-
     connect(&mPollTimer, &QTimer::timeout, this, &WindowsDesktopEventsMonitor::onPollTimeout);
 }
 

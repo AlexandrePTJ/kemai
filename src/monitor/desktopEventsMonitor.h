@@ -13,6 +13,9 @@ class DesktopEventsMonitor : public QObject
 {
     Q_OBJECT
 
+protected:
+    DesktopEventsMonitor(bool hasLockSupport, bool hasIdleSupport);
+
 public:
     static std::shared_ptr<DesktopEventsMonitor> create();
 
@@ -27,9 +30,9 @@ signals:
     void lockDetected();
     void idleDetected();
 
-protected:
-    bool mHasLockSupport = false;
-    bool mHasIdleSupport = false;
+private:
+    const bool mHasLockSupport = false;
+    const bool mHasIdleSupport = false;
 };
 
 } // namespace kemai

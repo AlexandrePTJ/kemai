@@ -4,11 +4,8 @@
 
 using namespace kemai;
 
-MacDesktopEventsMonitor::MacDesktopEventsMonitor()
+MacDesktopEventsMonitor::MacDesktopEventsMonitor() : DesktopEventsMonitor(false, true)
 {
-    mHasLockSupport = false;
-    mHasIdleSupport = true;
-
     connect(&mPollTimer, &QTimer::timeout, this, &MacDesktopEventsMonitor::onPollTimeout);
 }
 

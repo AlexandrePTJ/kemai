@@ -103,6 +103,11 @@ elseif (APPLE)
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/bundle/macos/Info.plist)
     target_link_libraries(${PROJECT_NAME} "-framework CoreGraphics")
+elseif (UNIX)
+    list(APPEND SRCS
+            monitor/linuxDesktopEventsMonitor.cpp)
+    list(APPEND HDRS
+            monitor/linuxDesktopEventsMonitor.h)
 endif ()
 
 # Target configuration
