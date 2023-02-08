@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Czech translation (Thanks to @office256) 
+- Dutch translation (Thanks to Thomas)
 - TimeSheet description and tags are saved on stop [#43](https://github.com/AlexandrePTJ/kemai/issues/43).
 - Option to enable/disable Kemai's update check [#68](https://github.com/AlexandrePTJ/kemai/issues/68).
 - Can stop current timesheet when idle is detected [#63](https://github.com/AlexandrePTJ/kemai/issues/63).
