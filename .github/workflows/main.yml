@@ -1,0 +1,102 @@
+name: CI
+on: [push, workflow_dispatch]
+
+jobs:
+  job:
+    name: ${{ matrix.os }}_qt-${{ matrix.qt_version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        qt_version: [6.2.4, 5.15.2]
+        include:
+          - os: windows-latest
+            qt_tools: 'tools_openssl_x64'
+            cmake_preset: 'release-win'
+            artifact_path: 'cmake-build-release-win/Kemai-*.msi'
+          - os: ubuntu-latest
+            cmake_preset: 'release'
+            artifact_path: 'cmake-build-release/Kemai-*.AppImage'
+          - os: macos-latest
+            cmake_preset: 'release-macos'
+            artifact_path: 'dist/Kemai-*.dmg'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # Setup dependencies
+      - name: Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+
+      - if: contains(matrix.os, 'windows')
+        name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install Qt ${{ matrix.qt_version }}
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ matrix.qt_version }}
+          tools: ${{ matrix.qt_tools }}
+          cache: true
+
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
+        with:
+          version: 1.59.0
+
+      # OS dependencies
+      - if: contains(matrix.os, 'ubuntu')
+        name: Install Linux dev dependencies
+        run: sudo apt install libxss-dev libxkbcommon-x11-dev
+
+      # Build
+      - name: Configure
+        run: |
+          cmake --preset ${{ matrix.cmake_preset }}
+
+      - name: Build
+        run: |
+          cmake --build --preset ${{ matrix.cmake_preset }}
+
+      # Package Windows
+      - if: contains(matrix.os, 'windows') && startsWith(matrix.qt_version, '6')
+        name: Create Windows package
+        run: |
+          cmake --build --preset ${{ matrix.cmake_preset }} --target package
+
+      # Package Linux
+      - if: contains(matrix.os, 'ubuntu') && startsWith(matrix.qt_version, '6')
+        name: Create Linux package
+        run: |
+          sudo add-apt-repository universe
+          sudo apt install libfuse2
+          chmod +x bundle/linux/create_appimage.sh
+          ./bundle/linux/create_appimage.sh --qt_path $Qt6_DIR --build_path cmake-build-release
+
+      # Package Mac
+      - if: contains(matrix.os, 'macos') && startsWith(matrix.qt_version, '6')
+        name: Create Linux package
+        run: |
+          chmod +x bundle/macos/create_dmg.sh
+          ./bundle/macos/create_dmg.sh --qt_path $Qt6_DIR --build_path cmake-build-release-macos
+
+      # Create release if on built on a tag
+      - if: startsWith(matrix.qt_version, '6') && startsWith(github.ref, 'refs/tags/')
+        name: Create/Update release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          draft: true
+          artifacts: ${{ matrix.artifact_path }}
+#
+#      # Update packages on continuous 'release'
+#      - if: startsWith(matrix.qt_version, '6') && github.ref_name == 'develop'
+#        name: Create/Update Continuous
+#        uses: ncipollo/release-action@v1
+#        with:
+#          allowUpdates: true
+#          tag: Continuous
+#          name: Continuous
+#          artifacts: ${{ matrix.artifact_path }}

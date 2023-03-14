@@ -1,8 +1,8 @@
 {
-  "version": 2,
+  "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 20,
+    "minor": 21,
     "patch": 0
   },
   "configurePresets": [
@@ -14,15 +14,24 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/cmake-build-${presetName}",
       "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "dist"
+        "CMAKE_INSTALL_PREFIX": "/usr"
       }
     },
     {
       "name": "default-windows",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "c:/Qt/6.2.3/msvc2019_64",
-        "OPENSSL_ROOT": "c:/Qt/Tools/OpenSSL/Win_x64"
+        "CMAKE_PREFIX_PATH": "c:/Qt/6.2.4/msvc2019_64",
+        "OPENSSL_ROOT": "c:/Qt/Tools/OpenSSL/Win_x64",
+        "CMAKE_INSTALL_PREFIX": "dist"
+      }
+    },
+    {
+      "name": "default-macos",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "$env{HOME}/Qt/6.2.4/macos",
+        "CMAKE_INSTALL_PREFIX": "dist"
       }
     },
     {
@@ -41,11 +50,15 @@
     },
     {
       "name": "debug-win",
-      "inherits": ["debug", "default-windows"]
+      "inherits": ["default-windows", "debug"]
     },
     {
       "name": "release-win",
-      "inherits": ["release", "default-windows"]
+      "inherits": ["default-windows", "release"]
+    },
+    {
+      "name": "release-macos",
+      "inherits": ["default-macos", "release"]
     }
   ],
   "buildPresets": [
@@ -64,6 +77,10 @@
     {
       "name": "release-win",
       "configurePreset": "release-win"
+    },
+    {
+      "name": "release-macos",
+      "configurePreset": "release-macos"
     }
   ]
 }

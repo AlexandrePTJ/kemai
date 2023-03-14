@@ -4,7 +4,7 @@
 
 |Develop|Master|Translation|
 |:--:|:--:|:--:|
-|![Build status](https://ci.appveyor.com/api/projects/status/github/AlexandrePTJ/Kemai?branch=develop&svg=true)|![Build status](https://ci.appveyor.com/api/projects/status/github/AlexandrePTJ/Kemai?branch=master&svg=true)|[![Translation status](https://hosted.weblate.org/widgets/kemai/-/kemai/svg-badge.svg)](https://hosted.weblate.org/engage/kemai/)|
+|![Build status](https://github.com/AlexandrePTJ/kemai/actions/workflows/main.yml/badge.svg?branch=develop)|![Build status](https://github.com/AlexandrePTJ/kemai/actions/workflows/main.yml/badge.svg?branch=master)|[![Translation status](https://hosted.weblate.org/widgets/kemai/-/kemai/svg-badge.svg)](https://hosted.weblate.org/engage/kemai/)|
 
 ## How to use
 
@@ -18,7 +18,7 @@ Then, you can set this credentials to _Kemai_ settings :
 
 ## How to build
 
-_Kemai_ is Qt6 based application and it uses CMake to build. So regular cmake process will work.
+_Kemai_ is Qt6 based application. It uses [conan](https://conan.io) to resolves dependencies and CMake to build. So regular cmake process will work.
 
 ```shell script
 > cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=<path to Qt installation>
