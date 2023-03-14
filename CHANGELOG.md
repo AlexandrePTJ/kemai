@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Can stop current timesheet when idle is detected [#63](https://github.com/AlexandrePTJ/kemai/issues/63).
 - Czech translation (Thanks to @office256) 
 - Dutch translation (Thanks to Thomas)
-- Turkish translation (Thanks to Arian)
+- Turkish translation (Thanks to Mert Saraç)
 
 ### Fixed
 - Enhance MacOSX generated dmg [#54](https://github.com/AlexandrePTJ/kemai/issues/54).
