@@ -71,7 +71,8 @@ set(KEMAI_TS_FILES
         resources/l10n/kemai_hr.ts
         resources/l10n/kemai_it.ts
         resources/l10n/kemai_nb_NO.ts
-        resources/l10n/kemai_nl.ts)
+        resources/l10n/kemai_nl.ts
+        resources/l10n/kemai_tr.ts)
 qt_add_translation(KEMAI_QM_FILES ${KEMAI_TS_FILES})
 add_qm_files_to_qrc(KEMAI_L10N_QRC ${KEMAI_QM_FILES})
 
