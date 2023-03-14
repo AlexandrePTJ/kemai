@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="nl">
+<TS version="2.1" language="tr">
 <context>
     <name>ActivityDialog</name>
     <message>
         <location filename="../activitydialog.ui" line="14"/>
         <source>Activity</source>
-        <translation>Activiteit</translation>
+        <translation>Aktivite</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="25"/>
@@ -16,17 +16,17 @@
     <message>
         <location filename="../activitydialog.ui" line="35"/>
         <source>Budget</source>
-        <translation>Begroting</translation>
+        <translation>Bütçe</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="62"/>
         <source>Name</source>
-        <translation>Naam</translation>
+        <translation>İsim</translation>
     </message>
     <message>
         <location filename="../activitydialog.ui" line="85"/>
         <source>Time Budget</source>
-        <translation>Tijdsbegroting</translation>
+        <translation>Zaman Bütçesi</translation>
     </message>
 </context>
 <context>
@@ -34,12 +34,12 @@
     <message>
         <location filename="../activitywidget.ui" line="14"/>
         <source>ActivityWidget</source>
-        <translation>ActiviteitsWidget</translation>
+        <translation>ActivityWidget</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="29"/>
         <source>Customer</source>
-        <translation>Klant</translation>
+        <translation>Müşteri</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="60"/>
@@ -51,27 +51,27 @@
     <message>
         <location filename="../activitywidget.ui" line="79"/>
         <source>Project</source>
-        <translation>Project</translation>
+        <translation>Proje</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="129"/>
         <source>Activity</source>
-        <translation>Activiteit</translation>
+        <translation>Aktivite</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="173"/>
         <source>Description</source>
-        <translation>Beschrijving</translation>
+        <translation>Açıklama</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="183"/>
         <source>Tags</source>
-        <translation>Tags</translation>
+        <translation>Etiketler</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="193"/>
         <source>Started at</source>
-        <translation>Gestart op</translation>
+        <translation>Başlangıç</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="240"/>
@@ -84,37 +84,37 @@
     <message>
         <location filename="../customerdialog.ui" line="14"/>
         <source>Customer</source>
-        <translation>Klant</translation>
+        <translation>Müşteri</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="25"/>
         <source>Country</source>
-        <translation>Land</translation>
+        <translation>Ülke</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="55"/>
         <source>Currency</source>
-        <translation>Valuta</translation>
+        <translation>Para Birimi</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="62"/>
         <source>Name</source>
-        <translation>Naam</translation>
+        <translation>İsim</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="69"/>
         <source>Time Budget</source>
-        <translation>Tijdsbegroting</translation>
+        <translation>Zaman Bütçesi</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="93"/>
         <source>Timezone</source>
-        <translation>Tijdzone</translation>
+        <translation>Zaman Dilimi</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="103"/>
         <source>Budget</source>
-        <translation>Begroting</translation>
+        <translation>Bütçe</translation>
     </message>
     <message>
         <location filename="../customerdialog.ui" line="126"/>
@@ -127,12 +127,12 @@
     <message>
         <location filename="../mainwindow.ui" line="14"/>
         <source>Kemai - Kimai client</source>
-        <translation>Kemai - Kimai client</translation>
+        <translation>Kemai - Kimai İstemcisi</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="48"/>
         <source>Settings...</source>
-        <translation>Instellingen...</translation>
+        <translation>Ayarlar...</translation>
     </message>
 </context>
 <context>
@@ -140,22 +140,22 @@
     <message>
         <location filename="../projectdialog.ui" line="14"/>
         <source>Project</source>
-        <translation>Project</translation>
+        <translation>Proje</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="25"/>
         <source>Name</source>
-        <translation>Naam</translation>
+        <translation>İsim</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="32"/>
         <source>Budget</source>
-        <translation>Begroting</translation>
+        <translation>Bütçe</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="68"/>
         <source>Time Budget</source>
-        <translation>Tijdsbegroting</translation>
+        <translation>Zaman Bütçesi</translation>
     </message>
     <message>
         <location filename="../projectdialog.ui" line="75"/>
@@ -168,52 +168,52 @@
     <message>
         <location filename="../settingsdialog.ui" line="14"/>
         <source>Settings</source>
-        <translation>Instellingen</translation>
+        <translation>Ayarlar</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="41"/>
         <source>General</source>
-        <translation>Algemeen</translation>
+        <translation>Genel</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="46"/>
         <source>Profiles</source>
-        <translation>Profielen</translation>
+        <translation>Profiller</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="61"/>
         <source>Close to system tray</source>
-        <translation>Sluit af naar systeemvak</translation>
+        <translation>Kapatıldığında sistem tepsisinde tut</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="68"/>
         <source>Minimize to system tray</source>
-        <translation>Minimaliseer naar systeemvak</translation>
+        <translation>Küçültüldüğünde sistem tepsisinde tut</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="75"/>
         <source>Language</source>
-        <translation>Taal</translation>
+        <translation>Dil</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="150"/>
         <source>Name</source>
-        <translation>Naam</translation>
+        <translation>İsim</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="170"/>
         <source>Host</source>
-        <translation>Host</translation>
+        <translation>Sunucu</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="187"/>
         <source>Username</source>
-        <translation>Gebruikersnaam</translation>
+        <translation>Kullanıcı Adı</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="201"/>
         <source>Token</source>
-        <translation>Token</translation>
+        <translation>Jeton</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="242"/>
@@ -226,12 +226,12 @@
     <message>
         <location filename="../taskwidget.ui" line="14"/>
         <source>TaskWidget</source>
-        <translation>Taakwidget</translation>
+        <translation>TaskWidget</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="25"/>
         <source>Filter</source>
-        <translation>Filter</translation>
+        <translation>Filtre</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="35"/>
@@ -241,12 +241,12 @@
     <message>
         <location filename="../taskwidget.ui" line="63"/>
         <source>Start</source>
-        <translation>Start</translation>
+        <translation>Başlat</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="73"/>
         <source>Close</source>
-        <translation>Sluit af</translation>
+        <translation>Kapat</translation>
     </message>
 </context>
 <context>
@@ -254,81 +254,81 @@
     <message>
         <location filename="../mainwindow.cpp" line="47"/>
         <source>&amp;Quit</source>
-        <translation>&amp;Verlaat</translation>
+        <translation>&amp;Çıkış</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="48"/>
         <source>&amp;Settings</source>
-        <translation>&amp;Instellingen</translation>
+        <translation>&amp;Ayarlar</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="49"/>
         <source>Check for updates...</source>
-        <translation>Controleer op updates...</translation>
+        <translation>Güncellemeleri denetle...</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="50"/>
         <source>Open Kimai instance</source>
-        <translation>Open Kimai instantie</translation>
+        <translation>Kimai Alanını Aç</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="51"/>
         <source>Activities</source>
-        <translation>Activiteiten</translation>
+        <translation>Aktiviteler</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="52"/>
         <source>Tasks</source>
-        <translation>Taken</translation>
+        <translation>Görevler</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="83"/>
         <source>&amp;File</source>
-        <translation>&amp;Bestand</translation>
+        <translation>&amp;Dosya</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="88"/>
         <source>&amp;Profile</source>
-        <translation>&amp;Profiel</translation>
+        <translation>&amp;Profil</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="90"/>
         <source>&amp;View</source>
-        <translation>&amp;Weergave</translation>
+        <translation>&amp;Görünüm</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="94"/>
         <source>&amp;Help</source>
-        <translation>&amp;Help</translation>
+        <translation>&amp;Yardım</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="99"/>
         <source>About Qt</source>
-        <translation>Over Qt</translation>
+        <translation>Qt Hakkında</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="410"/>
         <source>New version available</source>
-        <translation>Nieuwe versie beschikbaar</translation>
+        <translation>Yeni bir sürüm mevcut</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="410"/>
         <source>Version %1 is available.
 
 %2</source>
-        <translation>Versie %1 is beschikbaar.
+        <translation>%1 sürümü kullanılabilir durumda.
 
 %2</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="432"/>
         <source>No update</source>
-        <translation>Geen update</translation>
+        <translation>Güncelleme yok</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="432"/>
         <source>%1 is latest version.</source>
-        <translation>%1 is de meest recente versie.</translation>
+        <translation>%1 güncel bir sürümdür.</translation>
     </message>
 </context>
 <context>
@@ -336,17 +336,17 @@
     <message>
         <location filename="../settingsdialog.cpp" line="71"/>
         <source>Language changed. Application restart is required.</source>
-        <translation>Taal gewijzigd. Applicatie moet worden herstart.</translation>
+        <translation>Dil değiştirildi. Uygulamanın yeniden başlatılması gerekir.</translation>
     </message>
     <message>
         <location filename="../settingsdialog.cpp" line="171"/>
         <source>Invalid reply.</source>
-        <translation>Ongeldig antwoord.</translation>
+        <translation>Geçersiz yanıt.</translation>
     </message>
     <message>
         <location filename="../settingsdialog.cpp" line="176"/>
         <source>Connected to Kimai %1</source>
-        <translation>Verbonden met Kimai %1</translation>
+        <translation>Kimai %1 bağlandı</translation>
     </message>
 </context>
 </TS>

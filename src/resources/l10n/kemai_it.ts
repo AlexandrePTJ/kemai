@@ -34,7 +34,7 @@
     <message>
         <location filename="../activitywidget.ui" line="14"/>
         <source>ActivityWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>WidgetAttività</translation>
     </message>
     <message>
         <location filename="../activitywidget.ui" line="29"/>
@@ -193,12 +193,12 @@
     <message>
         <location filename="../settingsdialog.ui" line="75"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Lingua</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="150"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="170"/>
@@ -208,7 +208,7 @@
     <message>
         <location filename="../settingsdialog.ui" line="187"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome Utente</translation>
     </message>
     <message>
         <location filename="../settingsdialog.ui" line="201"/>
@@ -231,7 +231,7 @@
     <message>
         <location filename="../taskwidget.ui" line="25"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtro</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="35"/>
@@ -241,12 +241,12 @@
     <message>
         <location filename="../taskwidget.ui" line="63"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Inizio</translation>
     </message>
     <message>
         <location filename="../taskwidget.ui" line="73"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiudi</translation>
     </message>
 </context>
 <context>
@@ -254,32 +254,32 @@
     <message>
         <location filename="../mainwindow.cpp" line="47"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Esci</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="48"/>
         <source>&amp;Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Impostazioni</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="49"/>
         <source>Check for updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>Controllo aggiornamenti...</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="50"/>
         <source>Open Kimai instance</source>
-        <translation type="unfinished"></translation>
+        <translation>Apri istanza Kimai</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="51"/>
         <source>Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Attività</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="52"/>
         <source>Tasks</source>
-        <translation type="unfinished"></translation>
+        <translation>Compito</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="83"/>
@@ -289,12 +289,12 @@
     <message>
         <location filename="../mainwindow.cpp" line="88"/>
         <source>&amp;Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Profilo</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="90"/>
         <source>&amp;View</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Vista</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="94"/>
@@ -304,12 +304,12 @@
     <message>
         <location filename="../mainwindow.cpp" line="99"/>
         <source>About Qt</source>
-        <translation type="unfinished"></translation>
+        <translation>Su Qt</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="410"/>
         <source>New version available</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuova versione disponibile</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="410"/>
@@ -321,12 +321,12 @@
     <message>
         <location filename="../mainwindow.cpp" line="432"/>
         <source>No update</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun aggiornamento</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="432"/>
         <source>%1 is latest version.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 è l&apos;ultima versione.</translation>
     </message>
 </context>
 <context>
@@ -334,17 +334,17 @@
     <message>
         <location filename="../settingsdialog.cpp" line="71"/>
         <source>Language changed. Application restart is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lingua cambiata. Riavvio applicazione necessario.</translation>
     </message>
     <message>
         <location filename="../settingsdialog.cpp" line="171"/>
         <source>Invalid reply.</source>
-        <translation type="unfinished"></translation>
+        <translation>Risposta non valida.</translation>
     </message>
     <message>
         <location filename="../settingsdialog.cpp" line="176"/>
         <source>Connected to Kimai %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Connesso a Kimai %1</translation>
     </message>
 </context>
 </TS>
