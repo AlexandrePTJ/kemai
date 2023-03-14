@@ -43,6 +43,8 @@ jobs:
 
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
+        with:
+          version: 1.59.0
 
       # OS dependencies
       - if: contains(matrix.os, 'ubuntu')
