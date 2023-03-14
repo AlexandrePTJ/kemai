@@ -107,10 +107,13 @@ void ActivityWidget::onCbProjectTextChanged(const QString& text)
 
 void ActivityWidget::onCbActivityTextChanged(const QString& /*text*/)
 {
-    if (!mSession->hasCurrentTimeSheet())
+    if(mSession)
     {
-        mUi->pteDescription->clear();
-        mUi->leTags->clear();
+        if (!mSession->hasCurrentTimeSheet())
+        {
+            mUi->pteDescription->clear();
+            mUi->leTags->clear();
+        }
     }
 }
 
