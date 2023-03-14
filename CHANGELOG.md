@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Migrate to GitHub Actions
 - Changelog format
+- Kimai API client refactoring
 
 
 ## [0.7.1] - 2022-06-21
