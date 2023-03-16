@@ -23,6 +23,11 @@ std::shared_ptr<KimaiClient> KemaiSession::client() const
     return mKimaiClient;
 }
 
+const KimaiCache& KemaiSession::cache() const
+{
+    return mKimaiCache;
+}
+
 void KemaiSession::refreshSessionInfos()
 {
     requestMe();
@@ -50,6 +55,14 @@ void KemaiSession::refreshCurrentTimeSheet()
     });
 
     connect(activeTimeSheetsResult, &KimaiApiBaseResult::error, this, [this, activeTimeSheetsResult]() { onClientError(activeTimeSheetsResult); });
+}
+
+void KemaiSession::refreshCache(const std::set<KimaiCache::Category>& categories)
+{
+    if (mKimaiClient)
+    {
+        mKimaiCache.synchronize(mKimaiClient, categories);
+    }
 }
 
 bool KemaiSession::hasPlugin(ApiPlugin apiPlugin) const

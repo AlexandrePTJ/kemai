@@ -222,16 +222,28 @@ TimeSheetsResult KimaiClient::requestActiveTimeSheets()
     return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::ActiveTimeSheets, reply);
 }
 
-ProjectsResult KimaiClient::requestProjects(int customerId)
+ProjectsResult KimaiClient::requestProjects(std::optional<int> customerId)
 {
-    auto request = mD->prepareRequest(ApiMethod::Projects, {{"customer", QString::number(customerId)}});
+    std::map<QString, QString> parameters;
+    if (customerId.has_value())
+    {
+        parameters.emplace("customer", QString::number(customerId.value()));
+    }
+
+    auto request = mD->prepareRequest(ApiMethod::Projects, parameters);
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplyArray<Project>(ApiMethod::Projects, reply);
 }
 
-ActivitiesResult KimaiClient::requestActivities(int projectId)
+ActivitiesResult KimaiClient::requestActivities(std::optional<int> projectId)
 {
-    auto request = mD->prepareRequest(ApiMethod::Activities, {{"project", QString::number(projectId)}});
+    std::map<QString, QString> parameters;
+    if (projectId.has_value())
+    {
+        parameters.emplace("project", QString::number(projectId.value()));
+    }
+
+    auto request = mD->prepareRequest(ApiMethod::Activities, parameters);
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplyArray<Activity>(ApiMethod::Activities, reply);
 }
@@ -269,13 +281,6 @@ TimeSheetResult KimaiClient::startTimeSheet(const TimeSheet& timeSheet, TimeShee
     auto data    = toPostData(json);
     auto request = mD->prepareRequest(ApiMethod::TimeSheets, {}, data);
     auto reply   = mD->sendPostRequest(request, data);
-    return mD->processApiNetworkReplySingleObject<TimeSheet>(ApiMethod::TimeSheets, reply);
-}
-
-TimeSheetResult KimaiClient::stopTimeSheet(const TimeSheet& timeSheet)
-{
-    auto request = mD->prepareRequest(ApiMethod::TimeSheets, {}, {}, QString("%1/stop").arg(timeSheet.id));
-    auto reply   = mD->sendPatchRequest(request, {});
     return mD->processApiNetworkReplySingleObject<TimeSheet>(ApiMethod::TimeSheets, reply);
 }
 

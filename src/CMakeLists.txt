@@ -7,6 +7,7 @@ configure_file(kemai_config.h.in ${PROJECT_BINARY_DIR}/kemai_config.h)
 # Sources
 set(SRCS
         client/kimaiapi.cpp
+        client/kimaiCache.cpp
         client/kimaiclient.cpp
         client/kimaireply.cpp
         client/parser.cpp
@@ -29,6 +30,7 @@ set(SRCS
 
 set(HDRS
         client/kimaiapi.h
+        client/kimaiCache.h
         client/kimaiclient.h
         client/kimaiclient_p.h
         client/kimaireply.h

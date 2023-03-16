@@ -4,6 +4,7 @@
 
 #include <QObject>
 
+#include "client/kimaiCache.h"
 #include "client/kimaiapi.h"
 #include "client/kimaiclient.h"
 
@@ -18,12 +19,14 @@ public:
     ~KemaiSession() override;
 
     std::shared_ptr<KimaiClient> client() const;
+    const KimaiCache& cache() const;
 
     /*
      * send some request to identify instance
      */
     void refreshSessionInfos();
     void refreshCurrentTimeSheet();
+    void refreshCache(const std::set<KimaiCache::Category>& categories = {});
 
     bool hasPlugin(ApiPlugin apiPlugin) const;
     User me() const;
@@ -49,6 +52,7 @@ private:
     void clearCurrentTimeSheet();
 
     std::shared_ptr<KimaiClient> mKimaiClient;
+    KimaiCache mKimaiCache;
     QVersionNumber mKimaiVersion;
     Plugins mPlugins;
     User mMe;

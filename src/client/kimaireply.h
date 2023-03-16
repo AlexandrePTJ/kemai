@@ -24,6 +24,8 @@ public:
      */
     void markAsReady();
 
+    bool hasError() const;
+
     /*!
      * Mark the request result as ready
      * It will emit the ready finished
@@ -73,6 +75,12 @@ public:
         m_result = std::move(result);
 
         this->markAsReady();
+    }
+
+    template<class Q = ResultType>
+    typename std::enable_if<std::is_move_constructible<ResultType>::value, Q>::type takeResult()
+    {
+        return std::move(m_result);
     }
 
 private:

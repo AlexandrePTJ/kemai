@@ -1,11 +1,12 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <QObject>
 
-#include "kimaiapi.h"
-#include "kimaireply.h"
+#include "client/kimaiapi.h"
+#include "client/kimaireply.h"
 
 namespace kemai {
 
@@ -42,15 +43,14 @@ public:
     PluginsResult requestPlugins();
     CustomersResult requestCustomers();
     TimeSheetsResult requestActiveTimeSheets();
-    ProjectsResult requestProjects(int customerId);
-    ActivitiesResult requestActivities(int projectId);
+    ProjectsResult requestProjects(std::optional<int> customerId = std::nullopt);
+    ActivitiesResult requestActivities(std::optional<int> projectId = std::nullopt);
 
     CustomerAddResult addCustomer(const Customer& customer);
     ProjectAddResult addProject(const Project& project);
     ActivityAddResult addActivity(const Activity& activity);
 
     TimeSheetResult startTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode);
-    TimeSheetResult stopTimeSheet(const TimeSheet& timeSheet);
     TimeSheetResult updateTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode);
 
     TasksResult requestTasks();

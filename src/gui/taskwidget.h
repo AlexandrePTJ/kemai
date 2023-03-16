@@ -23,14 +23,9 @@ public:
 
     void setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession);
 
-signals:
-    void taskStarted();
-    void taskStopped();
-
 private:
     void updateTasks();
     void onTaskItemChanged(const QModelIndex& current, const QModelIndex& previous);
-    void onRefreshClicked();
     void onStartStopClicked();
     void onCloseClicked();
 

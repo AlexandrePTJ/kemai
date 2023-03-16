@@ -47,9 +47,13 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
     if (mSession)
     {
         connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &ActivityWidget::onSessionCurrentTimeSheetChanged);
+        connect(&mSession->cache(), &KimaiCache::synchronizeStarted, this, [this]() { setEnabled(false); });
+        connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, [this]() { setEnabled(true); });
     }
-
-    setEnabled(mSession != nullptr);
+    else
+    {
+        setEnabled(false);
+    }
 }
 
 void ActivityWidget::stopCurrentTimeSheet()
@@ -75,39 +79,21 @@ void ActivityWidget::stopCurrentTimeSheet()
     }
 }
 
-void ActivityWidget::onCbCustomerTextChanged(const QString& text)
+void ActivityWidget::onCbCustomerTextChanged(const QString& /*text*/)
 {
-    mUi->cbProject->clear();
-
-    if (!text.isEmpty() && mSession)
-    {
-        auto customerId = mUi->cbCustomer->currentData().toInt();
-
-        auto projectsResult = mSession->client()->requestProjects(customerId);
-        connect(projectsResult, &KimaiApiBaseResult::ready, this, [this, projectsResult] { processProjectsResult(projectsResult); });
-        connect(projectsResult, &KimaiApiBaseResult::error, [projectsResult]() { projectsResult->deleteLater(); });
-    }
+    updateProjectsCombo();
     updateControls();
 }
 
 void ActivityWidget::onCbProjectTextChanged(const QString& text)
 {
-    mUi->cbActivity->clear();
-
-    if (!text.isEmpty() && mSession)
-    {
-        auto projectId = mUi->cbProject->currentData().toInt();
-
-        auto activitiesResult = mSession->client()->requestActivities(projectId);
-        connect(activitiesResult, &KimaiApiBaseResult::ready, this, [this, activitiesResult] { processActivitiesResult(activitiesResult); });
-        connect(activitiesResult, &KimaiApiBaseResult::error, [activitiesResult]() { activitiesResult->deleteLater(); });
-    }
+    updateActivitiesCombo();
     updateControls();
 }
 
 void ActivityWidget::onCbActivityTextChanged(const QString& /*text*/)
 {
-    if(mSession)
+    if (mSession)
     {
         if (!mSession->hasCurrentTimeSheet())
         {
@@ -129,6 +115,7 @@ void ActivityWidget::onTbAddCustomerClicked()
             const auto& customer = customerAddResult->getResult();
             mUi->cbCustomer->addItem(customer.name, customer.id);
             customerAddResult->deleteLater();
+            mSession->refreshCache({KimaiCache::Category::Customers});
         });
         connect(customerAddResult, &KimaiApiBaseResult::error, [customerAddResult]() { customerAddResult->deleteLater(); });
     }
@@ -147,6 +134,7 @@ void ActivityWidget::onTbAddProjectClicked()
             const auto& project = projectAddResult->getResult();
             mUi->cbProject->addItem(project.name, project.id);
             projectAddResult->deleteLater();
+            mSession->refreshCache({KimaiCache::Category::Projects});
         });
         connect(projectAddResult, &KimaiApiBaseResult::error, [projectAddResult]() { projectAddResult->deleteLater(); });
     }
@@ -172,6 +160,7 @@ void ActivityWidget::onTbAddActivityClicked()
             const auto& activity = activityAddResult->getResult();
             mUi->cbActivity->addItem(activity.name, activity.id);
             activityAddResult->deleteLater();
+            mSession->refreshCache({KimaiCache::Category::Activities});
         });
         connect(activityAddResult, &KimaiApiBaseResult::error, [activityAddResult]() { activityAddResult->deleteLater(); });
     }
@@ -219,10 +208,7 @@ void ActivityWidget::onSessionCurrentTimeSheetChanged()
     }
 
     updateControls();
-
-    auto customersResult = mSession->client()->requestCustomers();
-    connect(customersResult, &KimaiApiBaseResult::ready, this, [this, customersResult] { processCustomersResult(customersResult); });
-    connect(customersResult, &KimaiApiBaseResult::error, [customersResult]() { customersResult->deleteLater(); });
+    updateCustomersCombo();
 }
 
 void ActivityWidget::onBtStartStopClicked()
@@ -287,89 +273,104 @@ void ActivityWidget::updateControls()
     emit currentActivityChanged(enable);
 }
 
-void ActivityWidget::processCustomersResult(CustomersResult customersResult)
+void ActivityWidget::updateCustomersCombo()
 {
-    const auto& customers = customersResult->getResult();
-    if (!customers.empty())
-    {
-        mUi->cbCustomer->clear();
-        mUi->cbCustomer->addItem("");
-        for (const auto& customer : customers)
-        {
-            mUi->cbCustomer->addItem(customer.name, customer.id);
-        }
-    }
+    mUi->cbCustomer->clear();
 
-    if (mSession->hasCurrentTimeSheet())
+    if (mSession)
     {
-        auto customerIndex = mUi->cbCustomer->findData(mSession->currentTimeSheet()->project.customer.id);
-        if (customerIndex >= 0)
+        auto customers = mSession->cache().customers();
+        if (!customers.empty())
         {
-            mUi->cbCustomer->setCurrentIndex(customerIndex);
+            mUi->cbCustomer->clear();
+            mUi->cbCustomer->addItem("");
+            for (const auto& customer : customers)
+            {
+                mUi->cbCustomer->addItem(customer.name, customer.id);
+            }
         }
-        else
+
+        if (mSession->hasCurrentTimeSheet())
         {
-            spdlog::error("Cannot find '{}' customer", mSession->currentTimeSheet()->project.customer.name.toStdString());
+            auto customerIndex = mUi->cbCustomer->findData(mSession->currentTimeSheet()->project.customer.id);
+            if (customerIndex >= 0)
+            {
+                mUi->cbCustomer->setCurrentIndex(customerIndex);
+            }
+            else
+            {
+                spdlog::error("Cannot find '{}' customer", mSession->currentTimeSheet()->project.customer.name.toStdString());
+            }
         }
     }
-    customersResult->deleteLater();
 }
 
-void ActivityWidget::processProjectsResult(ProjectsResult projectsResult)
+void ActivityWidget::updateProjectsCombo()
 {
-    const auto& projects = projectsResult->getResult();
-    if (!projects.empty())
-    {
-        mUi->cbProject->clear();
-        mUi->cbProject->addItem("");
+    mUi->cbProject->clear();
 
-        for (const auto& project : projects)
+    if (mSession)
+    {
+        // When no customer selected, list all projects
+        auto customerId = mUi->cbCustomer->currentText().isEmpty() ? std::nullopt : std::optional<int>(mUi->cbCustomer->currentData().toInt());
+        auto projects   = mSession->cache().projects(customerId);
+
+        if (!projects.empty())
         {
-            mUi->cbProject->addItem(project.name, project.id);
+            mUi->cbProject->addItem("");
+
+            for (const auto& project : projects)
+            {
+                mUi->cbProject->addItem(project.name, project.id);
+            }
+        }
+
+        if (mSession->hasCurrentTimeSheet())
+        {
+            auto projectIndex = mUi->cbProject->findData(mSession->currentTimeSheet()->project.id);
+            if (projectIndex >= 0)
+            {
+                mUi->cbProject->setCurrentIndex(projectIndex);
+            }
+            else
+            {
+                spdlog::error("Cannot find '{}' project", mSession->currentTimeSheet()->project.name.toStdString());
+            }
         }
     }
-
-    if (mSession->hasCurrentTimeSheet())
-    {
-        auto projectIndex = mUi->cbProject->findData(mSession->currentTimeSheet()->project.id);
-        if (projectIndex >= 0)
-        {
-            mUi->cbProject->setCurrentIndex(projectIndex);
-        }
-        else
-        {
-            spdlog::error("Cannot find '{}' project", mSession->currentTimeSheet()->project.name.toStdString());
-        }
-    }
-
-    projectsResult->deleteLater();
 }
 
-void ActivityWidget::processActivitiesResult(ActivitiesResult activitiesResult)
+void ActivityWidget::updateActivitiesCombo()
 {
-    const auto& activities = activitiesResult->getResult();
-    if (!activities.empty())
-    {
-        mUi->cbActivity->clear();
-        mUi->cbActivity->addItem("");
+    mUi->cbActivity->clear();
 
-        for (const auto& activity : activities)
+    if (!mUi->cbProject->currentText().isEmpty() && mSession)
+    {
+        auto projectId  = mUi->cbProject->currentData().toInt();
+        auto activities = mSession->cache().activities(projectId);
+
+        if (!activities.empty())
         {
-            mUi->cbActivity->addItem(activity.name, activity.id);
+            mUi->cbActivity->clear();
+            mUi->cbActivity->addItem("");
+
+            for (const auto& activity : activities)
+            {
+                mUi->cbActivity->addItem(activity.name, activity.id);
+            }
+        }
+
+        if (mSession->hasCurrentTimeSheet())
+        {
+            auto activityIndex = mUi->cbActivity->findData(mSession->currentTimeSheet()->activity.id);
+            if (activityIndex >= 0)
+            {
+                mUi->cbActivity->setCurrentIndex(activityIndex);
+            }
+            else
+            {
+                spdlog::error("Cannot find '{}' activity", mSession->currentTimeSheet()->activity.name.toStdString());
+            }
         }
     }
-
-    if (mSession->hasCurrentTimeSheet())
-    {
-        auto activityIndex = mUi->cbActivity->findData(mSession->currentTimeSheet()->activity.id);
-        if (activityIndex >= 0)
-        {
-            mUi->cbActivity->setCurrentIndex(activityIndex);
-        }
-        else
-        {
-            spdlog::error("Cannot find '{}' activity", mSession->currentTimeSheet()->activity.name.toStdString());
-        }
-    }
-    activitiesResult->deleteLater();
 }
