@@ -38,6 +38,9 @@ endif ()
 # Setup other dependencies
 find_package(spdlog REQUIRED)
 find_package(magic_enum REQUIRED)
+if (APPLE)
+    find_package(range-v3 REQUIRED)
+endif()
 
 # Write version to file to ease packaging
 file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${PROJECT_VERSION})
