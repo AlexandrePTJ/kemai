@@ -4,9 +4,9 @@
  * TODO: Removes when std::views is available on MacOS/clang
  */
 #ifdef Q_OS_MACOS
-#include <range/v3/all.hpp>
+#    include <range/v3/all.hpp>
 #else
-#include <ranges>
+#    include <ranges>
 namespace ranges = std;
 #endif
 
@@ -22,6 +22,8 @@ void KimaiCache::synchronize(const std::shared_ptr<KimaiClient>& client, const s
         spdlog::error("Sync already in progress");
         return;
     }
+
+    mStatus = KimaiCache::Status::SyncPending;
 
     // Fill what to sync
     if (categories.empty())
@@ -68,6 +70,11 @@ void KimaiCache::synchronize(const std::shared_ptr<KimaiClient>& client, const s
     }
 }
 
+KimaiCache::Status KimaiCache::status() const
+{
+    return mStatus;
+}
+
 Customers KimaiCache::customers() const
 {
     return mCustomers;
@@ -107,6 +114,7 @@ void KimaiCache::updateSyncProgress(Category finishedCategory)
 
     if (mPendingSync.empty())
     {
+        mStatus = KimaiCache::Status::Ready;
         mSyncSemaphore.release();
         emit synchronizeFinished();
     }

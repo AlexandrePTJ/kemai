@@ -214,15 +214,11 @@ void MainWindow::createKemaiSession(const Settings::Profile& profile)
         connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &MainWindow::onCurrentTimeSheetChanged);
         connect(mSession.get(), &KemaiSession::pluginsChanged, this, &MainWindow::onPluginsChanged);
 
-        // TODO: Change to avoid refresh each time en entry is added
-        connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, [this]() {
-            mSession->refreshSessionInfos();
-            mSession->refreshCurrentTimeSheet();
-        });
-
         mActivityWidget->setKemaiSession(mSession);
 
         mSession->refreshCache();
+        mSession->refreshSessionInfos();
+        mSession->refreshCurrentTimeSheet();
 
         // Save profile connection
         settings.kemai.lastConnectedProfile = profile.id;

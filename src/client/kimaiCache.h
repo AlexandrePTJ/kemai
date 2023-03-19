@@ -23,7 +23,15 @@ public:
         Activities
     };
 
+    enum class Status
+    {
+        Empty,
+        SyncPending,
+        Ready
+    };
+
     void synchronize(const std::shared_ptr<KimaiClient>& client, const std::set<Category>& categories = {});
+    Status status() const;
 
     Customers customers() const;
     Projects projects(std::optional<int> customerId) const;
@@ -45,6 +53,7 @@ private:
     Projects mProjects;
     Activities mActivities;
 
+    kemai::KimaiCache::Status mStatus = kemai::KimaiCache::Status::Empty;
     std::binary_semaphore mSyncSemaphore{1};
     std::mutex mProgressMutex;
 };

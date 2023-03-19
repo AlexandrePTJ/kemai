@@ -85,7 +85,7 @@ void ActivityWidget::onCbCustomerTextChanged(const QString& /*text*/)
     updateControls();
 }
 
-void ActivityWidget::onCbProjectTextChanged(const QString& text)
+void ActivityWidget::onCbProjectTextChanged(const QString& /*text*/)
 {
     updateActivitiesCombo();
     updateControls();
@@ -200,6 +200,12 @@ void ActivityWidget::onSecondTimeout()
 
 void ActivityWidget::onSessionCurrentTimeSheetChanged()
 {
+    // Waiting for cache to be filled before trying to update combos
+    while (mSession->cache().status() != KimaiCache::Status::Ready)
+    {
+        qApp->processEvents();
+    }
+
     if (mSession->hasCurrentTimeSheet())
     {
         mUi->dteStartedAt->setDateTime(mSession->currentTimeSheet()->beginAt);
