@@ -14,6 +14,7 @@ set(SRCS
         context/kemaisession.cpp
         gui/activitydialog.cpp
         gui/activitywidget.cpp
+        gui/autoCompleteComboBox.cpp
         gui/customerdialog.cpp
         gui/durationedit.cpp
         gui/mainwindow.cpp
@@ -38,6 +39,7 @@ set(HDRS
         context/kemaisession.h
         gui/activitydialog.h
         gui/activitywidget.h
+        gui/autoCompleteComboBox.h
         gui/customerdialog.h
         gui/durationedit.h
         gui/mainwindow.h

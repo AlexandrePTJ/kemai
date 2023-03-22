@@ -173,20 +173,22 @@ void ActivityWidget::onSecondTimeout()
     {
         auto nSecs = mSession->currentTimeSheet()->beginAt.secsTo(now);
 
-        auto nDays = nSecs / 86400;
+        //NOLINTBEGIN(readability-magic-numbers)
+        const auto nDays = nSecs / 86400;
         nSecs -= nDays * 86400;
 
-        auto nHours = nSecs / 3600;
+        const auto nHours = nSecs / 3600;
         nSecs -= nHours * 3600;
 
-        auto nMins = nSecs / 60;
-        nSecs -= nMins * 60;
+        const auto nMinutes = nSecs / 60;
+        nSecs -= nMinutes * 60;
 
         mUi->lbDurationTime->setText(QString("%1%2:%3:%4")
                                          .arg(nDays > 0 ? QString::number(nDays) + "d " : "")
                                          .arg(nHours, 2, 10, QChar('0'))
-                                         .arg(nMins, 2, 10, QChar('0'))
+                                         .arg(nMinutes, 2, 10, QChar('0'))
                                          .arg(nSecs, 2, 10, QChar('0')));
+        //NOLINTEND(readability-magic-numbers)
     }
     else
     {
@@ -285,16 +287,7 @@ void ActivityWidget::updateCustomersCombo()
 
     if (mSession)
     {
-        auto customers = mSession->cache().customers();
-        if (!customers.empty())
-        {
-            mUi->cbCustomer->clear();
-            mUi->cbCustomer->addItem("");
-            for (const auto& customer : customers)
-            {
-                mUi->cbCustomer->addItem(customer.name, customer.id);
-            }
-        }
+        mUi->cbCustomer->setKimaiData(mSession->cache().customers());
 
         if (mSession->hasCurrentTimeSheet())
         {
@@ -319,17 +312,7 @@ void ActivityWidget::updateProjectsCombo()
     {
         // When no customer selected, list all projects
         auto customerId = mUi->cbCustomer->currentText().isEmpty() ? std::nullopt : std::optional<int>(mUi->cbCustomer->currentData().toInt());
-        auto projects   = mSession->cache().projects(customerId);
-
-        if (!projects.empty())
-        {
-            mUi->cbProject->addItem("");
-
-            for (const auto& project : projects)
-            {
-                mUi->cbProject->addItem(project.name, project.id);
-            }
-        }
+        mUi->cbProject->setKimaiData(mSession->cache().projects(customerId));
 
         if (mSession->hasCurrentTimeSheet())
         {
@@ -353,18 +336,7 @@ void ActivityWidget::updateActivitiesCombo()
     if (!mUi->cbProject->currentText().isEmpty() && mSession)
     {
         auto projectId  = mUi->cbProject->currentData().toInt();
-        auto activities = mSession->cache().activities(projectId);
-
-        if (!activities.empty())
-        {
-            mUi->cbActivity->clear();
-            mUi->cbActivity->addItem("");
-
-            for (const auto& activity : activities)
-            {
-                mUi->cbActivity->addItem(activity.name, activity.id);
-            }
-        }
+        mUi->cbActivity->setKimaiData(mSession->cache().activities(projectId));
 
         if (mSession->hasCurrentTimeSheet())
         {
