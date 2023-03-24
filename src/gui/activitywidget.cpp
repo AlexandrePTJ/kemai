@@ -48,7 +48,12 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
     {
         connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &ActivityWidget::onSessionCurrentTimeSheetChanged);
         connect(&mSession->cache(), &KimaiCache::synchronizeStarted, this, [this]() { setEnabled(false); });
-        connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, [this]() { setEnabled(true); });
+        connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, [this]() {
+            mUi->cbCustomer->setKimaiData(mSession->cache().customers());
+            mUi->cbProject->setKimaiData(mSession->cache().projects());
+            mUi->cbActivity->setKimaiData(mSession->cache().activities());
+            setEnabled(true);
+        });
     }
     else
     {
@@ -173,7 +178,7 @@ void ActivityWidget::onSecondTimeout()
     {
         auto nSecs = mSession->currentTimeSheet()->beginAt.secsTo(now);
 
-        //NOLINTBEGIN(readability-magic-numbers)
+        // NOLINTBEGIN(readability-magic-numbers)
         const auto nDays = nSecs / 86400;
         nSecs -= nDays * 86400;
 
@@ -188,7 +193,7 @@ void ActivityWidget::onSecondTimeout()
                                          .arg(nHours, 2, 10, QChar('0'))
                                          .arg(nMinutes, 2, 10, QChar('0'))
                                          .arg(nSecs, 2, 10, QChar('0')));
-        //NOLINTEND(readability-magic-numbers)
+        // NOLINTEND(readability-magic-numbers)
     }
     else
     {
@@ -283,12 +288,8 @@ void ActivityWidget::updateControls()
 
 void ActivityWidget::updateCustomersCombo()
 {
-    mUi->cbCustomer->clear();
-
     if (mSession)
     {
-        mUi->cbCustomer->setKimaiData(mSession->cache().customers());
-
         if (mSession->hasCurrentTimeSheet())
         {
             auto customerIndex = mUi->cbCustomer->findData(mSession->currentTimeSheet()->project.customer.id);
@@ -306,13 +307,11 @@ void ActivityWidget::updateCustomersCombo()
 
 void ActivityWidget::updateProjectsCombo()
 {
-    mUi->cbProject->clear();
-
     if (mSession)
     {
         // When no customer selected, list all projects
         auto customerId = mUi->cbCustomer->currentText().isEmpty() ? std::nullopt : std::optional<int>(mUi->cbCustomer->currentData().toInt());
-        mUi->cbProject->setKimaiData(mSession->cache().projects(customerId));
+        mUi->cbProject->setFilter(mSession->cache().projects(customerId));
 
         if (mSession->hasCurrentTimeSheet())
         {
@@ -331,12 +330,10 @@ void ActivityWidget::updateProjectsCombo()
 
 void ActivityWidget::updateActivitiesCombo()
 {
-    mUi->cbActivity->clear();
-
-    if (!mUi->cbProject->currentText().isEmpty() && mSession)
+    if (mSession)
     {
-        auto projectId  = mUi->cbProject->currentData().toInt();
-        mUi->cbActivity->setKimaiData(mSession->cache().activities(projectId));
+        auto projectId = mUi->cbProject->currentData().toInt();
+        mUi->cbActivity->setFilter(mSession->cache().activities(projectId));
 
         if (mSession->hasCurrentTimeSheet())
         {

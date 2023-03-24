@@ -34,8 +34,8 @@ public:
     Status status() const;
 
     Customers customers() const;
-    Projects projects(std::optional<int> customerId) const;
-    Activities activities(std::optional<int> projectId) const;
+    Projects projects(std::optional<int> customerId = std::nullopt) const;
+    Activities activities(std::optional<int> projectId = std::nullopt) const;
 
 signals:
     void synchronizeStarted();

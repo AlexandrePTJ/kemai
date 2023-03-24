@@ -23,6 +23,8 @@ set(SRCS
         gui/taskwidget.cpp
         main.cpp
         misc/datareader.cpp
+        models/kimaiDataListModel.cpp
+        models/kimaiDataSortFilterProxyModel.cpp
         models/taskfilterproxymodel.cpp
         models/tasklistmodel.cpp
         monitor/desktopEventsMonitor.cpp
@@ -47,6 +49,8 @@ set(HDRS
         gui/settingsdialog.h
         gui/taskwidget.h
         misc/datareader.h
+        models/kimaiDataListModel.h
+        models/kimaiDataSortFilterProxyModel.h
         models/taskfilterproxymodel.h
         models/tasklistmodel.h
         monitor/desktopEventsMonitor.h

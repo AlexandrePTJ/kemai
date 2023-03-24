@@ -7,7 +7,7 @@ using namespace kemai;
 class kemai::AutoCompleteValidator : public QValidator
 {
 public:
-    explicit AutoCompleteValidator(AutoCompleteListModel* model) : mModel(model) {}
+    explicit AutoCompleteValidator(KimaiDataListModel* model) : mModel(model) {}
     ~AutoCompleteValidator() override = default;
 
     QValidator::State validate(QString& input, int& /*pos*/) const override
@@ -38,38 +38,13 @@ public:
     void fixup(QString& input) const override { input.clear(); }
 
 private:
-    AutoCompleteListModel* mModel = nullptr;
+    KimaiDataListModel* mModel;
 };
-
-int AutoCompleteListModel::rowCount(const QModelIndex& parent) const
-{
-    return static_cast<int>(mData.size());
-}
-
-QVariant AutoCompleteListModel::data(const QModelIndex& index, int role) const
-{
-    if (!index.isValid() || index.row() > mData.size())
-    {
-        return {};
-    }
-
-    const auto& it = std::next(mData.begin(), index.row());
-    switch (role)
-    {
-    case Qt::EditRole:
-    case Qt::DisplayRole:
-        return it->first;
-
-    case Qt::UserRole:
-        return it->second;
-
-    default:
-        return {};
-    }
-}
 
 AutoCompleteComboBox::AutoCompleteComboBox(QWidget* parent) : QComboBox(parent)
 {
+    mProxyModel.setSourceModel(&mModel);
+
     setEditable(true);
 
     auto completer = new QCompleter(&mModel);

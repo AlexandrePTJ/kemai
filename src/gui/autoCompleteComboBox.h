@@ -1,33 +1,11 @@
 #pragma once
 
-#include <QAbstractListModel>
 #include <QComboBox>
 
+#include <models/kimaiDataListModel.h>
+#include <models/kimaiDataSortFilterProxyModel.h>
+
 namespace kemai {
-
-class AutoCompleteListModel : public QAbstractListModel
-{
-public:
-    int rowCount(const QModelIndex& parent) const override;
-    QVariant data(const QModelIndex& index, int role) const override;
-
-    template<class K> void setKimaiData(const std::vector<K>& kds)
-    {
-        beginResetModel();
-        if (!kds.empty())
-        {
-            mData = {{"", 0}};
-            for (const auto& kd : kds)
-            {
-                mData.emplace(kd.name, kd.id);
-            }
-        }
-        endResetModel();
-    }
-
-private:
-    std::map<QString, int> mData;
-};
 
 class AutoCompleteValidator;
 
@@ -43,15 +21,18 @@ public:
     {
         if (!mModelSet) // Avoid to call virtual setModel in ctor and to have to call explicitly somewhere else.
         {
-            mModelSet=true;
-            setModel(&mModel);
+            mModelSet = true;
+            setModel(&mProxyModel);
         }
         mModel.setKimaiData(kds);
     }
 
+    template<class K> void setFilter(const std::vector<K>& kds) { mProxyModel.setKimaiFilter(kds); }
+
 private:
-    bool mModelSet=false;
-    AutoCompleteListModel mModel;
+    bool mModelSet = false;
+    KimaiDataListModel mModel;
+    KimaiDataSortFilterProxyModel mProxyModel;
     AutoCompleteValidator* mValidator = nullptr;
 };
 
