@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Allow selection of project without first selecting customer [#74](https://github.com/AlexandrePTJ/kemai/issues/74).
 - Improve Loading of Customer / Projects / Activities [#44](https://github.com/AlexandrePTJ/kemai/issues/44).
+- Improve filter on Customer / Projects / Activities [#75](https://github.com/AlexandrePTJ/kemai/issues/75).
 
 
 ## [0.8.0] - 2023-03-14
