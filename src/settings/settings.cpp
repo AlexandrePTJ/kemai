@@ -121,6 +121,14 @@ Settings Settings::load()
     {
         settings.kemai.lastConnectedProfile = QUuid(kemaiObject.value("lastConnectedProfile").toString());
     }
+    if (kemaiObject.contains("autoRefreshDelaySeconds"))
+    {
+        auto autoRefreshDelaySecondsValue = kemaiObject.value("autoRefreshDelaySeconds");
+        if (autoRefreshDelaySecondsValue.isDouble())
+        {
+            settings.kemai.autoRefreshDelaySeconds = autoRefreshDelaySecondsValue.toInt();
+        }
+    }
 
     for (const auto& profileValue : root.value("profiles").toArray())
     {
@@ -168,6 +176,8 @@ void Settings::save(const Settings& settings)
     kemaiObject["geometry"]             = QString(settings.kemai.geometry.toBase64());
     kemaiObject["language"]             = settings.kemai.language.name();
     kemaiObject["lastConnectedProfile"] = settings.kemai.lastConnectedProfile.toString();
+    kemaiObject["autoRefreshDelaySeconds"] =
+        settings.kemai.autoRefreshDelaySeconds.has_value() ? QJsonValue(settings.kemai.autoRefreshDelaySeconds.value()) : QJsonValue(QJsonValue::Null);
 
     QJsonObject eventsObject;
     eventsObject["stopOnLock"]       = settings.events.stopOnLock;

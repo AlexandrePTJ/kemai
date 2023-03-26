@@ -29,6 +29,7 @@ struct Settings
         QByteArray geometry;
         QLocale language;
         QUuid lastConnectedProfile;
+        std::optional<int> autoRefreshDelaySeconds = std::nullopt;
     } kemai;
 
     struct Events
