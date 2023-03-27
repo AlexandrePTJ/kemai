@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Special thanks to @shrippen for its support through [sponsorship](https://github.com/sponsors/AlexandrePTJ).
 
+### Fixed
+- Regression resetting dropdown fields when stopping timsesheet [#77](https://github.com/AlexandrePTJ/kemai/issues/77).
+
 ### Changed
 - Allow selection of project without first selecting customer [#74](https://github.com/AlexandrePTJ/kemai/issues/74).
 - Improve Loading of Customer / Projects / Activities [#44](https://github.com/AlexandrePTJ/kemai/issues/44).
@@ -125,7 +128,8 @@ Special thanks to @shrippen for its support through [sponsorship](https://github
 Initial version.
 
 
-[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.7.1...HEAD
+[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/AlexandrePTJ/kemai/compare/0.7.1...0.8.0
 [0.7.1]: https://github.com/AlexandrePTJ/kemai/compare/0.7.0...0.7.1
 [0.7.0]: https://github.com/AlexandrePTJ/kemai/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/AlexandrePTJ/kemai/compare/0.5.0...0.6.0
