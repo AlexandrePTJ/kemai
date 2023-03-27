@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Special thanks to @shrippen for its support through [sponsorship](https://github.com/sponsors/AlexandrePTJ).
 
+### Added
+- Periodic check of current timesheet [#80](https://github.com/AlexandrePTJ/kemai/issues/80).
+
 ### Fixed
 - Regression resetting dropdown fields when stopping timsesheet [#77](https://github.com/AlexandrePTJ/kemai/issues/77).
 

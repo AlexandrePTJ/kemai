@@ -14,7 +14,10 @@ static const auto MinimalKimaiVersionForPluginRequest = QVersionNumber(1, 14, 1)
 /*
  * Class impl
  */
-KemaiSession::KemaiSession(std::shared_ptr<KimaiClient> kimaiClient) : mKimaiClient(std::move(kimaiClient)) {}
+KemaiSession::KemaiSession(const std::shared_ptr<KimaiClient>& kimaiClient) : mKimaiClient(kimaiClient), mKimaiMonitor(kimaiClient)
+{
+    connect(&mKimaiMonitor, &KimaiEventsMonitor::currentTimeSheetChanged, this, &KemaiSession::currentTimeSheetChanged);
+}
 
 KemaiSession::~KemaiSession() = default;
 
@@ -37,24 +40,7 @@ void KemaiSession::refreshSessionInfos()
 
 void KemaiSession::refreshCurrentTimeSheet()
 {
-    auto activeTimeSheetsResult = mKimaiClient->requestActiveTimeSheets();
-
-    connect(activeTimeSheetsResult, &KimaiApiBaseResult::ready, this, [this, activeTimeSheetsResult] {
-        const auto& timeSheets = activeTimeSheetsResult->getResult();
-
-        if (timeSheets.empty())
-        {
-            clearCurrentTimeSheet();
-        }
-        else
-        {
-            setCurrentTimeSheet(timeSheets.front());
-        }
-
-        activeTimeSheetsResult->deleteLater();
-    });
-
-    connect(activeTimeSheetsResult, &KimaiApiBaseResult::error, this, [this, activeTimeSheetsResult]() { onClientError(activeTimeSheetsResult); });
+    mKimaiMonitor.refreshCurrentTimeSheet();
 }
 
 void KemaiSession::refreshCache(const std::set<KimaiCache::Category>& categories)
@@ -80,28 +66,14 @@ TimeSheetConfig KemaiSession::timeSheetConfig() const
     return mTimeSheetConfig;
 }
 
-void KemaiSession::setCurrentTimeSheet(const TimeSheet& timeSheet)
-{
-    if (mCurrentTimeSheet.has_value())
-    {
-        if (timeSheet.id == mCurrentTimeSheet->id)
-        {
-            return;
-        }
-    }
-
-    mCurrentTimeSheet = timeSheet;
-    emit currentTimeSheetChanged();
-}
-
 std::optional<TimeSheet> KemaiSession::currentTimeSheet() const
 {
-    return mCurrentTimeSheet;
+    return mKimaiMonitor.currentTimeSheet();
 }
 
 bool KemaiSession::hasCurrentTimeSheet() const
 {
-    return mCurrentTimeSheet.has_value();
+    return mKimaiMonitor.hasCurrentTimeSheet();
 }
 
 QDateTime KemaiSession::computeTZDateTime(const QDateTime& dateTime) const
@@ -113,12 +85,6 @@ QDateTime KemaiSession::computeTZDateTime(const QDateTime& dateTime) const
         return dateTime.toTimeZone(timeZone);
     }
     return dateTime;
-}
-
-void KemaiSession::clearCurrentTimeSheet()
-{
-    mCurrentTimeSheet.reset();
-    emit currentTimeSheetChanged();
 }
 
 void KemaiSession::onClientError(KimaiApiBaseResult* apiBaseResult)

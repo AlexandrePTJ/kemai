@@ -123,6 +123,8 @@ void SettingsDialog::setSettings(const Settings& settings)
     mUi->cbStopOnLock->setChecked(m_settings.events.stopOnLock);
     mUi->cbStopOnIdle->setChecked(m_settings.events.stopOnIdle);
     mUi->sbIdleDelay->setValue(m_settings.events.idleDelayMinutes);
+    mUi->cbAutoRefreshCurrentTimeSheet->setChecked(m_settings.events.autoRefreshCurrentTimeSheet);
+    mUi->sbAutoRefreshDelay->setValue(m_settings.events.autoRefreshCurrentTimeSheetDelaySeconds);
 }
 
 Settings SettingsDialog::settings() const
@@ -137,6 +139,9 @@ Settings SettingsDialog::settings() const
     settings.events.stopOnLock       = mUi->cbStopOnLock->isChecked();
     settings.events.stopOnIdle       = mUi->cbStopOnIdle->isChecked();
     settings.events.idleDelayMinutes = mUi->sbIdleDelay->value();
+
+    settings.events.autoRefreshCurrentTimeSheet             = mUi->cbAutoRefreshCurrentTimeSheet->isChecked();
+    settings.events.autoRefreshCurrentTimeSheetDelaySeconds = mUi->sbAutoRefreshDelay->value();
 
     // Profiles are directly managed from buttons on fields updates.
 

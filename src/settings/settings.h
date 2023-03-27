@@ -31,14 +31,15 @@ struct Settings
         QByteArray geometry;
         QLocale language;
         QUuid lastConnectedProfile;
-        std::optional<int> autoRefreshDelaySeconds = std::nullopt;
     } kemai;
 
     struct Events
     {
-        bool stopOnLock      = false;
-        bool stopOnIdle      = false;
-        int idleDelayMinutes = 1;
+        bool stopOnLock                             = false;
+        bool stopOnIdle                             = false;
+        int idleDelayMinutes                        = 1;
+        bool autoRefreshCurrentTimeSheet            = false;
+        int autoRefreshCurrentTimeSheetDelaySeconds = 5;
     } events;
 
     bool isReady() const;

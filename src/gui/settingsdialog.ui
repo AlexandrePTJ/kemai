@@ -155,6 +155,53 @@
            </item>
           </layout>
          </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Refresh delay (secs)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QSpinBox" name="sbAutoRefreshDelay">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="minimum">
+              <number>5</number>
+             </property>
+             <property name="maximum">
+              <number>60</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QCheckBox" name="cbAutoRefreshCurrentTimeSheet">
+           <property name="text">
+            <string>Auto-refresh current timesheet</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="profilesPage">
@@ -435,6 +482,38 @@
     <hint type="destinationlabel">
      <x>261</x>
      <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbAutoRefreshCurrentTimeSheet</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>sbAutoRefreshDelay</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>294</x>
+     <y>108</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>248</x>
+     <y>137</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbAutoRefreshCurrentTimeSheet</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_4</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>244</x>
+     <y>108</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>147</x>
+     <y>140</y>
     </hint>
    </hints>
   </connection>

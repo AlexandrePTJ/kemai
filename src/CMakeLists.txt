@@ -28,6 +28,7 @@ set(SRCS
         models/taskfilterproxymodel.cpp
         models/tasklistmodel.cpp
         monitor/desktopEventsMonitor.cpp
+        monitor/kimaiEventsMonitor.cpp
         settings/settings.cpp
         updater/kemaiupdater.cpp)
 
@@ -54,6 +55,7 @@ set(HDRS
         models/taskfilterproxymodel.h
         models/tasklistmodel.h
         monitor/desktopEventsMonitor.h
+        monitor/kimaiEventsMonitor.h
         settings/settings.h
         updater/kemaiupdater.h
         updater/kemaiupdater_p.h)

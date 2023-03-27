@@ -13,6 +13,14 @@
 using namespace kemai;
 
 /*
+ * Config file version
+ */
+static const auto gCfgVersion_0      = 0; // Ini format
+static const auto gCfgVersion_1      = 1; // Migrate to JSON
+static const auto gCfgVersion_2      = 2; // Add AutoRefreshCurrentTimeSheet setting
+static const auto gCurrentCfgVersion = gCfgVersion_2;
+
+/*
  * Static helpers
  */
 QSettings getQSettingsInstance()
@@ -110,6 +118,8 @@ Settings Settings::load()
 
     Settings settings;
 
+    const auto cfgVersion = root.value("version").toInt();
+
     for (const auto& certificationValue : root.value("trustedCertificates").toArray())
     {
         settings.trustedCertificates.append(certificationValue.toString());
@@ -125,14 +135,6 @@ Settings Settings::load()
     if (kemaiObject.contains("lastConnectedProfile"))
     {
         settings.kemai.lastConnectedProfile = QUuid(kemaiObject.value("lastConnectedProfile").toString());
-    }
-    if (kemaiObject.contains("autoRefreshDelaySeconds"))
-    {
-        auto autoRefreshDelaySecondsValue = kemaiObject.value("autoRefreshDelaySeconds");
-        if (autoRefreshDelaySecondsValue.isDouble())
-        {
-            settings.kemai.autoRefreshDelaySeconds = autoRefreshDelaySecondsValue.toInt();
-        }
     }
 
     for (const auto& profileValue : root.value("profiles").toArray())
@@ -154,6 +156,12 @@ Settings Settings::load()
         settings.events.stopOnLock       = eventsObject.value("stopOnLock").toBool();
         settings.events.stopOnIdle       = eventsObject.value("stopOnIdle").toBool();
         settings.events.idleDelayMinutes = eventsObject.value("idleDelayMinutes").toInt();
+
+        if (cfgVersion >= gCfgVersion_2)
+        {
+            settings.events.autoRefreshCurrentTimeSheet             = eventsObject.value("autoRefreshCurrentTimeSheet").toBool();
+            settings.events.autoRefreshCurrentTimeSheetDelaySeconds = eventsObject.value("autoRefreshCurrentTimeSheetDelaySeconds").toInt();
+        }
     }
 
     return settings;
@@ -181,16 +189,16 @@ void Settings::save(const Settings& settings)
     kemaiObject["geometry"]             = QString(settings.kemai.geometry.toBase64());
     kemaiObject["language"]             = settings.kemai.language.name();
     kemaiObject["lastConnectedProfile"] = settings.kemai.lastConnectedProfile.toString();
-    kemaiObject["autoRefreshDelaySeconds"] =
-        settings.kemai.autoRefreshDelaySeconds.has_value() ? QJsonValue(settings.kemai.autoRefreshDelaySeconds.value()) : QJsonValue(QJsonValue::Null);
 
     QJsonObject eventsObject;
-    eventsObject["stopOnLock"]       = settings.events.stopOnLock;
-    eventsObject["stopOnIdle"]       = settings.events.stopOnIdle;
-    eventsObject["idleDelayMinutes"] = settings.events.idleDelayMinutes;
+    eventsObject["stopOnLock"]                              = settings.events.stopOnLock;
+    eventsObject["stopOnIdle"]                              = settings.events.stopOnIdle;
+    eventsObject["idleDelayMinutes"]                        = settings.events.idleDelayMinutes;
+    eventsObject["autoRefreshCurrentTimeSheet"]             = settings.events.autoRefreshCurrentTimeSheet;
+    eventsObject["autoRefreshCurrentTimeSheetDelaySeconds"] = settings.events.autoRefreshCurrentTimeSheetDelaySeconds;
 
     QJsonObject root;
-    root["version"]             = 1;
+    root["version"]             = gCurrentCfgVersion;
     root["profiles"]            = profilesArray;
     root["trustedCertificates"] = QJsonArray::fromStringList(settings.trustedCertificates);
     root["kemai"]               = kemaiObject;
