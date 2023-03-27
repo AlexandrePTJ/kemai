@@ -45,7 +45,7 @@ struct Settings
     bool isReady() const;
     std::optional<Profile> findProfile(const QUuid& profileId);
 
-    static Settings load();
+    static Settings get();
     static void save(const Settings& settings);
 };
 
