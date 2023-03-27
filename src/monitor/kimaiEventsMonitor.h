@@ -32,7 +32,7 @@ private:
 
     std::shared_ptr<KimaiClient> mKimaiClient;
     std::optional<TimeSheet> mCurrentTimeSheet;
-    QDateTime mLastTimeSheetUpdate;
+    std::optional<QDateTime> mLastTimeSheetUpdate;
     QTimer mSecondTimer;
 };
 

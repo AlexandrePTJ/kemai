@@ -37,9 +37,9 @@ bool KimaiEventsMonitor::hasCurrentTimeSheet() const
 void KimaiEventsMonitor::onSecondTimeout()
 {
     auto settings = Settings::get();
-    if (settings.events.autoRefreshCurrentTimeSheet && mLastTimeSheetUpdate.isValid())
+    if (settings.events.autoRefreshCurrentTimeSheet && mLastTimeSheetUpdate.has_value())
     {
-        if (mLastTimeSheetUpdate.secsTo(QDateTime::currentDateTime()) >= settings.events.autoRefreshCurrentTimeSheetDelaySeconds)
+        if (mLastTimeSheetUpdate->secsTo(QDateTime::currentDateTime()) >= settings.events.autoRefreshCurrentTimeSheetDelaySeconds)
         {
             refreshCurrentTimeSheet();
         }
@@ -56,15 +56,23 @@ void KimaiEventsMonitor::onActiveTimeSheetsReceived(TimeSheetsResult timeSheetsR
 {
     const auto& timeSheets = timeSheetsResult->getResult();
 
-    if (timeSheets.empty() && (mCurrentTimeSheet.has_value() || !mLastTimeSheetUpdate.isValid()))
+    bool firstRun  = !mLastTimeSheetUpdate.has_value();
+    bool isRunning = mCurrentTimeSheet.has_value();
+
+    if(timeSheets.empty())
     {
-        mCurrentTimeSheet.reset();
-        emit currentTimeSheetChanged();
+        if (isRunning || firstRun)
+        {
+            mCurrentTimeSheet.reset();
+            emit currentTimeSheetChanged();
+        }
     }
-    else if (mCurrentTimeSheet.has_value())
+    else
     {
         auto timeSheet = timeSheets.front();
-        if (timeSheet.id != mCurrentTimeSheet->id)
+        bool isSame    = isRunning && timeSheet.id == mCurrentTimeSheet->id;
+
+        if (!isSame || firstRun || !isRunning)
         {
             mCurrentTimeSheet = timeSheet;
             emit currentTimeSheetChanged();
