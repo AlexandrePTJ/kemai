@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Special thanks to @shrippen for its support through [sponsorship](https://github.com/sponsors/AlexandrePTJ).
+
 ### Changed
 - Allow selection of project without first selecting customer [#74](https://github.com/AlexandrePTJ/kemai/issues/74).
 - Improve Loading of Customer / Projects / Activities [#44](https://github.com/AlexandrePTJ/kemai/issues/44).
