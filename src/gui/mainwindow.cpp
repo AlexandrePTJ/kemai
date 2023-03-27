@@ -259,7 +259,7 @@ void MainWindow::updateProfilesMenu()
     // Removes obsoletes profiles
     for (auto action : mActGroupProfiles->actions())
     {
-        if (settings.findProfileRef(action->data().toUuid()) == settings.profiles.end())
+        if (!settings.findProfile(action->data().toUuid()).has_value())
         {
             mProfileMenu->removeAction(action);
             mActGroupProfiles->removeAction(action);
@@ -297,20 +297,20 @@ void MainWindow::processAutoConnect()
         return;
     }
 
-    auto profileIt = settings.findProfileRef(settings.kemai.lastConnectedProfile);
-    if (profileIt == settings.profiles.end())
+    auto profile = settings.findProfile(settings.kemai.lastConnectedProfile);
+    if (!profile.has_value())
     {
-        profileIt = settings.profiles.begin();
+        profile = settings.profiles.front();
     }
 
     for (auto& action : mActGroupProfiles->actions())
     {
-        if (action->data().toUuid() == profileIt->id)
+        if (action->data().toUuid() == profile->id)
         {
             action->setChecked(true);
         }
     }
-    createKemaiSession(*profileIt);
+    createKemaiSession(profile.value());
 }
 
 void MainWindow::onCurrentTimeSheetChanged()
@@ -455,10 +455,10 @@ void MainWindow::onProfilesActionGroupTriggered(QAction* action)
         {
             auto settings  = Settings::load();
             auto profileId = action->data().toUuid();
-            auto profile   = settings.findProfileRef(profileId);
-            if (profile != settings.profiles.end())
+            auto profile   = settings.findProfile(profileId);
+            if (profile.has_value())
             {
-                createKemaiSession(*profile);
+                createKemaiSession(profile.value());
             }
         }
     }

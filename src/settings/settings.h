@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QLocale>
 #include <QStringList>
 #include <QUuid>
@@ -40,7 +42,7 @@ struct Settings
     } events;
 
     bool isReady() const;
-    QList<Profile>::iterator findProfileRef(const QUuid& profileId);
+    std::optional<Profile> findProfile(const QUuid& profileId);
 
     static Settings load();
     static void save(const Settings& settings);

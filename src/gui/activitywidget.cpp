@@ -6,7 +6,6 @@
 #include "activitydialog.h"
 #include "customerdialog.h"
 #include "projectdialog.h"
-#include "settings/settings.h"
 
 using namespace kemai;
 
