@@ -105,6 +105,7 @@ void ActivityWidget::onCbActivityTextChanged(const QString& /*text*/)
             mUi->leTags->clear();
         }
     }
+    updateControls();
 }
 
 void ActivityWidget::onTbAddCustomerClicked()
@@ -258,21 +259,24 @@ void ActivityWidget::updateControls()
         return;
     }
 
-    auto enable = !mSession->hasCurrentTimeSheet();
+    auto noTimeSheetRunning = !mSession->hasCurrentTimeSheet();
 
-    mUi->cbCustomer->setEnabled(enable);
-    mUi->cbProject->setEnabled(enable);
-    mUi->cbActivity->setEnabled(enable);
-    mUi->tbEnableStartedAtEdit->setEnabled(enable);
-    mUi->dteStartedAt->setEnabled(enable && mUi->tbEnableStartedAtEdit->isChecked());
+    mUi->cbCustomer->setEnabled(noTimeSheetRunning);
+    mUi->cbProject->setEnabled(noTimeSheetRunning);
+    mUi->cbActivity->setEnabled(noTimeSheetRunning && !mUi->cbProject->currentText().isEmpty());
+    mUi->tbEnableStartedAtEdit->setEnabled(noTimeSheetRunning);
+    mUi->dteStartedAt->setEnabled(noTimeSheetRunning && mUi->tbEnableStartedAtEdit->isChecked());
 
-    mUi->tbAddCustomer->setEnabled(enable);
-    mUi->tbAddProject->setEnabled(enable && !mUi->cbCustomer->currentText().isEmpty());
+    mUi->tbAddCustomer->setEnabled(noTimeSheetRunning);
+    mUi->tbAddProject->setEnabled(noTimeSheetRunning && !mUi->cbCustomer->currentText().isEmpty());
 
     bool projectOk = mUi->cbCustomer->currentText().isEmpty() || (!mUi->cbCustomer->currentText().isEmpty() && !mUi->cbProject->currentText().isEmpty());
-    mUi->tbAddActivity->setEnabled(enable && projectOk);
+    mUi->tbAddActivity->setEnabled(noTimeSheetRunning && projectOk);
 
-    if (enable)
+    bool enableStartStop = !mUi->cbProject->currentText().isEmpty() && !mUi->cbActivity->currentText().isEmpty();
+    mUi->btStartStop->setEnabled(enableStartStop);
+
+    if (noTimeSheetRunning)
     {
         mUi->btStartStop->setIcon(QIcon(":/icons/play"));
         mUi->lbDurationTime->clear();
@@ -282,7 +286,7 @@ void ActivityWidget::updateControls()
         mUi->btStartStop->setIcon(QIcon(":/icons/stop"));
     }
 
-    emit currentActivityChanged(enable);
+    emit currentActivityChanged(noTimeSheetRunning);
 }
 
 void ActivityWidget::updateCustomersCombo()
@@ -331,7 +335,7 @@ void ActivityWidget::updateActivitiesCombo()
 {
     if (mSession)
     {
-        auto projectId = mUi->cbProject->currentData().toInt();
+        auto projectId = mUi->cbProject->currentText().isEmpty() ? std::nullopt : std::optional<int>(mUi->cbProject->currentData().toInt());
         mUi->cbActivity->setFilter(mSession->cache().activities(projectId));
 
         if (mSession->hasCurrentTimeSheet())
@@ -345,6 +349,10 @@ void ActivityWidget::updateActivitiesCombo()
             {
                 spdlog::error("Cannot find '{}' activity", mSession->currentTimeSheet()->activity.name.toStdString());
             }
+        }
+        else if (!projectId.has_value())
+        {
+            mUi->cbActivity->setCurrentText("");
         }
     }
 }
