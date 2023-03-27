@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.11)
-project(KemaiProject VERSION 0.8.0 LANGUAGES CXX)
+project(KemaiProject VERSION 0.9.0 LANGUAGES CXX)
 
 # Point CMake to the custom modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake)
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
 # Common configuration
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Setup Conan
@@ -38,6 +38,9 @@ endif ()
 # Setup other dependencies
 find_package(spdlog REQUIRED)
 find_package(magic_enum REQUIRED)
+if (APPLE)
+    find_package(range-v3 REQUIRED)
+endif()
 
 # Write version to file to ease packaging
 file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${PROJECT_VERSION})

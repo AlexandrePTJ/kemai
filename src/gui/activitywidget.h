@@ -43,9 +43,9 @@ private:
 
     void updateControls();
 
-    void processCustomersResult(CustomersResult customersResult);
-    void processProjectsResult(ProjectsResult projectsResult);
-    void processActivitiesResult(ActivitiesResult activitiesResult);
+    void updateCustomersCombo();
+    void updateProjectsCombo();
+    void updateActivitiesCombo();
 
     Ui::ActivityWidget* mUi;
     QTimer mSecondTimer;

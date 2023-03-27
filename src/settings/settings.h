@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QLocale>
 #include <QStringList>
 #include <QUuid>
@@ -33,15 +35,17 @@ struct Settings
 
     struct Events
     {
-        bool stopOnLock      = false;
-        bool stopOnIdle      = false;
-        int idleDelayMinutes = 1;
+        bool stopOnLock                             = false;
+        bool stopOnIdle                             = false;
+        int idleDelayMinutes                        = 1;
+        bool autoRefreshCurrentTimeSheet            = false;
+        int autoRefreshCurrentTimeSheetDelaySeconds = 5;
     } events;
 
     bool isReady() const;
-    QList<Profile>::iterator findProfileRef(const QUuid& profileId);
+    std::optional<Profile> findProfile(const QUuid& profileId);
 
-    static Settings load();
+    static Settings get();
     static void save(const Settings& settings);
 };
 

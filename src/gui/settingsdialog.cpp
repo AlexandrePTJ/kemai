@@ -61,7 +61,7 @@ SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desk
 
     // show dialog if language changes from settings
     connect(mUi->cbLanguage, &QComboBox::currentTextChanged, [&](const QString&) {
-        auto settings = Settings::load();
+        auto settings = Settings::get();
         if (settings.kemai.language != mUi->cbLanguage->currentData().toLocale())
         {
             QMessageBox::warning(this, tr(""), tr("Language changed. Application restart is required."));
@@ -123,6 +123,8 @@ void SettingsDialog::setSettings(const Settings& settings)
     mUi->cbStopOnLock->setChecked(m_settings.events.stopOnLock);
     mUi->cbStopOnIdle->setChecked(m_settings.events.stopOnIdle);
     mUi->sbIdleDelay->setValue(m_settings.events.idleDelayMinutes);
+    mUi->cbAutoRefreshCurrentTimeSheet->setChecked(m_settings.events.autoRefreshCurrentTimeSheet);
+    mUi->sbAutoRefreshDelay->setValue(m_settings.events.autoRefreshCurrentTimeSheetDelaySeconds);
 }
 
 Settings SettingsDialog::settings() const
@@ -137,6 +139,9 @@ Settings SettingsDialog::settings() const
     settings.events.stopOnLock       = mUi->cbStopOnLock->isChecked();
     settings.events.stopOnIdle       = mUi->cbStopOnIdle->isChecked();
     settings.events.idleDelayMinutes = mUi->sbIdleDelay->value();
+
+    settings.events.autoRefreshCurrentTimeSheet             = mUi->cbAutoRefreshCurrentTimeSheet->isChecked();
+    settings.events.autoRefreshCurrentTimeSheetDelaySeconds = mUi->sbAutoRefreshDelay->value();
 
     // Profiles are directly managed from buttons on fields updates.
 
@@ -154,11 +159,7 @@ void SettingsDialog::onProfilesListCurrentItemChanged(QListWidgetItem* current, 
 
     if (current != nullptr)
     {
-        auto profileIt = m_settings.findProfileRef(current->data(Qt::UserRole).toUuid());
-        if (profileIt != m_settings.profiles.end())
-        {
-            profile = *profileIt;
-        }
+        profile = m_settings.findProfile(current->data(Qt::UserRole).toUuid()).value_or(Settings::Profile{});
     }
 
     auto hasProfile = !profile.id.isNull();
@@ -199,8 +200,8 @@ void SettingsDialog::onProfileFieldValueChanged()
     auto item = mUi->profilesListWidget->currentItem();
     if (item != nullptr)
     {
-        auto profile = m_settings.findProfileRef(item->data(Qt::UserRole).toUuid());
-        if (profile != m_settings.profiles.end())
+        auto profile = m_settings.findProfile(item->data(Qt::UserRole).toUuid());
+        if (profile.has_value())
         {
             profile->name     = mUi->leName->text();
             profile->host     = mUi->leHost->text();

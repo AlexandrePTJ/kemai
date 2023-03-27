@@ -10,9 +10,15 @@ void KimaiApiBaseResult::markAsReady()
     emit ready();
 }
 
-void KimaiApiBaseResult::setError(const QString &errorMessage)
+bool KimaiApiBaseResult::hasError() const
 {
-    mError = errorMessage;
+    return mIsReady && mError.has_value();
+}
+
+void KimaiApiBaseResult::setError(const QString& errorMessage)
+{
+    mIsReady = true;
+    mError   = errorMessage;
     spdlog::error("<=== {}", errorMessage.toStdString());
     emit error();
 }

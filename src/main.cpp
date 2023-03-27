@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     app.setOrganizationName("Kemai");
 
     // Get kemai data directory and log file path
-    auto kemaiSettings = Settings::load();
+    auto kemaiSettings = Settings::get();
     auto appDataDir    = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     auto logFilePath   = QDir(appDataDir).absoluteFilePath("kemai.log");
 

@@ -33,7 +33,7 @@
    <item row="0" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QComboBox" name="cbCustomer">
+      <widget class="kemai::AutoCompleteComboBox" name="cbCustomer">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -83,7 +83,7 @@
    <item row="1" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QComboBox" name="cbProject">
+      <widget class="kemai::AutoCompleteComboBox" name="cbProject">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -133,7 +133,7 @@
    <item row="2" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QComboBox" name="cbActivity">
+      <widget class="kemai::AutoCompleteComboBox" name="cbActivity">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -275,6 +275,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>kemai::AutoCompleteComboBox</class>
+   <extends>QComboBox</extends>
+   <header>gui/autoCompleteComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>cbCustomer</tabstop>
   <tabstop>tbAddCustomer</tabstop>

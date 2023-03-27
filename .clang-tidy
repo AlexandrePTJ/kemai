@@ -9,7 +9,8 @@ Checks: >
   performance-*,
   readability-*,
   -readability-convert-member-functions-to-static,
-  -readability-qualified-auto
+  -readability-qualified-auto,
+  -readability-identifier-length
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: none

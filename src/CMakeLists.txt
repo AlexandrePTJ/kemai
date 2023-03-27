@@ -7,12 +7,14 @@ configure_file(kemai_config.h.in ${PROJECT_BINARY_DIR}/kemai_config.h)
 # Sources
 set(SRCS
         client/kimaiapi.cpp
+        client/kimaiCache.cpp
         client/kimaiclient.cpp
         client/kimaireply.cpp
         client/parser.cpp
         context/kemaisession.cpp
         gui/activitydialog.cpp
         gui/activitywidget.cpp
+        gui/autoCompleteComboBox.cpp
         gui/customerdialog.cpp
         gui/durationedit.cpp
         gui/mainwindow.cpp
@@ -21,14 +23,18 @@ set(SRCS
         gui/taskwidget.cpp
         main.cpp
         misc/datareader.cpp
+        models/kimaiDataListModel.cpp
+        models/kimaiDataSortFilterProxyModel.cpp
         models/taskfilterproxymodel.cpp
         models/tasklistmodel.cpp
         monitor/desktopEventsMonitor.cpp
+        monitor/kimaiEventsMonitor.cpp
         settings/settings.cpp
         updater/kemaiupdater.cpp)
 
 set(HDRS
         client/kimaiapi.h
+        client/kimaiCache.h
         client/kimaiclient.h
         client/kimaiclient_p.h
         client/kimaireply.h
@@ -36,6 +42,7 @@ set(HDRS
         context/kemaisession.h
         gui/activitydialog.h
         gui/activitywidget.h
+        gui/autoCompleteComboBox.h
         gui/customerdialog.h
         gui/durationedit.h
         gui/mainwindow.h
@@ -43,9 +50,12 @@ set(HDRS
         gui/settingsdialog.h
         gui/taskwidget.h
         misc/datareader.h
+        models/kimaiDataListModel.h
+        models/kimaiDataSortFilterProxyModel.h
         models/taskfilterproxymodel.h
         models/tasklistmodel.h
         monitor/desktopEventsMonitor.h
+        monitor/kimaiEventsMonitor.h
         settings/settings.h
         updater/kemaiupdater.h
         updater/kemaiupdater_p.h)
@@ -104,7 +114,7 @@ elseif (APPLE)
     set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/kemai.icns")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/bundle/macos/Info.plist)
-    target_link_libraries(${PROJECT_NAME} "-framework CoreGraphics")
+    target_link_libraries(${PROJECT_NAME} range-v3::meta "-framework CoreGraphics")
 elseif (UNIX)
     list(APPEND SRCS
             monitor/linuxDesktopEventsMonitor.cpp)
