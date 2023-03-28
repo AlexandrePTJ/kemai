@@ -45,6 +45,7 @@ private:
     void onActionSettingsTriggered();
     void onActionCheckUpdateTriggered();
     void onActionOpenHostTriggered();
+    void onActionRefreshCacheTriggered();
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
     void onNewVersionCheckFinished(const VersionDetails& details);
     void onActivityChanged(bool started);
@@ -68,6 +69,7 @@ private:
     QAction* mActOpenHost           = nullptr;
     QAction* mActViewActivities     = nullptr;
     QAction* mActViewTasks          = nullptr;
+    QAction* mActRefreshCache       = nullptr;
     QActionGroup* mActGroupView     = nullptr;
     QActionGroup* mActGroupProfiles = nullptr;
 

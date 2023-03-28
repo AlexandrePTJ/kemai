@@ -27,9 +27,9 @@ signals:
     void currentActivityChanged(bool started);
 
 private:
-    void onCbCustomerTextChanged(const QString& text);
-    void onCbProjectTextChanged(const QString& text);
-    void onCbActivityTextChanged(const QString& text);
+    void onCbCustomerFieldChanged();
+    void onCbProjectFieldChanged();
+    void onCbActivityFieldChanged();
 
     void onTbAddCustomerClicked();
     void onTbAddProjectClicked();
@@ -40,6 +40,7 @@ private:
     void onSecondTimeout();
 
     void onSessionCurrentTimeSheetChanged();
+    void onSessionCacheSynchronizeFinished();
 
     void updateControls();
 
