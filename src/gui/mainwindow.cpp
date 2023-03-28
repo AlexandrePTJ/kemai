@@ -47,6 +47,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     mActOpenHost       = new QAction(tr("Open Kimai instance"), this);
     mActViewActivities = new QAction(tr("Activities"), this);
     mActViewTasks      = new QAction(tr("Tasks"), this);
+    mActRefreshCache   = new QAction(tr("Refresh cache"), this);
     mActViewTasks->setEnabled(false);
 
     mActViewActivities->setCheckable(true);
@@ -83,6 +84,8 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     fileMenu->addAction(mActQuit);
 
     mProfileMenu = new QMenu(tr("&Profile"), mMenuBar);
+    mProfileMenu->addAction(mActRefreshCache);
+    mProfileMenu->addSeparator();
 
     auto viewMenu = new QMenu(tr("&View"), mMenuBar);
     viewMenu->addAction(mActViewActivities);
@@ -131,6 +134,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     connect(mActViewTasks, &QAction::triggered, this, &MainWindow::showSelectedView);
     connect(mActCheckUpdate, &QAction::triggered, this, &MainWindow::onActionCheckUpdateTriggered);
     connect(mActOpenHost, &QAction::triggered, this, &MainWindow::onActionOpenHostTriggered);
+    connect(mActRefreshCache, &QAction::triggered, this, &MainWindow::onActionRefreshCacheTriggered);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
     connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
     connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChanged);
@@ -373,6 +377,14 @@ void MainWindow::onActionOpenHostTriggered()
     if (settings.isReady())
     {
         QDesktopServices::openUrl(QUrl::fromUserInput(settings.profiles.first().host));
+    }
+}
+
+void MainWindow::onActionRefreshCacheTriggered()
+{
+    if (mSession)
+    {
+        mSession->refreshCache();
     }
 }
 

@@ -50,12 +50,7 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
     {
         connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &ActivityWidget::onSessionCurrentTimeSheetChanged);
         connect(&mSession->cache(), &KimaiCache::synchronizeStarted, this, [this]() { setEnabled(false); });
-        connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, [this]() {
-            mUi->cbCustomer->setKimaiData(mSession->cache().customers());
-            mUi->cbProject->setKimaiData(mSession->cache().projects());
-            mUi->cbActivity->setKimaiData(mSession->cache().activities());
-            setEnabled(true);
-        });
+        connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, &ActivityWidget::onSessionCacheSynchronizeFinished);
     }
     else
     {
@@ -225,6 +220,20 @@ void ActivityWidget::onSessionCurrentTimeSheetChanged()
 
     updateControls();
     updateCustomersCombo();
+}
+
+void ActivityWidget::onSessionCacheSynchronizeFinished()
+{
+    mUi->cbCustomer->setKimaiData(mSession->cache().customers());
+    mUi->cbProject->setKimaiData(mSession->cache().projects());
+    mUi->cbActivity->setKimaiData(mSession->cache().activities());
+    setEnabled(true);
+
+    // Update all fields in case cache have refreshed with a running timesheet
+    if (mSession->hasCurrentTimeSheet())
+    {
+        onSessionCurrentTimeSheetChanged();
+    }
 }
 
 void ActivityWidget::onBtStartStopClicked()
