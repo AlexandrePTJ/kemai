@@ -15,11 +15,11 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbCustomerFieldChanged(); });
-    connect(mUi->cbCustomer, &QComboBox::currentIndexChanged, this, [this](int) { onCbCustomerFieldChanged(); });
+    connect(mUi->cbCustomer,  qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbCustomerFieldChanged(); });
     connect(mUi->cbProject, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbProjectFieldChanged(); });
-    connect(mUi->cbProject, &QComboBox::currentIndexChanged, this, [this](int) { onCbProjectFieldChanged(); });
+    connect(mUi->cbProject, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbProjectFieldChanged(); });
     connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbActivityFieldChanged(); });
-    connect(mUi->cbActivity, &QComboBox::currentIndexChanged, this, [this](int) { onCbActivityFieldChanged(); });
+    connect(mUi->cbActivity, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbActivityFieldChanged(); });
 #else
     connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbCustomerFieldChanged);
     connect(mUi->cbCustomer, &QComboBox::currentIndexChanged, this, &ActivityWidget::onCbCustomerFieldChanged);
