@@ -13,9 +13,21 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
 {
     mUi->setupUi(this);
 
-    connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbCustomerTextChanged);
-    connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbProjectTextChanged);
-    connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbActivityTextChanged);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbCustomerFieldChanged(); });
+    connect(mUi->cbCustomer,  qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbCustomerFieldChanged(); });
+    connect(mUi->cbProject, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbProjectFieldChanged(); });
+    connect(mUi->cbProject, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbProjectFieldChanged(); });
+    connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbActivityFieldChanged(); });
+    connect(mUi->cbActivity, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbActivityFieldChanged(); });
+#else
+    connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbCustomerFieldChanged);
+    connect(mUi->cbCustomer, &QComboBox::currentIndexChanged, this, &ActivityWidget::onCbCustomerFieldChanged);
+    connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbProjectFieldChanged);
+    connect(mUi->cbProject, &QComboBox::currentIndexChanged, this, &ActivityWidget::onCbProjectFieldChanged);
+    connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbActivityFieldChanged);
+    connect(mUi->cbActivity, &QComboBox::currentIndexChanged, this, &ActivityWidget::onCbActivityFieldChanged);
+#endif
     connect(mUi->tbAddCustomer, &QToolButton::clicked, this, &ActivityWidget::onTbAddCustomerClicked);
     connect(mUi->tbAddProject, &QToolButton::clicked, this, &ActivityWidget::onTbAddProjectClicked);
     connect(mUi->tbAddActivity, &QToolButton::clicked, this, &ActivityWidget::onTbAddActivityClicked);
@@ -47,12 +59,7 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
     {
         connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &ActivityWidget::onSessionCurrentTimeSheetChanged);
         connect(&mSession->cache(), &KimaiCache::synchronizeStarted, this, [this]() { setEnabled(false); });
-        connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, [this]() {
-            mUi->cbCustomer->setKimaiData(mSession->cache().customers());
-            mUi->cbProject->setKimaiData(mSession->cache().projects());
-            mUi->cbActivity->setKimaiData(mSession->cache().activities());
-            setEnabled(true);
-        });
+        connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, &ActivityWidget::onSessionCacheSynchronizeFinished);
     }
     else
     {
@@ -83,19 +90,19 @@ void ActivityWidget::stopCurrentTimeSheet()
     }
 }
 
-void ActivityWidget::onCbCustomerTextChanged(const QString& /*text*/)
+void ActivityWidget::onCbCustomerFieldChanged()
 {
     updateProjectsCombo();
     updateControls();
 }
 
-void ActivityWidget::onCbProjectTextChanged(const QString& /*text*/)
+void ActivityWidget::onCbProjectFieldChanged()
 {
     updateActivitiesCombo();
     updateControls();
 }
 
-void ActivityWidget::onCbActivityTextChanged(const QString& /*text*/)
+void ActivityWidget::onCbActivityFieldChanged()
 {
     if (mSession)
     {
@@ -222,6 +229,20 @@ void ActivityWidget::onSessionCurrentTimeSheetChanged()
 
     updateControls();
     updateCustomersCombo();
+}
+
+void ActivityWidget::onSessionCacheSynchronizeFinished()
+{
+    mUi->cbCustomer->setKimaiData(mSession->cache().customers());
+    mUi->cbProject->setKimaiData(mSession->cache().projects());
+    mUi->cbActivity->setKimaiData(mSession->cache().activities());
+    setEnabled(true);
+
+    // Update all fields in case cache have refreshed with a running timesheet
+    if (mSession->hasCurrentTimeSheet())
+    {
+        onSessionCurrentTimeSheetChanged();
+    }
 }
 
 void ActivityWidget::onBtStartStopClicked()

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.9.1] - 2023-03-28
+
+### Added
+- Add 'refresh cache' menu item 
+
+### Fixed
+- Fix filter on Customer / Projects / Activities
+
+
 ## [0.9.0] - 2023-03-27
 
 Special thanks to @shrippen for its support through [sponsorship](https://github.com/sponsors/AlexandrePTJ).
@@ -134,7 +143,8 @@ Special thanks to @shrippen for its support through [sponsorship](https://github
 Initial version.
 
 
-[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.9.0...HEAD
+[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.9.1...HEAD
+[0.9.1]: https://github.com/AlexandrePTJ/kemai/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/AlexandrePTJ/kemai/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/AlexandrePTJ/kemai/compare/0.7.1...0.8.0
 [0.7.1]: https://github.com/AlexandrePTJ/kemai/compare/0.7.0...0.7.1
