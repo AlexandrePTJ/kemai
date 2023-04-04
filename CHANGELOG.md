@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.9.2] - 2023-04-04
+
+### Fixed
+- Profiles not saved [#81](https://github.com/AlexandrePTJ/kemai/issues/81).
+
+
 ## [0.9.1] - 2023-03-28
 
 ### Added

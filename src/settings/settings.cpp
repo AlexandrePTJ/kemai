@@ -91,9 +91,14 @@ bool Settings::isReady() const
     return false;
 }
 
+QList<Settings::Profile>::iterator Settings::findProfileIt(const QUuid& profileId)
+{
+    return std::find_if(profiles.begin(), profiles.end(), [&profileId](const auto& profile) { return profile.id == profileId; });
+}
+
 std::optional<Settings::Profile> Settings::findProfile(const QUuid& profileId)
 {
-    auto it = std::find_if(profiles.begin(), profiles.end(), [&profileId](const Settings::Profile& profile) { return profile.id == profileId; });
+    auto it = findProfileIt(profileId);
     if (it != profiles.end())
     {
         return *it;

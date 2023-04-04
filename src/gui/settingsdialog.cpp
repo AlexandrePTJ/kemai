@@ -200,8 +200,8 @@ void SettingsDialog::onProfileFieldValueChanged()
     auto item = mUi->profilesListWidget->currentItem();
     if (item != nullptr)
     {
-        auto profile = m_settings.findProfile(item->data(Qt::UserRole).toUuid());
-        if (profile.has_value())
+        auto profile = m_settings.findProfileIt(item->data(Qt::UserRole).toUuid());
+        if (profile != m_settings.profiles.end())
         {
             profile->name     = mUi->leName->text();
             profile->host     = mUi->leHost->text();
