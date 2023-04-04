@@ -43,6 +43,8 @@ struct Settings
     } events;
 
     bool isReady() const;
+
+    QList<Profile>::iterator findProfileIt(const QUuid& profileId);
     std::optional<Profile> findProfile(const QUuid& profileId);
 
     static Settings get();
