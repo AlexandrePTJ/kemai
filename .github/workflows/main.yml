@@ -8,8 +8,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        qt_version: [6.2.4, 5.15.2]
+        os: [ubuntu-22.04, macos-13, windows-2022]
+        qt_version: [6.5.0, 5.15.2]
         include:
           - os: windows-latest
             qt_tools: 'tools_openssl_x64'

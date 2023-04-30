@@ -114,7 +114,7 @@ elseif (APPLE)
     set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/kemai.icns")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/bundle/macos/Info.plist)
-    target_link_libraries(${PROJECT_NAME} range-v3::meta "-framework CoreGraphics")
+    target_link_libraries(${PROJECT_NAME} "-framework CoreGraphics")
 elseif (UNIX)
     list(APPEND SRCS
             monitor/linuxDesktopEventsMonitor.cpp)

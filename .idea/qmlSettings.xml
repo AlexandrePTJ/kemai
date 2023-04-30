@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="QmlSettings">
+    <option name="myCurrentProfile" value="debug-win" />
+    <option name="mySettingsPerProfile">
+      <map>
+        <entry key="debug-win">
+          <value>
+            <PerProfileState>
+              <option name="myQmlPath" value="$PROJECT_DIR$/../../../../Qt/6.5.0/msvc2019_64/./qml" />
+              <option name="myQtBinPath" value="$PROJECT_DIR$/../../../../Qt/6.5.0/msvc2019_64/bin" />
+            </PerProfileState>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

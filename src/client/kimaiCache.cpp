@@ -1,14 +1,6 @@
 #include "kimaiCache.h"
 
-/*
- * TODO: Removes when std::views is available on MacOS/clang
- */
-#ifdef Q_OS_MACOS
-#    include <range/v3/all.hpp>
-#else
-#    include <ranges>
-namespace ranges = std;
-#endif
+#include <ranges>
 
 #include <magic_enum.hpp>
 #include <spdlog/spdlog.h>
@@ -84,7 +76,7 @@ Projects KimaiCache::projects(std::optional<int> customerId) const
 {
     if (customerId.has_value())
     {
-        auto its = mProjects | ranges::views::filter([id = customerId.value()](auto const& project) { return project.customer.id == id; });
+        auto its = mProjects | std::views::filter([id = customerId.value()](auto const& project) { return project.customer.id == id; });
         return {its.begin(), its.end()};
     }
     return mProjects;
@@ -94,7 +86,7 @@ Activities KimaiCache::activities(std::optional<int> projectId) const
 {
     if (projectId.has_value())
     {
-        auto its = mActivities | ranges::views::filter([id = projectId.value()](auto const& activity) {
+        auto its = mActivities | std::views::filter([id = projectId.value()](auto const& activity) {
                        if (!activity.project.has_value())
                        {
                            return true;
