@@ -49,7 +49,7 @@ jobs:
       # OS dependencies
       - if: contains(matrix.os, 'ubuntu')
         name: Install Linux dev dependencies
-        run: sudo apt install libxss-dev libxkbcommon-x11-dev
+        run: sudo apt install libxss-dev libxkbcommon-x11-dev libxcb-cursor-dev
 
       # Build
       - name: Configure
