@@ -11,14 +11,14 @@ jobs:
         os: [ubuntu-22.04, macos-13, windows-2022]
         qt_version: [6.5.0, 5.15.2]
         include:
-          - os: windows-latest
+          - os: windows-2022
             qt_tools: 'tools_openssl_x64'
             cmake_preset: 'release-win'
             artifact_path: 'cmake-build-release-win/Kemai-*.msi'
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             cmake_preset: 'release'
             artifact_path: 'cmake-build-release/Kemai-*.AppImage'
-          - os: macos-latest
+          - os: macos-13
             cmake_preset: 'release-macos'
             artifact_path: 'dist/Kemai-*.dmg'
 
