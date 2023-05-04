@@ -7,11 +7,11 @@ function(kemai_find_openssl directory)
 	message("Looking for OpenSSL in ${directory}")
 
 	find_file(_WINDEPLOYOPENSSL_CRYPTO
-		NAMES libcrypto-1_1-x64.dll
+		NAMES libcrypto-3-x64.dll
 		PATHS ${directory} ${directory}/bin
 		NO_DEFAULT_PATH)
 	find_file(_WINDEPLOYOPENSSL_SSL
-		NAMES libssl-1_1-x64.dll
+		NAMES libssl-3-x64.dll
 		PATHS ${directory} ${directory}/bin
 		NO_DEFAULT_PATH)
 

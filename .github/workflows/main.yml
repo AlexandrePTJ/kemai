@@ -12,10 +12,11 @@ jobs:
         qt_version: [6.5.0, 5.15.2]
         include:
           - os: windows-2022
-            qt_tools: 'tools_openssl_x64'
+            qt_tools: 'tools_opensslv3_x64'
             cmake_preset: 'release-win'
             artifact_path: 'cmake-build-release-win/Kemai-*.msi'
           - os: ubuntu-22.04
+            qt_tools: 'tools_opensslv3_src'
             cmake_preset: 'release'
             artifact_path: 'cmake-build-release/Kemai-*.AppImage'
           - os: macos-13
@@ -49,7 +50,13 @@ jobs:
       # OS dependencies
       - if: contains(matrix.os, 'ubuntu')
         name: Install Linux dev dependencies
-        run: sudo apt install libxss-dev libxkbcommon-x11-dev libxcb-cursor-dev
+        run: sudo apt install libxss-dev libxkbcommon-x11-dev libxcb-cursor0
+
+      - if: contains(matrix.os, 'ubuntu')
+        name: Build OpenSSLv3
+        run: |
+          cd ${{ github.workspace }}/Qt/Tools/OpenSSLv3/src
+          ./Configure && make -j3
 
       # Build
       - name: Configure
@@ -90,13 +97,3 @@ jobs:
           allowUpdates: true
           draft: true
           artifacts: ${{ matrix.artifact_path }}
-#
-#      # Update packages on continuous 'release'
-#      - if: startsWith(matrix.qt_version, '6') && github.ref_name == 'develop'
-#        name: Create/Update Continuous
-#        uses: ncipollo/release-action@v1
-#        with:
-#          allowUpdates: true
-#          tag: Continuous
-#          name: Continuous
-#          artifacts: ${{ matrix.artifact_path }}
