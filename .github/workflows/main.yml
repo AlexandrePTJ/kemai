@@ -53,10 +53,10 @@ jobs:
         name: Install Linux dev dependencies
         run: sudo apt install libxss-dev libxkbcommon-x11-dev libxcb-cursor0
 
-      - if: contains(matrix.os, 'ubuntu')
+      - if: contains(matrix.os, 'ubuntu') && startsWith(matrix.qt_version, '6')
         name: Build OpenSSLv3
         run: |
-          cd ${{ github.workspace }}/Qt/Tools/OpenSSLv3/src
+          cd $IQTA_TOOLS/OpenSSLv3/src
           ./Configure && make -j3
 
       # Build
