@@ -9,7 +9,7 @@ using namespace kemai;
 
 void KimaiCache::synchronize(const std::shared_ptr<KimaiClient>& client, const std::set<Category>& categories)
 {
-    if (!mSyncSemaphore.try_acquire())
+    if (!mSyncMutex.try_lock())
     {
         spdlog::error("Sync already in progress");
         return;
@@ -107,7 +107,7 @@ void KimaiCache::updateSyncProgress(Category finishedCategory)
     if (mPendingSync.empty())
     {
         mStatus = KimaiCache::Status::Ready;
-        mSyncSemaphore.release();
+        mSyncMutex.unlock();
         emit synchronizeFinished();
     }
 }

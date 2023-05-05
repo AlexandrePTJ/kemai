@@ -81,7 +81,7 @@ jobs:
           sudo add-apt-repository universe
           sudo apt install libfuse2
           chmod +x bundle/linux/create_appimage.sh
-          ./bundle/linux/create_appimage.sh --qt_path $Qt6_DIR --build_path cmake-build-release
+          ./bundle/linux/create_appimage.sh -q $Qt6_DIR -b cmake-build-release -o $IQTA_TOOLS/OpenSSLv3/src
 
       # Package Mac
       - if: contains(matrix.os, 'macos') && startsWith(matrix.qt_version, '6')

@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <mutex>
-#include <semaphore>
 #include <set>
 
 #include <QObject>
@@ -54,7 +53,7 @@ private:
     Activities mActivities;
 
     kemai::KimaiCache::Status mStatus = kemai::KimaiCache::Status::Empty;
-    std::binary_semaphore mSyncSemaphore{1};
+    std::mutex mSyncMutex;
     std::mutex mProgressMutex;
 };
 
