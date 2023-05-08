@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Sort regression [#86](https://github.com/AlexandrePTJ/kemai/issues/86).
 - SSL problems on some linux distro [#65](https://github.com/AlexandrePTJ/kemai/issues/65).
-
+- Profile name not updated in menu [#82](https://github.com/AlexandrePTJ/kemai/issues/82).
 
 ## [0.9.2] - 2023-04-04
 
