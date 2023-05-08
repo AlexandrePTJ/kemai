@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.9.3] - 2023-05-08
+
+### Fixed
+- Sort regression [#84](https://github.com/AlexandrePTJ/kemai/issues/84).
+- SSL problems on some linux distro [#65](https://github.com/AlexandrePTJ/kemai/issues/65).
+- Profile name not updated in menu [#82](https://github.com/AlexandrePTJ/kemai/issues/82).
+- List projects with same name [#83](https://github.com/AlexandrePTJ/kemai/issues/83).
+
+### Changed
+- Replace conan for dependencies management with CMake built-in FetchContent
+
+
 ## [0.9.2] - 2023-04-04
 
 ### Fixed
@@ -149,7 +161,9 @@ Special thanks to @shrippen for its support through [sponsorship](https://github
 Initial version.
 
 
-[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.9.1...HEAD
+[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.9.3...HEAD
+[0.9.2]: https://github.com/AlexandrePTJ/kemai/compare/0.9.2...0.9.3
+[0.9.2]: https://github.com/AlexandrePTJ/kemai/compare/0.9.1...0.9.2
 [0.9.1]: https://github.com/AlexandrePTJ/kemai/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/AlexandrePTJ/kemai/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/AlexandrePTJ/kemai/compare/0.7.1...0.8.0

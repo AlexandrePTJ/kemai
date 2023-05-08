@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Kemai
-Exec=Kemai
-Icon=kemai
+Exec=kemai-wrapper.sh
+Icon=kemai-wrapper
 Categories=

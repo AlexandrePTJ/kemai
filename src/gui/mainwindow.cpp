@@ -271,19 +271,17 @@ void MainWindow::updateProfilesMenu()
         }
     }
 
-    // Adds new profiles
+    // Add / Update profiles
+    auto actions = mActGroupProfiles->actions();
     for (const auto& profile : settings.profiles)
     {
-        bool profileExists = false;
-        for (auto action : mActGroupProfiles->actions())
-        {
-            if (action->data().toUuid() == profile.id)
-            {
-                profileExists = true;
-            }
-        }
+        auto profileAction = std::find_if(actions.begin(), actions.end(), [profile](const auto& action) { return action->data().toUuid() == profile.id; });
 
-        if (!profileExists)
+        if (profileAction != actions.end())
+        {
+            (*profileAction)->setText(profile.name);
+        }
+        else
         {
             auto action = mProfileMenu->addAction(profile.name);
             action->setCheckable(true);

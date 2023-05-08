@@ -43,6 +43,7 @@ private:
 
 AutoCompleteComboBox::AutoCompleteComboBox(QWidget* parent) : QComboBox(parent)
 {
+    mProxyModel.setSortCaseSensitivity(Qt::CaseInsensitive);
     mProxyModel.setSourceModel(&mModel);
 
     setEditable(true);

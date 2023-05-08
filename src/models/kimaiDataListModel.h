@@ -15,17 +15,17 @@ public:
         beginResetModel();
         if (!kds.empty())
         {
-            mData = {{"", 0}};
+            mData = {{0, ""}};
             for (const auto& kd : kds)
             {
-                mData.emplace(kd.name, kd.id);
+                mData.emplace(kd.id, kd.name);
             }
         }
         endResetModel();
     }
 
 private:
-    std::map<QString, int> mData;
+    std::map<int, QString> mData;
 };
 
 } // namespace kemai

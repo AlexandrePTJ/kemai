@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(KemaiProject VERSION 0.9.2 LANGUAGES CXX)
+project(KemaiProject VERSION 0.9.3 LANGUAGES CXX)
 
 # Point CMake to the custom modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake)
@@ -9,17 +9,18 @@ list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Setup Conan
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-    message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-    file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
-            "${CMAKE_BINARY_DIR}/conan.cmake"
-            TLS_VERIFY ON)
-endif()
-include(${CMAKE_BINARY_DIR}/conan.cmake)
-
-conan_cmake_autodetect(settings)
-conan_cmake_install(PATH_OR_REFERENCE ${CMAKE_SOURCE_DIR} BUILD missing SETTINGS ${settings})
+# Add dependencies
+include(FetchContent)
+FetchContent_Declare(magic_enum
+        GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+        GIT_TAG v0.8.2)
+FetchContent_Declare(spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG v1.11.0)
+FetchContent_Declare(range-v3
+        GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
+        GIT_TAG 0.12.0)
+FetchContent_MakeAvailable(magic_enum spdlog range-v3)
 
 # Setup Qt
 set(CMAKE_AUTOMOC ON)
@@ -34,13 +35,6 @@ if (NOT Qt6_FOUND)
 else ()
     message(STATUS "Using Qt ${Qt6_VERSION}")
 endif ()
-
-# Setup other dependencies
-find_package(spdlog REQUIRED)
-find_package(magic_enum REQUIRED)
-if (APPLE)
-    find_package(range-v3 REQUIRED)
-endif()
 
 # Write version to file to ease packaging
 file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${PROJECT_VERSION})

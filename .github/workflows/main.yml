@@ -8,17 +8,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        qt_version: [6.2.4, 5.15.2]
+        os: [ubuntu-22.04, macos-13, windows-2022]
+        qt_version: [6.5.0, 5.15.2]
         include:
-          - os: windows-latest
-            qt_tools: 'tools_openssl_x64'
+          - os: windows-2022
+            qt_tools: 'tools_opensslv3_x64'
             cmake_preset: 'release-win'
             artifact_path: 'cmake-build-release-win/Kemai-*.msi'
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
+            qt_tools: 'tools_opensslv3_src'
             cmake_preset: 'release'
             artifact_path: 'cmake-build-release/Kemai-*.AppImage'
-          - os: macos-latest
+          - os: macos-13
             cmake_preset: 'release-macos'
             artifact_path: 'dist/Kemai-*.dmg'
 
@@ -40,16 +41,18 @@ jobs:
           version: ${{ matrix.qt_version }}
           tools: ${{ matrix.qt_tools }}
           cache: true
-
-      - name: Install Conan
-        uses: turtlebrowser/get-conan@main
-        with:
-          version: 1.59.0
+          aqtversion: '==3.1.*'
 
       # OS dependencies
       - if: contains(matrix.os, 'ubuntu')
         name: Install Linux dev dependencies
-        run: sudo apt install libxss-dev libxkbcommon-x11-dev
+        run: sudo apt install libxss-dev libxkbcommon-x11-dev libxcb-cursor0
+
+      - if: contains(matrix.os, 'ubuntu') && startsWith(matrix.qt_version, '6')
+        name: Build OpenSSLv3
+        run: |
+          cd $IQTA_TOOLS/OpenSSLv3/src
+          ./Configure && make -j3
 
       # Build
       - name: Configure
@@ -73,7 +76,7 @@ jobs:
           sudo add-apt-repository universe
           sudo apt install libfuse2
           chmod +x bundle/linux/create_appimage.sh
-          ./bundle/linux/create_appimage.sh --qt_path $Qt6_DIR --build_path cmake-build-release
+          ./bundle/linux/create_appimage.sh -q $Qt6_DIR -b cmake-build-release -o $IQTA_TOOLS/OpenSSLv3/src
 
       # Package Mac
       - if: contains(matrix.os, 'macos') && startsWith(matrix.qt_version, '6')
@@ -90,13 +93,3 @@ jobs:
           allowUpdates: true
           draft: true
           artifacts: ${{ matrix.artifact_path }}
-#
-#      # Update packages on continuous 'release'
-#      - if: startsWith(matrix.qt_version, '6') && github.ref_name == 'develop'
-#        name: Create/Update Continuous
-#        uses: ncipollo/release-action@v1
-#        with:
-#          allowUpdates: true
-#          tag: Continuous
-#          name: Continuous
-#          artifacts: ${{ matrix.artifact_path }}

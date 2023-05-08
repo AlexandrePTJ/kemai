@@ -18,7 +18,7 @@ Then, you can set this credentials to _Kemai_ settings :
 
 ## How to build
 
-_Kemai_ is Qt6 based application. It uses [conan](https://conan.io) to resolves dependencies and CMake to build. So regular cmake process will work.
+_Kemai_ is Qt6 based application. It uses CMake to build. So regular cmake process will work.
 
 ```shell script
 > cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=<path to Qt installation>

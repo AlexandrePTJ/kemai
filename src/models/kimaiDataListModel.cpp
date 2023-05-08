@@ -19,10 +19,10 @@ QVariant KimaiDataListModel::data(const QModelIndex& index, int role) const
     {
     case Qt::EditRole:
     case Qt::DisplayRole:
-        return it->first;
+        return it->second;
 
     case Qt::UserRole:
-        return it->second;
+        return it->first;
 
     default:
         return {};
