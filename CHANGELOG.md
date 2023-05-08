@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Sort regression [#86](https://github.com/AlexandrePTJ/kemai/issues/86).
+- SSL problems on some linux distro [#65](https://github.com/AlexandrePTJ/kemai/issues/65).
+
 
 ## [0.9.2] - 2023-04-04
 
@@ -149,7 +153,8 @@ Special thanks to @shrippen for its support through [sponsorship](https://github
 Initial version.
 
 
-[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.9.1...HEAD
+[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.9.2...HEAD
+[0.9.2]: https://github.com/AlexandrePTJ/kemai/compare/0.9.1...0.9.2
 [0.9.1]: https://github.com/AlexandrePTJ/kemai/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/AlexandrePTJ/kemai/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/AlexandrePTJ/kemai/compare/0.7.1...0.8.0
