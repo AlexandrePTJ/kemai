@@ -18,7 +18,7 @@ jobs:
           - os: ubuntu-latest
             qt_tools: 'tools_opensslv3_src'
             cmake_preset: 'release'
-            artifact_path: 'cmake-build-release/Kemai-*.AppImage'
+            artifact_path: 'Kemai-*.AppImage'
           - os: macos-latest
             cmake_preset: 'release-macos'
             artifact_path: 'dist/Kemai-*.dmg'
