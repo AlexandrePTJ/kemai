@@ -25,6 +25,10 @@ rm dist/*.dmg || true
 # Run install to dist
 cmake --build $build_path --target install
 
+# Cleanup unneeded install files
+rm -r dist/include
+rm -r dist/lib
+
 # Gets create-dmg tools
 brew install create-dmg
 
