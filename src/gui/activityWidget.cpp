@@ -1,11 +1,11 @@
-#include "activitywidget.h"
-#include "ui_activitywidget.h"
+#include "activityWidget.h"
+#include "ui_activityWidget.h"
 
 #include <spdlog/spdlog.h>
 
-#include "activitydialog.h"
-#include "customerdialog.h"
-#include "projectdialog.h"
+#include "activityDialog.h"
+#include "customerDialog.h"
+#include "projectDialog.h"
 
 using namespace kemai;
 

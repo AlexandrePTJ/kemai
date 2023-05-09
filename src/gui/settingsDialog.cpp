@@ -1,12 +1,12 @@
-#include "settingsdialog.h"
-#include "ui_settingsdialog.h"
+#include "settingsDialog.h"
+#include "ui_settingsDialog.h"
 
 #include <QAction>
 #include <QDir>
 #include <QMessageBox>
 #include <QTranslator>
 
-#include "kemai_config.h"
+#include "kemaiConfig.h"
 
 using namespace kemai;
 

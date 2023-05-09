@@ -1,5 +1,5 @@
-#include "activitydialog.h"
-#include "ui_activitydialog.h"
+#include "activityDialog.h"
+#include "ui_activityDialog.h"
 
 #include <QPushButton>
 #include <QTimer>

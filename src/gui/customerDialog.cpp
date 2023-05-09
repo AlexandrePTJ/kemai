@@ -1,7 +1,7 @@
-#include "customerdialog.h"
-#include "ui_customerdialog.h"
+#include "customerDialog.h"
+#include "ui_customerDialog.h"
 
-#include "misc/datareader.h"
+#include "misc/dataReader.h"
 
 #include <QPushButton>
 #include <QTimeZone>

@@ -2,7 +2,7 @@
 
 #include <QAbstractListModel>
 
-#include "client/kimaiapi.h"
+#include "client/kimaiAPI.h"
 
 namespace kemai {
 

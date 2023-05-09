@@ -1,5 +1,5 @@
-#include "taskfilterproxymodel.h"
-#include "tasklistmodel.h"
+#include "taskFilterProxyModel.h"
+#include "taskListModel.h"
 
 using namespace kemai;
 

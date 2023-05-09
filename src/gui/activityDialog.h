@@ -2,7 +2,7 @@
 
 #include <QDialog>
 
-#include "client/kimaiclient.h"
+#include "client/kimaiClient.h"
 
 namespace Ui {
 class ActivityDialog;

@@ -6,11 +6,11 @@
 
 #include <QSystemTrayIcon>
 
-#include "client/kimaiclient.h"
-#include "context/kemaisession.h"
+#include "client/kimaiClient.h"
+#include "context/kemaiSession.h"
 #include "monitor/desktopEventsMonitor.h"
 #include "settings/settings.h"
-#include "updater/kemaiupdater.h"
+#include "updater/kemaiUpdater.h"
 
 namespace Ui {
 class MainWindow;

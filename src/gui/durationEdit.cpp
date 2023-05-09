@@ -1,4 +1,4 @@
-#include "durationedit.h"
+#include "durationEdit.h"
 
 #include <QRegularExpressionValidator>
 

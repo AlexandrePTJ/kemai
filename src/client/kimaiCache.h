@@ -6,7 +6,7 @@
 
 #include <QObject>
 
-#include "client/kimaiclient.h"
+#include "client/kimaiClient.h"
 
 namespace kemai {
 

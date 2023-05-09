@@ -1,4 +1,4 @@
-#include "datareader.h"
+#include "dataReader.h"
 
 #include <QFile>
 #include <QJsonArray>

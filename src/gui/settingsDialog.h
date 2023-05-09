@@ -5,7 +5,7 @@
 #include <QDialog>
 #include <QListWidget>
 
-#include "client/kimaiclient.h"
+#include "client/kimaiClient.h"
 #include "monitor/desktopEventsMonitor.h"
 #include "settings/settings.h"
 
