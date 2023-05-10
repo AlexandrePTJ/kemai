@@ -19,6 +19,9 @@ jobs:
             qt_tools: 'tools_opensslv3_src'
             cmake_preset: 'release'
             artifact_path: 'Kemai-*.AppImage'
+            env:
+              CC: gcc-10
+              CXX: g++-10
           - os: macos-latest
             cmake_preset: 'release-macos'
             artifact_path: 'dist/Kemai-*.dmg'
