@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.9.4] - 2023-05-10
+
+### Changed
+- Force gcc-10 for linux build to have better compatibility over linux distros
+
+
 ## [0.9.3] - 2023-05-08
 
 ### Fixed
@@ -161,8 +167,9 @@ Special thanks to @shrippen for its support through [sponsorship](https://github
 Initial version.
 
 
-[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.9.3...HEAD
-[0.9.2]: https://github.com/AlexandrePTJ/kemai/compare/0.9.2...0.9.3
+[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.9.4...HEAD
+[0.9.4]: https://github.com/AlexandrePTJ/kemai/compare/0.9.3...0.9.4
+[0.9.3]: https://github.com/AlexandrePTJ/kemai/compare/0.9.2...0.9.3
 [0.9.2]: https://github.com/AlexandrePTJ/kemai/compare/0.9.1...0.9.2
 [0.9.1]: https://github.com/AlexandrePTJ/kemai/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/AlexandrePTJ/kemai/compare/0.8.0...0.9.0
