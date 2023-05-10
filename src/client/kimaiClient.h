@@ -5,8 +5,8 @@
 
 #include <QObject>
 
-#include "client/kimaiapi.h"
-#include "client/kimaireply.h"
+#include "client/kimaiAPI.h"
+#include "client/kimaiReply.h"
 
 namespace kemai {
 

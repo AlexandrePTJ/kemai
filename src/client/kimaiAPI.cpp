@@ -1,4 +1,4 @@
-#include "kimaiapi.h"
+#include "kimaiAPI.h"
 
 namespace kemai {
 

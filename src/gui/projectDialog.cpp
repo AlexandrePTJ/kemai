@@ -1,5 +1,5 @@
-#include "projectdialog.h"
-#include "ui_projectdialog.h"
+#include "projectDialog.h"
+#include "ui_projectDialog.h"
 
 #include <QPushButton>
 #include <QTimer>

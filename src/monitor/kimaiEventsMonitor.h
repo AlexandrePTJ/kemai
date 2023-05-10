@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QTimer>
 
-#include "client/kimaiclient.h"
+#include "client/kimaiClient.h"
 
 namespace kemai {
 

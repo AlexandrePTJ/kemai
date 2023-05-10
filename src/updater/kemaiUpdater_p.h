@@ -4,7 +4,7 @@
 #include <QNetworkReply>
 #include <QObject>
 
-#include "kemaiupdater.h"
+#include "kemaiUpdater.h"
 
 namespace kemai {
 

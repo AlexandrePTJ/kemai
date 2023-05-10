@@ -1,5 +1,5 @@
-#include "kemaiupdater.h"
-#include "kemaiupdater_p.h"
+#include "kemaiUpdater.h"
+#include "kemaiUpdater_p.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>

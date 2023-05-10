@@ -2,10 +2,10 @@
 
 #include <QWidget>
 
-#include "client/kimaiclient.h"
-#include "context/kemaisession.h"
-#include "models/taskfilterproxymodel.h"
-#include "models/tasklistmodel.h"
+#include "client/kimaiClient.h"
+#include "context/kemaiSession.h"
+#include "models/taskFilterProxyModel.h"
+#include "models/taskListModel.h"
 
 namespace Ui {
 class TaskWidget;

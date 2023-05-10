@@ -1,5 +1,5 @@
-#include "taskwidget.h"
-#include "ui_taskwidget.h"
+#include "taskWidget.h"
+#include "ui_taskWidget.h"
 
 #include <QAction>
 #include <QTimer>

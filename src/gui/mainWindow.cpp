@@ -1,5 +1,5 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "mainWindow.h"
+#include "ui_mainWindow.h"
 
 #include <QActionGroup>
 #include <QCloseEvent>
@@ -9,12 +9,11 @@
 
 #include <spdlog/spdlog.h>
 
-#include "kemai_config.h"
-
-#include "activitywidget.h"
+#include "kemaiConfig.h"
+#include "activityWidget.h"
 #include "settings/settings.h"
-#include "settingsdialog.h"
-#include "taskwidget.h"
+#include "settingsDialog.h"
+#include "taskWidget.h"
 
 using namespace kemai;
 

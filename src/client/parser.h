@@ -9,7 +9,7 @@
 #include <QJsonObject>
 #include <QVariant>
 
-#include "kimaiapi.h"
+#include "kimaiAPI.h"
 
 namespace kemai {
 

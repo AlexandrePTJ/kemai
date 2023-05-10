@@ -8,8 +8,8 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-#include "client/kimaiclient.h"
-#include "gui/mainwindow.h"
+#include "client/kimaiClient.h"
+#include "gui/mainWindow.h"
 #include "settings/settings.h"
 
 using namespace kemai;

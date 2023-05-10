@@ -2,73 +2,73 @@ project(Kemai)
 
 add_executable(${PROJECT_NAME} ${OS_BUNDLE})
 
-configure_file(kemai_config.h.in ${PROJECT_BINARY_DIR}/kemai_config.h)
+configure_file(kemaiConfig.h.in ${PROJECT_BINARY_DIR}/kemaiConfig.h)
 
 # Sources
 set(SRCS
-        client/kimaiapi.cpp
+	client/kimaiAPI.cpp
         client/kimaiCache.cpp
-        client/kimaiclient.cpp
-        client/kimaireply.cpp
+	client/kimaiClient.cpp
+	client/kimaiReply.cpp
         client/parser.cpp
-        context/kemaisession.cpp
-        gui/activitydialog.cpp
-        gui/activitywidget.cpp
+	context/kemaiSession.cpp
+	gui/activityDialog.cpp
+	gui/activityWidget.cpp
         gui/autoCompleteComboBox.cpp
-        gui/customerdialog.cpp
-        gui/durationedit.cpp
-        gui/mainwindow.cpp
-        gui/projectdialog.cpp
-        gui/settingsdialog.cpp
-        gui/taskwidget.cpp
+	gui/customerDialog.cpp
+	gui/durationEdit.cpp
+	gui/mainWindow.cpp
+	gui/projectDialog.cpp
+	gui/settingsDialog.cpp
+	gui/taskWidget.cpp
         main.cpp
-        misc/datareader.cpp
+	misc/dataReader.cpp
         models/kimaiDataListModel.cpp
         models/kimaiDataSortFilterProxyModel.cpp
-        models/taskfilterproxymodel.cpp
-        models/tasklistmodel.cpp
+	models/taskFilterProxyModel.cpp
+	models/taskListModel.cpp
         monitor/desktopEventsMonitor.cpp
         monitor/kimaiEventsMonitor.cpp
         settings/settings.cpp
-        updater/kemaiupdater.cpp)
+        updater/kemaiUpdater.cpp)
 
 set(HDRS
-        client/kimaiapi.h
+	client/kimaiAPI.h
         client/kimaiCache.h
-        client/kimaiclient.h
-        client/kimaiclient_p.h
-        client/kimaireply.h
+	client/kimaiClient.h
+	client/kimaiClient_p.h
+	client/kimaiReply.h
         client/parser.h
-        context/kemaisession.h
-        gui/activitydialog.h
-        gui/activitywidget.h
+	context/kemaiSession.h
+	gui/activityDialog.h
+	gui/activityWidget.h
         gui/autoCompleteComboBox.h
-        gui/customerdialog.h
-        gui/durationedit.h
-        gui/mainwindow.h
-        gui/projectdialog.h
-        gui/settingsdialog.h
-        gui/taskwidget.h
-        misc/datareader.h
+	gui/customerDialog.h
+	gui/durationEdit.h
+	gui/mainWindow.h
+	gui/projectDialog.h
+	gui/settingsDialog.h
+	gui/taskWidget.h
+	misc/dataReader.h
         models/kimaiDataListModel.h
         models/kimaiDataSortFilterProxyModel.h
-        models/taskfilterproxymodel.h
-        models/tasklistmodel.h
+	models/taskFilterProxyModel.h
+	models/taskListModel.h
         monitor/desktopEventsMonitor.h
         monitor/kimaiEventsMonitor.h
         settings/settings.h
-        updater/kemaiupdater.h
-        updater/kemaiupdater_p.h)
+        updater/kemaiUpdater.h
+        updater/kemaiUpdater_p.h)
 
 # Forms
 set(UIS
-        gui/activitydialog.ui
-        gui/activitywidget.ui
-        gui/customerdialog.ui
-        gui/mainwindow.ui
-        gui/projectdialog.ui
-        gui/settingsdialog.ui
-        gui/taskwidget.ui)
+	gui/activityDialog.ui
+	gui/activityWidget.ui
+	gui/customerDialog.ui
+	gui/mainWindow.ui
+	gui/projectDialog.ui
+	gui/settingsDialog.ui
+	gui/taskWidget.ui)
 
 
 # Localization

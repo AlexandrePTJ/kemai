@@ -7,7 +7,7 @@
 #include <QNetworkReply>
 #include <QVersionNumber>
 
-#include "kimaiclient.h"
+#include "kimaiClient.h"
 #include "parser.h"
 
 namespace kemai {

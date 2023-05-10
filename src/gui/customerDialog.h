@@ -2,7 +2,7 @@
 
 #include <QDialog>
 
-#include "client/kimaiapi.h"
+#include "client/kimaiAPI.h"
 
 namespace Ui {
 class CustomerDialog;
