@@ -8,18 +8,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-13, windows-2022]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         qt_version: [6.5.0, 5.15.2]
         include:
-          - os: windows-2022
+          - os: windows-latest
             qt_tools: 'tools_opensslv3_x64'
             cmake_preset: 'release-win'
             artifact_path: 'cmake-build-release-win/Kemai-*.msi'
-          - os: ubuntu-22.04
+          - os: ubuntu-latest
             qt_tools: 'tools_opensslv3_src'
             cmake_preset: 'release'
-            artifact_path: 'cmake-build-release/Kemai-*.AppImage'
-          - os: macos-13
+            artifact_path: 'Kemai-*.AppImage'
+          - os: macos-latest
             cmake_preset: 'release-macos'
             artifact_path: 'dist/Kemai-*.dmg'
 
