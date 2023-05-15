@@ -123,3 +123,6 @@ tests/kimai_server/data/kimai.sqlite
 /build/
 /dist/
 *.AppImage
+
+# ---> Visual Studio
+.vs/
