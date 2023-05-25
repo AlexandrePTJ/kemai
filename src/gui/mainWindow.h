@@ -18,6 +18,7 @@ class MainWindow;
 
 namespace kemai {
 
+class ActivityManagerWidget;
 class ActivityWidget;
 class TaskWidget;
 
@@ -59,19 +60,21 @@ private:
     std::shared_ptr<DesktopEventsMonitor> mDesktopEventsMonitor;
 
     // Stacked widget (ownership is transferred, don't try to delete them)
-    ActivityWidget* mActivityWidget = nullptr;
-    TaskWidget* mTaskWidget         = nullptr;
+    ActivityWidget* mActivityWidget               = nullptr;
+    ActivityManagerWidget* mActivityManagerWidget = nullptr;
+    TaskWidget* mTaskWidget                       = nullptr;
 
     // Actions
-    QAction* mActQuit               = nullptr;
-    QAction* mActSettings           = nullptr;
-    QAction* mActCheckUpdate        = nullptr;
-    QAction* mActOpenHost           = nullptr;
-    QAction* mActViewActivities     = nullptr;
-    QAction* mActViewTasks          = nullptr;
-    QAction* mActRefreshCache       = nullptr;
-    QActionGroup* mActGroupView     = nullptr;
-    QActionGroup* mActGroupProfiles = nullptr;
+    QAction* mActQuit                  = nullptr;
+    QAction* mActSettings              = nullptr;
+    QAction* mActCheckUpdate           = nullptr;
+    QAction* mActOpenHost              = nullptr;
+    QAction* mActViewActivities        = nullptr;
+    QAction* mActViewActivitiesManager = nullptr;
+    QAction* mActViewTasks             = nullptr;
+    QAction* mActRefreshCache          = nullptr;
+    QActionGroup* mActGroupView        = nullptr;
+    QActionGroup* mActGroupProfiles    = nullptr;
 
     // Menus
     QMenuBar* mMenuBar  = nullptr;

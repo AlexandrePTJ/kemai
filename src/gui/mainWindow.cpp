@@ -9,8 +9,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include "kemaiConfig.h"
+#include "activityManagerWidget.h"
 #include "activityWidget.h"
+#include "kemaiConfig.h"
 #include "settings/settings.h"
 #include "settingsDialog.h"
 #include "taskWidget.h"
@@ -40,21 +41,24 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     /*
      * Setup actions
      */
-    mActQuit           = new QAction(tr("&Quit"), this);
-    mActSettings       = new QAction(tr("&Settings"), this);
-    mActCheckUpdate    = new QAction(tr("Check for updates..."), this);
-    mActOpenHost       = new QAction(tr("Open Kimai instance"), this);
-    mActViewActivities = new QAction(tr("Activities"), this);
-    mActViewTasks      = new QAction(tr("Tasks"), this);
-    mActRefreshCache   = new QAction(tr("Refresh cache"), this);
+    mActQuit                  = new QAction(tr("&Quit"), this);
+    mActSettings              = new QAction(tr("&Settings"), this);
+    mActCheckUpdate           = new QAction(tr("Check for updates..."), this);
+    mActOpenHost              = new QAction(tr("Open Kimai instance"), this);
+    mActViewActivities        = new QAction(tr("Activities"), this);
+    mActViewTasks             = new QAction(tr("Tasks"), this);
+    mActViewActivitiesManager = new QAction(tr("Activities M"), this);
+    mActRefreshCache          = new QAction(tr("Refresh cache"), this);
     mActViewTasks->setEnabled(false);
 
     mActViewActivities->setCheckable(true);
     mActViewTasks->setCheckable(true);
+    mActViewActivitiesManager->setCheckable(true);
     mActViewActivities->setChecked(true);
 
     mActGroupView = new QActionGroup(this);
     mActGroupView->addAction(mActViewActivities);
+    mActGroupView->addAction(mActViewActivitiesManager);
     mActGroupView->addAction(mActViewTasks);
 
     mActGroupProfiles = new QActionGroup(this);
@@ -88,6 +92,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
 
     auto viewMenu = new QMenu(tr("&View"), mMenuBar);
     viewMenu->addAction(mActViewActivities);
+    viewMenu->addAction(mActViewActivitiesManager);
     viewMenu->addAction(mActViewTasks);
 
     auto helpMenu = new QMenu(tr("&Help"), mMenuBar);
@@ -111,6 +116,9 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     mActivityWidget = new ActivityWidget;
     mUi->stackedWidget->addWidget(mActivityWidget);
 
+    mActivityManagerWidget = new ActivityManagerWidget;
+    mUi->stackedWidget->addWidget(mActivityManagerWidget);
+
     updateProfilesMenu();
 
     /*
@@ -130,6 +138,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     connect(mActSettings, &QAction::triggered, this, &MainWindow::onActionSettingsTriggered);
     connect(mActQuit, &QAction::triggered, qApp, &QCoreApplication::quit);
     connect(mActViewActivities, &QAction::triggered, this, &MainWindow::showSelectedView);
+    connect(mActViewActivitiesManager, &QAction::triggered, this, &MainWindow::showSelectedView);
     connect(mActViewTasks, &QAction::triggered, this, &MainWindow::showSelectedView);
     connect(mActCheckUpdate, &QAction::triggered, this, &MainWindow::onActionCheckUpdateTriggered);
     connect(mActOpenHost, &QAction::triggered, this, &MainWindow::onActionOpenHostTriggered);
@@ -218,6 +227,7 @@ void MainWindow::createKemaiSession(const Settings::Profile& profile)
         connect(mSession.get(), &KemaiSession::pluginsChanged, this, &MainWindow::onPluginsChanged);
 
         mActivityWidget->setKemaiSession(mSession);
+        mActivityManagerWidget->setKemaiSession(mSession);
 
         mSession->refreshCache();
         mSession->refreshSessionInfos();
@@ -237,15 +247,20 @@ void MainWindow::showSelectedView()
     {
         mUi->stackedWidget->setCurrentWidget(mTaskWidget);
     }
-    else
+    else if (mActViewActivities->isChecked())
     {
         mUi->stackedWidget->setCurrentWidget(mActivityWidget);
+    }
+    else
+    {
+        mUi->stackedWidget->setCurrentWidget(mActivityManagerWidget);
     }
 }
 
 void MainWindow::setViewActionsEnabled(bool enable)
 {
     mActViewActivities->setEnabled(enable);
+    mActViewActivitiesManager->setEnabled(enable);
 
     bool taskPluginEnabled = false;
     if (mSession)
