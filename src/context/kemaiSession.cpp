@@ -16,7 +16,8 @@ static const auto MinimalKimaiVersionForPluginRequest = QVersionNumber(1, 14, 1)
  */
 KemaiSession::KemaiSession(const std::shared_ptr<KimaiClient>& kimaiClient) : mKimaiClient(kimaiClient), mKimaiMonitor(kimaiClient)
 {
-    connect(&mKimaiMonitor, &KimaiEventsMonitor::currentTimeSheetChanged, this, &KemaiSession::currentTimeSheetChanged);
+    // QueuedConnection because signal is send while mutex is locked
+    connect(&mKimaiMonitor, &KimaiEventsMonitor::currentTimeSheetsChanged, this, &KemaiSession::currentTimeSheetsChanged, Qt::QueuedConnection);
 }
 
 KemaiSession::~KemaiSession() = default;
@@ -40,7 +41,7 @@ void KemaiSession::refreshSessionInfos()
 
 void KemaiSession::refreshCurrentTimeSheet()
 {
-    mKimaiMonitor.refreshCurrentTimeSheet();
+    mKimaiMonitor.refreshCurrentTimeSheets();
 }
 
 void KemaiSession::refreshCache(const std::set<KimaiCache::Category>& categories)
@@ -69,6 +70,11 @@ TimeSheetConfig KemaiSession::timeSheetConfig() const
 std::optional<TimeSheet> KemaiSession::currentTimeSheet() const
 {
     return mKimaiMonitor.currentTimeSheet();
+}
+
+TimeSheets KemaiSession::currentTimeSheets() const
+{
+    return mKimaiMonitor.currentTimeSheets();
 }
 
 bool KemaiSession::hasCurrentTimeSheet() const

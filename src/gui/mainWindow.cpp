@@ -223,7 +223,7 @@ void MainWindow::createKemaiSession(const Settings::Profile& profile)
         kimaiClient->setToken(profile.token);
 
         mSession = std::make_shared<KemaiSession>(kimaiClient);
-        connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &MainWindow::onCurrentTimeSheetChanged);
+        connect(mSession.get(), &KemaiSession::currentTimeSheetsChanged, this, &MainWindow::onCurrentTimeSheetsChanged);
         connect(mSession.get(), &KemaiSession::pluginsChanged, this, &MainWindow::onPluginsChanged);
 
         mActivityWidget->setKemaiSession(mSession);
@@ -329,7 +329,7 @@ void MainWindow::processAutoConnect()
     createKemaiSession(profile.value());
 }
 
-void MainWindow::onCurrentTimeSheetChanged()
+void MainWindow::onCurrentTimeSheetsChanged()
 {
     if (mSession && mSession->hasCurrentTimeSheet())
     {

@@ -17,13 +17,15 @@ public:
     KimaiEventsMonitor(std::shared_ptr<KimaiClient> kimaiClient);
     ~KimaiEventsMonitor() override;
 
-    void refreshCurrentTimeSheet();
+    void refreshCurrentTimeSheets();
 
     std::optional<TimeSheet> currentTimeSheet() const;
+    TimeSheets currentTimeSheets() const;
+
     bool hasCurrentTimeSheet() const;
 
 signals:
-    void currentTimeSheetChanged();
+    void currentTimeSheetsChanged();
 
 private:
     void onSecondTimeout();
@@ -31,7 +33,7 @@ private:
     void onActiveTimeSheetsReceived(TimeSheetsResult timeSheetsResult);
 
     std::shared_ptr<KimaiClient> mKimaiClient;
-    std::optional<TimeSheet> mCurrentTimeSheet;
+    TimeSheets mCurrentTimeSheets;
     std::optional<QDateTime> mLastTimeSheetUpdate;
     QTimer mSecondTimer;
 };

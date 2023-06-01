@@ -1,10 +1,15 @@
 #include "kimaiEventsMonitor.h"
 
+#include <mutex>
+#include <set>
+
 #include <spdlog/spdlog.h>
 
 #include "settings/settings.h"
 
 using namespace kemai;
+
+static std::mutex gTimeSheetsMutex;
 
 KimaiEventsMonitor::KimaiEventsMonitor(std::shared_ptr<KimaiClient> kimaiClient) : mKimaiClient(std::move(kimaiClient))
 {
@@ -17,7 +22,7 @@ KimaiEventsMonitor::KimaiEventsMonitor(std::shared_ptr<KimaiClient> kimaiClient)
 
 KimaiEventsMonitor::~KimaiEventsMonitor() = default;
 
-void KimaiEventsMonitor::refreshCurrentTimeSheet()
+void KimaiEventsMonitor::refreshCurrentTimeSheets()
 {
     auto activeTimeSheetsResult = mKimaiClient->requestActiveTimeSheets();
     connect(activeTimeSheetsResult, &KimaiApiBaseResult::ready, this, [this, activeTimeSheetsResult] { onActiveTimeSheetsReceived(activeTimeSheetsResult); });
@@ -26,12 +31,19 @@ void KimaiEventsMonitor::refreshCurrentTimeSheet()
 
 std::optional<TimeSheet> KimaiEventsMonitor::currentTimeSheet() const
 {
-    return mCurrentTimeSheet;
+    const std::scoped_lock<std::mutex> lock(gTimeSheetsMutex);
+    return mCurrentTimeSheets.empty() ? std::optional<TimeSheet>{} : mCurrentTimeSheets.front();
+}
+
+TimeSheets KimaiEventsMonitor::currentTimeSheets() const
+{
+    const std::scoped_lock<std::mutex> lock(gTimeSheetsMutex);
+    return mCurrentTimeSheets;
 }
 
 bool KimaiEventsMonitor::hasCurrentTimeSheet() const
 {
-    return mCurrentTimeSheet.has_value();
+    return !mCurrentTimeSheets.empty();
 }
 
 void KimaiEventsMonitor::onSecondTimeout()
@@ -41,7 +53,7 @@ void KimaiEventsMonitor::onSecondTimeout()
     {
         if (mLastTimeSheetUpdate->secsTo(QDateTime::currentDateTime()) >= settings.events.autoRefreshCurrentTimeSheetDelaySeconds)
         {
-            refreshCurrentTimeSheet();
+            refreshCurrentTimeSheets();
         }
     }
 }
@@ -54,28 +66,36 @@ void KimaiEventsMonitor::onClientError(KimaiApiBaseResult* apiBaseResult)
 
 void KimaiEventsMonitor::onActiveTimeSheetsReceived(TimeSheetsResult timeSheetsResult)
 {
-    const auto& timeSheets = timeSheetsResult->getResult();
+    const std::scoped_lock<std::mutex> lock(gTimeSheetsMutex);
+    auto timeSheets = timeSheetsResult->getResult();
 
     bool firstRun  = !mLastTimeSheetUpdate.has_value();
-    bool isRunning = mCurrentTimeSheet.has_value();
+    bool isRunning = !mCurrentTimeSheets.empty();
 
-    if(timeSheets.empty())
+    if (timeSheets.empty())
     {
         if (isRunning || firstRun)
         {
-            mCurrentTimeSheet.reset();
-            emit currentTimeSheetChanged();
+            mCurrentTimeSheets.clear();
+            emit currentTimeSheetsChanged();
         }
     }
     else
     {
-        auto timeSheet = timeSheets.front();
-        bool isSame    = isRunning && timeSheet.id == mCurrentTimeSheet->id;
+        /*
+         * Order may differ, compare list of active timesheet ids
+         */
+        std::set<int> currentIds;
+        std::set<int> newIds;
+        std::for_each(mCurrentTimeSheets.begin(), mCurrentTimeSheets.end(), [&currentIds](const auto& timeSheet) { currentIds.insert(timeSheet.id); });
+        std::for_each(timeSheets.begin(), timeSheets.end(), [&newIds](const auto& timeSheet) { newIds.insert(timeSheet.id); });
+
+        bool isSame = isRunning && currentIds == newIds;
 
         if (!isSame || firstRun || !isRunning)
         {
-            mCurrentTimeSheet = timeSheet;
-            emit currentTimeSheetChanged();
+            mCurrentTimeSheets = std::move(timeSheets);
+            emit currentTimeSheetsChanged();
         }
     }
 

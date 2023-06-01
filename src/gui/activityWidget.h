@@ -39,7 +39,7 @@ private:
 
     void onSecondTimeout();
 
-    void onSessionCurrentTimeSheetChanged();
+    void onSessionCurrentTimeSheetsChanged();
     void onSessionCacheSynchronizeFinished();
 
     void updateControls();

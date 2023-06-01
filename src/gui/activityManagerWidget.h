@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QToolButton>
 #include <QWidget>
 
@@ -23,8 +25,13 @@ public:
     void setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession);
 
 private:
+    void onSessionCurrentTimeSheetsChanged();
     void onAddActivityWidgetButtonClicked();
     void onSessionCacheSynchronizeFinished();
+
+    std::optional<int> findTabIndexForTimeSheet(const TimeSheet& timeSheet) const;
+    int findOrCreateTabForTimeSheet(const TimeSheet& timeSheet);
+    void updateTimeSheetTab(int index, const TimeSheet& timeSheet);
 
     Ui::ActivityManagerWidget* mUi;
     QToolButton* mAddActivityWidgetButton = nullptr;

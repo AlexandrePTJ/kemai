@@ -41,7 +41,7 @@ private:
     void updateProfilesMenu();
     void processAutoConnect();
 
-    void onCurrentTimeSheetChanged();
+    void onCurrentTimeSheetsChanged();
     void onPluginsChanged();
     void onActionSettingsTriggered();
     void onActionCheckUpdateTriggered();

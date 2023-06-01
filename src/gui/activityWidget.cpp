@@ -15,7 +15,7 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbCustomerFieldChanged(); });
-    connect(mUi->cbCustomer,  qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbCustomerFieldChanged(); });
+    connect(mUi->cbCustomer, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbCustomerFieldChanged(); });
     connect(mUi->cbProject, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbProjectFieldChanged(); });
     connect(mUi->cbProject, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbProjectFieldChanged(); });
     connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbActivityFieldChanged(); });
@@ -57,7 +57,7 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
 
     if (mSession)
     {
-        connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &ActivityWidget::onSessionCurrentTimeSheetChanged);
+        connect(mSession.get(), &KemaiSession::currentTimeSheetsChanged, this, &ActivityWidget::onSessionCurrentTimeSheetsChanged);
         connect(&mSession->cache(), &KimaiCache::synchronizeStarted, this, [this]() { setEnabled(false); });
         connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, &ActivityWidget::onSessionCacheSynchronizeFinished);
     }
@@ -212,7 +212,7 @@ void ActivityWidget::onSecondTimeout()
     }
 }
 
-void ActivityWidget::onSessionCurrentTimeSheetChanged()
+void ActivityWidget::onSessionCurrentTimeSheetsChanged()
 {
     // Waiting for cache to be filled before trying to update combos
     while (mSession->cache().status() != KimaiCache::Status::Ready)
@@ -241,7 +241,7 @@ void ActivityWidget::onSessionCacheSynchronizeFinished()
     // Update all fields in case cache have refreshed with a running timesheet
     if (mSession->hasCurrentTimeSheet())
     {
-        onSessionCurrentTimeSheetChanged();
+        onSessionCurrentTimeSheetsChanged();
     }
 }
 
