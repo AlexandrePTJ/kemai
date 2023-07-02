@@ -46,6 +46,7 @@ private:
     void onActionCheckUpdateTriggered();
     void onActionOpenHostTriggered();
     void onActionRefreshCacheTriggered();
+    void onActionAboutKemaiTriggered();
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
     void onNewVersionCheckFinished(const VersionDetails& details);
     void onActivityChanged(bool started);
@@ -70,6 +71,7 @@ private:
     QAction* mActViewActivities     = nullptr;
     QAction* mActViewTasks          = nullptr;
     QAction* mActRefreshCache       = nullptr;
+    QAction* mActAboutKemai         = nullptr;
     QActionGroup* mActGroupView     = nullptr;
     QActionGroup* mActGroupProfiles = nullptr;
 

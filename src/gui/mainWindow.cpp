@@ -9,8 +9,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include "kemaiConfig.h"
+#include "aboutDialog.h"
 #include "activityWidget.h"
+#include "kemaiConfig.h"
 #include "settings/settings.h"
 #include "settingsDialog.h"
 #include "taskWidget.h"
@@ -47,6 +48,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     mActViewActivities = new QAction(tr("Activities"), this);
     mActViewTasks      = new QAction(tr("Tasks"), this);
     mActRefreshCache   = new QAction(tr("Refresh cache"), this);
+    mActAboutKemai     = new QAction(tr("About Kemai"), this);
     mActViewTasks->setEnabled(false);
 
     mActViewActivities->setCheckable(true);
@@ -98,6 +100,8 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     helpMenu->addSeparator();
 #endif // KEMAI_ENABLE_UPDATE_CHECK
     helpMenu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
+    helpMenu->addSeparator();
+    helpMenu->addAction(mActAboutKemai);
 
     mMenuBar->addMenu(fileMenu);
     mMenuBar->addMenu(mProfileMenu);
@@ -138,6 +142,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
     connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChanged);
     connect(mActGroupProfiles, &QActionGroup::triggered, this, &MainWindow::onProfilesActionGroupTriggered);
+    connect(mActAboutKemai, &QAction::triggered, this, &MainWindow::onActionAboutKemaiTriggered);
 
     /*
      * Delay first refresh and update check
@@ -383,6 +388,12 @@ void MainWindow::onActionRefreshCacheTriggered()
     {
         mSession->refreshCache();
     }
+}
+
+void MainWindow::onActionAboutKemaiTriggered()
+{
+    AboutDialog aboutDialog(this);
+    aboutDialog.exec();
 }
 
 void MainWindow::onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason)

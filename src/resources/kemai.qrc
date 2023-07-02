@@ -1,4 +1,8 @@
 <RCC>
+    <qresource prefix="/data">
+        <file alias="countries">data/iso3166-alpha2.json</file>
+        <file alias="currencies">data/iso4217.json</file>
+    </qresource>
     <qresource prefix="/icons">
         <file alias="add">icons/add.svg</file>
         <file alias="play">icons/play.svg</file>
@@ -12,5 +16,8 @@
         <file alias="backspace">icons/backspace.svg</file>
         <file alias="refresh">icons/refresh.svg</file>
         <file alias="remove">icons/remove.svg</file>
+    </qresource>
+    <qresource prefix="/misc">
+        <file alias="licences">misc/licences.html</file>
     </qresource>
 </RCC>

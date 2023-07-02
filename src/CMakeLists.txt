@@ -6,54 +6,56 @@ configure_file(kemaiConfig.h.in ${PROJECT_BINARY_DIR}/kemaiConfig.h)
 
 # Sources
 set(SRCS
-	client/kimaiAPI.cpp
+        client/kimaiAPI.cpp
         client/kimaiCache.cpp
-	client/kimaiClient.cpp
-	client/kimaiReply.cpp
+        client/kimaiClient.cpp
+        client/kimaiReply.cpp
         client/parser.cpp
-	context/kemaiSession.cpp
-	gui/activityDialog.cpp
-	gui/activityWidget.cpp
+        context/kemaiSession.cpp
+        gui/aboutDialog.cpp
+        gui/activityDialog.cpp
+        gui/activityWidget.cpp
         gui/autoCompleteComboBox.cpp
-	gui/customerDialog.cpp
-	gui/durationEdit.cpp
-	gui/mainWindow.cpp
-	gui/projectDialog.cpp
-	gui/settingsDialog.cpp
-	gui/taskWidget.cpp
+        gui/customerDialog.cpp
+        gui/durationEdit.cpp
+        gui/mainWindow.cpp
+        gui/projectDialog.cpp
+        gui/settingsDialog.cpp
+        gui/taskWidget.cpp
         main.cpp
-	misc/dataReader.cpp
+        misc/dataReader.cpp
         models/kimaiDataListModel.cpp
         models/kimaiDataSortFilterProxyModel.cpp
-	models/taskFilterProxyModel.cpp
-	models/taskListModel.cpp
+        models/taskFilterProxyModel.cpp
+        models/taskListModel.cpp
         monitor/desktopEventsMonitor.cpp
         monitor/kimaiEventsMonitor.cpp
         settings/settings.cpp
         updater/kemaiUpdater.cpp)
 
 set(HDRS
-	client/kimaiAPI.h
+        client/kimaiAPI.h
         client/kimaiCache.h
-	client/kimaiClient.h
-	client/kimaiClient_p.h
-	client/kimaiReply.h
+        client/kimaiClient.h
+        client/kimaiClient_p.h
+        client/kimaiReply.h
         client/parser.h
-	context/kemaiSession.h
-	gui/activityDialog.h
-	gui/activityWidget.h
+        context/kemaiSession.h
+        gui/aboutDialog.h
+        gui/activityDialog.h
+        gui/activityWidget.h
         gui/autoCompleteComboBox.h
-	gui/customerDialog.h
-	gui/durationEdit.h
-	gui/mainWindow.h
-	gui/projectDialog.h
-	gui/settingsDialog.h
-	gui/taskWidget.h
-	misc/dataReader.h
+        gui/customerDialog.h
+        gui/durationEdit.h
+        gui/mainWindow.h
+        gui/projectDialog.h
+        gui/settingsDialog.h
+        gui/taskWidget.h
+        misc/dataReader.h
         models/kimaiDataListModel.h
         models/kimaiDataSortFilterProxyModel.h
-	models/taskFilterProxyModel.h
-	models/taskListModel.h
+        models/taskFilterProxyModel.h
+        models/taskListModel.h
         monitor/desktopEventsMonitor.h
         monitor/kimaiEventsMonitor.h
         settings/settings.h
@@ -62,13 +64,14 @@ set(HDRS
 
 # Forms
 set(UIS
-	gui/activityDialog.ui
-	gui/activityWidget.ui
-	gui/customerDialog.ui
-	gui/mainWindow.ui
-	gui/projectDialog.ui
-	gui/settingsDialog.ui
-	gui/taskWidget.ui)
+        gui/aboutDialog.ui
+        gui/activityDialog.ui
+        gui/activityWidget.ui
+        gui/customerDialog.ui
+        gui/mainWindow.ui
+        gui/projectDialog.ui
+        gui/settingsDialog.ui
+        gui/taskWidget.ui)
 
 
 # Localization
@@ -94,8 +97,7 @@ add_custom_target(kemai-update-ts COMMAND
 
 # Resources
 set(RESX
-        resources/data.qrc
-        resources/icons.qrc
+        resources/kemai.qrc
         ${KEMAI_L10N_QRC})
 
 # OS Specifics
