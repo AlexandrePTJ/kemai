@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Bad MacOSX layout resizing [#96](https://github.com/AlexandrePTJ/kemai/issues/96)
+
 ### Added
 - About dialog [#95](https://github.com/AlexandrePTJ/kemai/issues/95)
 
