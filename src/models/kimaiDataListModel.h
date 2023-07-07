@@ -18,14 +18,15 @@ public:
             mData = {{0, ""}};
             for (const auto& kd : kds)
             {
-                mData.emplace(kd.id, kd.name);
+                mData.emplace_back(std::make_pair(kd.id, kd.name));
             }
+            std::sort(mData.begin(), mData.end(), [](const auto& a, const auto& b) { return a.second.toLower() < b.second.toLower(); });
         }
         endResetModel();
     }
 
 private:
-    std::map<int, QString> mData;
+    std::vector<std::pair<int, QString>> mData;
 };
 
 } // namespace kemai
