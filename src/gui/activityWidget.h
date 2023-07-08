@@ -40,6 +40,7 @@ private:
     void onSecondTimeout();
 
     void onSessionCurrentTimeSheetChanged();
+    void onSessionRecentTimeSheetsChanged();
     void onSessionCacheSynchronizeFinished();
 
     void updateControls();

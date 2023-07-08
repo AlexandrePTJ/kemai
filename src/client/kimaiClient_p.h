@@ -23,6 +23,7 @@ enum class ApiMethod
     Activities,
     ActivityAdd,
     ActiveTimeSheets,
+    RecentTimeSheets,
     TimeSheets,
     Users,
     MeUsers,

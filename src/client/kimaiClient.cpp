@@ -49,6 +49,9 @@ QString kemai::apiMethodToString(ApiMethod method)
     case ApiMethod::ActiveTimeSheets:
         return "timesheets/active";
 
+    case ApiMethod::RecentTimeSheets:
+        return "timesheets/recent";
+
     case ApiMethod::TimeSheets:
         return "timesheets";
 
@@ -222,6 +225,13 @@ TimeSheetsResult KimaiClient::requestActiveTimeSheets()
     return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::ActiveTimeSheets, reply);
 }
 
+TimeSheetsResult KimaiClient::requestRecentTimeSheets()
+{
+    auto request = mD->prepareRequest(ApiMethod::RecentTimeSheets, std::map<QString, QString>{{"size", "5"}});
+    auto reply   = mD->sendGetRequest(request);
+    return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::RecentTimeSheets, reply);
+}
+
 ProjectsResult KimaiClient::requestProjects(std::optional<int> customerId)
 {
     std::map<QString, QString> parameters;
@@ -289,7 +299,7 @@ TimeSheetResult KimaiClient::updateTimeSheet(const TimeSheet& timeSheet, TimeShe
     auto json    = KimaiApiTypesParser::toJson(timeSheet, trackingMode);
     auto data    = toPostData(json);
     auto request = mD->prepareRequest(ApiMethod::TimeSheets, {}, data, QString::number(timeSheet.id));
-    auto reply   = mD->sendPatchRequest(request,data);
+    auto reply   = mD->sendPatchRequest(request, data);
     return mD->processApiNetworkReplySingleObject<TimeSheet>(ApiMethod::TimeSheets, reply);
 }
 

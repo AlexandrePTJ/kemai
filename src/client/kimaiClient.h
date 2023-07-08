@@ -43,6 +43,7 @@ public:
     PluginsResult requestPlugins();
     CustomersResult requestCustomers();
     TimeSheetsResult requestActiveTimeSheets();
+    TimeSheetsResult requestRecentTimeSheets();
     ProjectsResult requestProjects(std::optional<int> customerId = std::nullopt);
     ActivitiesResult requestActivities(std::optional<int> projectId = std::nullopt);
 

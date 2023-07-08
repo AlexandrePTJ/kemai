@@ -59,6 +59,7 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
     if (mSession)
     {
         connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &ActivityWidget::onSessionCurrentTimeSheetChanged);
+        connect(mSession.get(), &KemaiSession::recentTimeSheetsChanged, this, &ActivityWidget::onSessionRecentTimeSheetsChanged);
         connect(&mSession->cache(), &KimaiCache::synchronizeStarted, this, [this]() { setEnabled(false); });
         connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, &ActivityWidget::onSessionCacheSynchronizeFinished);
     }
@@ -230,6 +231,15 @@ void ActivityWidget::onSessionCurrentTimeSheetChanged()
 
     updateControls();
     updateCustomersCombo();
+}
+
+void ActivityWidget::onSessionRecentTimeSheetsChanged()
+{
+    mUi->lwHistory->clear();
+    for (const auto& timeSheet : mSession->recentTimeSheets())
+    {
+        mUi->lwHistory->addItem(QString("%1 / %2").arg(timeSheet.project.name, timeSheet.activity.name));
+    }
 }
 
 void ActivityWidget::onSessionCacheSynchronizeFinished()
