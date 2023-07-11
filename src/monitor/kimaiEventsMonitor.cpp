@@ -24,13 +24,6 @@ void KimaiEventsMonitor::refreshCurrentTimeSheet()
     connect(activeTimeSheetsResult, &KimaiApiBaseResult::error, this, [this, activeTimeSheetsResult]() { onClientError(activeTimeSheetsResult); });
 }
 
-void KimaiEventsMonitor::refreshRecentTimeSheets()
-{
-    auto recentTimeSheetsResult = mKimaiClient->requestRecentTimeSheets();
-    connect(recentTimeSheetsResult, &KimaiApiBaseResult::ready, this, [this, recentTimeSheetsResult] { onRecentTimeSheetsReceived(recentTimeSheetsResult); });
-    connect(recentTimeSheetsResult, &KimaiApiBaseResult::error, this, [this, recentTimeSheetsResult]() { onClientError(recentTimeSheetsResult); });
-}
-
 std::optional<TimeSheet> KimaiEventsMonitor::currentTimeSheet() const
 {
     return mCurrentTimeSheet;
@@ -41,11 +34,6 @@ bool KimaiEventsMonitor::hasCurrentTimeSheet() const
     return mCurrentTimeSheet.has_value();
 }
 
-TimeSheets KimaiEventsMonitor::recentTimeSheets() const
-{
-    return mRecentTimeSheets;
-}
-
 void KimaiEventsMonitor::onSecondTimeout()
 {
     auto settings = Settings::get();
@@ -54,7 +42,6 @@ void KimaiEventsMonitor::onSecondTimeout()
         if (mLastTimeSheetUpdate->secsTo(QDateTime::currentDateTime()) >= settings.events.autoRefreshCurrentTimeSheetDelaySeconds)
         {
             refreshCurrentTimeSheet();
-            refreshRecentTimeSheets();
         }
     }
 }
@@ -93,19 +80,5 @@ void KimaiEventsMonitor::onActiveTimeSheetsReceived(TimeSheetsResult timeSheetsR
     }
 
     mLastTimeSheetUpdate = QDateTime::currentDateTime();
-    timeSheetsResult->deleteLater();
-}
-
-void KimaiEventsMonitor::onRecentTimeSheetsReceived(TimeSheetsResult timeSheetsResult)
-{
-    auto timeSheets = timeSheetsResult->takeResult();
-
-    if (!std::equal(mRecentTimeSheets.begin(), mRecentTimeSheets.end(), timeSheets.begin(), timeSheets.end(),
-                    [](const auto& a, const auto& b) { return a.id == b.id; }))
-    {
-        mRecentTimeSheets = std::move(timeSheets);
-        emit recentTimeSheetsChanged();
-    }
-
     timeSheetsResult->deleteLater();
 }

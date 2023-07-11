@@ -57,6 +57,14 @@ void KimaiCache::synchronize(const std::shared_ptr<KimaiClient>& client, const s
             connect(activitiesResult, &KimaiApiBaseResult::error, this, [this, activitiesResult] { processActivitiesResult(activitiesResult); });
         }
         break;
+
+        case Category::RecentTimeSheets: {
+            mRecentTimeSheets.clear();
+            auto timeSheetsResult = client->requestRecentTimeSheets();
+            connect(timeSheetsResult, &KimaiApiBaseResult::ready, this, [this, timeSheetsResult] { processRecentTimeSheetsResult(timeSheetsResult); });
+            connect(timeSheetsResult, &KimaiApiBaseResult::error, this, [this, timeSheetsResult] { processRecentTimeSheetsResult(timeSheetsResult); });
+        }
+        break;
         }
     }
 }
@@ -95,6 +103,11 @@ Activities KimaiCache::activities(std::optional<int> projectId) const
         return {its.begin(), its.end()};
     }
     return mActivities;
+}
+
+TimeSheets KimaiCache::recentTimeSheets() const
+{
+    return mRecentTimeSheets;
 }
 
 void KimaiCache::updateSyncProgress(Category finishedCategory)
@@ -139,4 +152,14 @@ void KimaiCache::processActivitiesResult(ActivitiesResult activitiesResult)
     }
     activitiesResult->deleteLater();
     updateSyncProgress(Category::Activities);
+}
+
+void KimaiCache::processRecentTimeSheetsResult(TimeSheetsResult timeSheetsResult)
+{
+    if (!timeSheetsResult->hasError())
+    {
+        mRecentTimeSheets = timeSheetsResult->takeResult();
+    }
+    timeSheetsResult->deleteLater();
+    updateSyncProgress(Category::RecentTimeSheets);
 }

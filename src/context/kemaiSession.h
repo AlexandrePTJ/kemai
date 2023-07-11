@@ -27,6 +27,7 @@ public:
      */
     void refreshSessionInfos();
     void refreshCurrentTimeSheet();
+    void refreshCache(KimaiCache::Category category);
     void refreshCache(const std::set<KimaiCache::Category>& categories = {});
 
     bool hasPlugin(ApiPlugin apiPlugin) const;
@@ -36,14 +37,11 @@ public:
     std::optional<TimeSheet> currentTimeSheet() const;
     bool hasCurrentTimeSheet() const;
 
-    TimeSheets recentTimeSheets() const;
-
     QDateTime computeTZDateTime(const QDateTime& dateTime) const;
 
 signals:
     void pluginsChanged();
     void currentTimeSheetChanged();
-    void recentTimeSheetsChanged();
 
 private:
     void onClientError(KimaiApiBaseResult* apiBaseResult);

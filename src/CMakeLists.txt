@@ -22,8 +22,10 @@ set(SRCS
         gui/projectDialog.cpp
         gui/settingsDialog.cpp
         gui/taskWidget.cpp
+        gui/timeSheetListWidgetItem.cpp
         main.cpp
         misc/dataReader.cpp
+        misc/helpers.cpp
         models/kimaiDataListModel.cpp
         models/kimaiDataSortFilterProxyModel.cpp
         models/taskFilterProxyModel.cpp
@@ -51,7 +53,9 @@ set(HDRS
         gui/projectDialog.h
         gui/settingsDialog.h
         gui/taskWidget.h
+        gui/timeSheetListWidgetItem.h
         misc/dataReader.h
+        misc/helpers.h
         models/kimaiDataListModel.h
         models/kimaiDataSortFilterProxyModel.h
         models/taskFilterProxyModel.h
@@ -71,7 +75,8 @@ set(UIS
         gui/mainWindow.ui
         gui/projectDialog.ui
         gui/settingsDialog.ui
-        gui/taskWidget.ui)
+        gui/taskWidget.ui
+        gui/timeSheetListWidgetItem.ui)
 
 
 # Localization
