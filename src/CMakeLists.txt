@@ -28,6 +28,7 @@ set(SRCS
         misc/helpers.cpp
         models/kimaiDataListModel.cpp
         models/kimaiDataSortFilterProxyModel.cpp
+        models/loggerTreeModel.cpp
         models/taskFilterProxyModel.cpp
         models/taskListModel.cpp
         monitor/desktopEventsMonitor.cpp
@@ -58,6 +59,7 @@ set(HDRS
         misc/helpers.h
         models/kimaiDataListModel.h
         models/kimaiDataSortFilterProxyModel.h
+        models/loggerTreeModel.h
         models/taskFilterProxyModel.h
         models/taskListModel.h
         monitor/desktopEventsMonitor.h

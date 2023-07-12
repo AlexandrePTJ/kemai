@@ -3,13 +3,16 @@
 #include <QLibraryInfo>
 #include <QStandardPaths>
 #include <QTranslator>
+#include <QTreeView>
 
+// #include <spdlog/sinks/qt_sinks.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include "client/kimaiClient.h"
 #include "gui/mainWindow.h"
+#include "models/loggerTreeModel.h"
 #include "settings/settings.h"
 
 using namespace kemai;
@@ -30,10 +33,14 @@ int main(int argc, char* argv[])
     auto appDataDir    = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     auto logFilePath   = QDir(appDataDir).absoluteFilePath("kemai.log");
 
+    // Create Qt logger model before spdlog sinks
+    LoggerTreeModel loggerTreeModel;
+
     // Init spdlog console and rotating file (3 x 5Mb)
     auto console = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     auto rotfile = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFilePath.toStdString(), 1024 * 1024 * 5, 3);
-    std::vector<spdlog::sink_ptr> sinks{console, rotfile};
+    auto qtsink  = std::make_shared<LoggerTreeModelSink>(&loggerTreeModel);
+    std::vector<spdlog::sink_ptr> sinks{console, rotfile, qtsink};
 
     auto logger = std::make_shared<spdlog::logger>("kemai", sinks.begin(), sinks.end());
     spdlog::register_logger(logger);
@@ -64,6 +71,10 @@ int main(int argc, char* argv[])
     MainWindow mainWindow;
     mainWindow.restoreGeometry(kemaiSettings.kemai.geometry);
     mainWindow.show();
+
+    QTreeView loggerView;
+    loggerView.setModel(&loggerTreeModel);
+    loggerView.show();
 
     return app.exec();
 }
