@@ -1,7 +1,5 @@
 #include "loggerTreeModel.h"
 
-#include <chrono>
-
 using namespace kemai;
 
 const auto MaxLogEntries = 500;
