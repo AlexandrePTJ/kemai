@@ -106,9 +106,6 @@ jobs:
   MacOSJob:
     name: MacOS Qt-6.5.1
     runs-on: macos-latest
-    env:
-      CC: $(brew --prefix llvm@15)/bin/clang
-      CXX: $(brew --prefix llvm@15)/bin/clang
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3

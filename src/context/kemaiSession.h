@@ -31,6 +31,7 @@ public:
     void refreshCache(const std::set<KimaiCache::Category>& categories = {});
 
     bool hasPlugin(ApiPlugin apiPlugin) const;
+    QVersionNumber kimaiVersion() const;
     User me() const;
     TimeSheetConfig timeSheetConfig() const;
 
@@ -42,6 +43,9 @@ public:
 signals:
     void pluginsChanged();
     void currentTimeSheetChanged();
+    void versionChanged();
+    void meChanged();
+    void timeSheetConfigChanged();
 
 private:
     void onClientError(KimaiApiBaseResult* apiBaseResult);

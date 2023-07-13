@@ -129,6 +129,12 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     }
 
     /*
+     * Status bar
+     */
+    mStatusInstanceLabel.setText(tr("Not connected"));
+    mUi->statusbar->addWidget(&mStatusInstanceLabel);
+    
+    /*
      * Connections
      */
     connect(mActSettings, &QAction::triggered, this, &MainWindow::onActionSettingsTriggered);
@@ -207,6 +213,7 @@ void MainWindow::createKemaiSession(const Settings::Profile& profile)
             mTaskWidget->deleteLater();
             mTaskWidget = nullptr;
         }
+        mStatusInstanceLabel.setText(tr("Not connected"));
     }
 
     auto settings = Settings::get();
@@ -221,6 +228,7 @@ void MainWindow::createKemaiSession(const Settings::Profile& profile)
         mSession = std::make_shared<KemaiSession>(kimaiClient);
         connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &MainWindow::onCurrentTimeSheetChanged);
         connect(mSession.get(), &KemaiSession::pluginsChanged, this, &MainWindow::onPluginsChanged);
+        connect(mSession.get(), &KemaiSession::versionChanged, this, &MainWindow::onSessionVersionChanged);
 
         mActivityWidget->setKemaiSession(mSession);
 
@@ -346,6 +354,14 @@ void MainWindow::onPluginsChanged()
         }
 
         mTaskWidget->setKemaiSession(mSession);
+    }
+}
+
+void MainWindow::onSessionVersionChanged()
+{
+    if (!mSession->kimaiVersion().isNull())
+    {
+        mStatusInstanceLabel.setText(QString("Kimai %1").arg(mSession->kimaiVersion().toString()));
     }
 }
 

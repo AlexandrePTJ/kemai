@@ -54,8 +54,7 @@ public:
 protected:
     void sink_it_(const spdlog::details::log_msg& msg) override
     {
-        const auto sysTime    = std::chrono::clock_cast<std::chrono::system_clock>(msg.time);
-        const auto timeInMSec = std::chrono::time_point_cast<std::chrono::milliseconds>(sysTime);
+        const auto timeInMSec = std::chrono::time_point_cast<std::chrono::milliseconds>(msg.time);
 
         // clang-format off
         LoggerEntry entry{

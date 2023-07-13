@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QActionGroup>
+#include <QLabel>
 #include <QMainWindow>
 #include <QMenuBar>
 
@@ -42,6 +43,7 @@ private:
 
     void onCurrentTimeSheetChanged();
     void onPluginsChanged();
+    void onSessionVersionChanged();
     void onActionSettingsTriggered();
     void onActionCheckUpdateTriggered();
     void onActionOpenHostTriggered();
@@ -82,6 +84,9 @@ private:
     // Tray
     QMenu* mTrayMenu                 = nullptr;
     QSystemTrayIcon* mSystemTrayIcon = nullptr;
+
+    // Status bar
+    QLabel mStatusInstanceLabel;
 };
 
 } // namespace kemai
