@@ -2,6 +2,7 @@
 #include "ui_loggerWidget.h"
 
 #include <QDesktopServices>
+#include <QUrl>
 
 #include <misc/helpers.h>
 

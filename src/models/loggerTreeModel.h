@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <spdlog/sinks/base_sink.h>
 
 #include <QAbstractItemModel>
