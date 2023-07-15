@@ -21,7 +21,7 @@
       "name": "default-windows",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "c:/Qt/6.5.0/msvc2019_64",
+        "CMAKE_PREFIX_PATH": "c:/Qt/6.5.1/msvc2019_64",
         "OPENSSL_ROOT": "c:/Qt/Tools/OpenSSLv3/Win_x64",
         "CMAKE_INSTALL_PREFIX": "dist"
       }
@@ -30,7 +30,7 @@
       "name": "default-macos",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "$env{HOME}/Qt/6.5.0/macos",
+        "CMAKE_PREFIX_PATH": "$env{HOME}/Qt/6.5.1/macos",
         "CMAKE_INSTALL_PREFIX": "dist"
       }
     },
