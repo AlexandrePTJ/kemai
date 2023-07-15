@@ -1,5 +1,8 @@
 #include "helpers.h"
 
+#include <QDir>
+#include <QStandardPaths>
+
 namespace kemai::helpers {
 
 QString getDurationString(const QDateTime& beginAt, const QDateTime& endAt)
@@ -27,6 +30,16 @@ QString getDurationString(const QDateTime& beginAt, const QDateTime& endAt)
         .arg(nMinutes, 2, 10, QChar('0'))
         .arg(nSecs, 2, 10, QChar('0'));
     // NOLINTEND(readability-magic-numbers)
+}
+
+QString getLogDirPath()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+}
+
+QString getLogFilePath()
+{
+    return QDir(getLogDirPath()).absoluteFilePath("kemai.log");
 }
 
 } // namespace kemai::helpers

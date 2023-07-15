@@ -1,8 +1,6 @@
 #include "kimaiClient.h"
 #include "kimaiClient_p.h"
 
-#include "kemaiConfig.h"
-
 #include <QCoreApplication>
 #include <QUrlQuery>
 
@@ -120,7 +118,7 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
     networkRequest.setUrl(url);
     networkRequest.setRawHeader("X-AUTH-USER", username.toUtf8());
     networkRequest.setRawHeader("X-AUTH-TOKEN", token.toUtf8());
-    networkRequest.setHeader(QNetworkRequest::UserAgentHeader, QString("%1/%2").arg(qApp->applicationName(), KEMAI_VERSION));
+    networkRequest.setHeader(QNetworkRequest::UserAgentHeader, QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()));
     networkRequest.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
     if (!data.isEmpty())
     {
@@ -133,19 +131,19 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
 
 QNetworkReply* KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkRequest& networkRequest) const
 {
-    spdlog::debug("===> [GET] {}", networkRequest.url().toString().toStdString());
+    spdlog::debug("[GET] {}", networkRequest.url().toString().toStdString());
     return networkAccessManager->get(networkRequest);
 }
 
 QNetworkReply* KimaiClient::KimaiClientPrivate::sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const
 {
-    spdlog::debug("===> [POST] {}", networkRequest.url().toString().toStdString());
+    spdlog::debug("[POST] {}", networkRequest.url().toString().toStdString());
     return networkAccessManager->post(networkRequest, data);
 }
 
 QNetworkReply* KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const
 {
-    spdlog::debug("===> [PATCH] {}", networkRequest.url().toString().toStdString());
+    spdlog::debug("[PATCH] {}", networkRequest.url().toString().toStdString());
     return networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);
 }
 
@@ -153,7 +151,7 @@ void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* /*reply*/, c
 {
     for (const auto& error : errors)
     {
-        spdlog::error("<=== SSL Error: {}", error.errorString().toStdString());
+        spdlog::error("SSL Error: {}", error.errorString().toStdString());
     }
 
     // Process certificate errors one by one.

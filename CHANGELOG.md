@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - About dialog [#95](https://github.com/AlexandrePTJ/kemai/issues/95)
 - Recent time sheets history [#86](https://github.com/AlexandrePTJ/kemai/issues/86)
-
+- Add log widget [#58](https://github.com/AlexandrePTJ/kemai/issues/58)
 
 ## [0.9.4] - 2023-05-10
 

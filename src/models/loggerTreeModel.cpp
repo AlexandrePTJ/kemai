@@ -1,9 +1,58 @@
 #include "loggerTreeModel.h"
 
+#include <QColor>
+
 using namespace kemai;
 
 const auto MaxLogEntries = 500;
 
+/*
+ * Static helpers
+ */
+static QVariant getDisplay(const LoggerEntry& entry, int column)
+{
+    switch (column)
+    {
+    case 0:
+        return entry.level;
+
+    case 1:
+        return entry.dateTime;
+
+    case 2:
+        return entry.message;
+
+    default:
+        return {};
+    }
+}
+
+static QVariant getForeground(spdlog::level::level_enum level)
+{
+    switch (level)
+    {
+    case spdlog::level::trace:
+    case spdlog::level::debug:
+        return QColor(Qt::blue);
+
+    case spdlog::level::info:
+        return QColor(Qt::darkGreen);
+
+    case spdlog::level::warn:
+        return QColor(Qt::darkYellow);
+
+    case spdlog::level::err:
+    case spdlog::level::critical:
+        return QColor(Qt::darkRed);
+
+    default:
+        return {};
+    }
+}
+
+/*
+ * Public impl
+ */
 LoggerTreeModel::LoggerTreeModel(QObject* parent) : QAbstractItemModel(parent) {}
 
 LoggerTreeModel::~LoggerTreeModel() = default;
@@ -24,7 +73,7 @@ int LoggerTreeModel::rowCount(const QModelIndex& parent) const
     {
         return 0;
     }
-    return mEntries.size();
+    return static_cast<int>(mEntries.size());
 }
 
 int LoggerTreeModel::columnCount(const QModelIndex& parent) const
@@ -34,34 +83,50 @@ int LoggerTreeModel::columnCount(const QModelIndex& parent) const
 
 QVariant LoggerTreeModel::data(const QModelIndex& index, int role) const
 {
-    if (index.row() >= mEntries.size() || !index.isValid() || role != Qt::DisplayRole)
+    if (index.row() >= mEntries.size() || !index.isValid())
     {
         return {};
     }
 
     auto it = std::next(mEntries.begin(), index.row());
-    switch (index.column())
+    switch (role)
     {
-    case 0:
-        return it->level;
+    case Qt::DisplayRole:
+        return getDisplay(*it, index.column());
 
-    case 1:
-        return it->dateTime;
-
-    case 2:
-        return it->message;
+    case Qt::ForegroundRole:
+        return getForeground(it->level);
 
     default:
         return {};
     }
 }
 
+QVariant LoggerTreeModel::headerData(int section, Qt::Orientation /*orientation*/, int role) const
+{
+    if (role != Qt::DisplayRole)
+    {
+        return {};
+    }
+
+    switch (section)
+    {
+    case 0:
+        return tr("Level");
+
+    case 1:
+        return tr("Date");
+
+    case 2:
+        return tr("Message");
+    }
+
+    return {};
+}
+
 void LoggerTreeModel::sinkLog(const LoggerEntry& entry)
 {
-    if (entry.level <= spdlog::level::debug)
-    {
-        return;
-    }
+    QMutexLocker lock(&mSinkMutex);
 
     const auto size = static_cast<int>(mEntries.size());
     if (size > MaxLogEntries - 1)

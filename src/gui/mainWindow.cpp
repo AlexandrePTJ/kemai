@@ -26,7 +26,7 @@ static const auto FirstRequestDelayMs = 100;
 /*
  * Class impl
  */
-MainWindow::MainWindow() : mUi(new Ui::MainWindow)
+MainWindow::MainWindow() : mUi(std::make_unique<Ui::MainWindow>())
 {
     mUi->setupUi(this);
 
@@ -49,6 +49,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     mActViewTasks      = new QAction(tr("Tasks"), this);
     mActRefreshCache   = new QAction(tr("Refresh cache"), this);
     mActAboutKemai     = new QAction(tr("About Kemai"), this);
+    mActShowLogWidget  = new QAction(tr("Show logs"), this);
     mActViewTasks->setEnabled(false);
 
     mActViewActivities->setCheckable(true);
@@ -99,8 +100,9 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     helpMenu->addAction(mActCheckUpdate);
     helpMenu->addSeparator();
 #endif // KEMAI_ENABLE_UPDATE_CHECK
-    helpMenu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
+    helpMenu->addAction(mActShowLogWidget);
     helpMenu->addSeparator();
+    helpMenu->addAction(tr("About Qt"), qApp, &QApplication::aboutQt);
     helpMenu->addAction(mActAboutKemai);
 
     mMenuBar->addMenu(fileMenu);
@@ -133,7 +135,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
      */
     mStatusInstanceLabel.setText(tr("Not connected"));
     mUi->statusbar->addWidget(&mStatusInstanceLabel);
-    
+
     /*
      * Connections
      */
@@ -149,6 +151,7 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
     connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChanged);
     connect(mActGroupProfiles, &QActionGroup::triggered, this, &MainWindow::onProfilesActionGroupTriggered);
     connect(mActAboutKemai, &QAction::triggered, this, &MainWindow::onActionAboutKemaiTriggered);
+    connect(mActShowLogWidget, &QAction::triggered, &mLoggerWidget, &QWidget::show);
 
     /*
      * Delay first refresh and update check
@@ -170,11 +173,20 @@ MainWindow::MainWindow() : mUi(new Ui::MainWindow)
 MainWindow::~MainWindow()
 {
     delete mMenuBar;
-    delete mUi;
+}
+
+void MainWindow::setLoggerTreeModel(const std::shared_ptr<LoggerTreeModel>& model)
+{
+    mLoggerWidget.setModel(model);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+    if (mLoggerWidget.isVisible())
+    {
+        mLoggerWidget.close();
+    }
+
     auto settings = Settings::get();
     if (settings.kemai.closeToSystemTray)
     {

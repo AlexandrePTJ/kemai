@@ -1,21 +1,23 @@
 #include <QApplication>
-#include <QDir>
 #include <QLibraryInfo>
 #include <QStandardPaths>
 #include <QTranslator>
 #include <QTreeView>
 
-// #include <spdlog/sinks/qt_sinks.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include "client/kimaiClient.h"
 #include "gui/mainWindow.h"
+#include "kemaiConfig.h"
+#include "misc/helpers.h"
 #include "models/loggerTreeModel.h"
 #include "settings/settings.h"
 
 using namespace kemai;
+
+static constinit const auto MaxLogFileSize = 1024 * 102 * 5;
 
 int main(int argc, char* argv[])
 {
@@ -25,27 +27,28 @@ int main(int argc, char* argv[])
 #endif
 
     QApplication app(argc, argv);
-    app.setApplicationName("Kemai");
-    app.setOrganizationName("Kemai");
+    QApplication::setApplicationName("Kemai");
+    QApplication::setOrganizationName("Kemai");
+    QApplication::setApplicationVersion(KEMAI_VERSION);
 
     // Get kemai data directory and log file path
     auto kemaiSettings = Settings::get();
-    auto appDataDir    = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    auto logFilePath   = QDir(appDataDir).absoluteFilePath("kemai.log");
 
     // Create Qt logger model before spdlog sinks
-    LoggerTreeModel loggerTreeModel;
+    auto loggerTreeModel = std::make_shared<LoggerTreeModel>();
 
     // Init spdlog console and rotating file (3 x 5Mb)
     auto console = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    auto rotfile = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFilePath.toStdString(), 1024 * 1024 * 5, 3);
-    auto qtsink  = std::make_shared<LoggerTreeModelSink>(&loggerTreeModel);
+    auto rotfile = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(helpers::getLogFilePath().toStdString(), MaxLogFileSize, 3);
+    auto qtsink  = std::make_shared<LoggerTreeModelSink>(loggerTreeModel);
     std::vector<spdlog::sink_ptr> sinks{console, rotfile, qtsink};
 
     auto logger = std::make_shared<spdlog::logger>("kemai", sinks.begin(), sinks.end());
     spdlog::register_logger(logger);
     spdlog::set_level(spdlog::level::debug);
     spdlog::set_default_logger(logger);
+
+    logger->info("===== Starting Kemai {} =====", KEMAI_VERSION);
 
     // Setup Qt and app translations
     QTranslator qtTranslator;
@@ -55,13 +58,13 @@ int main(int argc, char* argv[])
     if (qtTranslator.load("qt_" + kemaiSettings.kemai.language.name(), QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
 #endif
     {
-        app.installTranslator(&qtTranslator);
+        QApplication::installTranslator(&qtTranslator);
     }
 
     QTranslator appTranslator;
     if (appTranslator.load(kemaiSettings.kemai.language, "kemai", "_", ":/l10n"))
     {
-        app.installTranslator(&appTranslator);
+        QApplication::installTranslator(&appTranslator);
     }
 
     // Setup trusted certificates
@@ -70,11 +73,8 @@ int main(int argc, char* argv[])
     // Startup
     MainWindow mainWindow;
     mainWindow.restoreGeometry(kemaiSettings.kemai.geometry);
+    mainWindow.setLoggerTreeModel(loggerTreeModel);
     mainWindow.show();
 
-    QTreeView loggerView;
-    loggerView.setModel(&loggerTreeModel);
-    loggerView.show();
-
-    return app.exec();
+    return QApplication::exec();
 }

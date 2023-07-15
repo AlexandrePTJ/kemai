@@ -1,10 +1,11 @@
 #pragma once
 
+#include <spdlog/sinks/base_sink.h>
+
 #include <QAbstractItemModel>
 #include <QDateTime>
+#include <QMutex>
 #include <QRegularExpression>
-
-#include <spdlog/sinks/base_sink.h>
 
 namespace kemai {
 
@@ -34,12 +35,14 @@ public:
     int rowCount(const QModelIndex& parent) const override;
     int columnCount(const QModelIndex& parent) const override;
     QVariant data(const QModelIndex& index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
 public slots: // NOLINT(readability-redundant-access-specifiers)
     void sinkLog(const kemai::LoggerEntry& entry);
 
 private:
     std::list<LoggerEntry> mEntries;
+    QMutex mSinkMutex;
 };
 
 /*
@@ -48,7 +51,7 @@ private:
 class LoggerTreeModelSink : public spdlog::sinks::base_sink<std::mutex>
 {
 public:
-    LoggerTreeModelSink(LoggerTreeModel* loggerTreeModel) : mLoggerTreeModel(loggerTreeModel) {}
+    LoggerTreeModelSink(const std::shared_ptr<LoggerTreeModel>& loggerTreeModel) : mLoggerTreeModel(loggerTreeModel) {}
     ~LoggerTreeModelSink() override = default;
 
 protected:
@@ -63,12 +66,12 @@ protected:
             msg.level};
         // clang-format on
 
-        QMetaObject::invokeMethod(mLoggerTreeModel, "sinkLog", Qt::AutoConnection, Q_ARG(kemai::LoggerEntry, entry));
+        QMetaObject::invokeMethod(mLoggerTreeModel.get(), "sinkLog", Qt::AutoConnection, Q_ARG(kemai::LoggerEntry, entry));
     }
     void flush_() override {}
 
 private:
-    LoggerTreeModel* mLoggerTreeModel;
+    std::shared_ptr<LoggerTreeModel> mLoggerTreeModel;
 };
 
 } // namespace kemai

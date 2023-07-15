@@ -9,6 +9,7 @@
 
 #include "client/kimaiClient.h"
 #include "context/kemaiSession.h"
+#include "gui/loggerWidget.h"
 #include "monitor/desktopEventsMonitor.h"
 #include "settings/settings.h"
 #include "updater/kemaiUpdater.h"
@@ -29,6 +30,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
     ~MainWindow() override;
+
+    void setLoggerTreeModel(const std::shared_ptr<LoggerTreeModel>& model);
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -56,7 +59,7 @@ private:
     void onDesktopIdleDetected();
     void onDesktopLockDetected();
 
-    Ui::MainWindow* mUi;
+    std::unique_ptr<Ui::MainWindow> mUi;
     KemaiUpdater mUpdater;
     std::shared_ptr<KemaiSession> mSession;
     std::shared_ptr<DesktopEventsMonitor> mDesktopEventsMonitor;
@@ -74,6 +77,7 @@ private:
     QAction* mActViewTasks          = nullptr;
     QAction* mActRefreshCache       = nullptr;
     QAction* mActAboutKemai         = nullptr;
+    QAction* mActShowLogWidget      = nullptr;
     QActionGroup* mActGroupView     = nullptr;
     QActionGroup* mActGroupProfiles = nullptr;
 
@@ -87,6 +91,9 @@ private:
 
     // Status bar
     QLabel mStatusInstanceLabel;
+
+    // Logger view
+    LoggerWidget mLoggerWidget;
 };
 
 } // namespace kemai
