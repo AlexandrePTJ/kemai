@@ -12,7 +12,7 @@
 
 using namespace kemai;
 
-ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::ActivityWidget)
+ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make_unique<Ui::ActivityWidget>())
 {
     mUi->setupUi(this);
     mUi->formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
@@ -48,7 +48,6 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
 ActivityWidget::~ActivityWidget()
 {
     mSecondTimer.stop();
-    delete mUi;
 }
 
 void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)

@@ -8,7 +8,7 @@
 
 using namespace kemai;
 
-CustomerDialog::CustomerDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::CustomerDialog)
+CustomerDialog::CustomerDialog(QWidget* parent) : QDialog(parent), mUi(std::make_unique<Ui::CustomerDialog>())
 {
     mUi->setupUi(this);
     enableSave(false);
@@ -33,10 +33,7 @@ CustomerDialog::CustomerDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::C
     }
 }
 
-CustomerDialog::~CustomerDialog()
-{
-    delete mUi;
-}
+CustomerDialog::~CustomerDialog() = default;
 
 Customer CustomerDialog::customer() const
 {

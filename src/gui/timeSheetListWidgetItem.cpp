@@ -6,7 +6,7 @@
 using namespace kemai;
 
 TimeSheetListWidgetItem::TimeSheetListWidgetItem(const TimeSheet& timeSheet, QWidget* parent)
-    : QWidget(parent), mTimeSheet(timeSheet), mUi(new Ui::TimeSheetListWidgetItem)
+    : QWidget(parent), mTimeSheet(timeSheet), mUi(std::make_unique<Ui::TimeSheetListWidgetItem>())
 {
     mUi->setupUi(this);
     mUi->frame->setFrameShape(QFrame::StyledPanel);
@@ -18,7 +18,4 @@ TimeSheetListWidgetItem::TimeSheetListWidgetItem(const TimeSheet& timeSheet, QWi
     connect(mUi->btStart, &QPushButton::clicked, [this]() { emit timeSheetStartRequested(mTimeSheet); });
 }
 
-TimeSheetListWidgetItem::~TimeSheetListWidgetItem()
-{
-    delete mUi;
-}
+TimeSheetListWidgetItem::~TimeSheetListWidgetItem() = default;

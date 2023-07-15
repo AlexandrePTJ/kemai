@@ -6,7 +6,7 @@
 
 using namespace kemai;
 
-ActivityDialog::ActivityDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::ActivityDialog)
+ActivityDialog::ActivityDialog(QWidget* parent) : QDialog(parent), mUi(std::make_unique<Ui::ActivityDialog>())
 {
     mUi->setupUi(this);
     enableSave(false);
@@ -15,10 +15,7 @@ ActivityDialog::ActivityDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::A
     connect(mUi->leTimeBudget, &QLineEdit::textChanged, this, &ActivityDialog::validateForm);
 }
 
-ActivityDialog::~ActivityDialog()
-{
-    delete mUi;
-}
+ActivityDialog::~ActivityDialog() = default;
 
 Activity ActivityDialog::activity() const
 {

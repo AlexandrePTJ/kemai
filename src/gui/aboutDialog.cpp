@@ -5,14 +5,11 @@
 
 using namespace kemai;
 
-AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::AboutDialog)
+AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent), mUi(std::make_unique<Ui::AboutDialog>())
 {
     mUi->setupUi(this);
     mUi->versionLabel->setText(KEMAI_VERSION);
     mUi->licencesTextBrowser->setSource({"qrc:/misc/licences"});
 }
 
-AboutDialog::~AboutDialog()
-{
-    delete mUi;
-}
+AboutDialog::~AboutDialog() = default;

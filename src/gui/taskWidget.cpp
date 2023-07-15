@@ -8,7 +8,7 @@
 
 using namespace kemai;
 
-TaskWidget::TaskWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::TaskWidget)
+TaskWidget::TaskWidget(QWidget* parent) : QWidget(parent), mUi(std::make_unique<Ui::TaskWidget>())
 {
     mUi->setupUi(this);
 
@@ -25,10 +25,7 @@ TaskWidget::TaskWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::TaskWidge
     connect(mUi->tbRefresh, &QPushButton::clicked, this, &TaskWidget::updateTasks);
 }
 
-TaskWidget::~TaskWidget()
-{
-    delete mUi;
-}
+TaskWidget::~TaskWidget() = default;
 
 void TaskWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
 {

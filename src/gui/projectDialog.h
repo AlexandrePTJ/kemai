@@ -25,7 +25,7 @@ private:
     void validateForm();
 
 private:
-    Ui::ProjectDialog* mUi;
+    std::unique_ptr<Ui::ProjectDialog> mUi;
 };
 
 } // namespace kemai

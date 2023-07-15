@@ -29,7 +29,7 @@ private:
     void onStartStopClicked();
     void onCloseClicked();
 
-    Ui::TaskWidget* mUi;
+    std::unique_ptr<Ui::TaskWidget> mUi;
     std::shared_ptr<KemaiSession> mSession;
     TaskListModel mTaskModel;
     TaskFilterProxyModel mTaskProxyModel;

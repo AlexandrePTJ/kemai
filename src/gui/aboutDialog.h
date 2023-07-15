@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <QDialog>
 
 namespace Ui {
@@ -17,7 +19,7 @@ public:
     ~AboutDialog() override;
 
 private:
-    Ui::AboutDialog* mUi;
+    std::unique_ptr<Ui::AboutDialog> mUi;
 };
 
 } // namespace kemai

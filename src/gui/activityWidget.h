@@ -53,7 +53,7 @@ private:
 
     void startPendingTimeSheet();
 
-    Ui::ActivityWidget* mUi;
+    std::unique_ptr<Ui::ActivityWidget> mUi;
     QTimer mSecondTimer;
     std::shared_ptr<KemaiSession> mSession;
     std::optional<TimeSheet> mPendingStartRequest;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <QWidget>
 
 #include "client/kimaiAPI.h"
@@ -22,8 +24,8 @@ signals:
     void timeSheetStartRequested(const TimeSheet& timeSheet);
 
 private:
+    std::unique_ptr<Ui::TimeSheetListWidgetItem> mUi;
     const TimeSheet mTimeSheet;
-    Ui::TimeSheetListWidgetItem* mUi;
 };
 
 } // namespace kemai
