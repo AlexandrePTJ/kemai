@@ -106,6 +106,9 @@ jobs:
   MacOSJob:
     name: MacOS Qt-6.5.1
     runs-on: macos-latest
+    strategy:
+      matrix:
+        preset: ["release-macos", "release-macos-noupdate"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -122,16 +125,16 @@ jobs:
 
       - name: Configure
         run: |
-          cmake --preset release-macos
+          cmake --preset ${{ matrix.preset }}
 
       - name: Build
         run: |
-          cmake --build --preset release-macos
+          cmake --build --preset ${{ matrix.preset }}
 
       - name: Create MacOS package
         run: |
           chmod +x bundle/macos/create_dmg.sh
-          ./bundle/macos/create_dmg.sh --qt_path $Qt6_DIR --build_path cmake-build-release-macos
+          ./bundle/macos/create_dmg.sh --qt_path $Qt6_DIR --build_path cmake-build-${{ matrix.preset }}
 
       # Create release if on built on a tag
       - if: startsWith(github.ref, 'refs/tags/')
