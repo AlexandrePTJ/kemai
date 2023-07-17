@@ -42,15 +42,21 @@ private:
     void onSessionCurrentTimeSheetChanged();
     void onSessionCacheSynchronizeFinished();
 
+    void onHistoryTimeSheetStartRequested(const TimeSheet& timeSheet);
+
     void updateControls();
 
     void updateCustomersCombo();
     void updateProjectsCombo();
     void updateActivitiesCombo();
+    void updateRecentTimeSheetsView();
 
-    Ui::ActivityWidget* mUi;
+    void startPendingTimeSheet();
+
+    std::unique_ptr<Ui::ActivityWidget> mUi;
     QTimer mSecondTimer;
     std::shared_ptr<KemaiSession> mSession;
+    std::optional<TimeSheet> mPendingStartRequest;
 };
 
 } // namespace kemai

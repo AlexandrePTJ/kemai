@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(KemaiProject VERSION 0.9.4 LANGUAGES CXX)
+project(KemaiProject VERSION 0.10.0 LANGUAGES CXX)
 
 # Point CMake to the custom modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake)
@@ -13,10 +13,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 FetchContent_Declare(magic_enum
         GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-        GIT_TAG v0.8.2)
+        GIT_TAG v0.9.3)
 FetchContent_Declare(spdlog
         GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.11.0)
+        GIT_TAG v1.12.0)
 FetchContent_Declare(range-v3
         GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
         GIT_TAG 0.12.0)
@@ -73,7 +73,7 @@ if (WIN32)
     set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt)
 elseif (APPLE)
     set(OS_BUNDLE MACOSX_BUNDLE)
-#    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
+    #    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
     set(DEPLOY_DIR .)
     set(CPACK_GENERATOR DragNDrop)
 else ()

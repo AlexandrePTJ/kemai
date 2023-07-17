@@ -33,7 +33,7 @@ private:
     void onProfileAddButtonClicked();
     void onProfileDelButtonClicked();
 
-    QScopedPointer<Ui::SettingsDialog> mUi;
+    std::unique_ptr<Ui::SettingsDialog> mUi;
     QAction* mActToggleTokenVisible = nullptr;
 
     Settings m_settings;

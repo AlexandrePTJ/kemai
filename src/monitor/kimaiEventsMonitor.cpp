@@ -59,7 +59,7 @@ void KimaiEventsMonitor::onActiveTimeSheetsReceived(TimeSheetsResult timeSheetsR
     bool firstRun  = !mLastTimeSheetUpdate.has_value();
     bool isRunning = mCurrentTimeSheet.has_value();
 
-    if(timeSheets.empty())
+    if (timeSheets.empty())
     {
         if (isRunning || firstRun)
         {

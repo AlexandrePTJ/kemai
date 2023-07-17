@@ -4,8 +4,8 @@
 
 #include <QObject>
 
-#include "client/kimaiCache.h"
 #include "client/kimaiAPI.h"
+#include "client/kimaiCache.h"
 #include "client/kimaiClient.h"
 #include "monitor/kimaiEventsMonitor.h"
 
@@ -27,19 +27,25 @@ public:
      */
     void refreshSessionInfos();
     void refreshCurrentTimeSheet();
+    void refreshCache(KimaiCache::Category category);
     void refreshCache(const std::set<KimaiCache::Category>& categories = {});
 
     bool hasPlugin(ApiPlugin apiPlugin) const;
+    QVersionNumber kimaiVersion() const;
     User me() const;
     TimeSheetConfig timeSheetConfig() const;
 
     std::optional<TimeSheet> currentTimeSheet() const;
     bool hasCurrentTimeSheet() const;
+
     QDateTime computeTZDateTime(const QDateTime& dateTime) const;
 
 signals:
     void pluginsChanged();
     void currentTimeSheetChanged();
+    void versionChanged();
+    void meChanged();
+    void timeSheetConfigChanged();
 
 private:
     void onClientError(KimaiApiBaseResult* apiBaseResult);

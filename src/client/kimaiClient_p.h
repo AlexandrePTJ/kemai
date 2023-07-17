@@ -23,6 +23,7 @@ enum class ApiMethod
     Activities,
     ActivityAdd,
     ActiveTimeSheets,
+    RecentTimeSheets,
     TimeSheets,
     Users,
     MeUsers,
@@ -60,10 +61,9 @@ public:
             {
                 try
                 {
-                    auto replyData = networkReply->readAll();
-                    spdlog::debug("<=== [{}]: {}", apiMethodToString(method).toStdString(), replyData.toStdString());
+                    spdlog::debug("[RECV] {}", apiMethodToString(method).toStdString());
 
-                    KimaiApiTypesParser parser(replyData);
+                    KimaiApiTypesParser parser(networkReply->readAll());
                     result->setResult(parser.getValueOf<ResultType>());
                 }
                 catch (std::runtime_error& ex)
@@ -91,10 +91,9 @@ public:
             {
                 try
                 {
-                    auto replyData = networkReply->readAll();
-                    spdlog::debug("<=== [{}]: {}", apiMethodToString(method).toStdString(), replyData.toStdString());
+                    spdlog::debug("[RECV] {}", apiMethodToString(method).toStdString());
 
-                    KimaiApiTypesParser parser(replyData);
+                    KimaiApiTypesParser parser(networkReply->readAll());
                     result->setResult(parser.getArrayOf<ResultType>());
                 }
                 catch (std::runtime_error& ex)

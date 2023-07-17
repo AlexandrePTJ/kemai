@@ -33,7 +33,6 @@ private:
     bool mModelSet = false;
     KimaiDataListModel mModel;
     KimaiDataSortFilterProxyModel mProxyModel;
-    AutoCompleteValidator* mValidator = nullptr;
 };
 
 } // namespace kemai

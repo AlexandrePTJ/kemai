@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <QDialog>
 
 #include "client/kimaiAPI.h"
@@ -24,8 +26,7 @@ private:
     void enableSave(bool enable);
     void validateForm();
 
-private:
-    Ui::CustomerDialog* mUi;
+    std::unique_ptr<Ui::CustomerDialog> mUi;
 };
 
 } // namespace kemai

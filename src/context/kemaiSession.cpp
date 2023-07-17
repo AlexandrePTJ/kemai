@@ -43,6 +43,14 @@ void KemaiSession::refreshCurrentTimeSheet()
     mKimaiMonitor.refreshCurrentTimeSheet();
 }
 
+void KemaiSession::refreshCache(KimaiCache::Category category)
+{
+    if (mKimaiClient)
+    {
+        mKimaiCache.synchronize(mKimaiClient, {category});
+    }
+}
+
 void KemaiSession::refreshCache(const std::set<KimaiCache::Category>& categories)
 {
     if (mKimaiClient)
@@ -54,6 +62,11 @@ void KemaiSession::refreshCache(const std::set<KimaiCache::Category>& categories
 bool KemaiSession::hasPlugin(ApiPlugin apiPlugin) const
 {
     return std::any_of(mPlugins.begin(), mPlugins.end(), [apiPlugin](const Plugin& plugin) { return plugin.apiPlugin == apiPlugin; });
+}
+
+QVersionNumber KemaiSession::kimaiVersion() const
+{
+    return mKimaiVersion;
 }
 
 User KemaiSession::me() const
@@ -99,6 +112,7 @@ void KemaiSession::requestMe()
 
     connect(meResult, &KimaiApiBaseResult::ready, this, [this, meResult]() {
         mMe = meResult->getResult();
+        emit meChanged();
         meResult->deleteLater();
     });
 
@@ -111,7 +125,7 @@ void KemaiSession::requestVersion()
 
     connect(versionResult, &KimaiApiBaseResult::ready, this, [this, versionResult]() {
         mKimaiVersion = versionResult->getResult().kimai;
-
+        emit versionChanged();
         // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.1
         if (mKimaiVersion >= MinimalKimaiVersionForPluginRequest)
         {
@@ -129,6 +143,7 @@ void KemaiSession::requestTimeSheetConfig()
 
     connect(timeSheetConfigResult, &KimaiApiBaseResult::ready, this, [this, timeSheetConfigResult]() {
         mTimeSheetConfig = timeSheetConfigResult->getResult();
+        emit timeSheetConfigChanged();
         timeSheetConfigResult->deleteLater();
     });
 

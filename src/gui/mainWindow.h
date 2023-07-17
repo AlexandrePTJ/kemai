@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QActionGroup>
+#include <QLabel>
 #include <QMainWindow>
 #include <QMenuBar>
 
@@ -8,6 +9,7 @@
 
 #include "client/kimaiClient.h"
 #include "context/kemaiSession.h"
+#include "gui/loggerWidget.h"
 #include "monitor/desktopEventsMonitor.h"
 #include "settings/settings.h"
 #include "updater/kemaiUpdater.h"
@@ -29,6 +31,8 @@ public:
     MainWindow();
     ~MainWindow() override;
 
+    void setLoggerTreeModel(const std::shared_ptr<LoggerTreeModel>& model);
+
 protected:
     void closeEvent(QCloseEvent* event) override;
     void hideEvent(QHideEvent* event) override;
@@ -42,10 +46,12 @@ private:
 
     void onCurrentTimeSheetChanged();
     void onPluginsChanged();
+    void onSessionVersionChanged();
     void onActionSettingsTriggered();
     void onActionCheckUpdateTriggered();
     void onActionOpenHostTriggered();
     void onActionRefreshCacheTriggered();
+    void onActionAboutKemaiTriggered();
     void onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason);
     void onNewVersionCheckFinished(const VersionDetails& details);
     void onActivityChanged(bool started);
@@ -53,7 +59,7 @@ private:
     void onDesktopIdleDetected();
     void onDesktopLockDetected();
 
-    Ui::MainWindow* mUi;
+    std::unique_ptr<Ui::MainWindow> mUi;
     KemaiUpdater mUpdater;
     std::shared_ptr<KemaiSession> mSession;
     std::shared_ptr<DesktopEventsMonitor> mDesktopEventsMonitor;
@@ -70,6 +76,8 @@ private:
     QAction* mActViewActivities     = nullptr;
     QAction* mActViewTasks          = nullptr;
     QAction* mActRefreshCache       = nullptr;
+    QAction* mActAboutKemai         = nullptr;
+    QAction* mActShowLogWidget      = nullptr;
     QActionGroup* mActGroupView     = nullptr;
     QActionGroup* mActGroupProfiles = nullptr;
 
@@ -80,6 +88,12 @@ private:
     // Tray
     QMenu* mTrayMenu                 = nullptr;
     QSystemTrayIcon* mSystemTrayIcon = nullptr;
+
+    // Status bar
+    QLabel mStatusInstanceLabel;
+
+    // Logger view
+    LoggerWidget mLoggerWidget;
 };
 
 } // namespace kemai

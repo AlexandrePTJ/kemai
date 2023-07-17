@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/data">
-        <file alias="countries">data/iso3166-alpha2.json</file>
-        <file alias="currencies">data/iso4217.json</file>
-    </qresource>
-</RCC>

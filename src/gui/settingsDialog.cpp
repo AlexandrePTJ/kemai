@@ -11,7 +11,7 @@
 using namespace kemai;
 
 SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desktopEventsMonitor, QWidget* parent)
-    : QDialog(parent), mUi(new Ui::SettingsDialog), mKimaiClient(std::make_unique<KimaiClient>())
+    : QDialog(parent), mUi(std::make_unique<Ui::SettingsDialog>()), mKimaiClient(std::make_unique<KimaiClient>())
 {
     mUi->setupUi(this);
 

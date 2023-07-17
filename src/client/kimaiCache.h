@@ -19,7 +19,8 @@ public:
     {
         Customers,
         Projects,
-        Activities
+        Activities,
+        RecentTimeSheets
     };
 
     enum class Status
@@ -35,6 +36,7 @@ public:
     Customers customers() const;
     Projects projects(std::optional<int> customerId = std::nullopt) const;
     Activities activities(std::optional<int> projectId = std::nullopt) const;
+    TimeSheets recentTimeSheets() const;
 
 signals:
     void synchronizeStarted();
@@ -45,12 +47,14 @@ private:
     void processCustomersResult(CustomersResult customersResult);
     void processProjectsResult(ProjectsResult projectsResult);
     void processActivitiesResult(ActivitiesResult activitiesResult);
+    void processRecentTimeSheetsResult(TimeSheetsResult timeSheetsResult);
 
     std::set<Category> mPendingSync;
 
     Customers mCustomers;
     Projects mProjects;
     Activities mActivities;
+    TimeSheets mRecentTimeSheets;
 
     kemai::KimaiCache::Status mStatus = kemai::KimaiCache::Status::Empty;
     std::mutex mSyncMutex;

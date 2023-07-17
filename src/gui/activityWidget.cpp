@@ -3,19 +3,23 @@
 
 #include <spdlog/spdlog.h>
 
+#include <misc/helpers.h>
+
 #include "activityDialog.h"
 #include "customerDialog.h"
 #include "projectDialog.h"
+#include "timeSheetListWidgetItem.h"
 
 using namespace kemai;
 
-ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::ActivityWidget)
+ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make_unique<Ui::ActivityWidget>())
 {
     mUi->setupUi(this);
+    mUi->formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbCustomerFieldChanged(); });
-    connect(mUi->cbCustomer,  qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbCustomerFieldChanged(); });
+    connect(mUi->cbCustomer, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbCustomerFieldChanged(); });
     connect(mUi->cbProject, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbProjectFieldChanged(); });
     connect(mUi->cbProject, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbProjectFieldChanged(); });
     connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbActivityFieldChanged(); });
@@ -44,7 +48,6 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(new Ui::A
 ActivityWidget::~ActivityWidget()
 {
     mSecondTimer.stop();
-    delete mUi;
 }
 
 void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
@@ -54,6 +57,7 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
     mUi->cbActivity->clear();
     mUi->cbProject->clear();
     mUi->cbCustomer->clear();
+    mUi->lwHistory->clear();
 
     if (mSession)
     {
@@ -82,7 +86,15 @@ void ActivityWidget::stopCurrentTimeSheet()
             auto timeSheetResult = mSession->client()->updateTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
 
             connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] {
-                mSession->refreshCurrentTimeSheet();
+                if (mPendingStartRequest.has_value())
+                {
+                    startPendingTimeSheet();
+                }
+                else
+                {
+                    mSession->refreshCache(KimaiCache::Category::RecentTimeSheets);
+                    mSession->refreshCurrentTimeSheet();
+                }
                 timeSheetResult->deleteLater();
             });
             connect(timeSheetResult, &KimaiApiBaseResult::error, [timeSheetResult]() { timeSheetResult->deleteLater(); });
@@ -127,7 +139,7 @@ void ActivityWidget::onTbAddCustomerClicked()
             const auto& customer = customerAddResult->getResult();
             mUi->cbCustomer->addItem(customer.name, customer.id);
             customerAddResult->deleteLater();
-            mSession->refreshCache({KimaiCache::Category::Customers});
+            mSession->refreshCache(KimaiCache::Category::Customers);
         });
         connect(customerAddResult, &KimaiApiBaseResult::error, [customerAddResult]() { customerAddResult->deleteLater(); });
     }
@@ -146,7 +158,7 @@ void ActivityWidget::onTbAddProjectClicked()
             const auto& project = projectAddResult->getResult();
             mUi->cbProject->addItem(project.name, project.id);
             projectAddResult->deleteLater();
-            mSession->refreshCache({KimaiCache::Category::Projects});
+            mSession->refreshCache(KimaiCache::Category::Projects);
         });
         connect(projectAddResult, &KimaiApiBaseResult::error, [projectAddResult]() { projectAddResult->deleteLater(); });
     }
@@ -172,7 +184,7 @@ void ActivityWidget::onTbAddActivityClicked()
             const auto& activity = activityAddResult->getResult();
             mUi->cbActivity->addItem(activity.name, activity.id);
             activityAddResult->deleteLater();
-            mSession->refreshCache({KimaiCache::Category::Activities});
+            mSession->refreshCache(KimaiCache::Category::Activities);
         });
         connect(activityAddResult, &KimaiApiBaseResult::error, [activityAddResult]() { activityAddResult->deleteLater(); });
     }
@@ -183,24 +195,7 @@ void ActivityWidget::onSecondTimeout()
     const auto& now = QDateTime::currentDateTime();
     if (mSession && mSession->hasCurrentTimeSheet())
     {
-        auto nSecs = mSession->currentTimeSheet()->beginAt.secsTo(now);
-
-        // NOLINTBEGIN(readability-magic-numbers)
-        const auto nDays = nSecs / 86400;
-        nSecs -= nDays * 86400;
-
-        const auto nHours = nSecs / 3600;
-        nSecs -= nHours * 3600;
-
-        const auto nMinutes = nSecs / 60;
-        nSecs -= nMinutes * 60;
-
-        mUi->lbDurationTime->setText(QString("%1%2:%3:%4")
-                                         .arg(nDays > 0 ? QString::number(nDays) + "d " : "")
-                                         .arg(nHours, 2, 10, QChar('0'))
-                                         .arg(nMinutes, 2, 10, QChar('0'))
-                                         .arg(nSecs, 2, 10, QChar('0')));
-        // NOLINTEND(readability-magic-numbers)
+        mUi->lbDurationTime->setText(helpers::getDurationString(mSession->currentTimeSheet()->beginAt, now));
     }
     else
     {
@@ -236,12 +231,27 @@ void ActivityWidget::onSessionCacheSynchronizeFinished()
     mUi->cbCustomer->setKimaiData(mSession->cache().customers());
     mUi->cbProject->setKimaiData(mSession->cache().projects());
     mUi->cbActivity->setKimaiData(mSession->cache().activities());
+    updateRecentTimeSheetsView();
     setEnabled(true);
 
     // Update all fields in case cache have refreshed with a running timesheet
     if (mSession->hasCurrentTimeSheet())
     {
         onSessionCurrentTimeSheetChanged();
+    }
+}
+
+void ActivityWidget::onHistoryTimeSheetStartRequested(const TimeSheet& timeSheet)
+{
+    mPendingStartRequest = timeSheet;
+
+    if (mSession->hasCurrentTimeSheet())
+    {
+        stopCurrentTimeSheet();
+    }
+    else
+    {
+        startPendingTimeSheet();
     }
 }
 
@@ -375,5 +385,44 @@ void ActivityWidget::updateActivitiesCombo()
         {
             mUi->cbActivity->setCurrentText("");
         }
+    }
+}
+
+void ActivityWidget::updateRecentTimeSheetsView()
+{
+    mUi->lwHistory->clear();
+    for (const auto& timeSheet : mSession->cache().recentTimeSheets())
+    {
+        auto timeSheetListWidgetItem = new TimeSheetListWidgetItem(timeSheet);
+
+        auto item = new QListWidgetItem;
+        item->setSizeHint(timeSheetListWidgetItem->sizeHint());
+
+        mUi->lwHistory->addItem(item);
+        mUi->lwHistory->setItemWidget(item, timeSheetListWidgetItem);
+
+        connect(timeSheetListWidgetItem, &TimeSheetListWidgetItem::timeSheetStartRequested, this, &ActivityWidget::onHistoryTimeSheetStartRequested);
+    }
+}
+
+void ActivityWidget::startPendingTimeSheet()
+{
+    if (mPendingStartRequest.has_value())
+    {
+        TimeSheet timeSheet;
+
+        timeSheet.beginAt     = mSession->computeTZDateTime(QDateTime::currentDateTime());
+        timeSheet.project.id  = mPendingStartRequest->project.id;
+        timeSheet.activity.id = mPendingStartRequest->activity.id;
+
+        mPendingStartRequest.reset();
+
+        auto timeSheetResult = mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
+
+        connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] {
+            mSession->refreshCurrentTimeSheet();
+            timeSheetResult->deleteLater();
+        });
+        connect(timeSheetResult, &KimaiApiBaseResult::error, [timeSheetResult]() { timeSheetResult->deleteLater(); });
     }
 }

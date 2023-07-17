@@ -24,8 +24,7 @@ private:
     void enableSave(bool enable);
     void validateForm();
 
-private:
-    Ui::ActivityDialog* mUi;
+    std::unique_ptr<Ui::ActivityDialog> mUi;
 };
 
 } // namespace kemai

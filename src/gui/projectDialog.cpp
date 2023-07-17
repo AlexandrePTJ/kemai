@@ -6,7 +6,7 @@
 
 using namespace kemai;
 
-ProjectDialog::ProjectDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::ProjectDialog)
+ProjectDialog::ProjectDialog(QWidget* parent) : QDialog(parent), mUi(std::make_unique<Ui::ProjectDialog>())
 {
     mUi->setupUi(this);
     enableSave(false);
@@ -15,10 +15,7 @@ ProjectDialog::ProjectDialog(QWidget* parent) : QDialog(parent), mUi(new Ui::Pro
     connect(mUi->leTimeBudget, &QLineEdit::textChanged, this, &ProjectDialog::validateForm);
 }
 
-ProjectDialog::~ProjectDialog()
-{
-    delete mUi;
-}
+ProjectDialog::~ProjectDialog() = default;
 
 Project ProjectDialog::project() const
 {
