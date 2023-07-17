@@ -6,13 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.10.0] - 2023-07-17
+
 ### Fixed
 - Bad MacOSX layout resizing [#96](https://github.com/AlexandrePTJ/kemai/issues/96)
 
 ### Added
 - About dialog [#95](https://github.com/AlexandrePTJ/kemai/issues/95)
 - Recent time sheets history [#86](https://github.com/AlexandrePTJ/kemai/issues/86)
-- Add log widget [#58](https://github.com/AlexandrePTJ/kemai/issues/58)
+- Log journal widget [#58](https://github.com/AlexandrePTJ/kemai/issues/58)
+
 
 ## [0.9.4] - 2023-05-10
 
@@ -174,7 +178,8 @@ Special thanks to @shrippen for its support through [sponsorship](https://github
 Initial version.
 
 
-[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.9.4...HEAD
+[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.10.0...HEAD
+[0.10.0]: https://github.com/AlexandrePTJ/kemai/compare/0.9.4...0.10.0
 [0.9.4]: https://github.com/AlexandrePTJ/kemai/compare/0.9.3...0.9.4
 [0.9.3]: https://github.com/AlexandrePTJ/kemai/compare/0.9.2...0.9.3
 [0.9.2]: https://github.com/AlexandrePTJ/kemai/compare/0.9.1...0.9.2
