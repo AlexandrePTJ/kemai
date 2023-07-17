@@ -139,7 +139,7 @@ void ActivityWidget::onTbAddCustomerClicked()
             const auto& customer = customerAddResult->getResult();
             mUi->cbCustomer->addItem(customer.name, customer.id);
             customerAddResult->deleteLater();
-            mSession->refreshCache({KimaiCache::Category::Customers});
+            mSession->refreshCache(KimaiCache::Category::Customers);
         });
         connect(customerAddResult, &KimaiApiBaseResult::error, [customerAddResult]() { customerAddResult->deleteLater(); });
     }
@@ -158,7 +158,7 @@ void ActivityWidget::onTbAddProjectClicked()
             const auto& project = projectAddResult->getResult();
             mUi->cbProject->addItem(project.name, project.id);
             projectAddResult->deleteLater();
-            mSession->refreshCache({KimaiCache::Category::Projects});
+            mSession->refreshCache(KimaiCache::Category::Projects);
         });
         connect(projectAddResult, &KimaiApiBaseResult::error, [projectAddResult]() { projectAddResult->deleteLater(); });
     }
@@ -184,7 +184,7 @@ void ActivityWidget::onTbAddActivityClicked()
             const auto& activity = activityAddResult->getResult();
             mUi->cbActivity->addItem(activity.name, activity.id);
             activityAddResult->deleteLater();
-            mSession->refreshCache({KimaiCache::Category::Activities});
+            mSession->refreshCache(KimaiCache::Category::Activities);
         });
         connect(activityAddResult, &KimaiApiBaseResult::error, [activityAddResult]() { activityAddResult->deleteLater(); });
     }
