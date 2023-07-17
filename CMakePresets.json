@@ -59,6 +59,13 @@
     {
       "name": "release-macos",
       "inherits": ["default-macos", "release"]
+    },
+    {
+      "name": "release-macos-noupdate",
+      "inherits": ["default-macos", "release"],
+      "cacheVariables": {
+        "KEMAI_ENABLE_UPDATE_CHECK": "OFF"
+      }
     }
   ],
   "buildPresets": [
@@ -81,6 +88,10 @@
     {
       "name": "release-macos",
       "configurePreset": "release-macos"
+    },
+    {
+      "name": "release-macos-noupdate",
+      "configurePreset": "release-macos-noupdate"
     }
   ]
 }
