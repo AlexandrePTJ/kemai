@@ -260,7 +260,7 @@
     <message>
         <location filename="../../gui/settingsDialog.ui" line="90"/>
         <source>Check update at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Beim Start auf Aktualisierung prüfen</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="104"/>
