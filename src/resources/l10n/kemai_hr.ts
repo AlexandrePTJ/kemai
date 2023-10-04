@@ -6,7 +6,7 @@
     <message>
         <location filename="../../gui/aboutDialog.ui" line="14"/>
         <source>About Kemai</source>
-        <translation>O aplikaciji Kemai</translation>
+        <translation>Kemai informacije</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="81"/>
@@ -49,7 +49,7 @@
     <message>
         <location filename="../../gui/activityDialog.ui" line="85"/>
         <source>Time Budget</source>
-        <translation>Vremenski proračun</translation>
+        <translation>Vremenski budžet</translation>
     </message>
 </context>
 <context>
@@ -155,12 +155,12 @@
     <message>
         <location filename="../../gui/loggerWidget.ui" line="14"/>
         <source>Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisnik</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="25"/>
         <source>Log file path</source>
-        <translation type="unfinished"></translation>
+        <translation>Staza datoteka zapisnika</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="39"/>
@@ -260,32 +260,32 @@
     <message>
         <location filename="../../gui/settingsDialog.ui" line="90"/>
         <source>Check update at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Traži nove verzije pri pokretanju</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="104"/>
         <source>Stop current timesheet on session lock (windows only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Prekini evidentiranje u aktualnoj vremenskoj tablici pri zaključavanju sesije (samo Windows)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="114"/>
         <source>Stop current timesheet when system idle</source>
-        <translation type="unfinished"></translation>
+        <translation>Prekini evidentiranje u aktualnoj vremenskoj tablici pri neaktivnosti sustava</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="124"/>
         <source>Idle delay (minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Odgoda neaktivnosti (minute)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="164"/>
         <source>Refresh delay (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Odgoda aktualiziranja (sekunde)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="201"/>
         <source>Auto-refresh current timesheet</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatski aktualiziraj aktualnu vremensku tablicu</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="273"/>
@@ -361,7 +361,7 @@
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="141"/>
         <source>StartedAt</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokrenuto</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="161"/>
@@ -407,7 +407,7 @@
     <message>
         <location filename="../../gui/mainWindow.cpp" line="47"/>
         <source>Open Kimai instance</source>
-        <translation type="unfinished">Otvori primjerak Kemaia</translation>
+        <translation>Otvori Kimai instancu</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="48"/>
@@ -432,7 +432,7 @@
     <message>
         <location filename="../../gui/mainWindow.cpp" line="52"/>
         <source>Show logs</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaži zapise</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="83"/>
@@ -463,31 +463,31 @@
         <location filename="../../gui/mainWindow.cpp" line="136"/>
         <location filename="../../gui/mainWindow.cpp" line="228"/>
         <source>Not connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Nije povezan</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="458"/>
         <source>New version available</source>
-        <translation type="unfinished">Postoji nova verzija</translation>
+        <translation>Dostupna je nova verzija</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="458"/>
         <source>Version %1 is available.
 
 %2</source>
-        <translation type="unfinished">Dostupna je verzija %1.
+        <translation>Dostupna je verzija %1.
 
 %2</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="480"/>
         <source>No update</source>
-        <translation type="unfinished">Nema nove verzije</translation>
+        <translation>Nema nove verzije</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="480"/>
         <source>%1 is latest version.</source>
-        <translation type="unfinished">%1 je najnovija verzija.</translation>
+        <translation>%1 je najnovija verzija.</translation>
     </message>
 </context>
 <context>
@@ -495,12 +495,12 @@
     <message>
         <location filename="../../gui/settingsDialog.cpp" line="67"/>
         <source>Language changed. Application restart is required.</source>
-        <translation type="unfinished">Jezik je promijenjen. Program se mora ponovo pokrenuti.</translation>
+        <translation>Jezik se promijenio. Program se mora ponovo pokrenuti.</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.cpp" line="189"/>
         <source>Connected to Kimai %1</source>
-        <translation type="unfinished">Povezano s Kimai %1</translation>
+        <translation>Povezan s Kimai %1</translation>
     </message>
 </context>
 </TS>
