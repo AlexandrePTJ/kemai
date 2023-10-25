@@ -76,9 +76,19 @@ elseif (APPLE)
     #    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
     set(DEPLOY_DIR .)
     set(CPACK_GENERATOR DragNDrop)
+    install(FILES LICENSE.txt DESTINATION ${DEPLOY_DIR})
 else ()
+    include(GNUInstallDirs)
     set(OS_BUNDLE)
     set(DEPLOY_DIR bin)
+    # install(FILES share/kemai.desktop DESTINATION ${)
+    install(FILES share/kemai.desktop
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+    )
+    install(FILES src/resources/icons/kimai.png
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps/
+    )
+    install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/)
 endif ()
 
 # Project code
@@ -86,7 +96,6 @@ add_subdirectory(src)
 
 # Install targets and files
 install(TARGETS Kemai DESTINATION ${DEPLOY_DIR})
-install(FILES LICENSE.txt DESTINATION ${DEPLOY_DIR})
 
 if (WIN32)
     windeployqt(Kemai ${DEPLOY_DIR})

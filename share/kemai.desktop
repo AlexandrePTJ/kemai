@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Kemai
+Comment=Kimai timetracking frontend
+TryExec=Kemai
+Exec=Kemai
+Terminal=false
+Categories=Office;Utility;
+Icon=kimai
