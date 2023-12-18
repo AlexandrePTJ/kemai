@@ -22,6 +22,7 @@ set(SRCS
         gui/mainWindow.cpp
         gui/projectDialog.cpp
         gui/settingsDialog.cpp
+        gui/simpleActivityWidget.cpp
         gui/taskWidget.cpp
         gui/timeSheetListWidgetItem.cpp
         main.cpp
@@ -55,6 +56,7 @@ set(HDRS
         gui/mainWindow.h
         gui/projectDialog.h
         gui/settingsDialog.h
+        gui/simpleActivityWidget.h
         gui/taskWidget.h
         gui/timeSheetListWidgetItem.h
         misc/dataReader.h
@@ -80,6 +82,7 @@ set(UIS
         gui/mainWindow.ui
         gui/projectDialog.ui
         gui/settingsDialog.ui
+        gui/simpleActivityWidget.ui
         gui/taskWidget.ui
         gui/timeSheetListWidgetItem.ui)
 

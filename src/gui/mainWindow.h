@@ -21,6 +21,7 @@ class MainWindow;
 namespace kemai {
 
 class ActivityWidget;
+class SimpleActivityWidget;
 class TaskWidget;
 
 class MainWindow : public QMainWindow
@@ -65,8 +66,8 @@ private:
     std::shared_ptr<DesktopEventsMonitor> mDesktopEventsMonitor;
 
     // Stacked widget (ownership is transferred, don't try to delete them)
-    ActivityWidget* mActivityWidget = nullptr;
-    TaskWidget* mTaskWidget         = nullptr;
+    SimpleActivityWidget* mActivityWidget = nullptr;
+    TaskWidget* mTaskWidget               = nullptr;
 
     // Actions
     QAction* mActQuit               = nullptr;

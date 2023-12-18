@@ -14,6 +14,7 @@
 #include "kemaiConfig.h"
 #include "settings/settings.h"
 #include "settingsDialog.h"
+#include "simpleActivityWidget.h"
 #include "taskWidget.h"
 
 using namespace kemai;
@@ -114,7 +115,7 @@ MainWindow::MainWindow() : mUi(std::make_unique<Ui::MainWindow>())
     /*
      * Setup widgets
      */
-    mActivityWidget = new ActivityWidget;
+    mActivityWidget = new SimpleActivityWidget;
     mUi->stackedWidget->addWidget(mActivityWidget);
 
     updateProfilesMenu();
@@ -148,7 +149,7 @@ MainWindow::MainWindow() : mUi(std::make_unique<Ui::MainWindow>())
     connect(mActRefreshCache, &QAction::triggered, this, &MainWindow::onActionRefreshCacheTriggered);
     connect(mSystemTrayIcon, &QSystemTrayIcon::activated, this, &MainWindow::onSystemTrayActivated);
     connect(&mUpdater, &KemaiUpdater::checkFinished, this, &MainWindow::onNewVersionCheckFinished);
-    connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChanged);
+    //    connect(mActivityWidget, &ActivityWidget::currentActivityChanged, this, &MainWindow::onActivityChanged);
     connect(mActGroupProfiles, &QActionGroup::triggered, this, &MainWindow::onProfilesActionGroupTriggered);
     connect(mActAboutKemai, &QAction::triggered, this, &MainWindow::onActionAboutKemaiTriggered);
     connect(mActShowLogWidget, &QAction::triggered, &mLoggerWidget, &QWidget::show);
@@ -515,11 +516,11 @@ void MainWindow::onProfilesActionGroupTriggered(QAction* action)
 void MainWindow::onDesktopIdleDetected()
 {
     spdlog::info("System is idle since {} minutes. Stop current TimeSheet.", Settings::get().events.idleDelayMinutes);
-    mActivityWidget->stopCurrentTimeSheet();
+    //    mActivityWidget->stopCurrentTimeSheet();
 }
 
 void MainWindow::onDesktopLockDetected()
 {
     spdlog::info("System is locked. Stop current TimeSheet.");
-    mActivityWidget->stopCurrentTimeSheet();
+    //    mActivityWidget->stopCurrentTimeSheet();
 }
