@@ -11,6 +11,8 @@ SimpleActivityWidget::SimpleActivityWidget(QWidget* parent) : QWidget(parent), m
     connect(mUi->cbProject, &QComboBox::currentIndexChanged, this, &SimpleActivityWidget::onCbProjectFieldChanged);
     connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &SimpleActivityWidget::onCbActivityFieldChanged);
     connect(mUi->cbActivity, &QComboBox::currentIndexChanged, this, &SimpleActivityWidget::onCbActivityFieldChanged);
+
+    mUi->cbProject->setModel(&mCustomerProjectModel);
 }
 
 SimpleActivityWidget::~SimpleActivityWidget() = default;
@@ -44,7 +46,9 @@ void SimpleActivityWidget::onBtCreateClicked() {}
 
 void SimpleActivityWidget::onSessionCacheSynchronizeFinished()
 {
-    //    mUi->cbProject->setKimaiData(mSession->cache().projects());
+    mCustomerProjectModel.setCustomersProjects(mSession->cache().customers(), mSession->cache().projects());
+
+    setEnabled(true);
 }
 
 void SimpleActivityWidget::updateProjectsCombo() {}

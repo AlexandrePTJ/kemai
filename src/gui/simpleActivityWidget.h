@@ -4,6 +4,7 @@
 
 #include "client/kimaiClient.h"
 #include "context/kemaiSession.h"
+#include "models/customerProjectModel.h"
 
 namespace Ui {
 class SimpleActivityWidget;
@@ -35,6 +36,7 @@ private:
 
     std::unique_ptr<Ui::SimpleActivityWidget> mUi;
     std::shared_ptr<KemaiSession> mSession;
+    CustomerProjectModel mCustomerProjectModel;
 };
 
 } // namespace kemai

@@ -28,6 +28,7 @@ set(SRCS
         main.cpp
         misc/dataReader.cpp
         misc/helpers.cpp
+        models/customerProjectModel.cpp
         models/kimaiDataListModel.cpp
         models/kimaiDataSortFilterProxyModel.cpp
         models/loggerTreeModel.cpp
@@ -61,6 +62,7 @@ set(HDRS
         gui/timeSheetListWidgetItem.h
         misc/dataReader.h
         misc/helpers.h
+        models/customerProjectModel.h
         models/kimaiDataListModel.h
         models/kimaiDataSortFilterProxyModel.h
         models/loggerTreeModel.h
