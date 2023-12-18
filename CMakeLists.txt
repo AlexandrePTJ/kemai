@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 FetchContent_Declare(magic_enum
         GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-        GIT_TAG v0.9.3)
+        GIT_TAG v0.9.5)
 FetchContent_Declare(spdlog
         GIT_REPOSITORY https://github.com/gabime/spdlog.git
         GIT_TAG v1.12.0)
@@ -83,10 +83,10 @@ else ()
     set(DEPLOY_DIR bin)
     # install(FILES share/kemai.desktop DESTINATION ${)
     install(FILES share/kemai.desktop
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
     )
     install(FILES src/resources/icons/kimai.png
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps/
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps/
     )
     install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/)
 endif ()
