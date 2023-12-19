@@ -19,12 +19,34 @@ using namespace kemai;
 
 static constinit const auto MaxLogFileSize = 1024 * 102 * 5;
 
+void myMessageOutput(QtMsgType type, const QMessageLogContext& /*context*/, const QString& msg)
+{
+    switch (type)
+    {
+    case QtDebugMsg:
+        spdlog::debug(msg.toStdString());
+        break;
+    case QtInfoMsg:
+        spdlog::info(msg.toStdString());
+        break;
+    case QtWarningMsg:
+        spdlog::warn(msg.toStdString());
+        break;
+    case QtCriticalMsg:
+    case QtFatalMsg:
+        spdlog::critical(msg.toStdString());
+        break;
+    }
+}
+
 int main(int argc, char* argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 #endif
+
+    qInstallMessageHandler(myMessageOutput);
 
     QApplication app(argc, argv);
     QApplication::setApplicationName("Kemai");
