@@ -39,7 +39,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="cbActivity">
+        <widget class="kemai::AutoCompleteComboBox" name="cbActivity">
          <property name="editable">
           <bool>true</bool>
          </property>
@@ -112,7 +112,7 @@
         <x>0</x>
         <y>0</y>
         <width>355</width>
-        <height>340</height>
+        <height>341</height>
        </rect>
       </property>
      </widget>
@@ -120,6 +120,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>kemai::AutoCompleteComboBox</class>
+   <extends>QComboBox</extends>
+   <header>gui/autoCompleteComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources/kemai.qrc"/>
  </resources>

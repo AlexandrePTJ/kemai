@@ -1,18 +1,29 @@
 #include "simpleActivityWidget.h"
 #include "ui_simpleActivityWidget.h"
 
+#include "timeSheetListWidgetItem.h"
+
 using namespace kemai;
 
 SimpleActivityWidget::SimpleActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make_unique<Ui::SimpleActivityWidget>())
 {
     mUi->setupUi(this);
 
-    connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &SimpleActivityWidget::onCbProjectFieldChanged);
+    mUi->scrollAreaWidgetContents->setLayout(new QVBoxLayout);
+    mUi->scrollAreaWidgetContents->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+    //    connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &SimpleActivityWidget::onCbProjectFieldChanged);
     connect(mUi->cbProject, &QComboBox::currentIndexChanged, this, &SimpleActivityWidget::onCbProjectFieldChanged);
-    connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &SimpleActivityWidget::onCbActivityFieldChanged);
+    //    connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &SimpleActivityWidget::onCbActivityFieldChanged);
     connect(mUi->cbActivity, &QComboBox::currentIndexChanged, this, &SimpleActivityWidget::onCbActivityFieldChanged);
+    connect(mUi->btCreate, &QPushButton::clicked, this, &SimpleActivityWidget::onBtCreateClicked);
+    connect(&mSecondTimer, &QTimer::timeout, this, &SimpleActivityWidget::onSecondTimeout);
 
     mUi->cbProject->setModel(&mCustomerProjectModel);
+
+    mSecondTimer.setInterval(std::chrono::seconds(1));
+    mSecondTimer.setTimerType(Qt::PreciseTimer);
+    mSecondTimer.start();
 }
 
 SimpleActivityWidget::~SimpleActivityWidget() = default;
@@ -26,6 +37,7 @@ void SimpleActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSe
 
     if (mSession)
     {
+        connect(mSession.get(), &KemaiSession::currentTimeSheetsChanged, this, &SimpleActivityWidget::updateTimeSheets);
         connect(&mSession->cache(), &KimaiCache::synchronizeStarted, this, [this]() { setEnabled(false); });
         connect(&mSession->cache(), &KimaiCache::synchronizeFinished, this, &SimpleActivityWidget::onSessionCacheSynchronizeFinished);
     }
@@ -37,22 +49,100 @@ void SimpleActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSe
 
 void SimpleActivityWidget::onCbProjectFieldChanged()
 {
-    updateActivitiesCombo();
+    if (mSession)
+    {
+        auto projectId = mUi->cbProject->currentText().isEmpty() ? std::nullopt : std::optional<int>(mUi->cbProject->currentData().toInt());
+        mUi->cbActivity->setFilter(mSession->cache().activities(projectId));
+    }
+    updateControls();
 }
 
-void SimpleActivityWidget::onCbActivityFieldChanged() {}
+void SimpleActivityWidget::onCbActivityFieldChanged()
+{
+    updateControls();
+}
 
-void SimpleActivityWidget::onBtCreateClicked() {}
+void SimpleActivityWidget::onBtCreateClicked()
+{
+    if (mSession)
+    {
+        TimeSheet timeSheet;
+
+        timeSheet.beginAt     = mSession->computeTZDateTime(QDateTime::currentDateTime());
+        timeSheet.project.id  = mUi->cbProject->currentData().toInt();
+        timeSheet.activity.id = mUi->cbActivity->currentData().toInt();
+
+        mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
+    }
+}
 
 void SimpleActivityWidget::onSessionCacheSynchronizeFinished()
 {
     mCustomerProjectModel.setCustomersProjects(mSession->cache().customers(), mSession->cache().projects());
+    mUi->cbActivity->setKimaiData(mSession->cache().activities());
+    updateTimeSheets();
 
     setEnabled(true);
 }
 
-void SimpleActivityWidget::updateProjectsCombo() {}
+void SimpleActivityWidget::onTimeSheetStartRequested(const TimeSheet& timeSheet)
+{
+    mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
+}
 
-void SimpleActivityWidget::updateActivitiesCombo() {}
+void SimpleActivityWidget::onTimeSheetStopRequested(const TimeSheet& timeSheet)
+{
+    auto updatedTimeSheet  = timeSheet;
+    updatedTimeSheet.endAt = mSession->computeTZDateTime(QDateTime::currentDateTime());
 
-void SimpleActivityWidget::updateTimeSheets() {}
+    mSession->client()->updateTimeSheet(updatedTimeSheet, mSession->timeSheetConfig().trackingMode);
+}
+
+void SimpleActivityWidget::onSecondTimeout()
+{
+    for (auto* child : mUi->scrollAreaWidgetContents->findChildren<TimeSheetListWidgetItem*>())
+    {
+        child->updateDuration();
+    }
+}
+
+void SimpleActivityWidget::updateControls()
+{
+    auto projectId  = mUi->cbProject->currentData().toInt();
+    auto activityId = mUi->cbActivity->currentData().toInt();
+    mUi->btCreate->setEnabled(projectId >= 0 && activityId >= 0 && mSession != nullptr);
+}
+
+void SimpleActivityWidget::updateTimeSheets()
+{
+    if (mSession)
+    {
+        auto* scrollLayout = qobject_cast<QVBoxLayout*>(mUi->scrollAreaWidgetContents->layout());
+
+        /*
+         * Clear previous items
+         */
+        for (auto* child : mUi->scrollAreaWidgetContents->findChildren<TimeSheetListWidgetItem*>())
+        {
+            scrollLayout->removeWidget(child);
+            child->setParent(nullptr);
+            child->deleteLater();
+        }
+
+        /*
+         * Push back widget before spacer item
+         */
+        for (const auto& timeSheet : mSession->currentTimeSheets())
+        {
+            auto* widget = new TimeSheetListWidgetItem(timeSheet, mUi->scrollAreaWidgetContents);
+            widget->setIsActive(true);
+
+            // Push back widget before spacer item
+            scrollLayout->insertWidget(scrollLayout->count() - 1, widget);
+
+            //
+            connect(widget, &TimeSheetListWidgetItem::timeSheetStartRequested, this, &SimpleActivityWidget::onTimeSheetStartRequested);
+            connect(widget, &TimeSheetListWidgetItem::timeSheetStopRequested, this, &SimpleActivityWidget::onTimeSheetStopRequested);
+        }
+    }
+}

@@ -30,12 +30,17 @@ private:
 
     void onSessionCacheSynchronizeFinished();
 
-    void updateProjectsCombo();
-    void updateActivitiesCombo();
+    void onTimeSheetStartRequested(const TimeSheet& timeSheet);
+    void onTimeSheetStopRequested(const TimeSheet& timeSheet);
+
+    void onSecondTimeout();
+
+    void updateControls();
     void updateTimeSheets();
 
     std::unique_ptr<Ui::SimpleActivityWidget> mUi;
     std::shared_ptr<KemaiSession> mSession;
+    QTimer mSecondTimer;
     CustomerProjectModel mCustomerProjectModel;
 };
 

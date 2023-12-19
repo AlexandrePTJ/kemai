@@ -13,9 +13,35 @@ TimeSheetListWidgetItem::TimeSheetListWidgetItem(const TimeSheet& timeSheet, QWi
     mUi->lbActivity->setText(mTimeSheet.activity.name);
     mUi->lbDescription->setText(mTimeSheet.project.name);
     mUi->lbDuration->setText(helpers::getDurationString(timeSheet.beginAt, timeSheet.endAt));
-    mUi->lbStartedAt->setText(timeSheet.beginAt.toString(Qt::ISODate));
+    mUi->lbStartedAt->setText(timeSheet.beginAt.toString(Qt::RFC2822Date));
 
-    connect(mUi->btStart, &QPushButton::clicked, [this]() { emit timeSheetStartRequested(mTimeSheet); });
+    connect(mUi->btStart, &QPushButton::clicked, this, &TimeSheetListWidgetItem::onBtStartStopClicked);
 }
 
 TimeSheetListWidgetItem::~TimeSheetListWidgetItem() = default;
+
+void TimeSheetListWidgetItem::setIsActive(bool active)
+{
+    mIsActive = active;
+    mUi->btStart->setIcon(QIcon(mIsActive ? ":/icons/stop" : ":/icons/play"));
+}
+
+void TimeSheetListWidgetItem::updateDuration()
+{
+    if (mIsActive)
+    {
+        mUi->lbDuration->setText(helpers::getDurationString(mTimeSheet.beginAt, QDateTime::currentDateTime()));
+    }
+}
+
+void TimeSheetListWidgetItem::onBtStartStopClicked()
+{
+    if (mIsActive)
+    {
+        emit timeSheetStopRequested(mTimeSheet);
+    }
+    else
+    {
+        emit timeSheetStartRequested(mTimeSheet);
+    }
+}

@@ -15,7 +15,7 @@ class KimaiCache : public QObject
     Q_OBJECT
 
 public:
-    enum class Category
+    enum class Category : uint8_t
     {
         Customers,
         Projects,
@@ -23,7 +23,7 @@ public:
         RecentTimeSheets
     };
 
-    enum class Status
+    enum class Status : uint8_t
     {
         Empty,
         SyncPending,

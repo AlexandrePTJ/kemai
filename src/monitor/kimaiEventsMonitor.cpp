@@ -34,6 +34,11 @@ bool KimaiEventsMonitor::hasCurrentTimeSheet() const
     return mCurrentTimeSheet.has_value();
 }
 
+const std::vector<TimeSheet>& KimaiEventsMonitor::currentTimeSheets() const
+{
+    return mCurrentTimeSheets;
+}
+
 void KimaiEventsMonitor::onSecondTimeout()
 {
     auto settings = Settings::get();
@@ -54,21 +59,31 @@ void KimaiEventsMonitor::onClientError(KimaiApiBaseResult* apiBaseResult)
 
 void KimaiEventsMonitor::onActiveTimeSheetsReceived(TimeSheetsResult timeSheetsResult)
 {
-    const auto& timeSheets = timeSheetsResult->getResult();
+    auto timeSheets = timeSheetsResult->takeResult();
 
     bool firstRun  = !mLastTimeSheetUpdate.has_value();
     bool isRunning = mCurrentTimeSheet.has_value();
 
     if (timeSheets.empty())
     {
-        if (isRunning || firstRun)
+        if (isRunning || firstRun || !mCurrentTimeSheets.empty())
         {
+            mCurrentTimeSheets.clear();
             mCurrentTimeSheet.reset();
             emit currentTimeSheetChanged();
+            emit currentTimeSheetsChanged();
         }
     }
     else
     {
+        std::sort(timeSheets.begin(), timeSheets.end(), [](const auto& a, const auto& b) { return a.beginAt < b.beginAt; });
+        if (timeSheets.size() != mCurrentTimeSheets.size() ||
+            !std::equal(timeSheets.begin(), timeSheets.end(), mCurrentTimeSheets.begin(), [](const auto& a, const auto& b) { return a.id == b.id; }))
+        {
+            mCurrentTimeSheets = timeSheets;
+            emit currentTimeSheetsChanged();
+        }
+
         auto timeSheet = timeSheets.front();
         bool isSame    = isRunning && timeSheet.id == mCurrentTimeSheet->id;
 

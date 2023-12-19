@@ -37,12 +37,14 @@ public:
 
     std::optional<TimeSheet> currentTimeSheet() const;
     bool hasCurrentTimeSheet() const;
+    const std::vector<TimeSheet>& currentTimeSheets() const;
 
     QDateTime computeTZDateTime(const QDateTime& dateTime) const;
 
 signals:
     void pluginsChanged();
     void currentTimeSheetChanged();
+    void currentTimeSheetsChanged();
     void versionChanged();
     void meChanged();
     void timeSheetConfigChanged();

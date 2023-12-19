@@ -17,6 +17,7 @@ static const auto MinimalKimaiVersionForPluginRequest = QVersionNumber(1, 14, 1)
 KemaiSession::KemaiSession(const std::shared_ptr<KimaiClient>& kimaiClient) : mKimaiClient(kimaiClient), mKimaiMonitor(kimaiClient)
 {
     connect(&mKimaiMonitor, &KimaiEventsMonitor::currentTimeSheetChanged, this, &KemaiSession::currentTimeSheetChanged);
+    connect(&mKimaiMonitor, &KimaiEventsMonitor::currentTimeSheetsChanged, this, &KemaiSession::currentTimeSheetsChanged);
 }
 
 KemaiSession::~KemaiSession() = default;
@@ -87,6 +88,11 @@ std::optional<TimeSheet> KemaiSession::currentTimeSheet() const
 bool KemaiSession::hasCurrentTimeSheet() const
 {
     return mKimaiMonitor.hasCurrentTimeSheet();
+}
+
+const std::vector<TimeSheet>& KemaiSession::currentTimeSheets() const
+{
+    return mKimaiMonitor.currentTimeSheets();
 }
 
 QDateTime KemaiSession::computeTZDateTime(const QDateTime& dateTime) const

@@ -8,36 +8,35 @@ using namespace kemai;
 class CustomerProjectModel::CustomerProjectItem
 {
 public:
-    CustomerProjectItem() = default;
+    CustomerProjectItem() = default; // only used for root item
 
-    CustomerProjectItem(int id, const QString& label, CustomerProjectItem* parent = nullptr) : mId(id), mLabel(label), mParent(parent) {}
+    CustomerProjectItem(int id, const QString& label, bool isCustomer) : mId(id), mLabel(label), mIsCustomer(isCustomer) {}
 
     const QString& label() const { return mLabel; }
     int id() const { return mId; }
 
+    QString fullLabel() const
+    {
+        if (mParent != nullptr)
+        {
+            auto parentFullLabel = mParent->fullLabel();
+            if (!parentFullLabel.isEmpty())
+            {
+                return QString("%1 / %2").arg(parentFullLabel, mLabel);
+            }
+        }
+        return mLabel;
+    }
+
     bool isRoot() const { return mParent == nullptr; }
 
-    bool isCustomer() const
-    {
-        if (mParent != nullptr)
-        {
-            return mParent->isRoot();
-        }
-        return false;
-    }
+    bool isCustomer() const { return !isRoot() && mIsCustomer; }
 
-    bool isProject() const
-    {
-        if (mParent != nullptr)
-        {
-            return mParent->isCustomer();
-        }
-        return false;
-    }
+    bool isProject() const { return !isRoot() && !mIsCustomer; }
 
-    int getChildCount() { return static_cast<int>(mChildren.size()); }
+    int getChildCount() const { return static_cast<int>(mChildren.size()); }
 
-    CustomerProjectItem* getChildAt(int index)
+    CustomerProjectItem* getChildAt(int index) const
     {
         if (index < 0 || index >= static_cast<int>(mChildren.size()))
         {
@@ -46,18 +45,19 @@ public:
         return mChildren.at(index).get();
     }
 
-    int appendChild(std::unique_ptr<CustomerProjectItem> child)
+    CustomerProjectItem* appendChild(int id, const QString& label, bool isCustomer = false)
     {
-        mChildren.push_back(std::move(child));
-        mChildren.back()->setParent(this);
-        return static_cast<int>(mChildren.size() - 1);
-    }
+        auto child     = std::make_unique<CustomerProjectItem>(id, label, isCustomer);
+        child->mParent = this;
 
-    void setParent(CustomerProjectItem* parent) { mParent = parent; }
+        mChildren.push_back(std::move(child));
+        return mChildren.back().get();
+    }
 
 private:
     const int mId = -1;
     const QString mLabel;
+    const bool mIsCustomer       = false;
     CustomerProjectItem* mParent = nullptr;
     std::vector<std::unique_ptr<CustomerProjectItem>> mChildren;
 };
@@ -72,21 +72,23 @@ void CustomerProjectModel::setCustomersProjects(const Customers& customers, cons
 {
     beginResetModel();
 
+    mFlatItems.clear();
     mRootItem = std::make_unique<CustomerProjectItem>();
+
+    auto emptyItem = mRootItem->appendChild(-1, "");
+    mFlatItems.emplace_back(*emptyItem);
 
     for (const auto& customer : customers)
     {
-        auto customerIndex = mRootItem->appendChild(std::make_unique<CustomerProjectItem>(customer.id, customer.name));
-        auto* customerItem = mRootItem->getChildAt(customerIndex);
-
+        auto customerItem = mRootItem->appendChild(customer.id, customer.name, true);
         mFlatItems.emplace_back(*customerItem);
 
         for (const auto& project : projects)
         {
             if (project.customer.id == customer.id)
             {
-                auto projectIndex = customerItem->appendChild(std::make_unique<CustomerProjectItem>(project.id, project.name));
-                mFlatItems.emplace_back(*customerItem->getChildAt(projectIndex));
+                auto projectItem = customerItem->appendChild(project.id, project.name);
+                mFlatItems.emplace_back(*projectItem);
             }
         }
     }
@@ -146,8 +148,14 @@ QVariant CustomerProjectModel::data(const QModelIndex& index, int role) const
     {
         switch (role)
         {
+        case Qt::EditRole:
+            return item.fullLabel();
+
         case Qt::DisplayRole:
             return QString("  %1").arg(item.label());
+
+        case Qt::UserRole:
+            return item.id();
 
         default:
             return {};

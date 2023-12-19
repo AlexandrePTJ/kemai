@@ -15,7 +15,7 @@ public:
         beginResetModel();
         if (!kds.empty())
         {
-            mData = {{0, ""}};
+            mData = {{-1, ""}};
             for (const auto& kd : kds)
             {
                 mData.emplace_back(std::make_pair(kd.id, kd.name));
