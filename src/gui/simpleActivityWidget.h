@@ -37,6 +37,7 @@ private:
 
     void updateControls();
     void updateTimeSheets();
+    void addTimeSheet(const TimeSheet& timeSheet, bool isActive = false);
 
     std::unique_ptr<Ui::SimpleActivityWidget> mUi;
     std::shared_ptr<KemaiSession> mSession;

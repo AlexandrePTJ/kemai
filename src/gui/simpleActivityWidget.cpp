@@ -87,7 +87,13 @@ void SimpleActivityWidget::onSessionCacheSynchronizeFinished()
 
 void SimpleActivityWidget::onTimeSheetStartRequested(const TimeSheet& timeSheet)
 {
-    mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
+    auto timeSheetResult = mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
+
+    connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] {
+        mSession->refreshCurrentTimeSheet();
+        timeSheetResult->deleteLater();
+    });
+    connect(timeSheetResult, &KimaiApiBaseResult::error, [timeSheetResult]() { timeSheetResult->deleteLater(); });
 }
 
 void SimpleActivityWidget::onTimeSheetStopRequested(const TimeSheet& timeSheet)
@@ -95,7 +101,13 @@ void SimpleActivityWidget::onTimeSheetStopRequested(const TimeSheet& timeSheet)
     auto updatedTimeSheet  = timeSheet;
     updatedTimeSheet.endAt = mSession->computeTZDateTime(QDateTime::currentDateTime());
 
-    mSession->client()->updateTimeSheet(updatedTimeSheet, mSession->timeSheetConfig().trackingMode);
+    auto timeSheetResult = mSession->client()->updateTimeSheet(updatedTimeSheet, mSession->timeSheetConfig().trackingMode);
+    
+    connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] {
+        mSession->refreshCurrentTimeSheet();
+        timeSheetResult->deleteLater();
+    });
+    connect(timeSheetResult, &KimaiApiBaseResult::error, [timeSheetResult]() { timeSheetResult->deleteLater(); });
 }
 
 void SimpleActivityWidget::onSecondTimeout()
@@ -117,32 +129,44 @@ void SimpleActivityWidget::updateTimeSheets()
 {
     if (mSession)
     {
-        auto* scrollLayout = qobject_cast<QVBoxLayout*>(mUi->scrollAreaWidgetContents->layout());
-
         /*
          * Clear previous items
          */
         for (auto* child : mUi->scrollAreaWidgetContents->findChildren<TimeSheetListWidgetItem*>())
         {
-            scrollLayout->removeWidget(child);
+            mUi->scrollAreaWidgetContents->layout()->removeWidget(child);
             child->setParent(nullptr);
             child->deleteLater();
         }
 
         /*
-         * Push back widget before spacer item
+         * Insert current running time sheets
          */
         for (const auto& timeSheet : mSession->currentTimeSheets())
         {
-            auto* widget = new TimeSheetListWidgetItem(timeSheet, mUi->scrollAreaWidgetContents);
-            widget->setIsActive(true);
+            addTimeSheet(timeSheet, true);
+        }
 
-            // Push back widget before spacer item
-            scrollLayout->insertWidget(scrollLayout->count() - 1, widget);
-
-            //
-            connect(widget, &TimeSheetListWidgetItem::timeSheetStartRequested, this, &SimpleActivityWidget::onTimeSheetStartRequested);
-            connect(widget, &TimeSheetListWidgetItem::timeSheetStopRequested, this, &SimpleActivityWidget::onTimeSheetStopRequested);
+        /*
+         * Insert history
+         */
+        for (const auto& timeSheet : mSession->cache().recentTimeSheets())
+        {
+            addTimeSheet(timeSheet);
         }
     }
+}
+
+void SimpleActivityWidget::addTimeSheet(const TimeSheet& timeSheet, bool isActive)
+{
+    auto* widget = new TimeSheetListWidgetItem(timeSheet, mUi->scrollAreaWidgetContents);
+    widget->setIsActive(isActive);
+
+    // Push back widget before spacer item
+    auto* scrollLayout = qobject_cast<QVBoxLayout*>(mUi->scrollAreaWidgetContents->layout());
+    scrollLayout->insertWidget(scrollLayout->count() - 1, widget);
+
+    //
+    connect(widget, &TimeSheetListWidgetItem::timeSheetStartRequested, this, &SimpleActivityWidget::onTimeSheetStartRequested);
+    connect(widget, &TimeSheetListWidgetItem::timeSheetStopRequested, this, &SimpleActivityWidget::onTimeSheetStopRequested);
 }
