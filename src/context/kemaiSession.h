@@ -35,9 +35,14 @@ public:
     User me() const;
     TimeSheetConfig timeSheetConfig() const;
 
+    /*
+     * helpers client methods
+     */
     std::optional<TimeSheet> currentTimeSheet() const;
     bool hasCurrentTimeSheet() const;
     const std::vector<TimeSheet>& currentTimeSheets() const;
+
+    TimeSheetResult startTimeSheet(int projectId, int activityId) const;
 
     QDateTime computeTZDateTime(const QDateTime& dateTime) const;
 

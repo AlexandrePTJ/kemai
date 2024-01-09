@@ -37,26 +37,26 @@ public:
     void setUsername(const QString& username);
     void setToken(const QString& token);
 
-    VersionRequestResult requestKimaiVersion();
-    MeRequestResult requestMeUserInfo();
-    TimeSheetConfigResult requestTimeSheetConfig();
-    PluginsResult requestPlugins();
-    CustomersResult requestCustomers();
-    TimeSheetsResult requestActiveTimeSheets();
-    TimeSheetsResult requestRecentTimeSheets();
-    ProjectsResult requestProjects(std::optional<int> customerId = std::nullopt);
-    ActivitiesResult requestActivities(std::optional<int> projectId = std::nullopt);
+    VersionRequestResult requestKimaiVersion() const;
+    MeRequestResult requestMeUserInfo() const;
+    TimeSheetConfigResult requestTimeSheetConfig() const;
+    PluginsResult requestPlugins() const;
+    CustomersResult requestCustomers() const;
+    TimeSheetsResult requestActiveTimeSheets() const;
+    TimeSheetsResult requestRecentTimeSheets() const;
+    ProjectsResult requestProjects(std::optional<int> customerId = std::nullopt) const;
+    ActivitiesResult requestActivities(std::optional<int> projectId = std::nullopt) const;
 
-    CustomerAddResult addCustomer(const Customer& customer);
-    ProjectAddResult addProject(const Project& project);
-    ActivityAddResult addActivity(const Activity& activity);
+    CustomerAddResult addCustomer(const Customer& customer) const;
+    ProjectAddResult addProject(const Project& project) const;
+    ActivityAddResult addActivity(const Activity& activity) const;
 
-    TimeSheetResult startTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode);
-    TimeSheetResult updateTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode);
+    TimeSheetResult startTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode) const;
+    TimeSheetResult updateTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode) const;
 
-    TasksResult requestTasks();
-    TaskResult startTask(int taskId);
-    TaskResult closeTask(int taskId);
+    TasksResult requestTasks() const;
+    TaskResult startTask(int taskId) const;
+    TaskResult closeTask(int taskId) const;
 
     static void addTrustedCertificates(const QStringList& trustedCertificates);
 

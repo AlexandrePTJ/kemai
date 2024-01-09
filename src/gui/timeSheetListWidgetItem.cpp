@@ -42,6 +42,10 @@ void TimeSheetListWidgetItem::onBtStartStopClicked()
     }
     else
     {
-        emit timeSheetStartRequested(mTimeSheet);
+        TimeSheet timeSheet;
+        timeSheet.project.id  = mTimeSheet.project.id;
+        timeSheet.activity.id = mTimeSheet.activity.id;
+
+        emit timeSheetStartRequested(timeSheet);
     }
 }

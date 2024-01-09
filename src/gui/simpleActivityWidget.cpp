@@ -1,6 +1,8 @@
 #include "simpleActivityWidget.h"
 #include "ui_simpleActivityWidget.h"
 
+#include <QLineEdit>
+
 #include "timeSheetListWidgetItem.h"
 
 using namespace kemai;
@@ -9,13 +11,21 @@ SimpleActivityWidget::SimpleActivityWidget(QWidget* parent) : QWidget(parent), m
 {
     mUi->setupUi(this);
 
+    for (auto* cb : std::vector<QComboBox*>{mUi->cbActivity, mUi->cbProject})
+    {
+        if (auto* lineEdit = cb->lineEdit())
+        {
+            lineEdit->setClearButtonEnabled(true);
+        }
+    }
+
     mUi->scrollAreaWidgetContents->setLayout(new QVBoxLayout);
     mUi->scrollAreaWidgetContents->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-    //    connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &SimpleActivityWidget::onCbProjectFieldChanged);
-    connect(mUi->cbProject, &QComboBox::currentIndexChanged, this, &SimpleActivityWidget::onCbProjectFieldChanged);
-    //    connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &SimpleActivityWidget::onCbActivityFieldChanged);
-    connect(mUi->cbActivity, &QComboBox::currentIndexChanged, this, &SimpleActivityWidget::onCbActivityFieldChanged);
+    connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &SimpleActivityWidget::onCbProjectFieldChanged);
+    //    connect(mUi->cbProject, &QComboBox::currentIndexChanged, this, &SimpleActivityWidget::onCbProjectFieldChanged);
+    connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &SimpleActivityWidget::onCbActivityFieldChanged);
+    //    connect(mUi->cbActivity, &QComboBox::currentIndexChanged, this, &SimpleActivityWidget::onCbActivityFieldChanged);
     connect(mUi->btCreate, &QPushButton::clicked, this, &SimpleActivityWidget::onBtCreateClicked);
     connect(&mSecondTimer, &QTimer::timeout, this, &SimpleActivityWidget::onSecondTimeout);
 
@@ -66,13 +76,7 @@ void SimpleActivityWidget::onBtCreateClicked()
 {
     if (mSession)
     {
-        TimeSheet timeSheet;
-
-        timeSheet.beginAt     = mSession->computeTZDateTime(QDateTime::currentDateTime());
-        timeSheet.project.id  = mUi->cbProject->currentData().toInt();
-        timeSheet.activity.id = mUi->cbActivity->currentData().toInt();
-
-        mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
+        mSession->startTimeSheet(mUi->cbProject->currentData().toInt(), mUi->cbActivity->currentData().toInt());
     }
 }
 
@@ -87,7 +91,7 @@ void SimpleActivityWidget::onSessionCacheSynchronizeFinished()
 
 void SimpleActivityWidget::onTimeSheetStartRequested(const TimeSheet& timeSheet)
 {
-    auto timeSheetResult = mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
+    auto timeSheetResult = mSession->startTimeSheet(timeSheet.project.id, timeSheet.activity.id);
 
     connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] {
         mSession->refreshCurrentTimeSheet();
@@ -102,7 +106,7 @@ void SimpleActivityWidget::onTimeSheetStopRequested(const TimeSheet& timeSheet)
     updatedTimeSheet.endAt = mSession->computeTZDateTime(QDateTime::currentDateTime());
 
     auto timeSheetResult = mSession->client()->updateTimeSheet(updatedTimeSheet, mSession->timeSheetConfig().trackingMode);
-    
+
     connect(timeSheetResult, &KimaiApiBaseResult::ready, this, [this, timeSheetResult] {
         mSession->refreshCurrentTimeSheet();
         timeSheetResult->deleteLater();

@@ -95,6 +95,17 @@ const std::vector<TimeSheet>& KemaiSession::currentTimeSheets() const
     return mKimaiMonitor.currentTimeSheets();
 }
 
+TimeSheetResult KemaiSession::startTimeSheet(int projectId, int activityId) const
+{
+    TimeSheet timeSheet;
+
+    timeSheet.beginAt     = computeTZDateTime(QDateTime::currentDateTime());
+    timeSheet.project.id  = projectId;
+    timeSheet.activity.id = activityId;
+
+    return mKimaiClient->startTimeSheet(timeSheet, mTimeSheetConfig.trackingMode);
+}
+
 QDateTime KemaiSession::computeTZDateTime(const QDateTime& dateTime) const
 {
     // Be sure to use expected timezone
