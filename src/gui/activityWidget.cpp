@@ -3,10 +3,10 @@
 
 #include <spdlog/spdlog.h>
 
-#include <misc/helpers.h>
-
 #include "activityDialog.h"
 #include "customerDialog.h"
+#include "misc/customFmt.h"
+#include "misc/helpers.h"
 #include "projectDialog.h"
 #include "timeSheetListWidgetItem.h"
 
@@ -353,7 +353,7 @@ void ActivityWidget::updateCustomersCombo()
             }
             else
             {
-                spdlog::error("Cannot find '{}' customer", mSession->currentTimeSheet()->project.customer.name.toStdString());
+                spdlog::error("Cannot find '{}' customer", mSession->currentTimeSheet()->project.customer.name);
             }
         }
     }
@@ -376,7 +376,7 @@ void ActivityWidget::updateProjectsCombo()
             }
             else
             {
-                spdlog::error("Cannot find '{}' project", mSession->currentTimeSheet()->project.name.toStdString());
+                spdlog::error("Cannot find '{}' project", mSession->currentTimeSheet()->project.name);
             }
         }
     }
@@ -398,7 +398,7 @@ void ActivityWidget::updateActivitiesCombo()
             }
             else
             {
-                spdlog::error("Cannot find '{}' activity", mSession->currentTimeSheet()->activity.name.toStdString());
+                spdlog::error("Cannot find '{}' activity", mSession->currentTimeSheet()->activity.name);
             }
         }
         else if (!projectId.has_value())

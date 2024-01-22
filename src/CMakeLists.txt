@@ -57,6 +57,7 @@ set(HDRS
         gui/settingsDialog.h
         gui/taskWidget.h
         gui/timeSheetListWidgetItem.h
+        misc/customFmt.h
         misc/dataReader.h
         misc/helpers.h
         models/kimaiDataListModel.h

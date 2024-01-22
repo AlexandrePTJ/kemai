@@ -4,6 +4,8 @@
 
 #include <QTimeZone>
 
+#include "misc/customFmt.h"
+
 using namespace kemai;
 
 /*
@@ -102,7 +104,7 @@ QDateTime KemaiSession::computeTZDateTime(const QDateTime& dateTime) const
 
 void KemaiSession::onClientError(KimaiApiBaseResult* apiBaseResult)
 {
-    spdlog::error("Client error: {}", apiBaseResult->errorMessage().toStdString());
+    spdlog::error("Client error: {}", apiBaseResult->errorMessage());
     apiBaseResult->deleteLater();
 }
 
