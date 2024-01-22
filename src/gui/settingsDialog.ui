@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>571</width>
+    <width>537</width>
     <height>361</height>
    </rect>
   </property>
@@ -21,6 +21,18 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QListWidget" name="listWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
          <width>100</width>
@@ -211,10 +223,16 @@
            <item>
             <widget class="QListWidget" name="profilesListWidget">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
              </property>
              <property name="maximumSize">
               <size>
@@ -229,7 +247,7 @@
              <item>
               <widget class="QToolButton" name="addProfileButton">
                <property name="icon">
-                <iconset resource="../resources/icons.qrc">
+                <iconset resource="../resources/kemai.qrc">
                  <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
                </property>
               </widget>
@@ -256,7 +274,7 @@
                 <bool>false</bool>
                </property>
                <property name="icon">
-                <iconset resource="../resources/icons.qrc">
+                <iconset resource="../resources/kemai.qrc">
                  <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
                </property>
               </widget>
@@ -267,8 +285,16 @@
          </item>
          <item>
           <layout class="QFormLayout" name="formLayout_2">
+           <property name="rowWrapPolicy">
+            <enum>QFormLayout::WrapAllRows</enum>
+           </property>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="lbName">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Name</string>
              </property>
@@ -289,6 +315,11 @@
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="lbHost">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Host</string>
              </property>
@@ -306,6 +337,11 @@
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="lbUsername">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Username</string>
              </property>
@@ -320,6 +356,11 @@
            </item>
            <item row="3" column="0">
             <widget class="QLabel" name="lbToken">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Token</string>
              </property>
@@ -339,14 +380,14 @@
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QLabel" name="testResultLabel">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>16777215</height>
+                </size>
                </property>
-               <property name="text">
-                <string/>
+               <property name="wordWrap">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -402,7 +443,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resources/icons.qrc"/>
+  <include location="../resources/kemai.qrc"/>
  </resources>
  <connections>
   <connection>
