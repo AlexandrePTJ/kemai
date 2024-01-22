@@ -60,6 +60,7 @@ set(HDRS
         gui/simpleActivityWidget.h
         gui/taskWidget.h
         gui/timeSheetListWidgetItem.h
+        misc/customFmt.h
         misc/dataReader.h
         misc/helpers.h
         models/customerProjectModel.h

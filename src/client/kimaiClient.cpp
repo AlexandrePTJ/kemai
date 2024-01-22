@@ -131,19 +131,19 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
 
 QNetworkReply* KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkRequest& networkRequest) const
 {
-    spdlog::debug("[GET] {}", networkRequest.url().toString().toStdString());
+    spdlog::debug("[GET] {}", networkRequest.url().toString());
     return networkAccessManager->get(networkRequest);
 }
 
 QNetworkReply* KimaiClient::KimaiClientPrivate::sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const
 {
-    spdlog::debug("[POST] {}", networkRequest.url().toString().toStdString());
+    spdlog::debug("[POST] {}", networkRequest.url().toString());
     return networkAccessManager->post(networkRequest, data);
 }
 
 QNetworkReply* KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const
 {
-    spdlog::debug("[PATCH] {}", networkRequest.url().toString().toStdString());
+    spdlog::debug("[PATCH] {}", networkRequest.url().toString());
     return networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);
 }
 
@@ -151,7 +151,7 @@ void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* /*reply*/, c
 {
     for (const auto& error : errors)
     {
-        spdlog::error("SSL Error: {}", error.errorString().toStdString());
+        spdlog::error("SSL Error: {}", error.errorString());
     }
 
     // Process certificate errors one by one.

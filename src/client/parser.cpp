@@ -3,7 +3,10 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
+#include <fmt/format.h>
 #include <magic_enum.hpp>
+
+#include "misc/customFmt.h"
 
 using namespace kemai;
 
@@ -54,7 +57,7 @@ static void checkKeysOrThrow(const QString& objectName, const QJsonObject& jsonO
     {
         if (!jsonObject.contains(key))
         {
-            throw std::runtime_error(QString("Invalid %1 object. Key '%2' is missing").arg(objectName, key).toStdString());
+            throw std::runtime_error(fmt::format("Invalid {} object. Key '{}' is missing", objectName, key));
         }
     }
 }
@@ -63,8 +66,7 @@ static void checkTypeOrThrow(const QString& objectName, const QJsonValue& jsonVa
 {
     if (std::none_of(allowedTypes.begin(), allowedTypes.end(), [jsonValue](QJsonValue::Type type) { return type == jsonValue.type(); }))
     {
-        throw std::runtime_error(
-            QString("Invalid type for %1: %2").arg(objectName, QString::fromStdString(std::string(magic_enum::enum_name(jsonValue.type())))).toStdString());
+        throw std::runtime_error(fmt::format("Invalid type for {}: {}", objectName, magic_enum::enum_name(jsonValue.type())));
     }
 }
 
@@ -77,7 +79,7 @@ KimaiApiTypesParser::KimaiApiTypesParser(const QByteArray& data)
     m_jsonDocument = QJsonDocument::fromJson(data, &parseError);
     if (parseError.error != QJsonParseError::NoError)
     {
-        throw std::runtime_error(QString("Data is not a valid json: %1").arg(parseError.errorString()).toStdString());
+        throw std::runtime_error(fmt::format("Data is not a valid json: {}", parseError.errorString()));
     }
 }
 
@@ -306,9 +308,9 @@ template<> Task KimaiApiTypesParser::parseValue(const QJsonValue& jsonValue) con
     task.description = jsonObject.value("description").toString();
     task.project     = parseValue<Project>(jsonObject.value("project"));
     task.activity    = parseValue<Activity>(jsonObject.value("activity"));
-//    task.user        = parseValue<User>(jsonObject.value("user"));
-    task.endAt       = QDateTime::fromString(jsonObject.value("end").toString(), Qt::ISODate);
-    task.estimation  = jsonObject.value("estimation").toInt();
+    //    task.user        = parseValue<User>(jsonObject.value("user"));
+    task.endAt      = QDateTime::fromString(jsonObject.value("end").toString(), Qt::ISODate);
+    task.estimation = jsonObject.value("estimation").toInt();
 
     if (jsonObject.contains("activeTimesheets"))
     {

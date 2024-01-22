@@ -9,8 +9,14 @@ list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Set dependencies options
+set(SPDLOG_FMT_EXTERNAL ON)
+
 # Add dependencies
 include(FetchContent)
+FetchContent_Declare(fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt
+        GIT_TAG 10.2.1)
 FetchContent_Declare(magic_enum
         GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
         GIT_TAG v0.9.5)
@@ -20,7 +26,7 @@ FetchContent_Declare(spdlog
 FetchContent_Declare(range-v3
         GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
         GIT_TAG 0.12.0)
-FetchContent_MakeAvailable(magic_enum spdlog range-v3)
+FetchContent_MakeAvailable(fmt magic_enum spdlog range-v3)
 
 # Setup Qt
 set(CMAKE_AUTOMOC ON)

@@ -8,6 +8,7 @@
 #include <QVersionNumber>
 
 #include "kimaiClient.h"
+#include "misc/customFmt.h"
 #include "parser.h"
 
 namespace kemai {
@@ -61,7 +62,7 @@ public:
             {
                 try
                 {
-                    spdlog::debug("[RECV] {}", apiMethodToString(method).toStdString());
+                    spdlog::debug("[RECV] {}", apiMethodToString(method));
 
                     KimaiApiTypesParser parser(networkReply->readAll());
                     result->setResult(parser.getValueOf<ResultType>());
@@ -91,7 +92,7 @@ public:
             {
                 try
                 {
-                    spdlog::debug("[RECV] {}", apiMethodToString(method).toStdString());
+                    spdlog::debug("[RECV] {}", apiMethodToString(method));
 
                     KimaiApiTypesParser parser(networkReply->readAll());
                     result->setResult(parser.getArrayOf<ResultType>());

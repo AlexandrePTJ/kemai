@@ -1,6 +1,5 @@
 #include <QApplication>
 #include <QLibraryInfo>
-#include <QStandardPaths>
 #include <QTranslator>
 #include <QTreeView>
 
@@ -11,6 +10,7 @@
 #include "client/kimaiClient.h"
 #include "gui/mainWindow.h"
 #include "kemaiConfig.h"
+#include "misc/customFmt.h"
 #include "misc/helpers.h"
 #include "models/loggerTreeModel.h"
 #include "settings/settings.h"
@@ -24,17 +24,17 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext& /*context*/, cons
     switch (type)
     {
     case QtDebugMsg:
-        spdlog::debug(msg.toStdString());
+        spdlog::debug(msg);
         break;
     case QtInfoMsg:
-        spdlog::info(msg.toStdString());
+        spdlog::info(msg);
         break;
     case QtWarningMsg:
-        spdlog::warn(msg.toStdString());
+        spdlog::warn(msg);
         break;
     case QtCriticalMsg:
     case QtFatalMsg:
-        spdlog::critical(msg.toStdString());
+        spdlog::critical(msg);
         break;
     }
 }

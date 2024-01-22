@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include "misc/customFmt.h"
+
 using namespace kemai;
 
 void KimaiApiBaseResult::markAsReady()
@@ -19,7 +21,7 @@ void KimaiApiBaseResult::setError(const QString& errorMessage)
 {
     mIsReady = true;
     mError   = errorMessage;
-    spdlog::error("<=== {}", errorMessage.toStdString());
+    spdlog::error("<=== {}", errorMessage);
     emit error();
 }
 
