@@ -6,22 +6,22 @@
     <message>
         <location filename="../../gui/aboutDialog.ui" line="14"/>
         <source>About Kemai</source>
-        <translation type="unfinished"></translation>
+        <translation>A Kemai-ról</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="81"/>
         <source>Kemai</source>
-        <translation type="unfinished"></translation>
+        <translation>Kemai</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="88"/>
         <source>Desktop client for Kimai</source>
-        <translation type="unfinished"></translation>
+        <translation>Kemai asztali kliens</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="109"/>
         <source>Proudly using:</source>
-        <translation type="unfinished"></translation>
+        <translation>Büszkén használja:</translation>
     </message>
 </context>
 <context>
@@ -29,27 +29,27 @@
     <message>
         <location filename="../../gui/activityDialog.ui" line="14"/>
         <source>Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivitás</translation>
     </message>
     <message>
         <location filename="../../gui/activityDialog.ui" line="25"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../../gui/activityDialog.ui" line="35"/>
         <source>Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Költségkeret</translation>
     </message>
     <message>
         <location filename="../../gui/activityDialog.ui" line="62"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Megnevezés</translation>
     </message>
     <message>
         <location filename="../../gui/activityDialog.ui" line="85"/>
         <source>Time Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Időkeret</translation>
     </message>
 </context>
 <context>
@@ -62,19 +62,19 @@
     <message>
         <location filename="../../gui/activityWidget.ui" line="31"/>
         <source>Customer</source>
-        <translation type="unfinished"></translation>
+        <translation>Vevő</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="62"/>
         <location filename="../../gui/activityWidget.ui" line="112"/>
         <location filename="../../gui/activityWidget.ui" line="162"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="81"/>
         <source>Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Projekt</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="131"/>
@@ -84,27 +84,27 @@
     <message>
         <location filename="../../gui/activityWidget.ui" line="175"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Leírás</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="185"/>
         <source>Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Tag-ek</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="224"/>
         <source>Started at</source>
-        <translation type="unfinished"></translation>
+        <translation>Elkezdve</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="271"/>
         <source>00:00:00</source>
-        <translation type="unfinished"></translation>
+        <translation>00:00:00</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="284"/>
         <source>History</source>
-        <translation type="unfinished"></translation>
+        <translation>Előzmények</translation>
     </message>
 </context>
 <context>
@@ -112,42 +112,42 @@
     <message>
         <location filename="../../gui/customerDialog.ui" line="14"/>
         <source>Customer</source>
-        <translation type="unfinished"></translation>
+        <translation>Vevő</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="25"/>
         <source>Country</source>
-        <translation type="unfinished"></translation>
+        <translation>Ország</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="55"/>
         <source>Currency</source>
-        <translation type="unfinished"></translation>
+        <translation>Pénznem</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="62"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Név</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="69"/>
         <source>Time Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Időkeret</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="93"/>
         <source>Timezone</source>
-        <translation type="unfinished"></translation>
+        <translation>Időzóna</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="103"/>
         <source>Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Költségkeret</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="126"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
 </context>
 <context>
@@ -155,17 +155,17 @@
     <message>
         <location filename="../../gui/loggerWidget.ui" line="14"/>
         <source>Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Napló</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="25"/>
         <source>Log file path</source>
-        <translation type="unfinished"></translation>
+        <translation>Napló fájl elérési útja</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="39"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -173,12 +173,12 @@
     <message>
         <location filename="../../gui/mainWindow.ui" line="14"/>
         <source>Kemai - Kimai client</source>
-        <translation type="unfinished"></translation>
+        <translation>Kemai - Kimai kliens</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.ui" line="48"/>
         <source>Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállítások...</translation>
     </message>
 </context>
 <context>
@@ -186,27 +186,27 @@
     <message>
         <location filename="../../gui/projectDialog.ui" line="14"/>
         <source>Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Projekt</translation>
     </message>
     <message>
         <location filename="../../gui/projectDialog.ui" line="25"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Megnevezés</translation>
     </message>
     <message>
         <location filename="../../gui/projectDialog.ui" line="32"/>
         <source>Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Költségkeret</translation>
     </message>
     <message>
         <location filename="../../gui/projectDialog.ui" line="68"/>
         <source>Time Budget</source>
-        <translation type="unfinished"></translation>
+        <translation>Időkeret</translation>
     </message>
     <message>
         <location filename="../../gui/projectDialog.ui" line="75"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
 </context>
 <context>
@@ -216,7 +216,8 @@
         <location filename="../../client/kimaiClient_p.h" line="106"/>
         <source>Error on request [%1]: %2
 %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba a(z) %1 lekérésnél: %2
+%3</translation>
     </message>
 </context>
 <context>
@@ -224,42 +225,42 @@
     <message>
         <location filename="../../gui/settingsDialog.ui" line="14"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállítások</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="41"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Általános</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="46"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Események</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="51"/>
         <source>Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilok</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="66"/>
         <source>Close to system tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendszertálcára minimalizálás</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="73"/>
         <source>Minimize to system tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendszertálcára minimalizálás</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="80"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyelv</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="90"/>
         <source>Check update at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Frissítések keresése induláskor</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="104"/>
