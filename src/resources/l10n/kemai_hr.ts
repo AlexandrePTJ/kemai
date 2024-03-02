@@ -94,7 +94,7 @@
     <message>
         <location filename="../../gui/activityWidget.ui" line="224"/>
         <source>Started at</source>
-        <translation>Pokrenuto</translation>
+        <translation>Pokrenuto u</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="271"/>
