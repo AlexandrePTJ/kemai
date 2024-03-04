@@ -5,6 +5,7 @@
 
 #include <fmt/format.h>
 #include <magic_enum.hpp>
+#include <spdlog/spdlog.h>
 
 #include "misc/customFmt.h"
 
@@ -51,6 +52,79 @@ static Task::Status taskStatusFromString(const QString& taskStatus)
     return Task::Status::Undefined;
 }
 
+static MetaField::Type metaFieldTypeFromString(const QString& metaFieldType)
+{
+    if (metaFieldType == "string")
+    {
+        return MetaField::Type::String;
+    }
+    if (metaFieldType == "integer")
+    {
+        return MetaField::Type::Integer;
+    }
+    if (metaFieldType == "number")
+    {
+        return MetaField::Type::Number;
+    }
+    if (metaFieldType == "duration")
+    {
+        return MetaField::Type::Duration;
+    }
+    if (metaFieldType == "money")
+    {
+        return MetaField::Type::Money;
+    }
+    if (metaFieldType == "language")
+    {
+        return MetaField::Type::Language;
+    }
+    if (metaFieldType == "currency")
+    {
+        return MetaField::Type::Currency;
+    }
+    if (metaFieldType == "country")
+    {
+        return MetaField::Type::Country;
+    }
+    if (metaFieldType == "color")
+    {
+        return MetaField::Type::Color;
+    }
+    if (metaFieldType == "date")
+    {
+        return MetaField::Type::Date;
+    }
+    if (metaFieldType == "datetime")
+    {
+        return MetaField::Type::DateTime;
+    }
+    if (metaFieldType == "email")
+    {
+        return MetaField::Type::Email;
+    }
+    if (metaFieldType == "url")
+    {
+        return MetaField::Type::Url;
+    }
+    if (metaFieldType == "textarea")
+    {
+        return MetaField::Type::TextArea;
+    }
+    if (metaFieldType == "invoice")
+    {
+        return MetaField::Type::Invoice;
+    }
+    if (metaFieldType == "checkbox")
+    {
+        return MetaField::Type::Checkbox;
+    }
+    if (metaFieldType == "choice-list")
+    {
+        return MetaField::Type::ChoiceList;
+    }
+    return MetaField::Type::Undefined;
+}
+
 static void checkKeysOrThrow(const QString& objectName, const QJsonObject& jsonObject, const QStringList& requiredKeys)
 {
     for (const auto& key : requiredKeys)
@@ -73,8 +147,13 @@ static void checkTypeOrThrow(const QString& objectName, const QJsonValue& jsonVa
 /*
  * KimaiApiTypesParser implementation
  */
-KimaiApiTypesParser::KimaiApiTypesParser(const QByteArray& data)
+KimaiApiTypesParser::KimaiApiTypesParser(const QByteArray& data, bool outputResponse)
 {
+    if (outputResponse)
+    {
+        spdlog::debug(QString(data));
+    }
+
     QJsonParseError parseError;
     m_jsonDocument = QJsonDocument::fromJson(data, &parseError);
     if (parseError.error != QJsonParseError::NoError)
@@ -324,6 +403,43 @@ template<> Task KimaiApiTypesParser::parseValue(const QJsonValue& jsonValue) con
     return task;
 }
 
+template<> QString KimaiApiTypesParser::parseValue(const QJsonValue& jsonValue) const
+{
+    return jsonValue.toString();
+}
+
+template<> MetaField KimaiApiTypesParser::parseValue(const QJsonValue& jsonValue) const
+{
+    checkTypeOrThrow("MetaField", jsonValue, {QJsonValue::Object});
+
+    auto jsonObject = jsonValue.toObject();
+    checkKeysOrThrow("MetaField", jsonObject, {"name", "type", "visible", "required"});
+
+    MetaField metaField;
+    metaField.id           = jsonObject.value("id").toInt();
+    metaField.name         = jsonObject.value("name").toString();
+    metaField.type         = metaFieldTypeFromString(jsonObject.value("type").toString());
+    metaField.label        = jsonObject.value("label").toString();
+    metaField.help         = jsonObject.value("help").toString();
+    metaField.defaultValue = jsonObject.value("value").toString();
+    metaField.entityType   = jsonObject.value("entityType").toString();
+
+    if (!jsonObject.value("customer").isNull())
+    {
+        metaField.customerId = jsonObject.value("customer").toInt();
+    }
+    if (!jsonObject.value("project").isNull())
+    {
+        metaField.projectId = jsonObject.value("project").toInt();
+    }
+    if (!jsonObject.value("activity").isNull())
+    {
+        metaField.activityId = jsonObject.value("activity").toInt();
+    }
+
+    return metaField;
+}
+
 QJsonValue KimaiApiTypesParser::toJson(const TimeSheet& inst, TimeSheetConfig::TrackingMode trackingMode)
 {
     QJsonObject joTimeSheet;
@@ -338,7 +454,7 @@ QJsonValue KimaiApiTypesParser::toJson(const TimeSheet& inst, TimeSheetConfig::T
     joTimeSheet["project"]     = inst.project.id;
     joTimeSheet["activity"]    = inst.activity.id;
     joTimeSheet["description"] = inst.description;
-    joTimeSheet["tags"]        = inst.tags.join(',');
+    joTimeSheet["tags"]        = QString::fromStdString(fmt::format("{}", fmt::join(inst.tags, ",")));
     return joTimeSheet;
 }
 

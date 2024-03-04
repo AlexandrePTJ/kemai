@@ -20,7 +20,9 @@ public:
         Customers,
         Projects,
         Activities,
-        RecentTimeSheets
+        RecentTimeSheets,
+        Tags,
+        MetaFields
     };
 
     enum class Status : uint8_t
@@ -37,6 +39,7 @@ public:
     Projects projects(std::optional<int> customerId = std::nullopt) const;
     Activities activities(std::optional<int> projectId = std::nullopt) const;
     TimeSheets recentTimeSheets() const;
+    Tags tags() const;
 
 signals:
     void synchronizeStarted();
@@ -48,6 +51,8 @@ private:
     void processProjectsResult(ProjectsResult projectsResult);
     void processActivitiesResult(ActivitiesResult activitiesResult);
     void processRecentTimeSheetsResult(TimeSheetsResult timeSheetsResult);
+    void processTagsResult(TagsResult tagsResult);
+    void processMetaFieldsResult(MetaFieldsResult metaFieldsResult);
 
     std::set<Category> mPendingSync;
 
@@ -55,6 +60,8 @@ private:
     Projects mProjects;
     Activities mActivities;
     TimeSheets mRecentTimeSheets;
+    Tags mTags;
+    MetaFields mMetaFields;
 
     kemai::KimaiCache::Status mStatus = kemai::KimaiCache::Status::Empty;
     std::mutex mSyncMutex;

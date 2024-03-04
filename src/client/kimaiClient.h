@@ -24,6 +24,8 @@ using ActivityAddResult     = KimaiApiResult<Activity>*;
 using TimeSheetResult       = KimaiApiResult<TimeSheet>*;
 using TaskResult            = KimaiApiResult<Task>*;
 using TasksResult           = KimaiApiResult<Tasks>*;
+using TagsResult            = KimaiApiResult<Tags>*;
+using MetaFieldsResult      = KimaiApiResult<MetaFields>*;
 
 class KimaiClient : public QObject
 {
@@ -46,6 +48,7 @@ public:
     TimeSheetsResult requestRecentTimeSheets() const;
     ProjectsResult requestProjects(std::optional<int> customerId = std::nullopt) const;
     ActivitiesResult requestActivities(std::optional<int> projectId = std::nullopt) const;
+    TagsResult requestTags() const;
 
     CustomerAddResult addCustomer(const Customer& customer) const;
     ProjectAddResult addProject(const Project& project) const;
@@ -57,6 +60,8 @@ public:
     TasksResult requestTasks() const;
     TaskResult startTask(int taskId) const;
     TaskResult closeTask(int taskId) const;
+
+    MetaFieldsResult requestMetaFields() const;
 
     static void addTrustedCertificates(const QStringList& trustedCertificates);
 

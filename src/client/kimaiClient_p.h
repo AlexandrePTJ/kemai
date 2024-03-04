@@ -35,7 +35,8 @@ enum class ApiMethod
     TaskStart,
     TaskStop,
     TaskClose,
-    TimeSheetConfig
+    TimeSheetConfig,
+    MetaFields
 };
 QString apiMethodToString(ApiMethod method);
 
@@ -53,18 +54,19 @@ public:
     QNetworkReply* sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const;
     QNetworkReply* sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const;
 
-    template<class ResultType> KimaiApiResult<ResultType>* processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply* networkReply) const
+    template<class ResultType>
+    KimaiApiResult<ResultType>* processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply* networkReply, bool outputResponse = false) const
     {
         auto result = new KimaiApiResult<ResultType>;
 
-        QObject::connect(networkReply, &QNetworkReply::finished, this, [networkReply, result, method]() {
+        QObject::connect(networkReply, &QNetworkReply::finished, this, [networkReply, result, method, outputResponse]() {
             if (networkReply->error() == QNetworkReply::NoError)
             {
                 try
                 {
                     spdlog::debug("[RECV] {}", apiMethodToString(method));
 
-                    KimaiApiTypesParser parser(networkReply->readAll());
+                    KimaiApiTypesParser parser(networkReply->readAll(), outputResponse);
                     result->setResult(parser.getValueOf<ResultType>());
                 }
                 catch (std::runtime_error& ex)
@@ -83,18 +85,19 @@ public:
         return result;
     }
 
-    template<class ResultType> KimaiApiResult<std::vector<ResultType>>* processApiNetworkReplyArray(ApiMethod method, QNetworkReply* networkReply) const
+    template<class ResultType>
+    KimaiApiResult<std::vector<ResultType>>* processApiNetworkReplyArray(ApiMethod method, QNetworkReply* networkReply, bool outputResponse = false) const
     {
         auto result = new KimaiApiResult<std::vector<ResultType>>;
 
-        QObject::connect(networkReply, &QNetworkReply::finished, this, [networkReply, result, method]() {
+        QObject::connect(networkReply, &QNetworkReply::finished, this, [networkReply, result, method, outputResponse]() {
             if (networkReply->error() == QNetworkReply::NoError)
             {
                 try
                 {
                     spdlog::debug("[RECV] {}", apiMethodToString(method));
 
-                    KimaiApiTypesParser parser(networkReply->readAll());
+                    KimaiApiTypesParser parser(networkReply->readAll(), outputResponse);
                     result->setResult(parser.getArrayOf<ResultType>());
                 }
                 catch (std::runtime_error& ex)

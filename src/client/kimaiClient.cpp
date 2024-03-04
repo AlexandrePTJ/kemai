@@ -75,6 +75,9 @@ QString kemai::apiMethodToString(ApiMethod method)
     case ApiMethod::TimeSheetConfig:
         return "config/timesheet";
 
+    case ApiMethod::MetaFields:
+        return "metafields";
+
     default:
         return "";
     }
@@ -118,6 +121,7 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
     networkRequest.setUrl(url);
     networkRequest.setRawHeader("X-AUTH-USER", username.toUtf8());
     networkRequest.setRawHeader("X-AUTH-TOKEN", token.toUtf8());
+    networkRequest.setRawHeader("accept", "application/json");
     networkRequest.setHeader(QNetworkRequest::UserAgentHeader, QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()));
     networkRequest.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
     if (!data.isEmpty())
@@ -256,6 +260,13 @@ ActivitiesResult KimaiClient::requestActivities(std::optional<int> projectId) co
     return mD->processApiNetworkReplyArray<Activity>(ApiMethod::Activities, reply);
 }
 
+TagsResult KimaiClient::requestTags() const
+{
+    auto request = mD->prepareRequest(ApiMethod::Tags);
+    auto reply   = mD->sendGetRequest(request);
+    return mD->processApiNetworkReplyArray<QString>(ApiMethod::Tags, reply);
+}
+
 CustomerAddResult KimaiClient::addCustomer(const Customer& customer) const
 {
     auto json    = KimaiApiTypesParser::toJson(customer);
@@ -320,6 +331,13 @@ TaskResult KimaiClient::closeTask(int taskId) const
     auto request = mD->prepareRequest(ApiMethod::TaskClose, {}, {}, QString("%1/close").arg(taskId));
     auto reply   = mD->sendPatchRequest(request, {});
     return mD->processApiNetworkReplySingleObject<Task>(ApiMethod::TaskClose, reply);
+}
+
+MetaFieldsResult KimaiClient::requestMetaFields() const
+{
+    auto request = mD->prepareRequest(ApiMethod::MetaFields);
+    auto reply   = mD->sendGetRequest(request);
+    return mD->processApiNetworkReplyArray<MetaField>(ApiMethod::MetaFields, reply, true);
 }
 
 void KimaiClient::addTrustedCertificates(const QStringList& trustedCertificates)

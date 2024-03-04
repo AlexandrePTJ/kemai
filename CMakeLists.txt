@@ -9,9 +9,6 @@ list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Set dependencies options
-set(SPDLOG_FMT_EXTERNAL ON)
-
 # Add dependencies
 include(FetchContent)
 FetchContent_Declare(fmt
@@ -22,7 +19,7 @@ FetchContent_Declare(magic_enum
         GIT_TAG v0.9.5)
 FetchContent_Declare(spdlog
         GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.12.0)
+        GIT_TAG v1.13.0)
 FetchContent_Declare(range-v3
         GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
         GIT_TAG 0.12.0)

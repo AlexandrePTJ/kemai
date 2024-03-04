@@ -20,7 +20,7 @@ public:
      *
      * \throw std::runtime_error if data is not json
      */
-    KimaiApiTypesParser(const QByteArray& data);
+    KimaiApiTypesParser(const QByteArray& data, bool outputResponse);
 
     template<class T> std::vector<T> getArrayOf() const
     {

@@ -81,7 +81,7 @@ void ActivityWidget::stopCurrentTimeSheet()
 
             timeSheet.endAt       = mSession->computeTZDateTime(QDateTime::currentDateTime());
             timeSheet.description = mUi->pteDescription->toPlainText();
-            timeSheet.tags        = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
+            //            timeSheet.tags        = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
 
             auto timeSheetResult = mSession->client()->updateTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
 
@@ -219,7 +219,7 @@ void ActivityWidget::onSessionCurrentTimeSheetChanged()
     {
         mUi->dteStartedAt->setDateTime(mSession->currentTimeSheet()->beginAt);
         mUi->pteDescription->setPlainText(mSession->currentTimeSheet()->description);
-        mUi->leTags->setText(mSession->currentTimeSheet()->tags.join(','));
+        //        mUi->leTags->setText(mSession->currentTimeSheet()->tags.join(','));
     }
 
     updateControls();
@@ -269,7 +269,7 @@ void ActivityWidget::onBtStartStopClicked()
         timeSheet.project.id  = mUi->cbProject->currentData().toInt();
         timeSheet.activity.id = mUi->cbActivity->currentData().toInt();
         timeSheet.description = mUi->pteDescription->toPlainText();
-        timeSheet.tags        = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
+        //        timeSheet.tags        = mUi->leTags->text().split(',', Qt::SkipEmptyParts);
 
         auto timeSheetResult = mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
 

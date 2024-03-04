@@ -65,6 +65,22 @@ void KimaiCache::synchronize(const std::shared_ptr<KimaiClient>& client, const s
             connect(timeSheetsResult, &KimaiApiBaseResult::error, this, [this, timeSheetsResult] { processRecentTimeSheetsResult(timeSheetsResult); });
         }
         break;
+
+        case Category::Tags: {
+            mTags.clear();
+            auto tagsResult = client->requestTags();
+            connect(tagsResult, &KimaiApiBaseResult::ready, this, [this, tagsResult] { processTagsResult(tagsResult); });
+            connect(tagsResult, &KimaiApiBaseResult::error, this, [this, tagsResult] { processTagsResult(tagsResult); });
+        }
+        break;
+
+        case Category::MetaFields: {
+            mMetaFields.clear();
+            auto metaFieldsResult = client->requestMetaFields();
+            connect(metaFieldsResult, &KimaiApiBaseResult::ready, this, [this, metaFieldsResult] { processMetaFieldsResult(metaFieldsResult); });
+            connect(metaFieldsResult, &KimaiApiBaseResult::error, this, [this, metaFieldsResult] { processMetaFieldsResult(metaFieldsResult); });
+        }
+        break;
         }
     }
 }
@@ -108,6 +124,11 @@ Activities KimaiCache::activities(std::optional<int> projectId) const
 TimeSheets KimaiCache::recentTimeSheets() const
 {
     return mRecentTimeSheets;
+}
+
+Tags KimaiCache::tags() const
+{
+    return mTags;
 }
 
 void KimaiCache::updateSyncProgress(Category finishedCategory)
@@ -162,4 +183,24 @@ void KimaiCache::processRecentTimeSheetsResult(TimeSheetsResult timeSheetsResult
     }
     timeSheetsResult->deleteLater();
     updateSyncProgress(Category::RecentTimeSheets);
+}
+
+void KimaiCache::processTagsResult(TagsResult tagsResult)
+{
+    if (!tagsResult->hasError())
+    {
+        mTags = tagsResult->takeResult();
+    }
+    tagsResult->deleteLater();
+    updateSyncProgress(Category::Tags);
+}
+
+void KimaiCache::processMetaFieldsResult(MetaFieldsResult metaFieldsResult)
+{
+    if (!metaFieldsResult->hasError())
+    {
+        mMetaFields = metaFieldsResult->takeResult();
+    }
+    metaFieldsResult->deleteLater();
+    updateSyncProgress(Category::MetaFields);
 }

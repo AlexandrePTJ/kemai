@@ -12,7 +12,8 @@ namespace kemai {
 enum class ApiPlugin
 {
     Unknown,
-    TaskManagement
+    TaskManagement,
+    MetaFields
 };
 
 // reply structs
@@ -21,7 +22,7 @@ struct KimaiVersion
     QVersionNumber kimai;
 };
 
-using Tags = QStringList;
+using Tags = std::vector<QString>;
 
 struct Customer
 {
@@ -141,6 +142,45 @@ struct TimeSheetConfig
 
     TrackingMode trackingMode = TrackingMode::Default;
 };
+
+struct MetaField
+{
+    enum class Type
+    {
+        Undefined,
+        String,
+        Integer,
+        Number,
+        Duration,
+        Money,
+        Language,
+        Currency,
+        Country,
+        Color,
+        Date,
+        DateTime,
+        Email,
+        Url,
+        TextArea,
+        Invoice,
+        Checkbox,
+        ChoiceList
+    };
+
+    int id;
+    QString name;
+    MetaField::Type type;
+    bool visible;
+    bool required;
+    QString label;
+    QString help;
+    QString defaultValue;
+    std::optional<int> customerId;
+    std::optional<int> projectId;
+    std::optional<int> activityId;
+    QString entityType;
+};
+using MetaFields = std::vector<MetaField>;
 
 ApiPlugin pluginByName(const QString& pluginName);
 

@@ -8,6 +8,10 @@ ApiPlugin pluginByName(const QString& pluginName)
     {
         return ApiPlugin::TaskManagement;
     }
+    if (pluginName == "MetaFieldsBundle")
+    {
+        return ApiPlugin::MetaFields;
+    }
     return ApiPlugin::Unknown;
 }
 
