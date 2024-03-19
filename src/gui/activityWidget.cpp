@@ -251,8 +251,30 @@ void ActivityWidget::onHistoryTimeSheetStartRequested(const TimeSheet& timeSheet
     }
     else
     {
+        fillFromTimesheet(timeSheet);
         startPendingTimeSheet();
     }
+}
+
+void ActivityWidget::onHistoryTimeSheetFillRequested(const TimeSheet& timeSheet)
+{
+    //mPendingStartRequest = timeSheet;
+
+    if (mSession->hasCurrentTimeSheet())
+    {
+        stopCurrentTimeSheet();
+    }
+    fillFromTimesheet(timeSheet);
+}
+
+void ActivityWidget::fillFromTimesheet(const TimeSheet& timeSheet)
+{
+    mUi->cbCustomer->setCurrentIndex(mUi->cbCustomer->findData(timeSheet.project.customer.id));
+    updateProjectsCombo();
+    mUi->cbProject->setCurrentIndex(mUi->cbProject->findData(timeSheet.project.id));
+    mUi->cbActivity->setCurrentIndex(mUi->cbActivity->findData(timeSheet.activity.id));
+    mUi->pteDescription->setPlainText(timeSheet.description);
+    mUi->leTags->setText(timeSheet.tags.join(","));
 }
 
 void ActivityWidget::onBtStartStopClicked()
@@ -402,6 +424,7 @@ void ActivityWidget::updateRecentTimeSheetsView()
         mUi->lwHistory->setItemWidget(item, timeSheetListWidgetItem);
 
         connect(timeSheetListWidgetItem, &TimeSheetListWidgetItem::timeSheetStartRequested, this, &ActivityWidget::onHistoryTimeSheetStartRequested);
+        connect(timeSheetListWidgetItem, &TimeSheetListWidgetItem::timeSheetFillRequested, this, &ActivityWidget::onHistoryTimeSheetFillRequested);
     }
 }
 

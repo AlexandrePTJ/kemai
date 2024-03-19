@@ -22,6 +22,7 @@ public:
 
 signals:
     void timeSheetStartRequested(const TimeSheet& timeSheet);
+    void timeSheetFillRequested(const TimeSheet& timeSheet);
 
 private:
     std::unique_ptr<Ui::TimeSheetListWidgetItem> mUi;
