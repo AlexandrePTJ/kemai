@@ -258,8 +258,6 @@ void ActivityWidget::onHistoryTimeSheetStartRequested(const TimeSheet& timeSheet
 
 void ActivityWidget::onHistoryTimeSheetFillRequested(const TimeSheet& timeSheet)
 {
-    //mPendingStartRequest = timeSheet;
-
     if (mSession->hasCurrentTimeSheet())
     {
         stopCurrentTimeSheet();
