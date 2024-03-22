@@ -229,7 +229,7 @@
              <item>
               <widget class="QToolButton" name="addProfileButton">
                <property name="icon">
-                <iconset resource="../resources/icons.qrc">
+                <iconset resource="../resources/kemai.qrc">
                  <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
                </property>
               </widget>
@@ -256,7 +256,7 @@
                 <bool>false</bool>
                </property>
                <property name="icon">
-                <iconset resource="../resources/icons.qrc">
+                <iconset resource="../resources/kemai.qrc">
                  <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
                </property>
               </widget>
@@ -402,7 +402,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resources/icons.qrc"/>
+  <include location="../resources/kemai.qrc"/>
  </resources>
  <connections>
   <connection>

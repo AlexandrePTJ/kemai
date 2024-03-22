@@ -16,6 +16,7 @@ TimeSheetListWidgetItem::TimeSheetListWidgetItem(const TimeSheet& timeSheet, QWi
     mUi->lbStartedAt->setText(timeSheet.beginAt.toString(Qt::ISODate));
 
     connect(mUi->btStart, &QPushButton::clicked, [this]() { emit timeSheetStartRequested(mTimeSheet); });
+    connect(mUi->btFill, &QPushButton::clicked, [this]() { emit timeSheetFillRequested(mTimeSheet); });
 }
 
 TimeSheetListWidgetItem::~TimeSheetListWidgetItem() = default;

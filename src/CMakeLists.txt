@@ -110,6 +110,8 @@ set(RESX
         resources/kemai.qrc
         ${KEMAI_L10N_QRC})
 
+qt_add_resources(${PROJECT_NAME} ${RESX})
+
 # OS Specifics
 if (WIN32)
     list(APPEND SRCS
