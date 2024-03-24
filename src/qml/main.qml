@@ -6,7 +6,14 @@ import QtQuick.Window
 
 ApplicationWindow {
     id: window
-    width: 400
-    height: 500
+    width: 500
+    height: 400
     visible: true
+
+    ListView {
+        id: timeSheetHistoryView
+        anchors.fill: parent
+        model: TimeSheetModel {}
+        delegate: TimeSheetDelegate {}
+    }
 }

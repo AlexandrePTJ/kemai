@@ -93,7 +93,10 @@ set(UIS
         gui/timeSheetListWidgetItem.ui)
 
 set(QMLS
-        qml/main.qml)
+        qml/main.qml
+        qml/TimeSheetDelegate.qml
+        qml/TimeSheetModel.qml
+)
 
 
 # Localization
