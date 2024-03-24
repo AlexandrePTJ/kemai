@@ -1,6 +1,14 @@
 project(Kemai)
 
-add_executable(${PROJECT_NAME} ${OS_BUNDLE})
+qt_add_executable(${PROJECT_NAME})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE TRUE
+        MACOSX_BUNDLE TRUE
+        AUTOMOC ON
+        AUTOUIC ON
+        AUTORCC ON
+)
 
 configure_file(kemaiConfig.h.in ${PROJECT_BINARY_DIR}/kemaiConfig.h)
 
@@ -84,6 +92,9 @@ set(UIS
         gui/taskWidget.ui
         gui/timeSheetListWidgetItem.ui)
 
+set(QMLS
+        qml/main.qml)
+
 
 # Localization
 include(LocalizationTools)
@@ -112,6 +123,8 @@ set(RESX
         ${KEMAI_L10N_QRC})
 
 qt_add_resources(${PROJECT_NAME} ${RESX})
+qt_add_resources(${PROJECT_NAME} "qml" PREFIX "/kemai/" FILES ${QMLS})
+qt_add_resources(${PROJECT_NAME} "controls_conf" PREFIX "/" FILES "qtquickcontrols2.conf")
 
 # OS Specifics
 if (WIN32)
@@ -120,7 +133,7 @@ if (WIN32)
             monitor/windowsDesktopEventsMonitor.cpp)
     list(APPEND HDRS
             monitor/windowsDesktopEventsMonitor.h)
-    target_link_libraries(${PROJECT_NAME} Wtsapi32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Wtsapi32)
 elseif (APPLE)
     list(APPEND SRCS
             monitor/macDesktopEventsMonitor.mm)
@@ -129,16 +142,16 @@ elseif (APPLE)
     set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/kemai.icns")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/bundle/macos/Info.plist)
-    target_link_libraries(${PROJECT_NAME} "-framework CoreGraphics")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreGraphics")
 elseif (UNIX)
     list(APPEND SRCS
             monitor/linuxDesktopEventsMonitor.cpp)
     list(APPEND HDRS
             monitor/linuxDesktopEventsMonitor.h)
-    target_link_libraries(${PROJECT_NAME} Xss X11)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Xss X11)
 endif ()
 
 # Target configuration
 target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX} ${KEMAI_ICNS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} Qt::Widgets Qt::Network spdlog::spdlog magic_enum::magic_enum range-v3::range-v3)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Widgets Qt::Network Qt::QuickControls2 spdlog::spdlog magic_enum::magic_enum range-v3::range-v3)

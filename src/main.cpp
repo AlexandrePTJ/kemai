@@ -1,5 +1,7 @@
 #include <QApplication>
+#include <QGuiApplication>
 #include <QLibraryInfo>
+#include <QQmlApplicationEngine>
 #include <QTranslator>
 #include <QTreeView>
 
@@ -19,7 +21,7 @@ using namespace kemai;
 
 static constinit const auto MaxLogFileSize = 1024 * 102 * 5;
 
-void myMessageOutput(QtMsgType type, const QMessageLogContext& /*context*/, const QString& msg)
+void kemaiQtMessageOutput(QtMsgType type, const QMessageLogContext& /*context*/, const QString& msg)
 {
     switch (type)
     {
@@ -41,7 +43,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext& /*context*/, cons
 
 int main(int argc, char* argv[])
 {
-    qInstallMessageHandler(myMessageOutput);
+    qInstallMessageHandler(kemaiQtMessageOutput);
 
     QApplication app(argc, argv);
     QApplication::setApplicationName("Kemai");
@@ -84,10 +86,18 @@ int main(int argc, char* argv[])
     KimaiClient::addTrustedCertificates(kemaiSettings.trustedCertificates);
 
     // Startup
-    MainWindow mainWindow;
-    mainWindow.restoreGeometry(kemaiSettings.kemai.geometry);
-    mainWindow.setLoggerTreeModel(loggerTreeModel);
-    mainWindow.show();
+    QQmlApplicationEngine engine;
+    const QUrl url("qrc:/kemai/qml/main.qml");
+    QObject::connect(
+        &engine, &QQmlApplicationEngine::objectCreated, &app,
+        [url](QObject* obj, const QUrl& objUrl) {
+            if (obj == nullptr && url == objUrl)
+            {
+                QCoreApplication::exit(-1);
+            }
+        },
+        Qt::QueuedConnection);
+    engine.load(url);
 
     return QApplication::exec();
 }
