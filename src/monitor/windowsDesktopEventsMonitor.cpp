@@ -49,11 +49,7 @@ void WindowsDesktopEventsMonitor::stop()
         WTSUnRegisterSessionNotification((HWND)mListenerWidget->winId());
     }
 }
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-bool WindowsDesktopEventsMonitor::nativeEventFilter(const QByteArray& eventType, void* message, long* /*result*/)
-#else
 bool WindowsDesktopEventsMonitor::nativeEventFilter(const QByteArray& eventType, void* message, qintptr* /*result*/)
-#endif //
 {
     if (eventType != "windows_generic_MSG" || !mEventsSettings.stopOnLock)
     {
