@@ -29,5 +29,22 @@ ItemDelegate {
             id: endDateTimeLabel
             text: model.endDateTime
         }
+        Label {
+            id: durationLabel
+            text: model.duration
+            font.bold: true
+        }
+        RoundButton {
+            id: reloadButton
+            width: 20
+            height: 20
+            icon.source: "qrc:/icons/refresh"
+        }
+        RoundButton {
+            id: restartButton
+            width: 20
+            height: 20
+            icon.source: "qrc:/icons/play"
+        }
     }
 }

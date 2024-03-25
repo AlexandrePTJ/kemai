@@ -13,7 +13,7 @@ ApplicationWindow {
     ListView {
         id: timeSheetHistoryView
         anchors.fill: parent
-        model: TimeSheetModel {}
+        model: timeSheetModel
         delegate: TimeSheetDelegate {}
     }
 }

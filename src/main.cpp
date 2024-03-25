@@ -15,6 +15,7 @@
 #include "misc/customFmt.h"
 #include "misc/helpers.h"
 #include "models/loggerTreeModel.h"
+#include "models/timeSheetModel.h"
 #include "settings/settings.h"
 
 using namespace kemai;
@@ -85,8 +86,12 @@ int main(int argc, char* argv[])
     // Setup trusted certificates
     KimaiClient::addTrustedCertificates(kemaiSettings.trustedCertificates);
 
+    TimeSheetModel timeSheetModel;
+
     // Startup
     QQmlApplicationEngine engine;
+    engine.setInitialProperties({{"timeSheetModel", QVariant::fromValue(&timeSheetModel)}});
+    
     const QUrl url("qrc:/kemai/qml/main.qml");
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated, &app,

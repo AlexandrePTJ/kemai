@@ -40,6 +40,7 @@ set(SRCS
         models/loggerTreeModel.cpp
         models/taskFilterProxyModel.cpp
         models/taskListModel.cpp
+        models/timeSheetModel.cpp
         monitor/desktopEventsMonitor.cpp
         monitor/kimaiEventsMonitor.cpp
         settings/settings.cpp
@@ -73,6 +74,7 @@ set(HDRS
         models/loggerTreeModel.h
         models/taskFilterProxyModel.h
         models/taskListModel.h
+        models/timeSheetModel.h
         monitor/desktopEventsMonitor.h
         monitor/kimaiEventsMonitor.h
         settings/settings.h
