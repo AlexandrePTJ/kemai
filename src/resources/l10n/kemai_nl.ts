@@ -173,7 +173,7 @@
     <message>
         <location filename="../../gui/mainWindow.ui" line="14"/>
         <source>Kemai - Kimai client</source>
-        <translation>Kemai - Kimai client</translation>
+        <translation>Kemai - Kimai cliënt</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.ui" line="48"/>
@@ -275,7 +275,7 @@
     <message>
         <location filename="../../gui/settingsDialog.ui" line="124"/>
         <source>Idle delay (minutes)</source>
-        <translation type="unfinished">Inactiviteitsvertraging (minuten)</translation>
+        <translation>Vertraging bij inactiviteit (minuten)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="164"/>
