@@ -9,6 +9,7 @@ set(SRCS
         client/kimaiAPI.cpp
         client/kimaiCache.cpp
         client/kimaiClient.cpp
+        client/kimaiFeatures.cpp
         client/kimaiReply.cpp
         client/parser.cpp
         context/kemaiSession.cpp
@@ -42,6 +43,7 @@ set(HDRS
         client/kimaiCache.h
         client/kimaiClient.h
         client/kimaiClient_p.h
+        client/kimaiFeatures.h
         client/kimaiReply.h
         client/parser.h
         context/kemaiSession.h

@@ -115,7 +115,7 @@ public:
 
     void onNamSslErrors(QNetworkReply* reply, const QList<QSslError>& errors);
 
-    QString username, host, token;
+    QString username, host, token, apiToken;
     QScopedPointer<QNetworkAccessManager> networkAccessManager;
 
 private:

@@ -8,7 +8,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMutex>
-#include <QMutexLocker>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -20,7 +19,8 @@ using namespace kemai;
 static const auto gCfgVersion_0      = 0; // Ini format
 static const auto gCfgVersion_1      = 1; // Migrate to JSON
 static const auto gCfgVersion_2      = 2; // Add AutoRefreshCurrentTimeSheet setting
-static const auto gCurrentCfgVersion = gCfgVersion_2;
+static const auto gCfgVersion_3      = 3; // Add API Token to profile
+static const auto gCurrentCfgVersion = gCfgVersion_3;
 
 /*
  * Global settings instance to avoid json reload
@@ -85,8 +85,12 @@ bool Settings::isReady() const
 {
     if (!profiles.isEmpty())
     {
-        auto profile = profiles.first();
-        return !profile.host.isEmpty() && !profile.username.isEmpty() && !profile.token.isEmpty();
+        const auto profile        = profiles.first();
+        const auto haveHost       = !profile.host.isEmpty();
+        const auto haveLegacyAuth = !profile.username.isEmpty() && !profile.token.isEmpty();
+        const auto haveAPIToken   = !profile.apiToken.isEmpty();
+
+        return haveHost && (haveLegacyAuth || haveAPIToken);
     }
     return false;
 }
@@ -166,6 +170,12 @@ Settings Settings::get()
         profile.host     = profileObject.value("host").toString();
         profile.username = profileObject.value("username").toString();
         profile.token    = profileObject.value("token").toString();
+
+        if (cfgVersion >= gCfgVersion_3)
+        {
+            profile.apiToken = profileObject.value("apiToken").toString();
+        }
+
         gSettings->profiles << profile;
     }
 
@@ -199,6 +209,7 @@ void Settings::save(const Settings& settings)
         profileObject["host"]     = profile.host;
         profileObject["username"] = profile.username;
         profileObject["token"]    = profile.token;
+        profileObject["apiToken"] = profile.apiToken;
         profilesArray.append(profileObject);
     }
 

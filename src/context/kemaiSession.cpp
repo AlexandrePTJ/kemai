@@ -4,14 +4,10 @@
 
 #include <QTimeZone>
 
+#include "client/kimaiFeatures.h"
 #include "misc/customFmt.h"
 
 using namespace kemai;
-
-/*
- * Static helpers
- */
-static const auto MinimalKimaiVersionForPluginRequest = QVersionNumber(1, 14, 1);
 
 /*
  * Class impl
@@ -128,8 +124,7 @@ void KemaiSession::requestVersion()
     connect(versionResult, &KimaiApiBaseResult::ready, this, [this, versionResult]() {
         mKimaiVersion = versionResult->getResult().kimai;
         emit versionChanged();
-        // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.1
-        if (mKimaiVersion >= MinimalKimaiVersionForPluginRequest)
+        if (KimaiFeatures::canRequestPlugins(mKimaiVersion))
         {
             requestPlugins();
         }

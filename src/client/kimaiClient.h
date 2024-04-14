@@ -34,8 +34,11 @@ public:
     ~KimaiClient() override;
 
     void setHost(const QString& host);
-    void setUsername(const QString& username);
-    void setToken(const QString& token);
+
+    void setLegacyAuth(const QString& username, const QString& token);
+    bool isUsingLegacyAuth() const;
+
+    void setAPIToken(const QString& token);
 
     VersionRequestResult requestKimaiVersion();
     MeRequestResult requestMeUserInfo();

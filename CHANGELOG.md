@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 - Template button to reload previous timesheet without starting it (Thanks to @poelzi)
+- Allow usage of API Token for kimai>=2.14.0
 
 
 ## [0.10.0] - 2023-07-17
