@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fix combo selection after model rest (Thanks to @virtulis)
+
 ## Added
 - Template button to reload previous timesheet without starting it (Thanks to @poelzi)
 - Allow usage of API Token for kimai>=2.14.0
