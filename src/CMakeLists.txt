@@ -20,6 +20,7 @@ set(SRCS
         gui/customerDialog.cpp
         gui/durationEdit.cpp
         gui/loggerWidget.cpp
+        gui/loginDialog.cpp
         gui/mainWindow.cpp
         gui/projectDialog.cpp
         gui/settingsDialog.cpp
@@ -54,6 +55,7 @@ set(HDRS
         gui/customerDialog.h
         gui/durationEdit.h
         gui/loggerWidget.h
+        gui/loginDialog.h
         gui/mainWindow.h
         gui/projectDialog.h
         gui/settingsDialog.h
@@ -80,6 +82,7 @@ set(UIS
         gui/activityWidget.ui
         gui/customerDialog.ui
         gui/loggerWidget.ui
+        gui/loginDialog.ui
         gui/mainWindow.ui
         gui/projectDialog.ui
         gui/settingsDialog.ui

@@ -8,6 +8,7 @@
 #include <spdlog/spdlog.h>
 
 #include "client/kimaiClient.h"
+#include "gui/loginDialog.h"
 #include "gui/mainWindow.h"
 #include "kemaiConfig.h"
 #include "misc/customFmt.h"
@@ -91,6 +92,10 @@ int main(int argc, char* argv[])
 
     // Setup trusted certificates
     KimaiClient::addTrustedCertificates(kemaiSettings.trustedCertificates);
+
+    LoginDialog loginDialog;
+    loginDialog.exec();
+    return 0;
 
     // Startup
     MainWindow mainWindow;

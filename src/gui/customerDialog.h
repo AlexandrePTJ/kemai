@@ -1,3 +1,10 @@
+/*
+ * Copyright Kemai authors
+ * Distributed under the MIT License.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #pragma once
 
 #include <memory>
