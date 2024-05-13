@@ -169,6 +169,44 @@
     </message>
 </context>
 <context>
+    <name>LoginDialog</name>
+    <message>
+        <location filename="../../gui/loginDialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/loginDialog.ui" line="80"/>
+        <source>Host</source>
+        <translation type="unfinished">Server</translation>
+    </message>
+    <message>
+        <location filename="../../gui/loginDialog.ui" line="92"/>
+        <source>...</source>
+        <translation type="unfinished">...</translation>
+    </message>
+    <message>
+        <location filename="../../gui/loginDialog.ui" line="101"/>
+        <source>User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/loginDialog.ui" line="111"/>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/loginDialog.ui" line="121"/>
+        <source>CheckBox</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/loginDialog.ui" line="143"/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="../../gui/mainWindow.ui" line="14"/>
@@ -212,8 +250,8 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../client/kimaiClient_p.h" line="76"/>
-        <location filename="../../client/kimaiClient_p.h" line="106"/>
+        <location filename="../../client/kimaiClient_p.h" line="77"/>
+        <location filename="../../client/kimaiClient_p.h" line="107"/>
         <source>Error on request [%1]: %2
 %3</source>
         <translation>Fehler auf Anfrage [%1]: %2
@@ -288,29 +326,39 @@
         <translation>Aktuelle Zeiterfassung automatisch aktualisieren</translation>
     </message>
     <message>
-        <location filename="../../gui/settingsDialog.ui" line="273"/>
+        <location filename="../../gui/settingsDialog.ui" line="275"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../../gui/settingsDialog.ui" line="293"/>
+        <location filename="../../gui/settingsDialog.ui" line="295"/>
         <source>Host</source>
         <translation>Server</translation>
     </message>
     <message>
-        <location filename="../../gui/settingsDialog.ui" line="310"/>
+        <location filename="../../gui/settingsDialog.ui" line="312"/>
         <source>Username</source>
         <translation>Benutzername</translation>
     </message>
     <message>
-        <location filename="../../gui/settingsDialog.ui" line="324"/>
+        <location filename="../../gui/settingsDialog.ui" line="326"/>
         <source>Token</source>
         <translation>API Passwort</translation>
     </message>
     <message>
-        <location filename="../../gui/settingsDialog.ui" line="365"/>
+        <location filename="../../gui/settingsDialog.ui" line="343"/>
+        <source>API Token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/settingsDialog.ui" line="386"/>
         <source>Test</source>
         <translation>Testen</translation>
+    </message>
+    <message>
+        <location filename="../../gui/settingsDialog.ui" line="410"/>
+        <source>Starting from kimai 2.14, API Token is recommended.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -349,24 +397,34 @@
         <translation>Formular</translation>
     </message>
     <message>
-        <location filename="../../gui/timeSheetListWidgetItem.ui" line="75"/>
+        <location filename="../../gui/timeSheetListWidgetItem.ui" line="128"/>
         <source>Activity</source>
         <translation>Tätigkeit</translation>
     </message>
     <message>
-        <location filename="../../gui/timeSheetListWidgetItem.ui" line="129"/>
+        <location filename="../../gui/timeSheetListWidgetItem.ui" line="105"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <location filename="../../gui/timeSheetListWidgetItem.ui" line="141"/>
+        <location filename="../../gui/timeSheetListWidgetItem.ui" line="70"/>
         <source>StartedAt</source>
         <translation>Gestartet am</translation>
     </message>
     <message>
-        <location filename="../../gui/timeSheetListWidgetItem.ui" line="161"/>
+        <location filename="../../gui/timeSheetListWidgetItem.ui" line="90"/>
         <source>duration</source>
         <translation>Dauer</translation>
+    </message>
+    <message>
+        <location filename="../../gui/timeSheetListWidgetItem.ui" line="151"/>
+        <source>Use as template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/timeSheetListWidgetItem.ui" line="180"/>
+        <source>Start again</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -390,88 +448,98 @@
 <context>
     <name>kemai::MainWindow</name>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="44"/>
+        <location filename="../../gui/mainWindow.cpp" line="45"/>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="45"/>
+        <location filename="../../gui/mainWindow.cpp" line="46"/>
         <source>&amp;Settings</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="46"/>
+        <location filename="../../gui/mainWindow.cpp" line="47"/>
         <source>Check for updates...</source>
         <translation>Auf Aktualisierungen überprüfen...</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="47"/>
+        <location filename="../../gui/mainWindow.cpp" line="48"/>
         <source>Open Kimai instance</source>
         <translation>Öffne Kimai im Browser</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="48"/>
+        <location filename="../../gui/mainWindow.cpp" line="49"/>
         <source>Activities</source>
         <translation>Tätigkeiten</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="49"/>
+        <location filename="../../gui/mainWindow.cpp" line="50"/>
         <source>Tasks</source>
         <translation>Aufgaben</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="50"/>
+        <location filename="../../gui/mainWindow.cpp" line="51"/>
         <source>Refresh cache</source>
         <translation>Cache aktualisieren</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="51"/>
+        <location filename="../../gui/mainWindow.cpp" line="52"/>
         <source>About Kemai</source>
         <translation>Über Kemai</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="52"/>
+        <location filename="../../gui/mainWindow.cpp" line="53"/>
         <source>Show logs</source>
         <translation>Protokoll anzeigen</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="83"/>
+        <location filename="../../gui/mainWindow.cpp" line="84"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="88"/>
+        <location filename="../../gui/mainWindow.cpp" line="89"/>
         <source>&amp;Profile</source>
         <translation>&amp;Profil</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="92"/>
+        <location filename="../../gui/mainWindow.cpp" line="93"/>
         <source>&amp;View</source>
         <translation>&amp;Ansehen</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="96"/>
+        <location filename="../../gui/mainWindow.cpp" line="97"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="105"/>
+        <location filename="../../gui/mainWindow.cpp" line="106"/>
         <source>About Qt</source>
         <translation>Über Qt</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="136"/>
-        <location filename="../../gui/mainWindow.cpp" line="228"/>
+        <location filename="../../gui/mainWindow.cpp" line="137"/>
+        <location filename="../../gui/mainWindow.cpp" line="229"/>
         <source>Not connected</source>
         <translation>Nicht verbunden</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="458"/>
+        <location filename="../../gui/mainWindow.cpp" line="380"/>
+        <source> - API Token is now recommended. Please migrate your credentials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/mainWindow.cpp" line="383"/>
+        <source>Kimai %1%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../gui/mainWindow.cpp" line="465"/>
         <source>New version available</source>
         <translation>Neue Version verfügbar</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="458"/>
+        <location filename="../../gui/mainWindow.cpp" line="465"/>
         <source>Version %1 is available.
 
 %2</source>
@@ -480,12 +548,12 @@
 %2</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="480"/>
+        <location filename="../../gui/mainWindow.cpp" line="487"/>
         <source>No update</source>
         <translation>Kein Update</translation>
     </message>
     <message>
-        <location filename="../../gui/mainWindow.cpp" line="480"/>
+        <location filename="../../gui/mainWindow.cpp" line="487"/>
         <source>%1 is latest version.</source>
         <translation>%1 ist die aktuellste Version.</translation>
     </message>
@@ -493,12 +561,12 @@
 <context>
     <name>kemai::SettingsDialog</name>
     <message>
-        <location filename="../../gui/settingsDialog.cpp" line="67"/>
+        <location filename="../../gui/settingsDialog.cpp" line="82"/>
         <source>Language changed. Application restart is required.</source>
         <translation>Sprache wurde gewechselt, das Programm muss neu gestartet werden.</translation>
     </message>
     <message>
-        <location filename="../../gui/settingsDialog.cpp" line="189"/>
+        <location filename="../../gui/settingsDialog.cpp" line="209"/>
         <source>Connected to Kimai %1</source>
         <translation>Verbunden mit Kimai %1</translation>
     </message>

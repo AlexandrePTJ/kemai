@@ -1,6 +1,8 @@
 project(Kemai)
 
-add_executable(${PROJECT_NAME} ${OS_BUNDLE})
+qt_standard_project_setup(
+        I18N_TRANSLATED_LANGUAGES cs de el fr hr it nb_NO nl tr
+        I18N_SOURCE_LANGUAGE en)
 
 configure_file(kemaiConfig.h.in ${PROJECT_BINARY_DIR}/kemaiConfig.h)
 
@@ -89,61 +91,64 @@ set(UIS
         gui/taskWidget.ui
         gui/timeSheetListWidgetItem.ui)
 
-
-# Localization
-include(LocalizationTools)
-set(KEMAI_TS_FILES
-        resources/l10n/kemai_cs.ts
-        resources/l10n/kemai_de.ts
-        resources/l10n/kemai_el.ts
-        resources/l10n/kemai_fr.ts
-        resources/l10n/kemai_hr.ts
-        resources/l10n/kemai_it.ts
-        resources/l10n/kemai_nb_NO.ts
-        resources/l10n/kemai_nl.ts
-        resources/l10n/kemai_tr.ts)
-qt_add_translation(KEMAI_QM_FILES ${KEMAI_TS_FILES})
-add_qm_files_to_qrc(KEMAI_L10N_QRC ${KEMAI_QM_FILES})
-
-# Update .ts files on demand
-get_target_property(_lupdate_executable Qt::lupdate IMPORTED_LOCATION)
-add_custom_target(kemai-update-ts COMMAND
-        ${_lupdate_executable} -no-obsolete ${CMAKE_CURRENT_SOURCE_DIR} -ts ${KEMAI_TS_FILES}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
-# Resources
-set(RESX
-        resources/kemai.qrc
-        ${KEMAI_L10N_QRC})
-
-qt_add_resources(${PROJECT_NAME} ${RESX})
-
 # OS Specifics
+set(KEMAI_ADDITIONAL_LIBS)
 if (WIN32)
     list(APPEND SRCS
             ${CMAKE_SOURCE_DIR}/bundle/windows/kemai.rc
             monitor/windowsDesktopEventsMonitor.cpp)
     list(APPEND HDRS
             monitor/windowsDesktopEventsMonitor.h)
-    target_link_libraries(${PROJECT_NAME} Wtsapi32)
+    list(APPEND KEMAI_ADDITIONAL_LIBS
+            Wtsapi32)
 elseif (APPLE)
     list(APPEND SRCS
             monitor/macDesktopEventsMonitor.mm)
     list(APPEND HDRS
             monitor/macDesktopEventsMonitor.h)
+
     set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/kemai.icns")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/bundle/macos/Info.plist)
-    target_link_libraries(${PROJECT_NAME} "-framework CoreGraphics")
+    qt_add_resources(RESX ${KEMAI_ICNS})
+
+    list(APPEND KEMAI_ADDITIONAL_LIBS "-framework CoreGraphics")
 elseif (UNIX)
     list(APPEND SRCS
             monitor/linuxDesktopEventsMonitor.cpp)
     list(APPEND HDRS
             monitor/linuxDesktopEventsMonitor.h)
-    target_link_libraries(${PROJECT_NAME} Xss X11)
+    list(APPEND KEMAI_ADDITIONAL_LIBS
+            Xss X11)
 endif ()
 
 # Target configuration
-target_sources(${PROJECT_NAME} PRIVATE ${SRCS} ${HDRS} ${UIS} ${RESX} ${KEMAI_ICNS})
+qt_add_resources(RESX
+        resources/kemai.qrc)
+
+qt_add_executable(${PROJECT_NAME}
+        WIN32 MACOSX_BUNDLE
+        ${SRCS} ${HDRS} ${UIS} ${RESX})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/bundle/macos/Info.plist)
+
+qt_add_translations(
+        TARGETS ${PROJECT_NAME}
+        TS_FILE_DIR resources/l10n
+        RESOURCE_PREFIX l10n)
+
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} Qt::Widgets Qt::Network spdlog::spdlog magic_enum::magic_enum range-v3::range-v3)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Widgets Qt::Network spdlog::spdlog magic_enum::magic_enum range-v3::range-v3 ${KEMAI_ADDITIONAL_LIBS})
+
+# Install configuration
+install(TARGETS ${PROJECT_NAME}
+        BUNDLE DESTINATION .
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+qt_generate_deploy_app_script(
+        TARGET ${PROJECT_NAME}
+        OUTPUT_SCRIPT deploy_script
+        NO_UNSUPPORTED_PLATFORM_ERROR)
+
+install(SCRIPT ${deploy_script})
