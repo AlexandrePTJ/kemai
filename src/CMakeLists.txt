@@ -136,7 +136,6 @@ qt_add_translations(
         TS_FILE_DIR resources/l10n
         RESOURCE_PREFIX l10n)
 
-
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Widgets Qt::Network spdlog::spdlog magic_enum::magic_enum range-v3::range-v3 ${KEMAI_ADDITIONAL_LIBS})

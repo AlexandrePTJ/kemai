@@ -17,19 +17,10 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make
     mUi->setupUi(this);
     mUi->formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    connect(mUi->cbCustomer, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbCustomerFieldChanged(); });
-    connect(mUi->cbCustomer, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbCustomerFieldChanged(); });
-    connect(mUi->cbProject, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbProjectFieldChanged(); });
-    connect(mUi->cbProject, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbProjectFieldChanged(); });
-    connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, [this](const QString&) { onCbActivityFieldChanged(); });
-    connect(mUi->cbActivity, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) { onCbActivityFieldChanged(); });
-#else
     connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbProjectFieldChanged);
     connect(mUi->cbProject, &QComboBox::currentIndexChanged, this, &ActivityWidget::onCbProjectFieldChanged);
     connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbActivityFieldChanged);
     connect(mUi->cbActivity, &QComboBox::currentIndexChanged, this, &ActivityWidget::onCbActivityFieldChanged);
-#endif
     connect(mUi->tbAddProject, &QToolButton::clicked, this, &ActivityWidget::onTbAddProjectClicked);
     connect(mUi->tbAddActivity, &QToolButton::clicked, this, &ActivityWidget::onTbAddActivityClicked);
     connect(mUi->btStartStop, &QPushButton::clicked, this, &ActivityWidget::onBtStartStopClicked);

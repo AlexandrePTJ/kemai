@@ -16,12 +16,7 @@ public:
     void initialize(const Settings::Events& eventsSettings) override;
     void start() override;
     void stop() override;
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    bool nativeEventFilter(const QByteArray& eventType, void* message, long* result) override;
-#else
     bool nativeEventFilter(const QByteArray& eventType, void* message, qintptr* result) override;
-#endif //
 
 private:
     void onPollTimeout();

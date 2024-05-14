@@ -1,17 +1,16 @@
 name: CI
 on: [push, workflow_dispatch]
 
+env:
+  qt_version: 6.7.0
+
 jobs:
   LinuxJob:
-    name: Ubuntu Qt-${{ matrix.qt_version }}
+    name: Ubuntu
     runs-on: ubuntu-latest
     env:
       CC: gcc-12
       CXX: g++-12
-    strategy:
-      fail-fast: false
-      matrix:
-        qt_version: [6.7.0, 5.15.2]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -19,10 +18,10 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
 
-      - name: Install Qt ${{ matrix.qt_version }}
+      - name: Install Qt ${{ env.qt_version }}
         uses: jurplel/install-qt-action@v3
         with:
-          version: ${{ matrix.qt_version }}
+          version: ${{ env.qt_version }}
           tools: 'tools_opensslv3_src'
           cache: true
           aqtversion: '==3.1.*'
@@ -30,8 +29,7 @@ jobs:
       - name: Install dev dependencies
         run: sudo apt install libxss-dev libxkbcommon-x11-dev libxcb-cursor0
 
-      - if: startsWith(matrix.qt_version, '6')
-        name: Build OpenSSLv3
+      - name: Build OpenSSLv3
         run: |
           cd $IQTA_TOOLS/OpenSSLv3/src
           ./Configure && make -j3
@@ -44,8 +42,7 @@ jobs:
         run: |
           cmake --build --preset release
 
-      - if: startsWith(matrix.qt_version, '6')
-        name: Create Linux package
+      - name: Create Linux package
         run: |
           sudo add-apt-repository universe
           sudo apt install libfuse2
@@ -53,7 +50,7 @@ jobs:
           ./bundle/linux/create_appimage.sh -q $Qt6_DIR -b cmake-build-release -o $IQTA_TOOLS/OpenSSLv3/src
 
       # Create release if on built on a tag
-      - if: startsWith(matrix.qt_version, '6') && startsWith(github.ref, 'refs/tags/')
+      - if: startsWith(github.ref, 'refs/tags/')
         name: Create/Update release
         uses: ncipollo/release-action@v1
         with:
@@ -62,7 +59,7 @@ jobs:
           artifacts: 'Kemai-*.AppImage'
 
   WindowsJob:
-    name: Windows Qt-6.7.0
+    name: Windows
     runs-on: windows-latest
     steps:
       - name: Checkout repo
@@ -74,7 +71,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.7.0'
+          version: ${{ env.qt_version }}
           tools: 'tools_opensslv3_x64'
           cache: true
           aqtversion: '==3.1.*'
@@ -104,7 +101,7 @@ jobs:
           artifacts: 'cmake-build-release-win/Kemai-*.msi'
 
   MacOSJob:
-    name: MacOS Qt-6.7.0
+    name: MacOS
     runs-on: macos-latest
     strategy:
       matrix:
@@ -119,7 +116,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.7.0'
+          version: ${{ env.qt_version }}
           cache: true
           aqtversion: '==3.1.*'
 

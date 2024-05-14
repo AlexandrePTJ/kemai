@@ -42,11 +42,6 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext& /*context*/, cons
 
 int main(int argc, char* argv[])
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
-    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-#endif
-
     qInstallMessageHandler(myMessageOutput);
 
     QApplication app(argc, argv);
@@ -75,11 +70,7 @@ int main(int argc, char* argv[])
 
     // Setup Qt and app translations
     QTranslator qtTranslator;
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    if (qtTranslator.load("qt_" + kemaiSettings.kemai.language.name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-#else
     if (qtTranslator.load("qt_" + kemaiSettings.kemai.language.name(), QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
-#endif
     {
         QApplication::installTranslator(&qtTranslator);
     }
