@@ -9,11 +9,15 @@ TimeSheetListWidgetItem::TimeSheetListWidgetItem(const TimeSheet& timeSheet, QWi
     : QWidget(parent), mTimeSheet(timeSheet), mUi(std::make_unique<Ui::TimeSheetListWidgetItem>())
 {
     mUi->setupUi(this);
-    mUi->frame->setFrameShape(QFrame::StyledPanel);
+
     mUi->lbActivity->setText(mTimeSheet.activity.name);
-    mUi->lbDescription->setText(mTimeSheet.project.name);
+
+    auto color = timeSheet.project.color.isEmpty() ? timeSheet.project.customer.color : timeSheet.project.color;
+    mUi->lbProject->setText(timeSheet.project.name);
+    mUi->lbProject->setStyleSheet(QString("QLabel { color : %1; }").arg(color));
+
     mUi->lbDuration->setText(helpers::getDurationString(timeSheet.beginAt, timeSheet.endAt));
-    mUi->lbStartedAt->setText(timeSheet.beginAt.toString(Qt::ISODate));
+    mUi->lbTimestamps->setText(timeSheet.beginAt.toString(Qt::ISODate));
 
     connect(mUi->btStart, &QPushButton::clicked, [this]() { emit timeSheetStartRequested(mTimeSheet); });
     connect(mUi->btFill, &QPushButton::clicked, [this]() { emit timeSheetFillRequested(mTimeSheet); });

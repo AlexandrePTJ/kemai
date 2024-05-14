@@ -93,10 +93,6 @@ int main(int argc, char* argv[])
     // Setup trusted certificates
     KimaiClient::addTrustedCertificates(kemaiSettings.trustedCertificates);
 
-    //    LoginDialog loginDialog;
-    //    loginDialog.exec();
-    //    return 0;
-
     // Startup
     MainWindow mainWindow;
     mainWindow.restoreGeometry(kemaiSettings.kemai.geometry);
