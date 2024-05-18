@@ -64,13 +64,13 @@ if (WIN32)
     set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt)
 elseif (APPLE)
     set(CPACK_GENERATOR DragNDrop)
+    install(FILES LICENSE.txt DESTINATION .)
 else ()
     install(FILES share/kemai.desktop
             DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
     install(FILES src/resources/icons/kimai.png
             DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps/)
+    install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/)
 endif ()
-
-install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/)
 
 include(CPack)
