@@ -107,9 +107,14 @@ elseif (APPLE)
     list(APPEND HDRS
             monitor/macDesktopEventsMonitor.h)
 
-    set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/kemai.icns")
+    # Set icons in Info.plist
+    set(MACOSX_BUNDLE_ICON_FILE kemai.icns)
+
+    # Tells cmake where to find icons
+    
+    set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/${MACOSX_BUNDLE_ICON_FILE}")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    qt_add_resources(RESX ${KEMAI_ICNS})
+    list(APPEND SRCS ${KEMAI_ICNS})
 
     list(APPEND KEMAI_ADDITIONAL_LIBS "-framework CoreGraphics")
 elseif (UNIX)
