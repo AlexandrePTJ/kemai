@@ -42,6 +42,10 @@ jobs:
         run: |
           cmake --build --preset release
 
+      - name: Create Linux package
+        run: |
+          cmake --build --preset release --target package
+
 #      - name: Create Linux package
 #        run: |
 #          sudo add-apt-repository universe
@@ -127,6 +131,10 @@ jobs:
       - name: Build
         run: |
           cmake --build --preset ${{ matrix.preset }}
+
+      - name: Create MacOS package from Qt
+        run: |
+          cmake --build --preset ${{ matrix.preset }} --target package
 
       - name: Create MacOS package
         run: |
