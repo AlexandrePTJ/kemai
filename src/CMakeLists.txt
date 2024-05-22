@@ -95,6 +95,7 @@ set(KEMAI_TS_FILES
         resources/l10n/kemai_el.ts
         resources/l10n/kemai_fr.ts
         resources/l10n/kemai_hr.ts
+        resources/l10n/kemai_hu.ts
         resources/l10n/kemai_it.ts
         resources/l10n/kemai_nb_NO.ts
         resources/l10n/kemai_nl.ts
