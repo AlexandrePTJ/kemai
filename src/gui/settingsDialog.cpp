@@ -6,21 +6,45 @@
 #include <QMessageBox>
 #include <QTranslator>
 
+#include "client/kimaiFeatures.h"
 #include "kemaiConfig.h"
 
 using namespace kemai;
 
+/*
+ * Static helpers
+ */
+static void toggleLineEditEchoMode(QLineEdit* lineEdit, QAction* action)
+{
+    if (lineEdit->echoMode() == QLineEdit::Password)
+    {
+        lineEdit->setEchoMode(QLineEdit::Normal);
+        action->setIcon(QIcon(":/icons/visible"));
+    }
+    else
+    {
+        lineEdit->setEchoMode(QLineEdit::Password);
+        action->setIcon(QIcon(":/icons/visible-off"));
+    }
+}
+
+/*
+ * Class impl
+ */
 SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desktopEventsMonitor, QWidget* parent)
     : QDialog(parent), mUi(std::make_unique<Ui::SettingsDialog>()), mKimaiClient(std::make_unique<KimaiClient>())
 {
     mUi->setupUi(this);
+
+    toggleProfileAPITokenWarningVisibility(/*visible=*/false);
 
     auto addLanguage = [cbLanguage = mUi->cbLanguage](const QString& language) {
         QLocale locale(language);
         cbLanguage->addItem(QString("%1 [%2]").arg(QLocale::languageToString(locale.language()), QLocale::countryToString(locale.country())), locale);
     };
 
-    mActToggleTokenVisible = mUi->leToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
+    mActToggleTokenVisible    = mUi->leToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
+    mActToggleAPITokenVisible = mUi->leAPIToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
 
     // Add default en_US language
     addLanguage("en_US");
@@ -38,24 +62,15 @@ SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desk
 
     connect(mUi->testButton, &QPushButton::clicked, this, &SettingsDialog::onBtTestClicked);
 
-    connect(mActToggleTokenVisible, &QAction::triggered, [&]() {
-        if (mUi->leToken->echoMode() == QLineEdit::Password)
-        {
-            mUi->leToken->setEchoMode(QLineEdit::Normal);
-            mActToggleTokenVisible->setIcon(QIcon(":/icons/visible"));
-        }
-        else
-        {
-            mUi->leToken->setEchoMode(QLineEdit::Password);
-            mActToggleTokenVisible->setIcon(QIcon(":/icons/visible-off"));
-        }
-    });
+    connect(mActToggleTokenVisible, &QAction::triggered, [&]() { toggleLineEditEchoMode(mUi->leToken, mActToggleTokenVisible); });
+    connect(mActToggleAPITokenVisible, &QAction::triggered, [&]() { toggleLineEditEchoMode(mUi->leAPIToken, mActToggleAPITokenVisible); });
 
     connect(mUi->profilesListWidget, &QListWidget::currentItemChanged, this, &SettingsDialog::onProfilesListCurrentItemChanged);
     connect(mUi->leName, &QLineEdit::textChanged, this, &SettingsDialog::onProfileFieldValueChanged);
     connect(mUi->leHost, &QLineEdit::textChanged, this, &SettingsDialog::onProfileFieldValueChanged);
     connect(mUi->leUsername, &QLineEdit::textChanged, this, &SettingsDialog::onProfileFieldValueChanged);
     connect(mUi->leToken, &QLineEdit::textChanged, this, &SettingsDialog::onProfileFieldValueChanged);
+    connect(mUi->leAPIToken, &QLineEdit::textChanged, this, &SettingsDialog::onProfileFieldValueChanged);
     connect(mUi->addProfileButton, &QToolButton::clicked, this, &SettingsDialog::onProfileAddButtonClicked);
     connect(mUi->delProfileButton, &QToolButton::clicked, this, &SettingsDialog::onProfileDelButtonClicked);
 
@@ -167,26 +182,35 @@ void SettingsDialog::onProfilesListCurrentItemChanged(QListWidgetItem* current, 
     mUi->leHost->setText(profile.host);
     mUi->leUsername->setText(profile.username);
     mUi->leToken->setText(profile.token);
+    mUi->leAPIToken->setText(profile.apiToken);
 
     mUi->delProfileButton->setEnabled(hasProfile);
     mUi->leName->setEnabled(hasProfile);
     mUi->leHost->setEnabled(hasProfile);
     mUi->leUsername->setEnabled(hasProfile);
     mUi->leToken->setEnabled(hasProfile);
+    mUi->leAPIToken->setEnabled(hasProfile);
     mUi->testButton->setEnabled(hasProfile);
 }
 
 void SettingsDialog::onBtTestClicked()
 {
     mUi->testResultLabel->clear();
+    toggleProfileAPITokenWarningVisibility(/*visible=*/false);
 
     mKimaiClient->setHost(mUi->leHost->text());
-    mKimaiClient->setUsername(mUi->leUsername->text());
-    mKimaiClient->setToken(mUi->leToken->text());
+    mKimaiClient->setLegacyAuth(mUi->leUsername->text(), mUi->leToken->text());
+    mKimaiClient->setAPIToken(mUi->leAPIToken->text());
 
     auto versionResult = mKimaiClient->requestKimaiVersion();
     connect(versionResult, &KimaiApiBaseResult::ready, this, [this, versionResult]() {
-        mUi->testResultLabel->setText(tr("Connected to Kimai %1").arg(versionResult->getResult().kimai.toString()));
+        auto kimaiVersion = versionResult->takeResult();
+
+        mUi->testResultLabel->setText(tr("Connected to Kimai %1").arg(kimaiVersion.kimai.toString()));
+        if (KimaiFeatures::shouldUseAPIToken(kimaiVersion.kimai) && mKimaiClient->isUsingLegacyAuth())
+        {
+            toggleProfileAPITokenWarningVisibility(/*visible=*/true);
+        }
         versionResult->deleteLater();
     });
     connect(versionResult, &KimaiApiBaseResult::error, this, [this, versionResult]() {
@@ -207,6 +231,7 @@ void SettingsDialog::onProfileFieldValueChanged()
             profile->host     = mUi->leHost->text();
             profile->username = mUi->leUsername->text();
             profile->token    = mUi->leToken->text();
+            profile->apiToken = mUi->leAPIToken->text();
 
             item->setText(profile->name);
         }
@@ -244,4 +269,10 @@ void SettingsDialog::onProfileDelButtonClicked()
 
         delete item;
     }
+}
+
+void SettingsDialog::toggleProfileAPITokenWarningVisibility(bool visible)
+{
+    mUi->lbAPITokenWarningIcon->setVisible(visible);
+    mUi->lbAPITokenWarningLabel->setVisible(visible);
 }

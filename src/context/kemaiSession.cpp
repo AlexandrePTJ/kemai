@@ -4,12 +4,10 @@
 
 #include <QTimeZone>
 
-using namespace kemai;
+#include "client/kimaiFeatures.h"
+#include "misc/customFmt.h"
 
-/*
- * Static helpers
- */
-static const auto MinimalKimaiVersionForPluginRequest = QVersionNumber(1, 14, 1);
+using namespace kemai;
 
 /*
  * Class impl
@@ -102,7 +100,7 @@ QDateTime KemaiSession::computeTZDateTime(const QDateTime& dateTime) const
 
 void KemaiSession::onClientError(KimaiApiBaseResult* apiBaseResult)
 {
-    spdlog::error("Client error: {}", apiBaseResult->errorMessage().toStdString());
+    spdlog::error("Client error: {}", apiBaseResult->errorMessage());
     apiBaseResult->deleteLater();
 }
 
@@ -126,8 +124,7 @@ void KemaiSession::requestVersion()
     connect(versionResult, &KimaiApiBaseResult::ready, this, [this, versionResult]() {
         mKimaiVersion = versionResult->getResult().kimai;
         emit versionChanged();
-        // Allow current client instance to get instance version and list of available plugins. Only available from Kimai 1.14.1
-        if (mKimaiVersion >= MinimalKimaiVersionForPluginRequest)
+        if (KimaiFeatures::canRequestPlugins(mKimaiVersion))
         {
             requestPlugins();
         }

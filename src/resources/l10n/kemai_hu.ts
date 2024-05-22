@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="nl">
+<TS version="2.1" language="hu">
 <context>
     <name>AboutDialog</name>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="14"/>
         <source>About Kemai</source>
-        <translation>Over Kemai</translation>
+        <translation>A Kemai-ról</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="81"/>
@@ -16,12 +16,12 @@
     <message>
         <location filename="../../gui/aboutDialog.ui" line="88"/>
         <source>Desktop client for Kimai</source>
-        <translation>Desktop client voor Kimai</translation>
+        <translation>Kemai asztali kliens</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="109"/>
         <source>Proudly using:</source>
-        <translation>Gebruikt trots:</translation>
+        <translation>Büszkén használja:</translation>
     </message>
 </context>
 <context>
@@ -29,7 +29,7 @@
     <message>
         <location filename="../../gui/activityDialog.ui" line="14"/>
         <source>Activity</source>
-        <translation>Activiteit</translation>
+        <translation>Aktivitás</translation>
     </message>
     <message>
         <location filename="../../gui/activityDialog.ui" line="25"/>
@@ -39,17 +39,17 @@
     <message>
         <location filename="../../gui/activityDialog.ui" line="35"/>
         <source>Budget</source>
-        <translation>Begroting</translation>
+        <translation>Költségkeret</translation>
     </message>
     <message>
         <location filename="../../gui/activityDialog.ui" line="62"/>
         <source>Name</source>
-        <translation>Naam</translation>
+        <translation>Megnevezés</translation>
     </message>
     <message>
         <location filename="../../gui/activityDialog.ui" line="85"/>
         <source>Time Budget</source>
-        <translation>Tijdsbegroting</translation>
+        <translation>Időkeret</translation>
     </message>
 </context>
 <context>
@@ -57,12 +57,12 @@
     <message>
         <location filename="../../gui/activityWidget.ui" line="14"/>
         <source>ActivityWidget</source>
-        <translation>ActiviteitsWidget</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="31"/>
         <source>Customer</source>
-        <translation>Klant</translation>
+        <translation>Vevő</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="62"/>
@@ -74,27 +74,27 @@
     <message>
         <location filename="../../gui/activityWidget.ui" line="81"/>
         <source>Project</source>
-        <translation>Project</translation>
+        <translation>Projekt</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="131"/>
         <source>Activity</source>
-        <translation>Activiteit</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="175"/>
         <source>Description</source>
-        <translation>Beschrijving</translation>
+        <translation>Leírás</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="185"/>
         <source>Tags</source>
-        <translation>Tags</translation>
+        <translation>Tag-ek</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="224"/>
         <source>Started at</source>
-        <translation>Gestart op</translation>
+        <translation>Elkezdve</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="271"/>
@@ -104,7 +104,7 @@
     <message>
         <location filename="../../gui/activityWidget.ui" line="284"/>
         <source>History</source>
-        <translation>Geschiedenis</translation>
+        <translation>Előzmények</translation>
     </message>
 </context>
 <context>
@@ -112,37 +112,37 @@
     <message>
         <location filename="../../gui/customerDialog.ui" line="14"/>
         <source>Customer</source>
-        <translation>Klant</translation>
+        <translation>Vevő</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="25"/>
         <source>Country</source>
-        <translation>Land</translation>
+        <translation>Ország</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="55"/>
         <source>Currency</source>
-        <translation>Valuta</translation>
+        <translation>Pénznem</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="62"/>
         <source>Name</source>
-        <translation>Naam</translation>
+        <translation>Név</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="69"/>
         <source>Time Budget</source>
-        <translation>Tijdsbegroting</translation>
+        <translation>Időkeret</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="93"/>
         <source>Timezone</source>
-        <translation>Tijdzone</translation>
+        <translation>Időzóna</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="103"/>
         <source>Budget</source>
-        <translation>Begroting</translation>
+        <translation>Költségkeret</translation>
     </message>
     <message>
         <location filename="../../gui/customerDialog.ui" line="126"/>
@@ -155,12 +155,12 @@
     <message>
         <location filename="../../gui/loggerWidget.ui" line="14"/>
         <source>Log</source>
-        <translation>Logboek</translation>
+        <translation>Napló</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="25"/>
         <source>Log file path</source>
-        <translation>Pad naar logbestand</translation>
+        <translation>Napló fájl elérési útja</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="39"/>
@@ -173,12 +173,12 @@
     <message>
         <location filename="../../gui/mainWindow.ui" line="14"/>
         <source>Kemai - Kimai client</source>
-        <translation>Kemai - Kimai cliënt</translation>
+        <translation>Kemai - Kimai kliens</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.ui" line="48"/>
         <source>Settings...</source>
-        <translation>Instellingen...</translation>
+        <translation>Beállítások...</translation>
     </message>
 </context>
 <context>
@@ -186,22 +186,22 @@
     <message>
         <location filename="../../gui/projectDialog.ui" line="14"/>
         <source>Project</source>
-        <translation>Project</translation>
+        <translation>Projekt</translation>
     </message>
     <message>
         <location filename="../../gui/projectDialog.ui" line="25"/>
         <source>Name</source>
-        <translation>Naam</translation>
+        <translation>Megnevezés</translation>
     </message>
     <message>
         <location filename="../../gui/projectDialog.ui" line="32"/>
         <source>Budget</source>
-        <translation>Begroting</translation>
+        <translation>Költségkeret</translation>
     </message>
     <message>
         <location filename="../../gui/projectDialog.ui" line="68"/>
         <source>Time Budget</source>
-        <translation>Tijdsbegroting</translation>
+        <translation>Időkeret</translation>
     </message>
     <message>
         <location filename="../../gui/projectDialog.ui" line="75"/>
@@ -216,7 +216,7 @@
         <location filename="../../client/kimaiClient_p.h" line="106"/>
         <source>Error on request [%1]: %2
 %3</source>
-        <translation>Fout met verzoek [%1]: %2
+        <translation>Hiba a(z) %1 lekérésnél: %2
 %3</translation>
     </message>
 </context>
@@ -225,92 +225,92 @@
     <message>
         <location filename="../../gui/settingsDialog.ui" line="14"/>
         <source>Settings</source>
-        <translation>Instellingen</translation>
+        <translation>Beállítások</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="41"/>
         <source>General</source>
-        <translation>Algemeen</translation>
+        <translation>Általános</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="46"/>
         <source>Events</source>
-        <translation>Gebeurtenissen</translation>
+        <translation>Események</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="51"/>
         <source>Profiles</source>
-        <translation>Profielen</translation>
+        <translation>Profilok</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="66"/>
         <source>Close to system tray</source>
-        <translation>Sluit af naar systeemvak</translation>
+        <translation>Rendszertálcára minimalizálás</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="73"/>
         <source>Minimize to system tray</source>
-        <translation>Minimaliseer naar systeemvak</translation>
+        <translation>Rendszertálcára minimalizálás</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="80"/>
         <source>Language</source>
-        <translation>Taal</translation>
+        <translation>Nyelv</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="90"/>
         <source>Check update at startup</source>
-        <translation>Controleer op updates bij het opstarten</translation>
+        <translation>Frissítések keresése induláskor</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="104"/>
         <source>Stop current timesheet on session lock (windows only)</source>
-        <translation>Stop huidige tijdkaart bij scherm vergrendeling (alleen windows)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="114"/>
         <source>Stop current timesheet when system idle</source>
-        <translation>Stop huidige tijdkaart bij inactiviteit</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="124"/>
         <source>Idle delay (minutes)</source>
-        <translation>Vertraging bij inactiviteit (minuten)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="164"/>
         <source>Refresh delay (secs)</source>
-        <translation>Tijd tussen verversing (seconden)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="201"/>
         <source>Auto-refresh current timesheet</source>
-        <translation>Ververs automatisch huidige tijdkaart</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="273"/>
         <source>Name</source>
-        <translation>Naam</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="293"/>
         <source>Host</source>
-        <translation>Host</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="310"/>
         <source>Username</source>
-        <translation>Gebruikersnaam</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="324"/>
         <source>Token</source>
-        <translation>Token</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="365"/>
         <source>Test</source>
-        <translation>Test</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -318,27 +318,27 @@
     <message>
         <location filename="../../gui/taskWidget.ui" line="14"/>
         <source>TaskWidget</source>
-        <translation>Taakwidget</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/taskWidget.ui" line="25"/>
         <source>Filter</source>
-        <translation>Filter</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/taskWidget.ui" line="35"/>
         <source>...</source>
-        <translation>...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/taskWidget.ui" line="63"/>
         <source>Start</source>
-        <translation>Start</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/taskWidget.ui" line="73"/>
         <source>Close</source>
-        <translation>Sluit af</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -346,27 +346,27 @@
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulier</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="75"/>
         <source>Activity</source>
-        <translation>Activiteit</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="129"/>
         <source>Description</source>
-        <translation>Beschrijving</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="141"/>
         <source>StartedAt</source>
-        <translation>GestartOp</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="161"/>
         <source>duration</source>
-        <translation>duur</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -374,17 +374,17 @@
     <message>
         <location filename="../../models/loggerTreeModel.cpp" line="115"/>
         <source>Level</source>
-        <translation>Niveau</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../models/loggerTreeModel.cpp" line="118"/>
         <source>Date</source>
-        <translation>Datum</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../models/loggerTreeModel.cpp" line="121"/>
         <source>Message</source>
-        <translation>Bericht</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -392,102 +392,100 @@
     <message>
         <location filename="../../gui/mainWindow.cpp" line="44"/>
         <source>&amp;Quit</source>
-        <translation>&amp;Verlaat</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="45"/>
         <source>&amp;Settings</source>
-        <translation>&amp;Instellingen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="46"/>
         <source>Check for updates...</source>
-        <translation>Controleer op updates...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="47"/>
         <source>Open Kimai instance</source>
-        <translation>Open Kimai instantie</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="48"/>
         <source>Activities</source>
-        <translation>Activiteiten</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="49"/>
         <source>Tasks</source>
-        <translation>Taken</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="50"/>
         <source>Refresh cache</source>
-        <translation>Ververs cache</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="51"/>
         <source>About Kemai</source>
-        <translation>Over Kemai</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="52"/>
         <source>Show logs</source>
-        <translation>Toon logboek</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="83"/>
         <source>&amp;File</source>
-        <translation>&amp;Bestand</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="88"/>
         <source>&amp;Profile</source>
-        <translation>&amp;Profiel</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="92"/>
         <source>&amp;View</source>
-        <translation>&amp;Weergave</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="96"/>
         <source>&amp;Help</source>
-        <translation>&amp;Help</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="105"/>
         <source>About Qt</source>
-        <translation>Over Qt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="136"/>
         <location filename="../../gui/mainWindow.cpp" line="228"/>
         <source>Not connected</source>
-        <translation>Niet verbonden</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="458"/>
         <source>New version available</source>
-        <translation>Nieuwe versie beschikbaar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="458"/>
         <source>Version %1 is available.
 
 %2</source>
-        <translation>Versie %1 is beschikbaar.
-
-%2</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="480"/>
         <source>No update</source>
-        <translation>Geen update</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="480"/>
         <source>%1 is latest version.</source>
-        <translation>%1 is de meest recente versie.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -495,12 +493,12 @@
     <message>
         <location filename="../../gui/settingsDialog.cpp" line="67"/>
         <source>Language changed. Application restart is required.</source>
-        <translation>Taal gewijzigd. Applicatie moet worden herstart.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.cpp" line="189"/>
         <source>Connected to Kimai %1</source>
-        <translation>Verbonden met Kimai %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

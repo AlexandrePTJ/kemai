@@ -17,6 +17,7 @@ struct Settings
         QString host;
         QString username;
         QString token;
+        QString apiToken; // Since Kimai 2.14
     };
     QList<Profile> profiles;
 

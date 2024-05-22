@@ -33,8 +33,11 @@ private:
     void onProfileAddButtonClicked();
     void onProfileDelButtonClicked();
 
+    void toggleProfileAPITokenWarningVisibility(bool visible);
+
     std::unique_ptr<Ui::SettingsDialog> mUi;
-    QAction* mActToggleTokenVisible = nullptr;
+    QAction* mActToggleTokenVisible    = nullptr;
+    QAction* mActToggleAPITokenVisible = nullptr;
 
     Settings m_settings;
 

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.11.0] - 2024-05-22
+
+### Fixed
+- Fix combo selection after model reset (Thanks to @virtulis)
+
+## Added
+- Template button to reload previous timesheet without starting it (Thanks to @poelzi)
+- Allow usage of API Token for kimai>=2.14.0
+
+
 ## [0.10.0] - 2023-07-17
 
 ### Fixed
@@ -178,7 +188,8 @@ Special thanks to @shrippen for its support through [sponsorship](https://github
 Initial version.
 
 
-[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.10.0...HEAD
+[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.11.0...HEAD
+[0.11.0]: https://github.com/AlexandrePTJ/kemai/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/AlexandrePTJ/kemai/compare/0.9.4...0.10.0
 [0.9.4]: https://github.com/AlexandrePTJ/kemai/compare/0.9.3...0.9.4
 [0.9.3]: https://github.com/AlexandrePTJ/kemai/compare/0.9.2...0.9.3

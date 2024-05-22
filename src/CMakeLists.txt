@@ -9,6 +9,7 @@ set(SRCS
         client/kimaiAPI.cpp
         client/kimaiCache.cpp
         client/kimaiClient.cpp
+        client/kimaiFeatures.cpp
         client/kimaiReply.cpp
         client/parser.cpp
         context/kemaiSession.cpp
@@ -42,6 +43,7 @@ set(HDRS
         client/kimaiCache.h
         client/kimaiClient.h
         client/kimaiClient_p.h
+        client/kimaiFeatures.h
         client/kimaiReply.h
         client/parser.h
         context/kemaiSession.h
@@ -57,6 +59,7 @@ set(HDRS
         gui/settingsDialog.h
         gui/taskWidget.h
         gui/timeSheetListWidgetItem.h
+        misc/customFmt.h
         misc/dataReader.h
         misc/helpers.h
         models/kimaiDataListModel.h
@@ -92,6 +95,7 @@ set(KEMAI_TS_FILES
         resources/l10n/kemai_el.ts
         resources/l10n/kemai_fr.ts
         resources/l10n/kemai_hr.ts
+        resources/l10n/kemai_hu.ts
         resources/l10n/kemai_it.ts
         resources/l10n/kemai_nb_NO.ts
         resources/l10n/kemai_nl.ts
@@ -109,6 +113,8 @@ add_custom_target(kemai-update-ts COMMAND
 set(RESX
         resources/kemai.qrc
         ${KEMAI_L10N_QRC})
+
+qt_add_resources(${PROJECT_NAME} ${RESX})
 
 # OS Specifics
 if (WIN32)

@@ -43,6 +43,8 @@ private:
     void onSessionCacheSynchronizeFinished();
 
     void onHistoryTimeSheetStartRequested(const TimeSheet& timeSheet);
+    void onHistoryTimeSheetFillRequested(const TimeSheet& timeSheet);
+    void fillFromTimesheet(const TimeSheet& timeSheet);
 
     void updateControls();
 

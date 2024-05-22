@@ -1,6 +1,5 @@
 #include <QApplication>
 #include <QLibraryInfo>
-#include <QStandardPaths>
 #include <QTranslator>
 #include <QTreeView>
 
@@ -11,6 +10,7 @@
 #include "client/kimaiClient.h"
 #include "gui/mainWindow.h"
 #include "kemaiConfig.h"
+#include "misc/customFmt.h"
 #include "misc/helpers.h"
 #include "models/loggerTreeModel.h"
 #include "settings/settings.h"
@@ -19,12 +19,34 @@ using namespace kemai;
 
 static constinit const auto MaxLogFileSize = 1024 * 102 * 5;
 
+void myMessageOutput(QtMsgType type, const QMessageLogContext& /*context*/, const QString& msg)
+{
+    switch (type)
+    {
+    case QtDebugMsg:
+        spdlog::debug(msg);
+        break;
+    case QtInfoMsg:
+        spdlog::info(msg);
+        break;
+    case QtWarningMsg:
+        spdlog::warn(msg);
+        break;
+    case QtCriticalMsg:
+    case QtFatalMsg:
+        spdlog::critical(msg);
+        break;
+    }
+}
+
 int main(int argc, char* argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 #endif
+
+    qInstallMessageHandler(myMessageOutput);
 
     QApplication app(argc, argv);
     QApplication::setApplicationName("Kemai");

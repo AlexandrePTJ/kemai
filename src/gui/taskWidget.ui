@@ -35,7 +35,7 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources/icons.qrc">
+        <iconset resource="../resources/kemai.qrc">
          <normaloff>:/icons/refresh</normaloff>:/icons/refresh</iconset>
        </property>
       </widget>
@@ -45,7 +45,7 @@
    <item>
     <widget class="QListView" name="lvTasks">
      <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
+      <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
      </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
@@ -86,7 +86,7 @@
   <tabstop>btClose</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/icons.qrc"/>
+  <include location="../resources/kemai.qrc"/>
  </resources>
  <connections/>
 </ui>

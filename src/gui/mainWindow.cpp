@@ -11,6 +11,7 @@
 
 #include "aboutDialog.h"
 #include "activityWidget.h"
+#include "client/kimaiFeatures.h"
 #include "kemaiConfig.h"
 #include "settings/settings.h"
 #include "settingsDialog.h"
@@ -234,8 +235,8 @@ void MainWindow::createKemaiSession(const Settings::Profile& profile)
         auto kimaiClient = std::make_shared<KimaiClient>();
 
         kimaiClient->setHost(profile.host);
-        kimaiClient->setUsername(profile.username);
-        kimaiClient->setToken(profile.token);
+        kimaiClient->setLegacyAuth(profile.username, profile.token);
+        kimaiClient->setAPIToken(profile.apiToken);
 
         mSession = std::make_shared<KemaiSession>(kimaiClient);
         connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &MainWindow::onCurrentTimeSheetChanged);
@@ -373,7 +374,13 @@ void MainWindow::onSessionVersionChanged()
 {
     if (!mSession->kimaiVersion().isNull())
     {
-        mStatusInstanceLabel.setText(QString("Kimai %1").arg(mSession->kimaiVersion().toString()));
+        QString apiTokenWarning;
+        if (KimaiFeatures::shouldUseAPIToken(mSession->kimaiVersion()) && mSession->client()->isUsingLegacyAuth())
+        {
+            apiTokenWarning = tr(" - API Token is now recommended. Please migrate your credentials.");
+        }
+
+        mStatusInstanceLabel.setText(tr("Kimai %1%2").arg(mSession->kimaiVersion().toString(), apiTokenWarning));
     }
 }
 

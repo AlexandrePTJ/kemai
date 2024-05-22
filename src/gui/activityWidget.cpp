@@ -3,10 +3,10 @@
 
 #include <spdlog/spdlog.h>
 
-#include <misc/helpers.h>
-
 #include "activityDialog.h"
 #include "customerDialog.h"
+#include "misc/customFmt.h"
+#include "misc/helpers.h"
 #include "projectDialog.h"
 #include "timeSheetListWidgetItem.h"
 
@@ -251,8 +251,28 @@ void ActivityWidget::onHistoryTimeSheetStartRequested(const TimeSheet& timeSheet
     }
     else
     {
+        fillFromTimesheet(timeSheet);
         startPendingTimeSheet();
     }
+}
+
+void ActivityWidget::onHistoryTimeSheetFillRequested(const TimeSheet& timeSheet)
+{
+    if (mSession->hasCurrentTimeSheet())
+    {
+        stopCurrentTimeSheet();
+    }
+    fillFromTimesheet(timeSheet);
+}
+
+void ActivityWidget::fillFromTimesheet(const TimeSheet& timeSheet)
+{
+    mUi->cbCustomer->setCurrentIndex(mUi->cbCustomer->findData(timeSheet.project.customer.id));
+    updateProjectsCombo();
+    mUi->cbProject->setCurrentIndex(mUi->cbProject->findData(timeSheet.project.id));
+    mUi->cbActivity->setCurrentIndex(mUi->cbActivity->findData(timeSheet.activity.id));
+    mUi->pteDescription->setPlainText(timeSheet.description);
+    mUi->leTags->setText(timeSheet.tags.join(","));
 }
 
 void ActivityWidget::onBtStartStopClicked()
@@ -333,7 +353,7 @@ void ActivityWidget::updateCustomersCombo()
             }
             else
             {
-                spdlog::error("Cannot find '{}' customer", mSession->currentTimeSheet()->project.customer.name.toStdString());
+                spdlog::error("Cannot find '{}' customer", mSession->currentTimeSheet()->project.customer.name);
             }
         }
     }
@@ -356,7 +376,7 @@ void ActivityWidget::updateProjectsCombo()
             }
             else
             {
-                spdlog::error("Cannot find '{}' project", mSession->currentTimeSheet()->project.name.toStdString());
+                spdlog::error("Cannot find '{}' project", mSession->currentTimeSheet()->project.name);
             }
         }
     }
@@ -378,7 +398,7 @@ void ActivityWidget::updateActivitiesCombo()
             }
             else
             {
-                spdlog::error("Cannot find '{}' activity", mSession->currentTimeSheet()->activity.name.toStdString());
+                spdlog::error("Cannot find '{}' activity", mSession->currentTimeSheet()->activity.name);
             }
         }
         else if (!projectId.has_value())
@@ -402,6 +422,7 @@ void ActivityWidget::updateRecentTimeSheetsView()
         mUi->lwHistory->setItemWidget(item, timeSheetListWidgetItem);
 
         connect(timeSheetListWidgetItem, &TimeSheetListWidgetItem::timeSheetStartRequested, this, &ActivityWidget::onHistoryTimeSheetStartRequested);
+        connect(timeSheetListWidgetItem, &TimeSheetListWidgetItem::timeSheetFillRequested, this, &ActivityWidget::onHistoryTimeSheetFillRequested);
     }
 }
 

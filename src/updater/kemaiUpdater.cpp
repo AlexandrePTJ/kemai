@@ -6,6 +6,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include "misc/customFmt.h"
+
 using namespace kemai;
 
 /*
@@ -33,7 +35,7 @@ void KemaiUpdater::KemaiUpdaterPrivate::onNamFinished(QNetworkReply* reply)
 {
     if (reply->error() != QNetworkReply::NoError)
     {
-        spdlog::error("Error on update check: {}", reply->errorString().toStdString());
+        spdlog::error("Error on update check: {}", reply->errorString());
     }
     else
     {

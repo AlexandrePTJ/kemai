@@ -6,22 +6,22 @@
     <message>
         <location filename="../../gui/aboutDialog.ui" line="14"/>
         <source>About Kemai</source>
-        <translation type="unfinished"></translation>
+        <translation>O Kemai</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="81"/>
         <source>Kemai</source>
-        <translation type="unfinished"></translation>
+        <translation>Kemai</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="88"/>
         <source>Desktop client for Kimai</source>
-        <translation type="unfinished"></translation>
+        <translation>Klient pro Kimai</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="109"/>
         <source>Proudly using:</source>
-        <translation type="unfinished"></translation>
+        <translation>Používá:</translation>
     </message>
 </context>
 <context>
@@ -104,7 +104,7 @@
     <message>
         <location filename="../../gui/activityWidget.ui" line="284"/>
         <source>History</source>
-        <translation type="unfinished"></translation>
+        <translation>Historie</translation>
     </message>
 </context>
 <context>
@@ -155,17 +155,17 @@
     <message>
         <location filename="../../gui/loggerWidget.ui" line="14"/>
         <source>Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Log</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="25"/>
         <source>Log file path</source>
-        <translation type="unfinished"></translation>
+        <translation>Cesta k logu</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="39"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -216,7 +216,7 @@
         <location filename="../../client/kimaiClient_p.h" line="106"/>
         <source>Error on request [%1]: %2
 %3</source>
-        <translation type="unfinished">Erreur sur la requête [%1] : %2
+        <translation>Chyba požadavku [%1] : %2
 %3 {1]?}</translation>
     </message>
 </context>
@@ -225,92 +225,92 @@
     <message>
         <location filename="../../gui/settingsDialog.ui" line="14"/>
         <source>Settings</source>
-        <translation type="unfinished">Nastavení</translation>
+        <translation>Nastavení</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="41"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Hlavní</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="46"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Události</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="51"/>
         <source>Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Profily</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="66"/>
         <source>Close to system tray</source>
-        <translation type="unfinished">Zavřením minimalizovat na lištu</translation>
+        <translation>Zavřením minimalizovat na lištu</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="73"/>
         <source>Minimize to system tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimalizovat na systémovou lištu</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="80"/>
         <source>Language</source>
-        <translation type="unfinished">Jazyk</translation>
+        <translation>Jazyk</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="90"/>
         <source>Check update at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Zkontrolovat dostupnost aktualizací po startu</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="104"/>
         <source>Stop current timesheet on session lock (windows only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zastavit běžící úkol při odhlášení (pouze pro windows)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="114"/>
         <source>Stop current timesheet when system idle</source>
-        <translation type="unfinished"></translation>
+        <translation>Zastavit běžící úkol pro nečinnosti</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="124"/>
         <source>Idle delay (minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpoždění nečinnosti (minut)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="164"/>
         <source>Refresh delay (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interval obnovení (sekund)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="201"/>
         <source>Auto-refresh current timesheet</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizovat běžící událost</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="273"/>
         <source>Name</source>
-        <translation type="unfinished">Jméno</translation>
+        <translation>Jméno</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="293"/>
         <source>Host</source>
-        <translation type="unfinished">Server</translation>
+        <translation>Server</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="310"/>
         <source>Username</source>
-        <translation type="unfinished">Uživatelské jméno</translation>
+        <translation>Uživatelské jméno</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="324"/>
         <source>Token</source>
-        <translation type="unfinished">Klíč</translation>
+        <translation>Klíč</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="365"/>
         <source>Test</source>
-        <translation type="unfinished">Otestovat</translation>
+        <translation>Otestovat</translation>
     </message>
 </context>
 <context>
@@ -338,7 +338,7 @@
     <message>
         <location filename="../../gui/taskWidget.ui" line="73"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Zavřít</translation>
     </message>
 </context>
 <context>
@@ -346,27 +346,27 @@
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Formulář</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="75"/>
         <source>Activity</source>
-        <translation type="unfinished">Aktivita</translation>
+        <translation>Aktivita</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="129"/>
         <source>Description</source>
-        <translation type="unfinished">Popis</translation>
+        <translation>Popis</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="141"/>
         <source>StartedAt</source>
-        <translation type="unfinished"></translation>
+        <translation>Spuštěno v</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="161"/>
         <source>duration</source>
-        <translation type="unfinished"></translation>
+        <translation>doba trvání</translation>
     </message>
 </context>
 <context>
@@ -374,17 +374,17 @@
     <message>
         <location filename="../../models/loggerTreeModel.cpp" line="115"/>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Level</translation>
     </message>
     <message>
         <location filename="../../models/loggerTreeModel.cpp" line="118"/>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../models/loggerTreeModel.cpp" line="121"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpráva</translation>
     </message>
 </context>
 <context>
@@ -392,102 +392,102 @@
     <message>
         <location filename="../../gui/mainWindow.cpp" line="44"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Ukončit</translation>
+        <translation>&amp;Ukončit</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="45"/>
         <source>&amp;Settings</source>
-        <translation type="unfinished">&amp;Nastavení</translation>
+        <translation>&amp;Nastavení</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="46"/>
         <source>Check for updates...</source>
-        <translation type="unfinished">Zkontrolovat aktualizace...</translation>
+        <translation>Zkontrolovat aktualizace...</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="47"/>
         <source>Open Kimai instance</source>
-        <translation type="unfinished">Přejít na server</translation>
+        <translation>Přejít na server</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="48"/>
         <source>Activities</source>
-        <translation type="unfinished">Aktivity</translation>
+        <translation>Aktivity</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="49"/>
         <source>Tasks</source>
-        <translation type="unfinished">Úkoly</translation>
+        <translation>Úkoly</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="50"/>
         <source>Refresh cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Znovu načíst mezipaměť</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="51"/>
         <source>About Kemai</source>
-        <translation type="unfinished"></translation>
+        <translation>O Kemai</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="52"/>
         <source>Show logs</source>
-        <translation type="unfinished"></translation>
+        <translation>Zobrazit logy</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="83"/>
         <source>&amp;File</source>
-        <translation type="unfinished">&amp;Soubor</translation>
+        <translation>&amp;Soubor</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="88"/>
         <source>&amp;Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Profil</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="92"/>
         <source>&amp;View</source>
-        <translation type="unfinished">&amp;Zobrazit</translation>
+        <translation>&amp;Zobrazit</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="96"/>
         <source>&amp;Help</source>
-        <translation type="unfinished">&amp;Pomoc</translation>
+        <translation>&amp;Pomoc</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="105"/>
         <source>About Qt</source>
-        <translation type="unfinished">O programu</translation>
+        <translation>O programu</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="136"/>
         <location filename="../../gui/mainWindow.cpp" line="228"/>
         <source>Not connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Nepřipojeno</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="458"/>
         <source>New version available</source>
-        <translation type="unfinished">K dispozici je nová verze programu</translation>
+        <translation>K dispozici je nová verze programu</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="458"/>
         <source>Version %1 is available.
 
 %2</source>
-        <translation type="unfinished">Verze %1 je k dispozici.
+        <translation>Verze %1 je k dispozici.
 
 %2</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="480"/>
         <source>No update</source>
-        <translation type="unfinished">Máte nejnovější verzi</translation>
+        <translation>Máte nejnovější verzi</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="480"/>
         <source>%1 is latest version.</source>
-        <translation type="unfinished">%1 je poslední verze.</translation>
+        <translation>%1 je poslední verze.</translation>
     </message>
 </context>
 <context>
@@ -495,12 +495,12 @@
     <message>
         <location filename="../../gui/settingsDialog.cpp" line="67"/>
         <source>Language changed. Application restart is required.</source>
-        <translation type="unfinished">Jazyk byl změněn. Je vyžadován restart aplikace.</translation>
+        <translation>Jazyk byl změněn. Je vyžadován restart aplikace.</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.cpp" line="189"/>
         <source>Connected to Kimai %1</source>
-        <translation type="unfinished">Připojeno ke Kimai %1</translation>
+        <translation>Připojeno ke Kimai %1</translation>
     </message>
 </context>
 </TS>

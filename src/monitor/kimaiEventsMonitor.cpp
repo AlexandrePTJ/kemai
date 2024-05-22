@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "misc/customFmt.h"
 #include "settings/settings.h"
 
 using namespace kemai;
@@ -48,7 +49,7 @@ void KimaiEventsMonitor::onSecondTimeout()
 
 void KimaiEventsMonitor::onClientError(KimaiApiBaseResult* apiBaseResult)
 {
-    spdlog::error("Client error: {}", apiBaseResult->errorMessage().toStdString());
+    spdlog::error("Client error: {}", apiBaseResult->errorMessage());
     apiBaseResult->deleteLater();
 }
 
