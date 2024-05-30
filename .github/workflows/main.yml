@@ -13,17 +13,16 @@ jobs:
       CXX: g++-12
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
 
       - name: Install Qt ${{ env.qt_version }}
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.qt_version }}
           cache: true
-          aqtversion: '==3.1.*'
 
       - name: Install dev dependencies
         run: sudo apt install libxss-dev libxkbcommon-x11-dev libxcb-cursor0
@@ -45,18 +44,17 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.qt_version }}
           tools: 'tools_opensslv3_x64'
           cache: true
-          aqtversion: '==3.1.*'
 
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
@@ -90,17 +88,16 @@ jobs:
         preset: ["release-macos", "release-macos-noupdate"]
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.qt_version }}
           cache: true
-          aqtversion: '==3.1.*'
 
       - name: Configure
         run: |
