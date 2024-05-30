@@ -1,7 +1,8 @@
 #include "kimaiCache.h"
 
+#include <ranges>
+
 #include <magic_enum.hpp>
-#include <range/v3/all.hpp>
 #include <spdlog/spdlog.h>
 
 using namespace kemai;
@@ -83,7 +84,7 @@ Projects KimaiCache::projects(std::optional<int> customerId) const
 {
     if (customerId.has_value())
     {
-        auto its = mProjects | ranges::views::filter([id = customerId.value()](auto const& project) { return project.customer.id == id; });
+        auto its = mProjects | std::ranges::views::filter([id = customerId.value()](auto const& project) { return project.customer.id == id; });
         return {its.begin(), its.end()};
     }
     return mProjects;
@@ -93,7 +94,7 @@ Activities KimaiCache::activities(std::optional<int> projectId) const
 {
     if (projectId.has_value())
     {
-        auto its = mActivities | ranges::views::filter([id = projectId.value()](auto const& activity) {
+        auto its = mActivities | std::ranges::views::filter([id = projectId.value()](auto const& activity) {
                        if (!activity.project.has_value())
                        {
                            return true;

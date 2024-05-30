@@ -1,7 +1,7 @@
 project(Kemai)
 
 qt_standard_project_setup(
-        I18N_TRANSLATED_LANGUAGES cs de el fr hr it nb_NO nl tr
+        I18N_TRANSLATED_LANGUAGES cs de el fr hr hu it nb_NO nl tr
         I18N_SOURCE_LANGUAGE en)
 
 configure_file(kemaiConfig.h.in ${PROJECT_BINARY_DIR}/kemaiConfig.h)
@@ -111,7 +111,7 @@ elseif (APPLE)
     set(MACOSX_BUNDLE_ICON_FILE kemai.icns)
 
     # Tells cmake where to find icons
-    
+
     set(KEMAI_ICNS "${CMAKE_SOURCE_DIR}/bundle/macos/${MACOSX_BUNDLE_ICON_FILE}")
     set_source_files_properties(${KEMAI_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     list(APPEND SRCS ${KEMAI_ICNS})
@@ -143,7 +143,7 @@ qt_add_translations(
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Widgets Qt::Network spdlog::spdlog magic_enum::magic_enum range-v3::range-v3 ${KEMAI_ADDITIONAL_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Widgets Qt::Network spdlog::spdlog magic_enum::magic_enum ${KEMAI_ADDITIONAL_LIBS})
 
 # Install configuration
 install(TARGETS ${PROJECT_NAME}
