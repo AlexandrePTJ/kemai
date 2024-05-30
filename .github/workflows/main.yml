@@ -22,17 +22,11 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           version: ${{ env.qt_version }}
-#          tools: 'tools_opensslv3_src'
           cache: true
           aqtversion: '==3.1.*'
 
       - name: Install dev dependencies
         run: sudo apt install libxss-dev libxkbcommon-x11-dev libxcb-cursor0
-
-#      - name: Build OpenSSLv3
-#        run: |
-#          cd $IQTA_TOOLS/OpenSSLv3/src
-#          ./Configure && make -j3
 
       - name: Configure
         run: |
@@ -42,25 +36,9 @@ jobs:
         run: |
           cmake --build --preset release
 
-      - name: Create Linux package
-        run: |
-          cmake --build --preset release --target package
-
 #      - name: Create Linux package
 #        run: |
-#          sudo add-apt-repository universe
-#          sudo apt install libfuse2
-#          chmod +x bundle/linux/create_appimage.sh
-#          ./bundle/linux/create_appimage.sh -q $Qt6_DIR -b cmake-build-release -o $IQTA_TOOLS/OpenSSLv3/src
-#
-#      # Create release if on built on a tag
-#      - if: startsWith(github.ref, 'refs/tags/')
-#        name: Create/Update release
-#        uses: ncipollo/release-action@v1
-#        with:
-#          allowUpdates: true
-#          draft: true
-#          artifacts: 'Kemai-*.AppImage'
+#          cmake --build --preset release --target package
 
   WindowsJob:
     name: Windows
