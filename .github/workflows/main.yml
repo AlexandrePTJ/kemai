@@ -35,10 +35,6 @@ jobs:
         run: |
           cmake --build --preset release
 
-#      - name: Create Linux package
-#        run: |
-#          cmake --build --preset release --target package
-
   WindowsJob:
     name: Windows
     runs-on: windows-latest
@@ -53,7 +49,6 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.qt_version }}
-          tools: 'tools_opensslv3_x64'
           cache: true
 
       - name: Setup MSVC
@@ -107,14 +102,9 @@ jobs:
         run: |
           cmake --build --preset ${{ matrix.preset }}
 
-      - name: Create MacOS package from Qt
-        run: |
-          cmake --build --preset ${{ matrix.preset }} --target package
-
       - name: Create MacOS package
         run: |
-          chmod +x bundle/macos/create_dmg.sh
-          ./bundle/macos/create_dmg.sh --qt_path $Qt6_DIR --build_path cmake-build-${{ matrix.preset }}
+          cmake --build --preset ${{ matrix.preset }} --target package
 
       # Create release if on built on a tag
       - if: startsWith(github.ref, 'refs/tags/')

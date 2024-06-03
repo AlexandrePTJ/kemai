@@ -3,11 +3,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include "activityDialog.h"
-#include "customerDialog.h"
 #include "misc/customFmt.h"
 #include "misc/helpers.h"
-#include "projectDialog.h"
 #include "timeSheetListWidgetItem.h"
 
 using namespace kemai;
@@ -15,14 +12,7 @@ using namespace kemai;
 ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make_unique<Ui::ActivityWidget>())
 {
     mUi->setupUi(this);
-    mUi->formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
-    connect(mUi->cbProject, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbProjectFieldChanged);
-    connect(mUi->cbProject, &QComboBox::currentIndexChanged, this, &ActivityWidget::onCbProjectFieldChanged);
-    connect(mUi->cbActivity, &QComboBox::currentTextChanged, this, &ActivityWidget::onCbActivityFieldChanged);
-    connect(mUi->cbActivity, &QComboBox::currentIndexChanged, this, &ActivityWidget::onCbActivityFieldChanged);
-    connect(mUi->tbAddProject, &QToolButton::clicked, this, &ActivityWidget::onTbAddProjectClicked);
-    connect(mUi->tbAddActivity, &QToolButton::clicked, this, &ActivityWidget::onTbAddActivityClicked);
     connect(mUi->btStartStop, &QPushButton::clicked, this, &ActivityWidget::onBtStartStopClicked);
     connect(&mSecondTimer, &QTimer::timeout, this, &ActivityWidget::onSecondTimeout);
 
@@ -42,8 +32,6 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
 {
     mSession = std::move(kemaiSession);
 
-    mUi->cbActivity->clear();
-    mUi->cbProject->clear();
     mUi->lwHistory->clear();
 
     if (mSession)
@@ -87,80 +75,6 @@ void ActivityWidget::stopCurrentTimeSheet()
     }
 }
 
-void ActivityWidget::onCbCustomerFieldChanged()
-{
-    updateProjectsCombo();
-    updateControls();
-}
-
-void ActivityWidget::onCbProjectFieldChanged()
-{
-    updateActivitiesCombo();
-    updateControls();
-}
-
-void ActivityWidget::onCbActivityFieldChanged()
-{
-    if (mSession)
-    {
-        if (!mSession->hasCurrentTimeSheet()) {}
-    }
-    updateControls();
-}
-
-void ActivityWidget::onTbAddCustomerClicked()
-{
-    auto dialog = CustomerDialog(this);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        const auto& customer = dialog.customer();
-
-        auto customerAddResult = mSession->client()->addCustomer(customer);
-        connect(customerAddResult, &KimaiApiBaseResult::ready, this, [this, customerAddResult] {
-            const auto& customer = customerAddResult->getResult();
-            customerAddResult->deleteLater();
-            mSession->refreshCache(KimaiCache::Category::Customers);
-        });
-        connect(customerAddResult, &KimaiApiBaseResult::error, [customerAddResult]() { customerAddResult->deleteLater(); });
-    }
-}
-
-void ActivityWidget::onTbAddProjectClicked()
-{
-    auto dialog = ProjectDialog(this);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        auto project = dialog.project();
-
-        auto projectAddResult = mSession->client()->addProject(project);
-        connect(projectAddResult, &KimaiApiBaseResult::ready, this, [this, projectAddResult] {
-            const auto& project = projectAddResult->getResult();
-            mUi->cbProject->addItem(project.name, project.id);
-            projectAddResult->deleteLater();
-            mSession->refreshCache(KimaiCache::Category::Projects);
-        });
-        connect(projectAddResult, &KimaiApiBaseResult::error, [projectAddResult]() { projectAddResult->deleteLater(); });
-    }
-}
-
-void ActivityWidget::onTbAddActivityClicked()
-{
-    auto dialog = ActivityDialog(this);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        auto activity = dialog.activity();
-
-        auto activityAddResult = mSession->client()->addActivity(activity);
-        connect(activityAddResult, &KimaiApiBaseResult::ready, this, [this, activityAddResult] {
-            const auto& activity = activityAddResult->getResult();
-            mUi->cbActivity->addItem(activity.name, activity.id);
-            activityAddResult->deleteLater();
-            mSession->refreshCache(KimaiCache::Category::Activities);
-        });
-        connect(activityAddResult, &KimaiApiBaseResult::error, [activityAddResult]() { activityAddResult->deleteLater(); });
-    }
-}
-
 void ActivityWidget::onSecondTimeout()
 {
     const auto& now = QDateTime::currentDateTime();
@@ -182,13 +96,10 @@ void ActivityWidget::onSessionCurrentTimeSheetChanged()
     if (mSession->hasCurrentTimeSheet()) {}
 
     updateControls();
-    updateCustomersCombo();
 }
 
 void ActivityWidget::onSessionCacheSynchronizeFinished()
 {
-    mUi->cbProject->setKimaiData(mSession->cache().projects());
-    mUi->cbActivity->setKimaiData(mSession->cache().activities());
     updateRecentTimeSheetsView();
     setEnabled(true);
 
@@ -223,12 +134,7 @@ void ActivityWidget::onHistoryTimeSheetFillRequested(const TimeSheet& timeSheet)
     fillFromTimesheet(timeSheet);
 }
 
-void ActivityWidget::fillFromTimesheet(const TimeSheet& timeSheet)
-{
-    updateProjectsCombo();
-    mUi->cbProject->setCurrentIndex(mUi->cbProject->findData(timeSheet.project.id));
-    mUi->cbActivity->setCurrentIndex(mUi->cbActivity->findData(timeSheet.activity.id));
-}
+void ActivityWidget::fillFromTimesheet(const TimeSheet& timeSheet) {}
 
 void ActivityWidget::onBtStartStopClicked()
 {
@@ -239,9 +145,6 @@ void ActivityWidget::onBtStartStopClicked()
     else
     {
         TimeSheet timeSheet;
-
-        timeSheet.project.id  = mUi->cbProject->currentData().toInt();
-        timeSheet.activity.id = mUi->cbActivity->currentData().toInt();
 
         auto timeSheetResult = mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
 
@@ -264,11 +167,8 @@ void ActivityWidget::updateControls()
 
     auto noTimeSheetRunning = !mSession->hasCurrentTimeSheet();
 
-    mUi->cbProject->setEnabled(noTimeSheetRunning);
-    mUi->cbActivity->setEnabled(noTimeSheetRunning && !mUi->cbProject->currentText().isEmpty());
-
-    bool enableStartStop = !mUi->cbProject->currentText().isEmpty() && !mUi->cbActivity->currentText().isEmpty();
-    mUi->btStartStop->setEnabled(enableStartStop);
+    //    bool enableStartStop = !mUi->cbProject->currentText().isEmpty() && !mUi->cbActivity->currentText().isEmpty();
+    //    mUi->btStartStop->setEnabled(enableStartStop);
 
     if (noTimeSheetRunning)
     {
@@ -281,61 +181,6 @@ void ActivityWidget::updateControls()
     }
 
     emit currentActivityChanged(noTimeSheetRunning);
-}
-
-void ActivityWidget::updateCustomersCombo()
-{
-    if (mSession)
-    {
-        if (mSession->hasCurrentTimeSheet()) {}
-    }
-}
-
-void ActivityWidget::updateProjectsCombo()
-{
-    if (mSession)
-    {
-        // When no customer selected, list all projects
-
-        if (mSession->hasCurrentTimeSheet())
-        {
-            auto projectIndex = mUi->cbProject->findData(mSession->currentTimeSheet()->project.id);
-            if (projectIndex >= 0)
-            {
-                mUi->cbProject->setCurrentIndex(projectIndex);
-            }
-            else
-            {
-                spdlog::error("Cannot find '{}' project", mSession->currentTimeSheet()->project.name);
-            }
-        }
-    }
-}
-
-void ActivityWidget::updateActivitiesCombo()
-{
-    if (mSession)
-    {
-        auto projectId = mUi->cbProject->currentText().isEmpty() ? std::nullopt : std::optional<int>(mUi->cbProject->currentData().toInt());
-        mUi->cbActivity->setFilter(mSession->cache().activities(projectId));
-
-        if (mSession->hasCurrentTimeSheet())
-        {
-            auto activityIndex = mUi->cbActivity->findData(mSession->currentTimeSheet()->activity.id);
-            if (activityIndex >= 0)
-            {
-                mUi->cbActivity->setCurrentIndex(activityIndex);
-            }
-            else
-            {
-                spdlog::error("Cannot find '{}' activity", mSession->currentTimeSheet()->activity.name);
-            }
-        }
-        else if (!projectId.has_value())
-        {
-            mUi->cbActivity->setCurrentText("");
-        }
-    }
 }
 
 void ActivityWidget::updateRecentTimeSheetsView()

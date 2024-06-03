@@ -16,23 +16,17 @@ set(SRCS
         client/parser.cpp
         context/kemaiSession.cpp
         gui/aboutDialog.cpp
-        gui/activityDialog.cpp
         gui/activityWidget.cpp
-        gui/autoCompleteComboBox.cpp
-        gui/customerDialog.cpp
         gui/durationEdit.cpp
         gui/loggerWidget.cpp
         gui/loginDialog.cpp
         gui/mainWindow.cpp
-        gui/projectDialog.cpp
         gui/settingsDialog.cpp
         gui/taskWidget.cpp
         gui/timeSheetListWidgetItem.cpp
         main.cpp
         misc/dataReader.cpp
         misc/helpers.cpp
-        models/kimaiDataListModel.cpp
-        models/kimaiDataSortFilterProxyModel.cpp
         models/loggerTreeModel.cpp
         models/taskFilterProxyModel.cpp
         models/taskListModel.cpp
@@ -51,23 +45,17 @@ set(HDRS
         client/parser.h
         context/kemaiSession.h
         gui/aboutDialog.h
-        gui/activityDialog.h
         gui/activityWidget.h
-        gui/autoCompleteComboBox.h
-        gui/customerDialog.h
         gui/durationEdit.h
         gui/loggerWidget.h
         gui/loginDialog.h
         gui/mainWindow.h
-        gui/projectDialog.h
         gui/settingsDialog.h
         gui/taskWidget.h
         gui/timeSheetListWidgetItem.h
         misc/customFmt.h
         misc/dataReader.h
         misc/helpers.h
-        models/kimaiDataListModel.h
-        models/kimaiDataSortFilterProxyModel.h
         models/loggerTreeModel.h
         models/taskFilterProxyModel.h
         models/taskListModel.h
@@ -80,13 +68,10 @@ set(HDRS
 # Forms
 set(UIS
         gui/aboutDialog.ui
-        gui/activityDialog.ui
         gui/activityWidget.ui
-        gui/customerDialog.ui
         gui/loggerWidget.ui
         gui/loginDialog.ui
         gui/mainWindow.ui
-        gui/projectDialog.ui
         gui/settingsDialog.ui
         gui/taskWidget.ui
         gui/timeSheetListWidgetItem.ui)

@@ -27,14 +27,6 @@ signals:
     void currentActivityChanged(bool started);
 
 private:
-    void onCbCustomerFieldChanged();
-    void onCbProjectFieldChanged();
-    void onCbActivityFieldChanged();
-
-    void onTbAddCustomerClicked();
-    void onTbAddProjectClicked();
-    void onTbAddActivityClicked();
-
     void onBtStartStopClicked();
 
     void onSecondTimeout();
@@ -48,9 +40,6 @@ private:
 
     void updateControls();
 
-    void updateCustomersCombo();
-    void updateProjectsCombo();
-    void updateActivitiesCombo();
     void updateRecentTimeSheetsView();
 
     void startPendingTimeSheet();

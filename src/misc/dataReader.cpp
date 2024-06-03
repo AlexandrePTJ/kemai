@@ -7,16 +7,16 @@
 
 using namespace kemai;
 
-QMap<QString, QString> DataReader::countries()
+static QMap<QString, QString> readKeyValueJsonFile(const QString& jsonFile)
 {
     QMap<QString, QString> res;
 
-    QFile fdata(":/data/countries");
-    fdata.open(QIODevice::ReadOnly | QIODevice::Text);
+    QFile dataFile(jsonFile);
+    dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    auto jdoc = QJsonDocument::fromJson(fdata.readAll());
-    auto jobj = jdoc.object();
-    for (auto it = jobj.begin(); it != jobj.end(); ++it)
+    auto jsonDocument = QJsonDocument::fromJson(dataFile.readAll());
+    auto jsonObject   = jsonDocument.object();
+    for (auto it = jsonObject.begin(); it != jsonObject.end(); ++it)
     {
         res.insert(it.key(), it.value().toString());
     }
@@ -24,19 +24,12 @@ QMap<QString, QString> DataReader::countries()
     return res;
 }
 
+QMap<QString, QString> DataReader::countries()
+{
+    return readKeyValueJsonFile(":/data/countries");
+}
+
 QMap<QString, QString> DataReader::currencies()
 {
-    QMap<QString, QString> res;
-
-    QFile fdata(":/data/currencies");
-    fdata.open(QIODevice::ReadOnly | QIODevice::Text);
-
-    auto jdoc = QJsonDocument::fromJson(fdata.readAll());
-    auto jobj = jdoc.object();
-    for (auto it = jobj.begin(); it != jobj.end(); ++it)
-    {
-        res.insert(it.key(), it.value().toString());
-    }
-
-    return res;
+    return readKeyValueJsonFile(":/data/currencies");
 }
