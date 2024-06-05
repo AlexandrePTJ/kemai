@@ -6,12 +6,16 @@
 #include "misc/customFmt.h"
 #include "misc/helpers.h"
 #include "timeSheetListWidgetItem.h"
+#include "timeSheetParamsItemDelegate.h"
 
 using namespace kemai;
 
 ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make_unique<Ui::ActivityWidget>())
 {
     mUi->setupUi(this);
+
+    mUi->cbTimeSheetParams->setModel(&mTimeSheetParamsModel);
+    mUi->cbTimeSheetParams->setItemDelegate(new TimeSheetParamsItemDelegate);
 
     connect(mUi->btStartStop, &QPushButton::clicked, this, &ActivityWidget::onBtStartStopClicked);
     connect(&mSecondTimer, &QTimer::timeout, this, &ActivityWidget::onSecondTimeout);
@@ -77,12 +81,10 @@ void ActivityWidget::stopCurrentTimeSheet()
 
 void ActivityWidget::onSecondTimeout()
 {
-    const auto& now = QDateTime::currentDateTime();
     if (mSession && mSession->hasCurrentTimeSheet())
     {
-        mUi->lbDurationTime->setText(helpers::getDurationString(mSession->currentTimeSheet()->beginAt, now));
+        mUi->lbDurationTime->setText(helpers::getDurationString(mSession->currentTimeSheet()->beginAt, QDateTime::currentDateTime()));
     }
-    else {}
 }
 
 void ActivityWidget::onSessionCurrentTimeSheetChanged()
@@ -92,8 +94,6 @@ void ActivityWidget::onSessionCurrentTimeSheetChanged()
     {
         qApp->processEvents();
     }
-
-    if (mSession->hasCurrentTimeSheet()) {}
 
     updateControls();
 }
@@ -108,6 +108,8 @@ void ActivityWidget::onSessionCacheSynchronizeFinished()
     {
         onSessionCurrentTimeSheetChanged();
     }
+
+    mTimeSheetParamsModel.updateDataFromCache(mSession->cache());
 }
 
 void ActivityWidget::onHistoryTimeSheetStartRequested(const TimeSheet& timeSheet)
@@ -165,22 +167,17 @@ void ActivityWidget::updateControls()
         return;
     }
 
-    auto noTimeSheetRunning = !mSession->hasCurrentTimeSheet();
+    mUi->btStartStop->setEnabled(mPendingStartRequest.has_value() || mSession->hasCurrentTimeSheet());
 
-    //    bool enableStartStop = !mUi->cbProject->currentText().isEmpty() && !mUi->cbActivity->currentText().isEmpty();
-    //    mUi->btStartStop->setEnabled(enableStartStop);
-
-    if (noTimeSheetRunning)
+    if (mSession->hasCurrentTimeSheet())
+    {
+        mUi->btStartStop->setIcon(QIcon(":/icons/stop"));
+    }
+    else
     {
         mUi->btStartStop->setIcon(QIcon(":/icons/play"));
         mUi->lbDurationTime->clear();
     }
-    else
-    {
-        mUi->btStartStop->setIcon(QIcon(":/icons/stop"));
-    }
-
-    emit currentActivityChanged(noTimeSheetRunning);
 }
 
 void ActivityWidget::updateRecentTimeSheetsView()

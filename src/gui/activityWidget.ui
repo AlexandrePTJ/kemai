@@ -60,7 +60,7 @@
        <number>12</number>
       </property>
       <item>
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QComboBox" name="cbTimeSheetParams">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -71,9 +71,6 @@
          <font>
           <pointsize>12</pointsize>
          </font>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
         </property>
         <property name="placeholderText">
          <string>What are you working on ?</string>

@@ -24,12 +24,14 @@ set(SRCS
         gui/settingsDialog.cpp
         gui/taskWidget.cpp
         gui/timeSheetListWidgetItem.cpp
+        gui/timeSheetParamsItemDelegate.cpp
         main.cpp
         misc/dataReader.cpp
         misc/helpers.cpp
         models/loggerTreeModel.cpp
         models/taskFilterProxyModel.cpp
         models/taskListModel.cpp
+        models/timeSheetParamsModel.cpp
         monitor/desktopEventsMonitor.cpp
         monitor/kimaiEventsMonitor.cpp
         settings/settings.cpp
@@ -53,12 +55,14 @@ set(HDRS
         gui/settingsDialog.h
         gui/taskWidget.h
         gui/timeSheetListWidgetItem.h
+        gui/timeSheetParamsItemDelegate.h
         misc/customFmt.h
         misc/dataReader.h
         misc/helpers.h
         models/loggerTreeModel.h
         models/taskFilterProxyModel.h
         models/taskListModel.h
+        models/timeSheetParamsModel.h
         monitor/desktopEventsMonitor.h
         monitor/kimaiEventsMonitor.h
         settings/settings.h
