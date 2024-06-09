@@ -47,11 +47,6 @@ void TimeSheetParamsItemDelegate::paint(QPainter* painter, const QStyleOptionVie
     // Activity
     auto activityRect = QRect(textX + widthThird, secondLineY, 2 * widthThird, textH);
     qApp->style()->drawItemText(painter, activityRect, Qt::AlignLeft, option.palette, isSelected, index.data(TimeSheetParamsModel::ActivityName).toString());
-
-    if (option.showDecorationSelected)
-    {
-        qDebug() << index.data().toString();
-    }
 }
 
 QSize TimeSheetParamsItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const

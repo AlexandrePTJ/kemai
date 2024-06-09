@@ -26,6 +26,7 @@ public:
 
 private:
     void onBtStartStopClicked();
+    void onTimeSheetParamsIndexChanged(int index);
 
     void onSecondTimeout();
 
@@ -41,6 +42,9 @@ private:
     void updateRecentTimeSheetsView();
 
     void startPendingTimeSheet();
+
+    bool isCurrentTimeSheetParamsValid() const;
+    std::pair<int, int> getCurrentTimeSheetParams() const;
 
     std::unique_ptr<Ui::ActivityWidget> mUi;
     QTimer mSecondTimer;

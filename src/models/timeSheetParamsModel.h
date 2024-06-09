@@ -20,6 +20,9 @@ public:
 
     void updateDataFromCache(const KimaiCache& cache);
 
+    // Returns -1 if not found
+    int findIndex(int projectId, int activityId) const;
+
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
@@ -32,7 +35,7 @@ private:
         int projectId;
         int activityId;
     };
-    std::vector<TimeSheetParams> m_timeSheetParams;
+    std::vector<TimeSheetParams> mTimeSheetParams;
 };
 
 } // namespace kemai

@@ -12,7 +12,7 @@ void TimeSheetParamsModel::updateDataFromCache(const KimaiCache& cache)
         {
             for (const auto& activity : cache.activities(project.id))
             {
-                m_timeSheetParams.emplace_back(TimeSheetParams{
+                mTimeSheetParams.emplace_back(TimeSheetParams{
                     .customer = customer.name, .project = project.name, .activity = activity.name, .projectId = project.id, .activityId = activity.id});
             }
         }
@@ -21,15 +21,26 @@ void TimeSheetParamsModel::updateDataFromCache(const KimaiCache& cache)
     endResetModel();
 }
 
+int TimeSheetParamsModel::findIndex(int projectId, int activityId) const
+{
+    auto it = std::find_if(mTimeSheetParams.begin(), mTimeSheetParams.end(), [projectId, activityId](const auto& timeSheetParams) {
+        return timeSheetParams.projectId == projectId && timeSheetParams.activityId == activityId;
+    });
+    if (it == mTimeSheetParams.end())
+    {
+        return -1;
+    }
+    return std::distance(mTimeSheetParams.begin(), it);
+}
+
 QVariant TimeSheetParamsModel::data(const QModelIndex& index, int role) const
 {
-
-    if (!index.isValid() || (index.row() > m_timeSheetParams.size()))
+    if (!index.isValid() || (index.row() > mTimeSheetParams.size()))
     {
         return {};
     }
 
-    const auto& params = m_timeSheetParams.at(index.row());
+    const auto& params = mTimeSheetParams.at(index.row());
     switch (role)
     {
     case Qt::DisplayRole:
@@ -57,5 +68,5 @@ QVariant TimeSheetParamsModel::data(const QModelIndex& index, int role) const
 
 int TimeSheetParamsModel::rowCount(const QModelIndex& /*parent*/) const
 {
-    return static_cast<int>(m_timeSheetParams.size());
+    return static_cast<int>(mTimeSheetParams.size());
 }

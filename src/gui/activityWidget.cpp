@@ -18,6 +18,7 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make
     mUi->cbTimeSheetParams->setItemDelegate(new TimeSheetParamsItemDelegate);
 
     connect(mUi->btStartStop, &QPushButton::clicked, this, &ActivityWidget::onBtStartStopClicked);
+    connect(mUi->cbTimeSheetParams, &QComboBox::currentIndexChanged, this, &ActivityWidget::onTimeSheetParamsIndexChanged);
     connect(&mSecondTimer, &QTimer::timeout, this, &ActivityWidget::onSecondTimeout);
 
     mSecondTimer.setInterval(std::chrono::seconds(1));
@@ -110,6 +111,7 @@ void ActivityWidget::onSessionCacheSynchronizeFinished()
     }
 
     mTimeSheetParamsModel.updateDataFromCache(mSession->cache());
+    mUi->cbTimeSheetParams->setCurrentIndex(-1);
 }
 
 void ActivityWidget::onHistoryTimeSheetStartRequested(const TimeSheet& timeSheet)
@@ -136,7 +138,11 @@ void ActivityWidget::onHistoryTimeSheetFillRequested(const TimeSheet& timeSheet)
     fillFromTimesheet(timeSheet);
 }
 
-void ActivityWidget::fillFromTimesheet(const TimeSheet& timeSheet) {}
+void ActivityWidget::fillFromTimesheet(const TimeSheet& timeSheet)
+{
+    auto index = mTimeSheetParamsModel.findIndex(timeSheet.project.id, timeSheet.activity.id);
+    mUi->cbTimeSheetParams->setCurrentIndex(index);
+}
 
 void ActivityWidget::onBtStartStopClicked()
 {
@@ -144,9 +150,10 @@ void ActivityWidget::onBtStartStopClicked()
     {
         stopCurrentTimeSheet();
     }
-    else
+    else if (isCurrentTimeSheetParamsValid())
     {
         TimeSheet timeSheet;
+        std::tie(timeSheet.project.id, timeSheet.activity.id) = getCurrentTimeSheetParams();
 
         auto timeSheetResult = mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
 
@@ -156,6 +163,11 @@ void ActivityWidget::onBtStartStopClicked()
         });
         connect(timeSheetResult, &KimaiApiBaseResult::error, [timeSheetResult]() { timeSheetResult->deleteLater(); });
     }
+}
+
+void ActivityWidget::onTimeSheetParamsIndexChanged(int /*index*/)
+{
+    mUi->btStartStop->setEnabled(isCurrentTimeSheetParamsValid());
 }
 
 void ActivityWidget::updateControls()
@@ -218,4 +230,16 @@ void ActivityWidget::startPendingTimeSheet()
         });
         connect(timeSheetResult, &KimaiApiBaseResult::error, [timeSheetResult]() { timeSheetResult->deleteLater(); });
     }
+}
+
+bool ActivityWidget::isCurrentTimeSheetParamsValid() const
+{
+    return mUi->cbTimeSheetParams->currentData(TimeSheetParamsModel::ProjectIdRole).isValid() &&
+           mUi->cbTimeSheetParams->currentData(TimeSheetParamsModel::ActivityIdRole).isValid();
+}
+
+std::pair<int, int> ActivityWidget::getCurrentTimeSheetParams() const
+{
+    return {mUi->cbTimeSheetParams->currentData(TimeSheetParamsModel::ProjectIdRole).toInt(),
+            mUi->cbTimeSheetParams->currentData(TimeSheetParamsModel::ActivityIdRole).toInt()};
 }
