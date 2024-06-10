@@ -10,9 +10,12 @@
 
 using namespace kemai;
 
+static const auto gDefaultDurationText = "--:--:--";
+
 ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make_unique<Ui::ActivityWidget>())
 {
     mUi->setupUi(this);
+    mUi->lbDurationTime->setText(gDefaultDurationText);
 
     mUi->cbTimeSheetParams->setModel(&mTimeSheetParamsModel);
     mUi->cbTimeSheetParams->setItemDelegate(new TimeSheetParamsItemDelegate);
@@ -154,6 +157,7 @@ void ActivityWidget::onBtStartStopClicked()
     {
         TimeSheet timeSheet;
         std::tie(timeSheet.project.id, timeSheet.activity.id) = getCurrentTimeSheetParams();
+        timeSheet.beginAt                                     = mSession->computeTZDateTime(QDateTime::currentDateTime());
 
         auto timeSheetResult = mSession->client()->startTimeSheet(timeSheet, mSession->timeSheetConfig().trackingMode);
 
@@ -188,7 +192,7 @@ void ActivityWidget::updateControls()
     else
     {
         mUi->btStartStop->setIcon(QIcon(":/icons/play"));
-        mUi->lbDurationTime->clear();
+        mUi->lbDurationTime->setText(gDefaultDurationText);
     }
 }
 

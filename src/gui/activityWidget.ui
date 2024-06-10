@@ -108,6 +108,12 @@
       </item>
       <item>
        <widget class="QLabel" name="lbDurationTime">
+        <property name="minimumSize">
+         <size>
+          <width>105</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <pointsize>20</pointsize>
