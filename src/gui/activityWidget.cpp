@@ -20,6 +20,8 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make
     mUi->cbTimeSheetParams->setModel(&mTimeSheetParamsModel);
     mUi->cbTimeSheetParams->setItemDelegate(new TimeSheetParamsItemDelegate);
 
+    mUi->lwHistory->setModel(&mTimeSheetModel);
+
     connect(mUi->btStartStop, &QPushButton::clicked, this, &ActivityWidget::onBtStartStopClicked);
     connect(mUi->cbTimeSheetParams, &QComboBox::currentIndexChanged, this, &ActivityWidget::onTimeSheetParamsIndexChanged);
     connect(&mSecondTimer, &QTimer::timeout, this, &ActivityWidget::onSecondTimeout);
@@ -36,11 +38,11 @@ ActivityWidget::~ActivityWidget()
     mSecondTimer.stop();
 }
 
-void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
+void ActivityWidget::setKemaiSession(const std::shared_ptr<KemaiSession>& kemaiSession)
 {
-    mSession = std::move(kemaiSession);
+    mSession = kemaiSession;
 
-    mUi->lwHistory->clear();
+    mTimeSheetModel.setKemaiSession(kemaiSession);
 
     if (mSession)
     {
@@ -198,20 +200,20 @@ void ActivityWidget::updateControls()
 
 void ActivityWidget::updateRecentTimeSheetsView()
 {
-    mUi->lwHistory->clear();
-    for (const auto& timeSheet : mSession->cache().recentTimeSheets())
-    {
-        auto timeSheetListWidgetItem = new TimeSheetListWidgetItem(timeSheet);
-
-        auto item = new QListWidgetItem;
-        item->setSizeHint(timeSheetListWidgetItem->sizeHint());
-
-        mUi->lwHistory->addItem(item);
-        mUi->lwHistory->setItemWidget(item, timeSheetListWidgetItem);
-
-        connect(timeSheetListWidgetItem, &TimeSheetListWidgetItem::timeSheetStartRequested, this, &ActivityWidget::onHistoryTimeSheetStartRequested);
-        connect(timeSheetListWidgetItem, &TimeSheetListWidgetItem::timeSheetFillRequested, this, &ActivityWidget::onHistoryTimeSheetFillRequested);
-    }
+    //    mUi->lwHistory->clear();
+    //    for (const auto& timeSheet : mSession->cache().recentTimeSheets())
+    //    {
+    //        auto timeSheetListWidgetItem = new TimeSheetListWidgetItem(timeSheet);
+    //
+    //        auto item = new QListWidgetItem;
+    //        item->setSizeHint(timeSheetListWidgetItem->sizeHint());
+    //
+    //        mUi->lwHistory->addItem(item);
+    //        mUi->lwHistory->setItemWidget(item, timeSheetListWidgetItem);
+    //
+    //        connect(timeSheetListWidgetItem, &TimeSheetListWidgetItem::timeSheetStartRequested, this, &ActivityWidget::onHistoryTimeSheetStartRequested);
+    //        connect(timeSheetListWidgetItem, &TimeSheetListWidgetItem::timeSheetFillRequested, this, &ActivityWidget::onHistoryTimeSheetFillRequested);
+    //    }
 }
 
 void ActivityWidget::startPendingTimeSheet()

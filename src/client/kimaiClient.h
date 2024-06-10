@@ -47,6 +47,7 @@ public:
     CustomersResult requestCustomers();
     TimeSheetsResult requestActiveTimeSheets();
     TimeSheetsResult requestRecentTimeSheets();
+    TimeSheetsResult requestTimeSheets(const QString& term = "", int page = 1);
     ProjectsResult requestProjects(std::optional<int> customerId = std::nullopt);
     ActivitiesResult requestActivities(std::optional<int> projectId = std::nullopt);
 

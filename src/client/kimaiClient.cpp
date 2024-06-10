@@ -245,6 +245,13 @@ TimeSheetsResult KimaiClient::requestRecentTimeSheets()
     return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::RecentTimeSheets, reply);
 }
 
+TimeSheetsResult KimaiClient::requestTimeSheets(const QString& term, int page)
+{
+    auto request = mD->prepareRequest(ApiMethod::TimeSheets, {{"page", QString::number(page)}, {"full", "1"}, {"term", term}});
+    auto reply   = mD->sendGetRequest(request);
+    return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::TimeSheets, reply);
+}
+
 ProjectsResult KimaiClient::requestProjects(std::optional<int> customerId)
 {
     std::map<QString, QString> parameters;

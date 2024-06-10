@@ -157,7 +157,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="lwHistory"/>
+    <widget class="QListView" name="lwHistory"/>
    </item>
   </layout>
  </widget>

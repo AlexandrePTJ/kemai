@@ -5,6 +5,7 @@
 
 #include "client/kimaiClient.h"
 #include "context/kemaiSession.h"
+#include "models/timeSheetModel.h"
 #include "models/timeSheetParamsModel.h"
 
 namespace Ui {
@@ -21,7 +22,7 @@ public:
     ActivityWidget(QWidget* parent = nullptr);
     ~ActivityWidget() override;
 
-    void setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession);
+    void setKemaiSession(const std::shared_ptr<KemaiSession>& kemaiSession);
     void stopCurrentTimeSheet();
 
 private:
@@ -51,6 +52,7 @@ private:
     std::shared_ptr<KemaiSession> mSession;
     std::optional<TimeSheet> mPendingStartRequest;
     TimeSheetParamsModel mTimeSheetParamsModel;
+    TimeSheetModel mTimeSheetModel;
 };
 
 } // namespace kemai
