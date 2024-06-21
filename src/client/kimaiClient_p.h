@@ -113,10 +113,8 @@ public:
         return result;
     }
 
-    void onNamSslErrors(QNetworkReply* reply, const QList<QSslError>& errors);
-
     QString username, host, token, apiToken;
-    QScopedPointer<QNetworkAccessManager> networkAccessManager;
+    std::shared_ptr<QNetworkAccessManager> networkAccessManager;
 
 private:
     KimaiClient* const mQ;

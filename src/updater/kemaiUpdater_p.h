@@ -16,12 +16,12 @@ public:
     explicit KemaiUpdaterPrivate(KemaiUpdater* c);
 
     QNetworkRequest prepareGithubRequest(const QString& path);
-    void onNamFinished(QNetworkReply* reply);
+    void onLatestReleaseReplyFinished();
 
     QVersionNumber currentCheckSinceVersion;
     bool silenceIfNoNew;
 
-    QScopedPointer<QNetworkAccessManager> networkAccessManager;
+    std::shared_ptr<QNetworkAccessManager> networkAccessManager;
 
 private:
     KemaiUpdater* const mQ;

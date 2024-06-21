@@ -3,6 +3,7 @@
 #include <memory>
 #include <optional>
 
+#include <QNetworkAccessManager>
 #include <QObject>
 
 #include "client/kimaiAPI.h"
@@ -32,6 +33,8 @@ class KimaiClient : public QObject
 public:
     explicit KimaiClient(QObject* parent = nullptr);
     ~KimaiClient() override;
+
+    void setNetworkAccessManager(const std::shared_ptr<QNetworkAccessManager>& nam);
 
     void setHost(const QString& host);
 

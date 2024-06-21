@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QNetworkAccessManager>
 #include <QObject>
 #include <QUrl>
 #include <QVersionNumber>
@@ -20,6 +21,8 @@ class KemaiUpdater : public QObject
 public:
     explicit KemaiUpdater(QObject* parent = nullptr);
     ~KemaiUpdater() override;
+
+    void setNetworkAccessManager(const std::shared_ptr<QNetworkAccessManager>& nam);
 
     void checkAvailableNewVersion(const QVersionNumber& sinceVersion = QVersionNumber(0, 0, 0), bool silenceIfNoNew = false);
 

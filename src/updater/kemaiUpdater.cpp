@@ -13,10 +13,7 @@ using namespace kemai;
 /*
  * Private impl
  */
-KemaiUpdater::KemaiUpdaterPrivate::KemaiUpdaterPrivate(KemaiUpdater* c) : networkAccessManager(new QNetworkAccessManager), mQ(c)
-{
-    connect(networkAccessManager.data(), &QNetworkAccessManager::finished, this, &KemaiUpdaterPrivate::onNamFinished);
-}
+KemaiUpdater::KemaiUpdaterPrivate::KemaiUpdaterPrivate(KemaiUpdater* c) : networkAccessManager(std::make_shared<QNetworkAccessManager>()), mQ(c) {}
 
 QNetworkRequest KemaiUpdater::KemaiUpdaterPrivate::prepareGithubRequest(const QString& path)
 {
@@ -31,32 +28,37 @@ QNetworkRequest KemaiUpdater::KemaiUpdaterPrivate::prepareGithubRequest(const QS
     return r;
 }
 
-void KemaiUpdater::KemaiUpdaterPrivate::onNamFinished(QNetworkReply* reply)
+void KemaiUpdater::KemaiUpdaterPrivate::onLatestReleaseReplyFinished()
 {
-    if (reply->error() != QNetworkReply::NoError)
+    if (auto reply = qobject_cast<QNetworkReply*>(sender()))
     {
-        spdlog::error("Error on update check: {}", reply->errorString());
-    }
-    else
-    {
-        // Parse json
-        auto jdoc = QJsonDocument::fromJson(reply->readAll());
-        auto jobj = jdoc.object();
-
-        auto newVersion = QVersionNumber::fromString(jobj.value("tag_name").toString());
-        if (newVersion > currentCheckSinceVersion)
+        if (reply->error() != QNetworkReply::NoError)
         {
-            VersionDetails vd;
-            vd.vn          = newVersion;
-            vd.description = jobj.value("body").toString();
-            vd.url         = jobj.value("html_url").toString();
-
-            emit mQ->checkFinished(vd);
+            spdlog::error("Error on update check: {}", reply->errorString());
         }
-        else if (!silenceIfNoNew)
+        else
         {
-            emit mQ->checkFinished(VersionDetails());
+            // Parse json
+            auto jdoc = QJsonDocument::fromJson(reply->readAll());
+            auto jobj = jdoc.object();
+
+            auto newVersion = QVersionNumber::fromString(jobj.value("tag_name").toString());
+            if (newVersion > currentCheckSinceVersion)
+            {
+                VersionDetails vd;
+                vd.vn          = newVersion;
+                vd.description = jobj.value("body").toString();
+                vd.url         = jobj.value("html_url").toString();
+
+                emit mQ->checkFinished(vd);
+            }
+            else if (!silenceIfNoNew)
+            {
+                emit mQ->checkFinished(VersionDetails());
+            }
         }
+
+        reply->deleteLater();
     }
 }
 
@@ -67,11 +69,17 @@ KemaiUpdater::KemaiUpdater(QObject* parent) : QObject(parent), mD(new KemaiUpdat
 
 KemaiUpdater::~KemaiUpdater() = default;
 
+void KemaiUpdater::setNetworkAccessManager(const std::shared_ptr<QNetworkAccessManager>& nam)
+{
+    mD->networkAccessManager = nam;
+}
+
 void KemaiUpdater::checkAvailableNewVersion(const QVersionNumber& sinceVersion, bool silenceIfNoNew)
 {
     mD->currentCheckSinceVersion = sinceVersion;
     mD->silenceIfNoNew           = silenceIfNoNew;
 
-    auto rq = mD->prepareGithubRequest("/repos/AlexandrePTJ/kemai/releases/latest");
-    mD->networkAccessManager->get(rq);
+    auto request = mD->prepareGithubRequest("/repos/AlexandrePTJ/kemai/releases/latest");
+    auto reply   = mD->networkAccessManager->get(request);
+    connect(reply, &QNetworkReply::finished, mD.get(), &KemaiUpdaterPrivate::onLatestReleaseReplyFinished);
 }

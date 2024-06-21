@@ -4,8 +4,6 @@
 #include <QCoreApplication>
 #include <QUrlQuery>
 
-#include <spdlog/spdlog.h>
-
 using namespace kemai;
 
 /*
@@ -83,10 +81,7 @@ QString kemai::apiMethodToString(ApiMethod method)
 /*
  * Private impl
  */
-KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c) : networkAccessManager(new QNetworkAccessManager), mQ(c)
-{
-    connect(networkAccessManager.get(), &QNetworkAccessManager::sslErrors, this, &KimaiClientPrivate::onNamSslErrors);
-}
+KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c) : networkAccessManager(std::make_shared<QNetworkAccessManager>()), mQ(c) {}
 
 QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method, const std::map<QString, QString>& parameters, const QByteArray& data,
                                                                 const QString& subPath) const
@@ -156,24 +151,17 @@ QNetworkReply* KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkR
     return networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);
 }
 
-void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* /*reply*/, const QList<QSslError>& errors)
-{
-    for (const auto& error : errors)
-    {
-        spdlog::error("SSL Error: {}", error.errorString());
-    }
-
-    // Process certificate errors one by one.
-    const auto& crtError = errors.first();
-    emit mQ->sslError(crtError.errorString(), crtError.certificate().serialNumber(), crtError.certificate().toPem());
-}
-
 /*
  * Public impl
  */
 KimaiClient::KimaiClient(QObject* parent) : QObject(parent), mD(new KimaiClientPrivate(this)) {}
 
 KimaiClient::~KimaiClient() = default;
+
+void KimaiClient::setNetworkAccessManager(const std::shared_ptr<QNetworkAccessManager>& nam)
+{
+    mD->networkAccessManager = nam;
+}
 
 void KimaiClient::setHost(const QString& host)
 {

@@ -4,7 +4,7 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QMenuBar>
-
+#include <QNetworkAccessManager>
 #include <QSystemTrayIcon>
 
 #include "client/kimaiClient.h"
@@ -44,6 +44,7 @@ private:
     void updateProfilesMenu();
     void processAutoConnect();
 
+    void onNamSslErrors(QNetworkReply* reply, const QList<QSslError>& errors);
     void onCurrentTimeSheetChanged();
     void onPluginsChanged();
     void onSessionVersionChanged();
@@ -63,6 +64,7 @@ private:
     KemaiUpdater mUpdater;
     std::shared_ptr<KemaiSession> mSession;
     std::shared_ptr<DesktopEventsMonitor> mDesktopEventsMonitor;
+    std::shared_ptr<QNetworkAccessManager> mNam;
 
     // Stacked widget (ownership is transferred, don't try to delete them)
     ActivityWidget* mActivityWidget = nullptr;

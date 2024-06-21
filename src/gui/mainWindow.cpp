@@ -13,6 +13,7 @@
 #include "activityWidget.h"
 #include "client/kimaiFeatures.h"
 #include "kemaiConfig.h"
+#include "misc/customFmt.h"
 #include "settings/settings.h"
 #include "settingsDialog.h"
 #include "taskWidget.h"
@@ -27,9 +28,11 @@ static const auto FirstRequestDelayMs = 100;
 /*
  * Class impl
  */
-MainWindow::MainWindow() : mUi(std::make_unique<Ui::MainWindow>())
+MainWindow::MainWindow() : mUi(std::make_unique<Ui::MainWindow>()), mNam(std::make_shared<QNetworkAccessManager>())
 {
     mUi->setupUi(this);
+
+    mUpdater.setNetworkAccessManager(mNam);
 
     auto settings = Settings::get();
 
@@ -140,6 +143,7 @@ MainWindow::MainWindow() : mUi(std::make_unique<Ui::MainWindow>())
     /*
      * Connections
      */
+    connect(mNam.get(), &QNetworkAccessManager::sslErrors, this, &MainWindow::onNamSslErrors);
     connect(mActSettings, &QAction::triggered, this, &MainWindow::onActionSettingsTriggered);
     connect(mActQuit, &QAction::triggered, qApp, &QCoreApplication::quit);
     connect(mActViewActivities, &QAction::triggered, this, &MainWindow::showSelectedView);
@@ -233,6 +237,7 @@ void MainWindow::createKemaiSession(const Settings::Profile& profile)
     {
         auto kimaiClient = std::make_shared<KimaiClient>();
 
+        kimaiClient->setNetworkAccessManager(mNam);
         kimaiClient->setHost(profile.host);
         kimaiClient->setLegacyAuth(profile.username, profile.token);
         kimaiClient->setAPIToken(profile.apiToken);
@@ -337,6 +342,18 @@ void MainWindow::processAutoConnect()
         }
     }
     createKemaiSession(profile.value());
+}
+
+void MainWindow::onNamSslErrors(QNetworkReply* /*reply*/, const QList<QSslError>& errors)
+{
+    for (const auto& error : errors)
+    {
+        spdlog::error("SSL Error: {}", error.errorString());
+    }
+
+    //    // Process certificate errors one by one.
+    //    const auto& crtError = errors.first();
+    //    emit mQ->sslError(crtError.errorString(), crtError.certificate().serialNumber(), crtError.certificate().toPem());
 }
 
 void MainWindow::onCurrentTimeSheetChanged()
