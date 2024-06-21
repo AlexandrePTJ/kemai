@@ -67,8 +67,7 @@ jobs:
           cmake --build --preset release-win --target package
 
       # Create release if on built on a tag
-      - if: startsWith(github.ref, 'refs/tags/')
-        name: Create/Update release
+      - name: Create/Update release
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
