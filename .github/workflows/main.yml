@@ -2,7 +2,7 @@ name: CI
 on: [push, workflow_dispatch]
 
 env:
-  qt_version: 6.7.1
+  qt_version: 6.7.2
 
 jobs:
   LinuxJob:
@@ -135,7 +135,7 @@ jobs:
         with:
           allowUpdates: true
           draft: true
-          artifacts: 'dist/Kemai-*.dmg'
+          artifacts: 'cmake-build-${{ matrix.preset }}/Kemai-*.dmg'
 
       # Create continuous release on some branches
       - if: github.ref == 'refs/heads/develop'
@@ -147,7 +147,7 @@ jobs:
           allowUpdates: true
           updateOnlyUnreleased: true
           prerelease: true
-          artifacts: 'dist/Kemai-*.dmg'
+          artifacts: 'cmake-build-${{ matrix.preset }}/Kemai-*.dmg'
       - if: github.ref == 'refs/heads/feature/98-break-ui'
         name: Create/Update prerelease
         uses: ncipollo/release-action@v1
@@ -157,4 +157,4 @@ jobs:
           allowUpdates: true
           updateOnlyUnreleased: true
           prerelease: true
-          artifacts: 'dist/Kemai-*.dmg'
+          artifacts: 'cmake-build-${{ matrix.preset }}/Kemai-*.dmg'
