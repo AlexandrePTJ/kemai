@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>577</width>
-    <height>355</height>
+    <width>631</width>
+    <height>384</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,7 +28,7 @@
         </size>
        </property>
        <property name="textElideMode">
-        <enum>Qt::ElideMiddle</enum>
+        <enum>Qt::TextElideMode::ElideMiddle</enum>
        </property>
        <property name="uniformItemSizes">
         <bool>false</bool>
@@ -56,7 +56,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="generalPage">
         <layout class="QFormLayout" name="formLayout">
@@ -94,24 +94,24 @@
         </layout>
        </widget>
        <widget class="QWidget" name="eventsPage">
-        <layout class="QFormLayout" name="formLayout_3">
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="cbStopOnLock">
+        <layout class="QGridLayout" name="gridLayout" columnminimumwidth="0,75,0">
+         <item row="4" column="1">
+          <widget class="QSpinBox" name="sbAutoRefreshDelay">
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="text">
-            <string>Stop current timesheet on session lock (windows only)</string>
+           <property name="minimum">
+            <number>5</number>
+           </property>
+           <property name="maximum">
+            <number>60</number>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="cbStopOnIdle">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
+         <item row="3" column="0" colspan="2">
+          <widget class="QCheckBox" name="cbAutoRefreshCurrentTimeSheet">
            <property name="text">
-            <string>Stop current timesheet when system idle</string>
+            <string>Auto-refresh current timesheet</string>
            </property>
           </widget>
          </item>
@@ -125,35 +125,60 @@
            </property>
           </widget>
          </item>
+         <item row="0" column="0" colspan="3">
+          <widget class="QCheckBox" name="cbStopOnLock">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Stop current timesheet on session lock (windows only)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>289</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="2" column="2">
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>289</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item row="2" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
-            <widget class="QSpinBox" name="sbIdleDelay">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>720</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
+          <widget class="QSpinBox" name="sbIdleDelay">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>75</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>720</number>
+           </property>
+          </widget>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_4">
@@ -165,42 +190,28 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <item>
-            <widget class="QSpinBox" name="sbAutoRefreshDelay">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="minimum">
-              <number>5</number>
-             </property>
-             <property name="maximum">
-              <number>60</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QCheckBox" name="cbAutoRefreshCurrentTimeSheet">
+         <item row="1" column="0" colspan="3">
+          <widget class="QCheckBox" name="cbStopOnIdle">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
-            <string>Auto-refresh current timesheet</string>
+            <string>Stop current timesheet when system idle</string>
            </property>
           </widget>
+         </item>
+         <item row="5" column="0" colspan="3">
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Orientation::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
@@ -237,10 +248,10 @@
              <item>
               <spacer name="horizontalSpacer">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Maximum</enum>
+                <enum>QSizePolicy::Policy::Maximum</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -302,7 +313,7 @@
                 <bool>false</bool>
                </property>
                <property name="inputMethodHints">
-                <set>Qt::ImhUrlCharactersOnly</set>
+                <set>Qt::InputMethodHint::ImhUrlCharactersOnly</set>
                </property>
               </widget>
              </item>
@@ -333,7 +344,7 @@
                 <bool>false</bool>
                </property>
                <property name="echoMode">
-                <enum>QLineEdit::Password</enum>
+                <enum>QLineEdit::EchoMode::Password</enum>
                </property>
               </widget>
              </item>
@@ -350,7 +361,7 @@
                 <bool>false</bool>
                </property>
                <property name="echoMode">
-                <enum>QLineEdit::Password</enum>
+                <enum>QLineEdit::EchoMode::Password</enum>
                </property>
               </widget>
              </item>
@@ -416,7 +427,7 @@
            <item>
             <spacer name="verticalSpacer">
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -444,10 +455,10 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Save</set>
      </property>
     </widget>
    </item>
