@@ -81,6 +81,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           name: 'last develop'
+          tag: 'develop'
           allowUpdates: true
           updateOnlyUnreleased: true
           prerelease: true
@@ -90,6 +91,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           name: 'UI break'
+          tag: '98-break-ui'
           allowUpdates: true
           updateOnlyUnreleased: true
           prerelease: true
@@ -141,6 +143,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           name: 'last develop'
+          tag: 'develop'
           allowUpdates: true
           updateOnlyUnreleased: true
           prerelease: true
@@ -150,6 +153,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           name: 'UI break'
+          tag: '98-break-ui'
           allowUpdates: true
           updateOnlyUnreleased: true
           prerelease: true
