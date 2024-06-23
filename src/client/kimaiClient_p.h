@@ -53,7 +53,7 @@ public:
     QNetworkReply* sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const;
     QNetworkReply* sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const;
 
-    template<class ResultType> KimaiApiResult<ResultType>* processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply* networkReply)
+    template<class ResultType> KimaiApiResult<ResultType>* processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply* networkReply) const
     {
         auto result = new KimaiApiResult<ResultType>;
 
@@ -83,7 +83,7 @@ public:
         return result;
     }
 
-    template<class ResultType> KimaiApiResult<std::vector<ResultType>>* processApiNetworkReplyArray(ApiMethod method, QNetworkReply* networkReply)
+    template<class ResultType> KimaiApiResult<std::vector<ResultType>>* processApiNetworkReplyArray(ApiMethod method, QNetworkReply* networkReply) const
     {
         auto result = new KimaiApiResult<std::vector<ResultType>>;
 

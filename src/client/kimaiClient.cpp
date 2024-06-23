@@ -184,63 +184,63 @@ void KimaiClient::setAPIToken(const QString& token)
     mD->apiToken = token;
 }
 
-VersionRequestResult KimaiClient::requestKimaiVersion()
+VersionRequestResult KimaiClient::requestKimaiVersion() const
 {
     auto request = mD->prepareRequest(ApiMethod::Version);
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplySingleObject<KimaiVersion>(ApiMethod::Version, reply);
 }
 
-MeRequestResult KimaiClient::requestMeUserInfo()
+MeRequestResult KimaiClient::requestMeUserInfo() const
 {
     auto request = mD->prepareRequest(ApiMethod::MeUsers);
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplySingleObject<User>(ApiMethod::MeUsers, reply);
 }
 
-TimeSheetConfigResult KimaiClient::requestTimeSheetConfig()
+TimeSheetConfigResult KimaiClient::requestTimeSheetConfig() const
 {
     auto request = mD->prepareRequest(ApiMethod::TimeSheetConfig);
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplySingleObject<TimeSheetConfig>(ApiMethod::TimeSheetConfig, reply);
 }
 
-PluginsResult KimaiClient::requestPlugins()
+PluginsResult KimaiClient::requestPlugins() const
 {
     auto request = mD->prepareRequest(ApiMethod::Plugins);
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplyArray<Plugin>(ApiMethod::Plugins, reply);
 }
 
-CustomersResult KimaiClient::requestCustomers()
+CustomersResult KimaiClient::requestCustomers() const
 {
     auto request = mD->prepareRequest(ApiMethod::Customers);
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplyArray<Customer>(ApiMethod::Customers, reply);
 }
 
-TimeSheetsResult KimaiClient::requestActiveTimeSheets()
+TimeSheetsResult KimaiClient::requestActiveTimeSheets() const
 {
     auto request = mD->prepareRequest(ApiMethod::ActiveTimeSheets);
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::ActiveTimeSheets, reply);
 }
 
-TimeSheetsResult KimaiClient::requestRecentTimeSheets()
+TimeSheetsResult KimaiClient::requestRecentTimeSheets() const
 {
     auto request = mD->prepareRequest(ApiMethod::RecentTimeSheets, std::map<QString, QString>{{"size", "5"}});
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::RecentTimeSheets, reply);
 }
 
-TimeSheetsResult KimaiClient::requestTimeSheets(const QString& term, int page)
+TimeSheetsResult KimaiClient::requestTimeSheets(const QString& term, int page) const
 {
     auto request = mD->prepareRequest(ApiMethod::TimeSheets, {{"page", QString::number(page)}, {"full", "1"}, {"term", term}});
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::TimeSheets, reply);
 }
 
-ProjectsResult KimaiClient::requestProjects(std::optional<int> customerId)
+ProjectsResult KimaiClient::requestProjects(std::optional<int> customerId) const
 {
     std::map<QString, QString> parameters;
     if (customerId.has_value())
@@ -253,7 +253,7 @@ ProjectsResult KimaiClient::requestProjects(std::optional<int> customerId)
     return mD->processApiNetworkReplyArray<Project>(ApiMethod::Projects, reply);
 }
 
-ActivitiesResult KimaiClient::requestActivities(std::optional<int> projectId)
+ActivitiesResult KimaiClient::requestActivities(std::optional<int> projectId) const
 {
     std::map<QString, QString> parameters;
     if (projectId.has_value())
@@ -266,7 +266,7 @@ ActivitiesResult KimaiClient::requestActivities(std::optional<int> projectId)
     return mD->processApiNetworkReplyArray<Activity>(ApiMethod::Activities, reply);
 }
 
-CustomerAddResult KimaiClient::addCustomer(const Customer& customer)
+CustomerAddResult KimaiClient::addCustomer(const Customer& customer) const
 {
     auto json    = KimaiApiTypesParser::toJson(customer);
     auto data    = toPostData(json);
@@ -275,7 +275,7 @@ CustomerAddResult KimaiClient::addCustomer(const Customer& customer)
     return mD->processApiNetworkReplySingleObject<Customer>(ApiMethod::CustomerAdd, reply);
 }
 
-ProjectAddResult KimaiClient::addProject(const Project& project)
+ProjectAddResult KimaiClient::addProject(const Project& project) const
 {
     auto json    = KimaiApiTypesParser::toJson(project);
     auto data    = toPostData(json);
@@ -284,7 +284,7 @@ ProjectAddResult KimaiClient::addProject(const Project& project)
     return mD->processApiNetworkReplySingleObject<Project>(ApiMethod::ProjectAdd, reply);
 }
 
-ActivityAddResult KimaiClient::addActivity(const Activity& activity)
+ActivityAddResult KimaiClient::addActivity(const Activity& activity) const
 {
     auto json    = KimaiApiTypesParser::toJson(activity);
     auto data    = toPostData(json);
@@ -293,7 +293,7 @@ ActivityAddResult KimaiClient::addActivity(const Activity& activity)
     return mD->processApiNetworkReplySingleObject<Activity>(ApiMethod::ActivityAdd, reply);
 }
 
-TimeSheetResult KimaiClient::startTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode)
+TimeSheetResult KimaiClient::startTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode) const
 {
     auto json    = KimaiApiTypesParser::toJson(timeSheet, trackingMode);
     auto data    = toPostData(json);
@@ -302,7 +302,7 @@ TimeSheetResult KimaiClient::startTimeSheet(const TimeSheet& timeSheet, TimeShee
     return mD->processApiNetworkReplySingleObject<TimeSheet>(ApiMethod::TimeSheets, reply);
 }
 
-TimeSheetResult KimaiClient::updateTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode)
+TimeSheetResult KimaiClient::updateTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode) const
 {
     auto json    = KimaiApiTypesParser::toJson(timeSheet, trackingMode);
     auto data    = toPostData(json);
@@ -311,21 +311,21 @@ TimeSheetResult KimaiClient::updateTimeSheet(const TimeSheet& timeSheet, TimeShe
     return mD->processApiNetworkReplySingleObject<TimeSheet>(ApiMethod::TimeSheets, reply);
 }
 
-TasksResult KimaiClient::requestTasks()
+TasksResult KimaiClient::requestTasks() const
 {
     auto request = mD->prepareRequest(ApiMethod::Tasks);
     auto reply   = mD->sendGetRequest(request);
     return mD->processApiNetworkReplyArray<Task>(ApiMethod::Tasks, reply);
 }
 
-TaskResult KimaiClient::startTask(int taskId)
+TaskResult KimaiClient::startTask(int taskId) const
 {
     auto request = mD->prepareRequest(ApiMethod::TaskStart, {}, {}, QString("%1/start").arg(taskId));
     auto reply   = mD->sendPatchRequest(request, {});
     return mD->processApiNetworkReplySingleObject<Task>(ApiMethod::TaskStart, reply);
 }
 
-TaskResult KimaiClient::closeTask(int taskId)
+TaskResult KimaiClient::closeTask(int taskId) const
 {
     auto request = mD->prepareRequest(ApiMethod::TaskClose, {}, {}, QString("%1/close").arg(taskId));
     auto reply   = mD->sendPatchRequest(request, {});
