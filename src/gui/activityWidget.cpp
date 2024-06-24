@@ -5,6 +5,7 @@
 
 #include "misc/customFmt.h"
 #include "misc/helpers.h"
+#include "timeSheetItemDelegate.h"
 #include "timeSheetListWidgetItem.h"
 #include "timeSheetParamsItemDelegate.h"
 
@@ -21,6 +22,10 @@ ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make
     mUi->cbTimeSheetParams->setItemDelegate(new TimeSheetParamsItemDelegate);
 
     mUi->lwHistory->setModel(&mTimeSheetModel);
+    mUi->lwHistory->setItemDelegate(new TimeSheetItemDelegate);
+
+    auto scrollBarWidth = qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+    mUi->lwHistoryOutsideLayout->setContentsMargins(scrollBarWidth, 0, 0, 0);
 
     connect(mUi->btStartStop, &QPushButton::clicked, this, &ActivityWidget::onBtStartStopClicked);
     connect(mUi->cbTimeSheetParams, &QComboBox::currentIndexChanged, this, &ActivityWidget::onTimeSheetParamsIndexChanged);

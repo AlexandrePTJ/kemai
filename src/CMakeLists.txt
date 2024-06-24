@@ -23,6 +23,7 @@ set(SRCS
         gui/mainWindow.cpp
         gui/settingsDialog.cpp
         gui/taskWidget.cpp
+        gui/timeSheetItemDelegate.cpp
         gui/timeSheetListWidgetItem.cpp
         gui/timeSheetParamsItemDelegate.cpp
         main.cpp
@@ -55,6 +56,7 @@ set(HDRS
         gui/mainWindow.h
         gui/settingsDialog.h
         gui/taskWidget.h
+        gui/timeSheetItemDelegate.h
         gui/timeSheetListWidgetItem.h
         gui/timeSheetParamsItemDelegate.h
         misc/customFmt.h

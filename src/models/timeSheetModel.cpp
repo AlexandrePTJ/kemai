@@ -18,22 +18,14 @@ void TimeSheetModel::setFilterTerm(const QString& term)
     resetModel();
 }
 
+QModelIndex TimeSheetModel::index(int row, int column, const QModelIndex& parent) const
+{
+    return hasIndex(row, column, parent) ? createIndex(row, column, mTimeSheets.at(row).get()) : QModelIndex();
+}
+
 QVariant TimeSheetModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || (index.row() > mTimeSheets.size()))
-    {
-        return {};
-    }
-
-    const auto& timeSheet = mTimeSheets.at(index.row());
-    switch (role)
-    {
-    case Qt::DisplayRole:
-        return QString("%1 / %2 / %3").arg(timeSheet.project.customer.name, timeSheet.project.name, timeSheet.activity.name);
-
-    default:
-        return {};
-    }
+    return {};
 }
 
 int TimeSheetModel::rowCount(const QModelIndex& /*parent*/) const
@@ -55,7 +47,7 @@ void TimeSheetModel::fetchMore(const QModelIndex& /*parent*/)
         auto timeSheets = timeSheetsResult->takeResult();
 
         beginInsertRows({}, static_cast<int>(mTimeSheets.size()), static_cast<int>(mTimeSheets.size() + timeSheets.size() - 1));
-        mTimeSheets.insert(mTimeSheets.end(), timeSheets.begin(), timeSheets.end());
+        std::ranges::transform(timeSheets, std::back_inserter(mTimeSheets), [](const auto& ts) { return std::make_unique<TimeSheet>(ts); });
         endInsertRows();
 
         ++mLastPageFetched;
