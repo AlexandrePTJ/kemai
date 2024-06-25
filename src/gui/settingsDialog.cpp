@@ -76,7 +76,7 @@ SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desk
 
     // show dialog if language changes from settings
     connect(mUi->cbLanguage, &QComboBox::currentTextChanged, [&](const QString&) {
-        auto settings = Settings::get();
+        const auto& settings = SettingsHandler::instance().get();
         if (settings.kemai.language != mUi->cbLanguage->currentData().toLocale())
         {
             QMessageBox::warning(this, tr(""), tr("Language changed. Application restart is required."));

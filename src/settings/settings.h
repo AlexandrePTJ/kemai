@@ -43,13 +43,23 @@ struct Settings
         int autoRefreshCurrentTimeSheetDelaySeconds = 5;
     } events;
 
-    bool isReady() const;
+    bool hasValidProfile() const;
 
-    QList<Profile>::iterator findProfileIt(const QUuid& profileId);
-    std::optional<Profile> findProfile(const QUuid& profileId);
+    QList<Settings::Profile>::iterator findProfileIt(const QUuid& profileId);
+    QList<Settings::Profile>::const_iterator findProfileIt(const QUuid& profileId) const;
+    std::optional<Settings::Profile> findProfile(const QUuid& profileId) const;
+};
 
-    static Settings get();
-    static void save(const Settings& settings);
+class SettingsHandler
+{
+public:
+    static SettingsHandler& instance();
+
+    const Settings& get();
+    void set(const Settings& settings);
+
+private:
+    std::optional<Settings> mSettings = std::nullopt;
 };
 
 } // namespace kemai

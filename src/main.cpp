@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     QApplication::setApplicationVersion(KEMAI_VERSION);
 
     // Get kemai data directory and log file path
-    auto kemaiSettings = Settings::get();
+    const auto& kemaiSettings = SettingsHandler::instance().get();
 
     // Create Qt logger model before spdlog sinks
     auto loggerTreeModel = std::make_shared<LoggerTreeModel>();
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     std::vector<spdlog::sink_ptr> sinks;
     sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
     sinks.emplace_back(std::make_shared<LoggerTreeModelSink>(loggerTreeModel));
-    
+
     if (!QDir(helpers::getLogDirPath()).mkpath(".")) // Ensure log dir exists before adding sink
     {
         sinks.emplace_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(helpers::getLogFilePath().toStdString(), MaxLogFileSize, 3));
