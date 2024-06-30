@@ -19,7 +19,7 @@ struct Settings
         QString token;
         QString apiToken; // Since Kimai 2.14
     };
-    QList<Profile> profiles;
+    std::vector<Profile> profiles;
 
     QStringList trustedCertificates;
 
@@ -42,24 +42,13 @@ struct Settings
         bool autoRefreshCurrentTimeSheet            = false;
         int autoRefreshCurrentTimeSheetDelaySeconds = 5;
     } events;
-
-    bool hasValidProfile() const;
-
-    QList<Settings::Profile>::iterator findProfileIt(const QUuid& profileId);
-    QList<Settings::Profile>::const_iterator findProfileIt(const QUuid& profileId) const;
-    std::optional<Settings::Profile> findProfile(const QUuid& profileId) const;
 };
 
-class SettingsHandler
+class SettingsHelper
 {
 public:
-    static SettingsHandler& instance();
-
-    const Settings& get();
-    void set(const Settings& settings);
-
-private:
-    std::optional<Settings> mSettings = std::nullopt;
+    static Settings load();
+    static void save(const Settings& settings);
 };
 
 } // namespace kemai

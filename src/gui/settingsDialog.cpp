@@ -40,7 +40,7 @@ SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desk
 
     auto addLanguage = [cbLanguage = mUi->cbLanguage](const QString& language) {
         QLocale locale(language);
-        cbLanguage->addItem(QString("%1 [%2]").arg(QLocale::languageToString(locale.language()), QLocale::countryToString(locale.country())), locale);
+        cbLanguage->addItem(QString("%1 [%2]").arg(QLocale::languageToString(locale.language()), QLocale::territoryToString(locale.territory())), locale);
     };
 
     mActToggleTokenVisible    = mUi->leToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
@@ -76,7 +76,7 @@ SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desk
 
     // show dialog if language changes from settings
     connect(mUi->cbLanguage, &QComboBox::currentTextChanged, [&](const QString&) {
-        const auto& settings = SettingsHandler::instance().get();
+        const auto& settings = SettingsHelper::load();
         if (settings.kemai.language != mUi->cbLanguage->currentData().toLocale())
         {
             QMessageBox::warning(this, tr(""), tr("Language changed. Application restart is required."));
@@ -169,20 +169,32 @@ void SettingsDialog::onProfilesListCurrentItemChanged(QListWidgetItem* current, 
     QSignalBlocker hostSignalBlocker(mUi->leHost);
     QSignalBlocker usernameSignalBlocker(mUi->leUsername);
     QSignalBlocker tokenSignalBlocker(mUi->leToken);
+    QSignalBlocker apiTokenSignalBlocker(mUi->leAPIToken);
 
-    Settings::Profile profile;
+    mUi->leName->clear();
+    mUi->leHost->clear();
+    mUi->leUsername->clear();
+    mUi->leToken->clear();
+    mUi->leAPIToken->clear();
+
+    auto hasProfile = false;
 
     if (current != nullptr)
     {
-        profile = m_settings.findProfile(current->data(Qt::UserRole).toUuid()).value_or(Settings::Profile{});
-    }
+        auto profileIt = std::find_if(m_settings.profiles.begin(), m_settings.profiles.end(),
+                                      [profileId = current->data(Qt::UserRole).toUuid()](const auto& profile) { return profile.id == profileId; });
 
-    auto hasProfile = !profile.id.isNull();
-    mUi->leName->setText(profile.name);
-    mUi->leHost->setText(profile.host);
-    mUi->leUsername->setText(profile.username);
-    mUi->leToken->setText(profile.token);
-    mUi->leAPIToken->setText(profile.apiToken);
+        if (profileIt != m_settings.profiles.end())
+        {
+            mUi->leName->setText(profileIt->name);
+            mUi->leHost->setText(profileIt->host);
+            mUi->leUsername->setText(profileIt->username);
+            mUi->leToken->setText(profileIt->token);
+            mUi->leAPIToken->setText(profileIt->apiToken);
+
+            hasProfile = true;
+        }
+    }
 
     mUi->delProfileButton->setEnabled(hasProfile);
     mUi->leName->setEnabled(hasProfile);
@@ -224,16 +236,19 @@ void SettingsDialog::onProfileFieldValueChanged()
     auto item = mUi->profilesListWidget->currentItem();
     if (item != nullptr)
     {
-        auto profile = m_settings.findProfileIt(item->data(Qt::UserRole).toUuid());
-        if (profile != m_settings.profiles.end())
-        {
-            profile->name     = mUi->leName->text();
-            profile->host     = mUi->leHost->text();
-            profile->username = mUi->leUsername->text();
-            profile->token    = mUi->leToken->text();
-            profile->apiToken = mUi->leAPIToken->text();
+        const auto profileId = item->data(Qt::UserRole).toUuid();
+        auto profileIt =
+            std::find_if(m_settings.profiles.begin(), m_settings.profiles.end(), [&profileId](const auto& profile) { return profile.id == profileId; });
 
-            item->setText(profile->name);
+        if (profileIt != m_settings.profiles.end())
+        {
+            profileIt->name     = mUi->leName->text();
+            profileIt->host     = mUi->leHost->text();
+            profileIt->username = mUi->leUsername->text();
+            profileIt->token    = mUi->leToken->text();
+            profileIt->apiToken = mUi->leAPIToken->text();
+
+            item->setText(profileIt->name);
         }
     }
 }
@@ -259,13 +274,16 @@ void SettingsDialog::onProfileDelButtonClicked()
     auto item = mUi->profilesListWidget->takeItem(mUi->profilesListWidget->currentRow());
     if (item != nullptr)
     {
-        auto it = std::find_if(m_settings.profiles.begin(), m_settings.profiles.end(),
-                               [profileId = item->data(Qt::UserRole).toUuid()](const Settings::Profile& profile) { return profile.id == profileId; });
-        if (it != m_settings.profiles.end())
-        {
-            auto pos = std::distance(m_settings.profiles.begin(), it);
-            m_settings.profiles.removeAt(pos);
-        }
+        //        auto it = std::find_if(m_settings.profiles.begin(), m_settings.profiles.end(),
+        //                               [profileId = item->data(Qt::UserRole).toUuid()](const Settings::Profile& profile) { return profile.id == profileId; });
+        //        if (it != m_settings.profiles.end())
+        //        {
+        //            auto pos = std::distance(m_settings.profiles.begin(), it);
+        //            m_settings.profiles.removeAt(pos);
+        //        }
+
+        std::erase_if(m_settings.profiles,
+                      [profileId = item->data(Qt::UserRole).toUuid()](const Settings::Profile& profile) { return profile.id == profileId; });
 
         delete item;
     }

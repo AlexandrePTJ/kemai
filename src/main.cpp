@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     QApplication::setApplicationVersion(KEMAI_VERSION);
 
     // Get kemai data directory and log file path
-    const auto& kemaiSettings = SettingsHandler::instance().get();
+    const auto& kemaiSettings = SettingsHelper::load();
 
     // Create Qt logger model before spdlog sinks
     auto loggerTreeModel = std::make_shared<LoggerTreeModel>();
