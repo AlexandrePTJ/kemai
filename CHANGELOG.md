@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.11.1] - 2024-06-30
+
+### Fixed
+- Fix missing log directory at first startup (Thanks to @ensemblebd) 
+- Settings management
+
+
 ## [0.11.0] - 2024-05-22
 
 ### Fixed
@@ -188,7 +195,8 @@ Special thanks to @shrippen for its support through [sponsorship](https://github
 Initial version.
 
 
-[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.11.0...HEAD
+[Unreleased]: https://github.com/AlexandrePTJ/kemai/compare/0.11.1...HEAD
+[0.11.1]: https://github.com/AlexandrePTJ/kemai/compare/0.11.0...0.11.1
 [0.11.0]: https://github.com/AlexandrePTJ/kemai/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/AlexandrePTJ/kemai/compare/0.9.4...0.10.0
 [0.9.4]: https://github.com/AlexandrePTJ/kemai/compare/0.9.3...0.9.4

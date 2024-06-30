@@ -31,7 +31,7 @@ MainWindow::MainWindow() : mUi(std::make_unique<Ui::MainWindow>())
 {
     mUi->setupUi(this);
 
-    auto settings = Settings::get();
+    const auto& settings = SettingsHelper::load();
 
     /*
      * Setup icon
@@ -163,7 +163,7 @@ MainWindow::MainWindow() : mUi(std::make_unique<Ui::MainWindow>())
     if (settings.kemai.checkUpdateAtStartup)
     {
         QTimer::singleShot(FirstRequestDelayMs, [&]() {
-            auto ignoreVersion  = QVersionNumber::fromString(Settings::get().kemai.ignoredVersion);
+            auto ignoreVersion  = QVersionNumber::fromString(SettingsHelper::load().kemai.ignoredVersion);
             auto currentVersion = QVersionNumber::fromString(KEMAI_VERSION);
             mUpdater.checkAvailableNewVersion(currentVersion >= ignoreVersion ? currentVersion : ignoreVersion, true);
         });
@@ -188,19 +188,19 @@ void MainWindow::closeEvent(QCloseEvent* event)
         mLoggerWidget.close();
     }
 
-    auto settings = Settings::get();
+    auto settings = SettingsHelper::load();
     if (settings.kemai.closeToSystemTray)
     {
         hide();
         event->ignore();
     }
     settings.kemai.geometry = saveGeometry();
-    Settings::save(settings);
+    SettingsHelper::save(settings);
 }
 
 void MainWindow::hideEvent(QHideEvent* event)
 {
-    auto settings = Settings::get();
+    auto settings = SettingsHelper::load();
     if (settings.kemai.minimizeToSystemTray)
     {
         if (event->spontaneous() && isMinimized())
@@ -210,7 +210,7 @@ void MainWindow::hideEvent(QHideEvent* event)
         }
     }
     settings.kemai.geometry = saveGeometry();
-    Settings::save(settings);
+    SettingsHelper::save(settings);
 }
 
 void MainWindow::createKemaiSession(const Settings::Profile& profile)
@@ -229,30 +229,39 @@ void MainWindow::createKemaiSession(const Settings::Profile& profile)
         mStatusInstanceLabel.setText(tr("Not connected"));
     }
 
-    auto settings = Settings::get();
-    if (settings.isReady())
+    // Ensure profile has all required infos
+    const auto haveHost           = !profile.host.isEmpty();
+    const auto haveLegacyAuth     = !profile.username.isEmpty() && !profile.token.isEmpty();
+    const auto haveAPIToken       = !profile.apiToken.isEmpty();
+    const auto isProfileValidated = haveHost && (haveLegacyAuth || haveAPIToken);
+    if (!isProfileValidated)
     {
-        auto kimaiClient = std::make_shared<KimaiClient>();
-
-        kimaiClient->setHost(profile.host);
-        kimaiClient->setLegacyAuth(profile.username, profile.token);
-        kimaiClient->setAPIToken(profile.apiToken);
-
-        mSession = std::make_shared<KemaiSession>(kimaiClient);
-        connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &MainWindow::onCurrentTimeSheetChanged);
-        connect(mSession.get(), &KemaiSession::pluginsChanged, this, &MainWindow::onPluginsChanged);
-        connect(mSession.get(), &KemaiSession::versionChanged, this, &MainWindow::onSessionVersionChanged);
-
-        mActivityWidget->setKemaiSession(mSession);
-
-        mSession->refreshCache();
-        mSession->refreshSessionInfos();
-        mSession->refreshCurrentTimeSheet();
-
-        // Save profile connection
-        settings.kemai.lastConnectedProfile = profile.id;
-        Settings::save(settings);
+        spdlog::error("Invalid profile. Check settings.");
+        return;
     }
+
+    // Create session
+    auto kimaiClient = std::make_shared<KimaiClient>();
+
+    kimaiClient->setHost(profile.host);
+    kimaiClient->setLegacyAuth(profile.username, profile.token);
+    kimaiClient->setAPIToken(profile.apiToken);
+
+    mSession = std::make_shared<KemaiSession>(kimaiClient);
+    connect(mSession.get(), &KemaiSession::currentTimeSheetChanged, this, &MainWindow::onCurrentTimeSheetChanged);
+    connect(mSession.get(), &KemaiSession::pluginsChanged, this, &MainWindow::onPluginsChanged);
+    connect(mSession.get(), &KemaiSession::versionChanged, this, &MainWindow::onSessionVersionChanged);
+
+    mActivityWidget->setKemaiSession(mSession);
+
+    mSession->refreshCache();
+    mSession->refreshSessionInfos();
+    mSession->refreshCurrentTimeSheet();
+
+    // Save profile connection
+    auto settings                       = SettingsHelper::load();
+    settings.kemai.lastConnectedProfile = profile.id;
+    SettingsHelper::save(settings);
 }
 
 void MainWindow::showSelectedView()
@@ -283,12 +292,14 @@ void MainWindow::setViewActionsEnabled(bool enable)
 
 void MainWindow::updateProfilesMenu()
 {
-    auto settings = Settings::get();
+    const auto& settings = SettingsHelper::load();
 
-    // Removes obsoletes profiles
+    // Removes previous profiles
     for (auto action : mActGroupProfiles->actions())
     {
-        if (!settings.findProfile(action->data().toUuid()).has_value())
+        auto it = std::find_if(settings.profiles.begin(), settings.profiles.end(),
+                               [profileId = action->data().toUuid()](const auto& profile) { return profile.id == profileId; });
+        if (it != settings.profiles.end())
         {
             mProfileMenu->removeAction(action);
             mActGroupProfiles->removeAction(action);
@@ -318,26 +329,26 @@ void MainWindow::updateProfilesMenu()
 
 void MainWindow::processAutoConnect()
 {
-    auto settings = Settings::get();
-    if (settings.profiles.isEmpty())
+    const auto& settings = SettingsHelper::load();
+    if (settings.profiles.empty())
     {
         return;
     }
 
-    auto profile = settings.findProfile(settings.kemai.lastConnectedProfile);
-    if (!profile.has_value())
+    auto profileIt = std::find_if(settings.profiles.begin(), settings.profiles.end(),
+                                  [profileId = settings.kemai.lastConnectedProfile](const auto& profile) { return profile.id == profileId; });
+    if (profileIt != settings.profiles.end())
     {
-        profile = settings.profiles.front();
-    }
-
-    for (auto& action : mActGroupProfiles->actions())
-    {
-        if (action->data().toUuid() == profile->id)
+        for (auto& action : mActGroupProfiles->actions())
         {
-            action->setChecked(true);
+            if (action->data().toUuid() == profileIt->id)
+            {
+                action->setChecked(true);
+            }
         }
+
+        createKemaiSession(*profileIt);
     }
-    createKemaiSession(profile.value());
 }
 
 void MainWindow::onCurrentTimeSheetChanged()
@@ -387,10 +398,10 @@ void MainWindow::onSessionVersionChanged()
 void MainWindow::onActionSettingsTriggered()
 {
     SettingsDialog settingsDialog(mDesktopEventsMonitor, this);
-    settingsDialog.setSettings(Settings::get());
+    settingsDialog.setSettings(SettingsHelper::load());
     if (settingsDialog.exec() == QDialog::Accepted)
     {
-        Settings::save(settingsDialog.settings());
+        SettingsHelper::save(settingsDialog.settings());
 
         showSelectedView();
         updateProfilesMenu();
@@ -410,10 +421,9 @@ void MainWindow::onActionCheckUpdateTriggered()
 
 void MainWindow::onActionOpenHostTriggered()
 {
-    auto settings = Settings::get();
-    if (settings.isReady())
+    if (mSession)
     {
-        QDesktopServices::openUrl(QUrl::fromUserInput(settings.profiles.first().host));
+        QDesktopServices::openUrl(QUrl::fromUserInput(mSession->client()->host()));
     }
 }
 
@@ -436,7 +446,7 @@ void MainWindow::onSystemTrayActivated(QSystemTrayIcon::ActivationReason reason)
     switch (reason)
     {
     case QSystemTrayIcon::Trigger: {
-        auto settings = Settings::get();
+        const auto& settings = SettingsHelper::load();
         if (isVisible() && (settings.kemai.minimizeToSystemTray || settings.kemai.closeToSystemTray))
         {
             hide();
@@ -472,9 +482,9 @@ void MainWindow::onNewVersionCheckFinished(const VersionDetails& details)
             break;
 
         case QMessageBox::Ignore: {
-            auto settings                 = Settings::get();
+            auto settings                 = SettingsHelper::load();
             settings.kemai.ignoredVersion = details.vn.toString();
-            Settings::save(settings);
+            SettingsHelper::save(settings);
         }
         break;
 
@@ -508,12 +518,13 @@ void MainWindow::onProfilesActionGroupTriggered(QAction* action)
     {
         if (action->isChecked())
         {
-            auto settings  = Settings::get();
+            auto settings  = SettingsHelper::load();
             auto profileId = action->data().toUuid();
-            auto profile   = settings.findProfile(profileId);
-            if (profile.has_value())
+            auto profileIt =
+                std::find_if(settings.profiles.begin(), settings.profiles.end(), [profileId](const auto& profile) { return profile.id == profileId; });
+            if (profileIt != settings.profiles.end())
             {
-                createKemaiSession(profile.value());
+                createKemaiSession(*profileIt);
             }
         }
     }
@@ -521,7 +532,7 @@ void MainWindow::onProfilesActionGroupTriggered(QAction* action)
 
 void MainWindow::onDesktopIdleDetected()
 {
-    spdlog::info("System is idle since {} minutes. Stop current TimeSheet.", Settings::get().events.idleDelayMinutes);
+    spdlog::info("System is idle since {} minutes. Stop current TimeSheet.", SettingsHelper::load().events.idleDelayMinutes);
     mActivityWidget->stopCurrentTimeSheet();
 }
 

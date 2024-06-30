@@ -7,7 +7,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QMutex>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -23,12 +22,6 @@ static const auto gCfgVersion_3      = 3; // Add API Token to profile
 static const auto gCurrentCfgVersion = gCfgVersion_3;
 
 /*
- * Global settings instance to avoid json reload
- */
-static QMutex gSettingsMutex;
-static std::optional<Settings> gSettings = std::nullopt;
-
-/*
  * Static helpers
  */
 QSettings getQSettingsInstance()
@@ -41,7 +34,7 @@ QString getJsonSettingsPath()
     return QDir(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)).absoluteFilePath("settings.json");
 }
 
-void migrateIniToJson(const QSettings& qset)
+Settings loadFromLegacyIni(const QSettings& qset)
 {
     Settings settings;
 
@@ -73,50 +66,15 @@ void migrateIniToJson(const QSettings& qset)
     settings.kemai.geometry             = qset.value(kemaiGrpPrefix + "geometry").toByteArray();
     settings.kemai.language             = qset.value(kemaiGrpPrefix + "language", QLocale::system()).toLocale();
 
-    // Save to json format
-    Settings::save(settings);
+    return settings;
 }
 
 /*
  * Class impl
  */
-
-bool Settings::isReady() const
+Settings SettingsHelper::load()
 {
-    if (!profiles.isEmpty())
-    {
-        const auto profile        = profiles.first();
-        const auto haveHost       = !profile.host.isEmpty();
-        const auto haveLegacyAuth = !profile.username.isEmpty() && !profile.token.isEmpty();
-        const auto haveAPIToken   = !profile.apiToken.isEmpty();
-
-        return haveHost && (haveLegacyAuth || haveAPIToken);
-    }
-    return false;
-}
-
-QList<Settings::Profile>::iterator Settings::findProfileIt(const QUuid& profileId)
-{
-    return std::find_if(profiles.begin(), profiles.end(), [&profileId](const auto& profile) { return profile.id == profileId; });
-}
-
-std::optional<Settings::Profile> Settings::findProfile(const QUuid& profileId)
-{
-    auto it = findProfileIt(profileId);
-    if (it != profiles.end())
-    {
-        return *it;
-    }
-    return std::nullopt;
-}
-
-Settings Settings::get()
-{
-    QMutexLocker lock(&gSettingsMutex);
-    if (gSettings.has_value())
-    {
-        return gSettings.value();
-    }
+    auto settings = Settings{};
 
     auto qset             = getQSettingsInstance();
     auto jsonSettingsPath = getJsonSettingsPath();
@@ -124,82 +82,75 @@ Settings Settings::get()
     // Migrate from ini settings to json
     if (QFile::exists(qset.fileName()) && !QFile::exists(jsonSettingsPath))
     {
-        migrateIniToJson(qset);
+        save(loadFromLegacyIni(qset));
     }
 
-    // First run
-    if (!QFile::exists(jsonSettingsPath))
+    // Load from previous save
+    if (QFile::exists(jsonSettingsPath))
     {
-        return {};
-    }
+        QFile jsonFile(jsonSettingsPath);
+        jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+        auto jsonDocument = QJsonDocument::fromJson(jsonFile.readAll());
+        auto root         = jsonDocument.object();
+        jsonFile.close();
 
-    QFile jsonFile(jsonSettingsPath);
-    jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    auto jsonDocument = QJsonDocument::fromJson(jsonFile.readAll());
-    auto root         = jsonDocument.object();
-    jsonFile.close();
+        const auto cfgVersion = root.value("version").toInt();
 
-    gSettings = Settings{};
-
-    const auto cfgVersion = root.value("version").toInt();
-
-    for (const auto& certificationValue : root.value("trustedCertificates").toArray())
-    {
-        gSettings->trustedCertificates.append(certificationValue.toString());
-    }
-
-    auto kemaiObject                      = root.value("kemai").toObject();
-    gSettings->kemai.closeToSystemTray    = kemaiObject.value("closeToSystemTray").toBool();
-    gSettings->kemai.minimizeToSystemTray = kemaiObject.value("minimizeToSystemTray").toBool();
-    gSettings->kemai.checkUpdateAtStartup = kemaiObject.value("checkUpdateAtStartup").toBool();
-    gSettings->kemai.ignoredVersion       = kemaiObject.value("ignoredVersion").toString();
-    gSettings->kemai.geometry             = QByteArray::fromBase64(kemaiObject.value("geometry").toString().toLocal8Bit());
-    gSettings->kemai.language             = QLocale(kemaiObject.value("language").toString());
-    if (kemaiObject.contains("lastConnectedProfile"))
-    {
-        gSettings->kemai.lastConnectedProfile = QUuid(kemaiObject.value("lastConnectedProfile").toString());
-    }
-
-    for (const auto& profileValue : root.value("profiles").toArray())
-    {
-        const auto profileObject = profileValue.toObject();
-
-        Settings::Profile profile;
-        profile.id       = QUuid(profileObject.value("id").toString());
-        profile.name     = profileObject.value("name").toString();
-        profile.host     = profileObject.value("host").toString();
-        profile.username = profileObject.value("username").toString();
-        profile.token    = profileObject.value("token").toString();
-
-        if (cfgVersion >= gCfgVersion_3)
+        for (const auto& certificationValue : root.value("trustedCertificates").toArray())
         {
-            profile.apiToken = profileObject.value("apiToken").toString();
+            settings.trustedCertificates.append(certificationValue.toString());
         }
 
-        gSettings->profiles << profile;
-    }
-
-    if (root.contains("events"))
-    {
-        auto eventsObject                  = root.value("events").toObject();
-        gSettings->events.stopOnLock       = eventsObject.value("stopOnLock").toBool();
-        gSettings->events.stopOnIdle       = eventsObject.value("stopOnIdle").toBool();
-        gSettings->events.idleDelayMinutes = eventsObject.value("idleDelayMinutes").toInt();
-
-        if (cfgVersion >= gCfgVersion_2)
+        auto kemaiObject                    = root.value("kemai").toObject();
+        settings.kemai.closeToSystemTray    = kemaiObject.value("closeToSystemTray").toBool();
+        settings.kemai.minimizeToSystemTray = kemaiObject.value("minimizeToSystemTray").toBool();
+        settings.kemai.checkUpdateAtStartup = kemaiObject.value("checkUpdateAtStartup").toBool();
+        settings.kemai.ignoredVersion       = kemaiObject.value("ignoredVersion").toString();
+        settings.kemai.geometry             = QByteArray::fromBase64(kemaiObject.value("geometry").toString().toLocal8Bit());
+        settings.kemai.language             = QLocale(kemaiObject.value("language").toString());
+        if (kemaiObject.contains("lastConnectedProfile"))
         {
-            gSettings->events.autoRefreshCurrentTimeSheet             = eventsObject.value("autoRefreshCurrentTimeSheet").toBool();
-            gSettings->events.autoRefreshCurrentTimeSheetDelaySeconds = eventsObject.value("autoRefreshCurrentTimeSheetDelaySeconds").toInt();
+            settings.kemai.lastConnectedProfile = QUuid(kemaiObject.value("lastConnectedProfile").toString());
+        }
+
+        for (const auto& profileValue : root.value("profiles").toArray())
+        {
+            const auto profileObject = profileValue.toObject();
+
+            Settings::Profile profile;
+            profile.id       = QUuid(profileObject.value("id").toString());
+            profile.name     = profileObject.value("name").toString();
+            profile.host     = profileObject.value("host").toString();
+            profile.username = profileObject.value("username").toString();
+            profile.token    = profileObject.value("token").toString();
+
+            if (cfgVersion >= gCfgVersion_3)
+            {
+                profile.apiToken = profileObject.value("apiToken").toString();
+            }
+
+            settings.profiles.push_back(profile);
+        }
+
+        if (root.contains("events"))
+        {
+            auto eventsObject                = root.value("events").toObject();
+            settings.events.stopOnLock       = eventsObject.value("stopOnLock").toBool();
+            settings.events.stopOnIdle       = eventsObject.value("stopOnIdle").toBool();
+            settings.events.idleDelayMinutes = eventsObject.value("idleDelayMinutes").toInt();
+
+            if (cfgVersion >= gCfgVersion_2)
+            {
+                settings.events.autoRefreshCurrentTimeSheet             = eventsObject.value("autoRefreshCurrentTimeSheet").toBool();
+                settings.events.autoRefreshCurrentTimeSheetDelaySeconds = eventsObject.value("autoRefreshCurrentTimeSheetDelaySeconds").toInt();
+            }
         }
     }
-
-    return gSettings.value();
+    return settings;
 }
 
-void Settings::save(const Settings& settings)
+void SettingsHelper::save(const Settings& settings)
 {
-    QMutexLocker lock(&gSettingsMutex);
-
     QJsonArray profilesArray;
     for (const auto& profile : settings.profiles)
     {
@@ -236,8 +187,6 @@ void Settings::save(const Settings& settings)
     root["kemai"]               = kemaiObject;
     root["events"]              = eventsObject;
 
-    QJsonDocument jsonDocument(root);
-
     QFileInfo jsonFileInfo(getJsonSettingsPath());
     if (!jsonFileInfo.exists())
     {
@@ -251,9 +200,7 @@ void Settings::save(const Settings& settings)
     jsonFile.open(QIODevice::WriteOnly | QIODevice::Text);
 
     QTextStream testStream(&jsonFile);
-    testStream << jsonDocument.toJson();
+    testStream << QJsonDocument(root).toJson();
 
     jsonFile.close();
-
-    gSettings = settings;
 }
