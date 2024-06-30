@@ -40,7 +40,7 @@ SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desk
 
     auto addLanguage = [cbLanguage = mUi->cbLanguage](const QString& language) {
         QLocale locale(language);
-        cbLanguage->addItem(QString("%1 [%2]").arg(QLocale::languageToString(locale.language()), QLocale::territoryToString(locale.territory())), locale);
+        cbLanguage->addItem(QString("%1 [%2]").arg(QLocale::languageToString(locale.language()), QLocale::countryToString(locale.country())), locale);
     };
 
     mActToggleTokenVisible    = mUi->leToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
