@@ -37,6 +37,7 @@ public:
     void setNetworkAccessManager(const std::shared_ptr<QNetworkAccessManager>& nam);
 
     void setHost(const QString& host);
+    QString host() const;
 
     void setLegacyAuth(const QString& username, const QString& token);
     bool isUsingLegacyAuth() const;

@@ -37,7 +37,7 @@ bool KimaiEventsMonitor::hasCurrentTimeSheet() const
 
 void KimaiEventsMonitor::onSecondTimeout()
 {
-    auto settings = Settings::get();
+    auto settings = SettingsHelper::load();
     if (settings.events.autoRefreshCurrentTimeSheet && mLastTimeSheetUpdate.has_value())
     {
         if (mLastTimeSheetUpdate->secsTo(QDateTime::currentDateTime()) >= settings.events.autoRefreshCurrentTimeSheetDelaySeconds)

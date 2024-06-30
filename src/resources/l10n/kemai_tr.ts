@@ -6,22 +6,22 @@
     <message>
         <location filename="../../gui/aboutDialog.ui" line="14"/>
         <source>About Kemai</source>
-        <translation type="unfinished"></translation>
+        <translation>Kemai Hakkında</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="81"/>
         <source>Kemai</source>
-        <translation type="unfinished"></translation>
+        <translation>Kemai</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="88"/>
         <source>Desktop client for Kimai</source>
-        <translation type="unfinished"></translation>
+        <translation>Kimai için masaüstü istemcisi</translation>
     </message>
     <message>
         <location filename="../../gui/aboutDialog.ui" line="109"/>
         <source>Proudly using:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kullandıkları:</translation>
     </message>
 </context>
 <context>
@@ -29,7 +29,7 @@
     <message>
         <location filename="../../gui/activityDialog.ui" line="14"/>
         <source>Activity</source>
-        <translation>Aktivite</translation>
+        <translation>Etkinlik</translation>
     </message>
     <message>
         <location filename="../../gui/activityDialog.ui" line="25"/>
@@ -79,7 +79,7 @@
     <message>
         <location filename="../../gui/activityWidget.ui" line="131"/>
         <source>Activity</source>
-        <translation>Aktivite</translation>
+        <translation>Etkinlik</translation>
     </message>
     <message>
         <location filename="../../gui/activityWidget.ui" line="175"/>
@@ -104,7 +104,7 @@
     <message>
         <location filename="../../gui/activityWidget.ui" line="284"/>
         <source>History</source>
-        <translation type="unfinished"></translation>
+        <translation>Geçmiş</translation>
     </message>
 </context>
 <context>
@@ -155,17 +155,17 @@
     <message>
         <location filename="../../gui/loggerWidget.ui" line="14"/>
         <source>Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Günlük</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="25"/>
         <source>Log file path</source>
-        <translation type="unfinished"></translation>
+        <translation>Günlük dosyası yolu</translation>
     </message>
     <message>
         <location filename="../../gui/loggerWidget.ui" line="39"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -254,7 +254,8 @@
         <location filename="../../client/kimaiClient_p.h" line="107"/>
         <source>Error on request [%1]: %2
 %3</source>
-        <translation type="unfinished"></translation>
+        <translation>[%1] isteğinde hata: %2
+%3</translation>
     </message>
 </context>
 <context>
@@ -272,7 +273,7 @@
     <message>
         <location filename="../../gui/settingsDialog.ui" line="46"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Olaylar</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="51"/>
@@ -297,32 +298,32 @@
     <message>
         <location filename="../../gui/settingsDialog.ui" line="90"/>
         <source>Check update at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Başlangıçta güncellemeleri denetle</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="104"/>
         <source>Stop current timesheet on session lock (windows only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Oturum kilidinde geçerli zaman çizelgesini durdur (yalnızca windows)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="114"/>
         <source>Stop current timesheet when system idle</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem boştayken geçerli zaman çizelgesini durdur</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="124"/>
         <source>Idle delay (minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Boşta kalma gecikmesi (dakika)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="164"/>
         <source>Refresh delay (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yenileme gecikmesi (saniye)</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="201"/>
         <source>Auto-refresh current timesheet</source>
-        <translation type="unfinished"></translation>
+        <translation>Geçerli zaman çizelgesini otomatik yenile</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.ui" line="275"/>
@@ -393,27 +394,27 @@
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="128"/>
         <source>Activity</source>
-        <translation type="unfinished">Aktivite</translation>
+        <translation>Etkinlik</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="105"/>
         <source>Description</source>
-        <translation type="unfinished">Açıklama</translation>
+        <translation>Açıklama</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="70"/>
         <source>StartedAt</source>
-        <translation type="unfinished"></translation>
+        <translation>Başladı</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="90"/>
         <source>duration</source>
-        <translation type="unfinished"></translation>
+        <translation>süre</translation>
     </message>
     <message>
         <location filename="../../gui/timeSheetListWidgetItem.ui" line="151"/>
@@ -431,17 +432,17 @@
     <message>
         <location filename="../../models/loggerTreeModel.cpp" line="115"/>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Seviye</translation>
     </message>
     <message>
         <location filename="../../models/loggerTreeModel.cpp" line="118"/>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarih</translation>
     </message>
     <message>
         <location filename="../../models/loggerTreeModel.cpp" line="121"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesaj</translation>
     </message>
 </context>
 <context>
@@ -449,78 +450,78 @@
     <message>
         <location filename="../../gui/mainWindow.cpp" line="45"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Çıkış</translation>
+        <translation>&amp;Çıkış</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="46"/>
         <source>&amp;Settings</source>
-        <translation type="unfinished">&amp;Ayarlar</translation>
+        <translation>&amp;Ayarlar</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="47"/>
         <source>Check for updates...</source>
-        <translation type="unfinished">Güncellemeleri denetle...</translation>
+        <translation>Güncellemeleri denetle...</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="48"/>
         <source>Open Kimai instance</source>
-        <translation type="unfinished">Kimai Alanını Aç</translation>
+        <translation>Kimai örneğini aç</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="49"/>
         <source>Activities</source>
-        <translation type="unfinished">Aktiviteler</translation>
+        <translation>Etkinlikler</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="50"/>
         <source>Tasks</source>
-        <translation type="unfinished">Görevler</translation>
+        <translation>Görevler</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="51"/>
         <source>Refresh cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Önbelleği yenile</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="52"/>
         <source>About Kemai</source>
-        <translation type="unfinished"></translation>
+        <translation>Kemai Hakkında</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="53"/>
         <source>Show logs</source>
-        <translation type="unfinished"></translation>
+        <translation>Günlükleri göster</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="84"/>
         <source>&amp;File</source>
-        <translation type="unfinished">&amp;Dosya</translation>
+        <translation>&amp;Dosya</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="89"/>
         <source>&amp;Profile</source>
-        <translation type="unfinished">&amp;Profil</translation>
+        <translation>&amp;Profil</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="93"/>
         <source>&amp;View</source>
-        <translation type="unfinished">&amp;Görünüm</translation>
+        <translation>&amp;Görünüm</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="97"/>
         <source>&amp;Help</source>
-        <translation type="unfinished">&amp;Yardım</translation>
+        <translation>&amp;Yardım</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="106"/>
         <source>About Qt</source>
-        <translation type="unfinished">Qt Hakkında</translation>
+        <translation>Qt Hakkında</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="137"/>
         <location filename="../../gui/mainWindow.cpp" line="229"/>
         <source>Not connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Bağlı değil</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="380"/>
@@ -535,26 +536,26 @@
     <message>
         <location filename="../../gui/mainWindow.cpp" line="465"/>
         <source>New version available</source>
-        <translation type="unfinished">Yeni bir sürüm mevcut</translation>
+        <translation>Yeni sürüm var</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="465"/>
         <source>Version %1 is available.
 
 %2</source>
-        <translation type="unfinished">%1 sürümü kullanılabilir durumda.
+        <translation>%1 sürümü kullanılabilir.
 
 %2</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="487"/>
         <source>No update</source>
-        <translation type="unfinished">Güncelleme yok</translation>
+        <translation>Güncelleme yok</translation>
     </message>
     <message>
         <location filename="../../gui/mainWindow.cpp" line="487"/>
         <source>%1 is latest version.</source>
-        <translation type="unfinished">%1 güncel bir sürümdür.</translation>
+        <translation>%1 en son sürüm.</translation>
     </message>
 </context>
 <context>
@@ -562,12 +563,12 @@
     <message>
         <location filename="../../gui/settingsDialog.cpp" line="82"/>
         <source>Language changed. Application restart is required.</source>
-        <translation type="unfinished">Dil değiştirildi. Uygulamanın yeniden başlatılması gerekir.</translation>
+        <translation>Dil değiştirildi. Uygulamanın yeniden başlatılması gerekir.</translation>
     </message>
     <message>
         <location filename="../../gui/settingsDialog.cpp" line="209"/>
         <source>Connected to Kimai %1</source>
-        <translation type="unfinished">Kimai %1 bağlandı</translation>
+        <translation>Kimai %1 ile bağlantı kuruldu</translation>
     </message>
 </context>
 </TS>

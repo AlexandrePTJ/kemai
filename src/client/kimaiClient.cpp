@@ -168,6 +168,11 @@ void KimaiClient::setHost(const QString& host)
     mD->host = host;
 }
 
+QString KimaiClient::host() const
+{
+    return mD->host;
+}
+
 void KimaiClient::setLegacyAuth(const QString& username, const QString& token)
 {
     mD->username = username;
