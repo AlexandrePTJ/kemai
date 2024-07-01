@@ -27,12 +27,17 @@ if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
             GIT_REPOSITORY https://github.com/gabime/spdlog.git
             GIT_TAG v1.14.0
             OVERRIDE_FIND_PACKAGE)
+    FetchContent_Declare(QtAwesome
+            GIT_REPOSITORY https://github.com/gamecreature/QtAwesome.git
+            GIT_TAG font-awesome-6.5.1
+            OVERRIDE_FIND_PACKAGE)
 endif (KEMAI_BUILD_LOCAL_DEPENDENCIES)
 
 # Find external dependencies
 find_package(fmt REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(QtAwesome REQUIRED)
 find_package(Qt6 QUIET COMPONENTS Widgets Network LinguistTools)
 
 # Write version to file to ease packaging

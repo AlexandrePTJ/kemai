@@ -8,6 +8,7 @@
 
 #include "client/kimaiFeatures.h"
 #include "kemaiConfig.h"
+#include "misc/fontAwesomeHolder.h"
 
 using namespace kemai;
 
@@ -19,12 +20,12 @@ static void toggleLineEditEchoMode(QLineEdit* lineEdit, QAction* action)
     if (lineEdit->echoMode() == QLineEdit::Password)
     {
         lineEdit->setEchoMode(QLineEdit::Normal);
-        action->setIcon(QIcon(":/icons/visible"));
+        action->setIcon(FontAwesomeHolder::get()->icon(fa::fa_regular, fa::fa_eye));
     }
     else
     {
         lineEdit->setEchoMode(QLineEdit::Password);
-        action->setIcon(QIcon(":/icons/visible-off"));
+        action->setIcon(FontAwesomeHolder::get()->icon(fa::fa_regular, fa::fa_eye_slash));
     }
 }
 
@@ -43,8 +44,8 @@ SettingsDialog::SettingsDialog(const std::shared_ptr<DesktopEventsMonitor>& desk
         cbLanguage->addItem(QString("%1 [%2]").arg(QLocale::languageToString(locale.language()), QLocale::territoryToString(locale.territory())), locale);
     };
 
-    mActToggleTokenVisible    = mUi->leToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
-    mActToggleAPITokenVisible = mUi->leAPIToken->addAction(QIcon(":/icons/visible-off"), QLineEdit::TrailingPosition);
+    mActToggleTokenVisible    = mUi->leToken->addAction(FontAwesomeHolder::get()->icon(fa::fa_regular, fa::fa_eye_slash), QLineEdit::TrailingPosition);
+    mActToggleAPITokenVisible = mUi->leAPIToken->addAction(FontAwesomeHolder::get()->icon(fa::fa_regular, fa::fa_eye_slash), QLineEdit::TrailingPosition);
 
     // Add default en_US language
     addLanguage("en_US");

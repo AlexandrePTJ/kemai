@@ -3,8 +3,8 @@
     <radialGradient id="a" cx="611" cy="41.266644"
                     gradientTransform="matrix(1.1673343 0 0 1.4196623 -102.24121 -19.722475)"
                     gradientUnits="userSpaceOnUse" r="160.5">
-        <stop offset="0" stop-color="#01fd00"/>
-        <stop offset="1" stop-color="#009d39"/>
+        <stop offset="0" stop-color="#fd0100"/>
+        <stop offset="1" stop-color="#9d0039"/>
     </radialGradient>
     <radialGradient id="b" cx="873.78265" cy="-16.37981"
                     gradientTransform="matrix(1.9295131 -1.1140049 1.1550268 2.0005649 -1087.6858 1104.8947)"

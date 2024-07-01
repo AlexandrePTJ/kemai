@@ -5,6 +5,7 @@
 #include <QPalette>
 #include <QStyle>
 
+#include "misc/fontAwesomeHolder.h"
 #include "models/timeSheetModel.h"
 
 using namespace kemai;
@@ -14,6 +15,7 @@ static const auto gTextSpacing    = 2;
 static const auto gTextLeftOffset = gIndicatorWidth + gTextSpacing;
 static const auto gPadding        = 4;
 static const auto gButtonWidth    = 64;
+static const auto gButtonIconSide = 24;
 
 // gIndicatorWidth + gPadding (1 x blue rect + 1 x empty)
 // |  |
@@ -76,21 +78,27 @@ void TimeSheetItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem&
     const auto buttonY = option.rect.top() + gPadding;
     const auto buttonH = option.rect.height() - 2 * gPadding;
 
+    QVariantMap fontAwesomeOptions;
+    if (isHover)
+    {
+        fontAwesomeOptions.insert("color-disabled", QColor::fromString("#009d39"));
+    }
+
     // Reload button
     QStyleOptionButton reloadButtonOption;
     reloadButtonOption.features = QStyleOptionButton::Flat;
-    reloadButtonOption.text     = "Reload";
-    reloadButtonOption.state    = QStyle::State_Sunken;
+    reloadButtonOption.icon     = FontAwesomeHolder::get()->icon(fa::fa_solid, fa::fa_play, fontAwesomeOptions);
+    reloadButtonOption.iconSize = {gButtonIconSide, gButtonIconSide};
     reloadButtonOption.rect     = QRect(option.rect.right() - 3 * gPadding - 2 * gButtonWidth, buttonY, gButtonWidth, buttonH);
 
     qApp->style()->drawControl(QStyle::CE_PushButton, &reloadButtonOption, painter);
 
     // Restart button
     QStyleOptionButton restartButtonOption;
-    //    buttonOption.features = QStyleOptionButton::DefaultButton;
-    restartButtonOption.text  = "Restart";
-    restartButtonOption.state = QStyle::State_Sunken;
-    restartButtonOption.rect  = QRect(option.rect.right() - gPadding - gButtonWidth, buttonY, gButtonWidth, buttonH);
+    restartButtonOption.features = QStyleOptionButton::Flat;
+    restartButtonOption.icon     = FontAwesomeHolder::get()->icon(fa::fa_solid, fa::fa_rotate_right, fontAwesomeOptions);
+    restartButtonOption.iconSize = {gButtonIconSide, gButtonIconSide};
+    restartButtonOption.rect     = QRect(option.rect.right() - gPadding - gButtonWidth, buttonY, gButtonWidth, buttonH);
 
     qApp->style()->drawControl(QStyle::CE_PushButton, &restartButtonOption, painter);
 }

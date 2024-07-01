@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 
 #include "misc/customFmt.h"
+#include "misc/fontAwesomeHolder.h"
 #include "misc/helpers.h"
 #include "timeSheetItemDelegate.h"
 #include "timeSheetListWidgetItem.h"
@@ -16,6 +17,9 @@ static const auto gDefaultDurationText = "--:--:--";
 ActivityWidget::ActivityWidget(QWidget* parent) : QWidget(parent), mUi(std::make_unique<Ui::ActivityWidget>())
 {
     mUi->setupUi(this);
+
+    mUi->btEditTimeSheet->setIcon(FontAwesomeHolder::get()->icon(fa::fa_regular, fa::fa_square_pen));
+
     mUi->lbDurationTime->setText(gDefaultDurationText);
 
     mUi->cbTimeSheetParams->setModel(&mTimeSheetParamsModel);
@@ -194,11 +198,11 @@ void ActivityWidget::updateControls()
 
     if (mSession->hasCurrentTimeSheet())
     {
-        mUi->btStartStop->setIcon(QIcon(":/icons/stop"));
+        mUi->btStartStop->setIcon(QIcon(":/icons/kimai-stop"));
     }
     else
     {
-        mUi->btStartStop->setIcon(QIcon(":/icons/play"));
+        mUi->btStartStop->setIcon(QIcon(":/icons/kimai-play"));
         mUi->lbDurationTime->setText(gDefaultDurationText);
     }
 }

@@ -28,6 +28,7 @@ set(SRCS
         gui/timeSheetParamsItemDelegate.cpp
         main.cpp
         misc/dataReader.cpp
+        misc/fontAwesomeHolder.cpp
         misc/helpers.cpp
         models/loggerTreeModel.cpp
         models/taskFilterProxyModel.cpp
@@ -61,6 +62,7 @@ set(HDRS
         gui/timeSheetParamsItemDelegate.h
         misc/customFmt.h
         misc/dataReader.h
+        misc/fontAwesomeHolder.h
         misc/helpers.h
         models/loggerTreeModel.h
         models/taskFilterProxyModel.h
@@ -136,7 +138,7 @@ qt_add_translations(
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Widgets Qt::Network spdlog::spdlog magic_enum::magic_enum ${KEMAI_ADDITIONAL_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Widgets Qt::Network QtAwesome spdlog::spdlog magic_enum::magic_enum ${KEMAI_ADDITIONAL_LIBS})
 
 # Install configuration
 install(TARGETS ${PROJECT_NAME}

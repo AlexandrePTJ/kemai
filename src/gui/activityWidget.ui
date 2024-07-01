@@ -78,7 +78,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="btEditTimeSheet">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -90,10 +90,6 @@
           <width>32</width>
           <height>32</height>
          </size>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/kemai.qrc">
-          <normaloff>:/icons/update</normaloff>:/icons/update</iconset>
         </property>
         <property name="iconSize">
          <size>

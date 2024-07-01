@@ -7,11 +7,11 @@
         <file alias="add">icons/add.svg</file>
         <file alias="play">icons/play.svg</file>
         <file alias="stop">icons/stop.svg</file>
+        <file alias="kimai-play">icons/kimai.svg</file>
+        <file alias="kimai-stop">icons/kimai-stop.svg</file>
         <file alias="kemai">icons/kimai.svg</file>
         <file alias="kemai-red">icons/kimai-red.png</file>
         <file alias="kemai-animated">icons/kimai-animated.svg</file>
-        <file alias="visible">icons/visibility.svg</file>
-        <file alias="visible-off">icons/visibility-off.svg</file>
         <file alias="update">icons/update.svg</file>
         <file alias="update-off">icons/update-off.svg</file>
         <file alias="backspace">icons/backspace.svg</file>

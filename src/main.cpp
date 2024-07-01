@@ -13,6 +13,7 @@
 #include "gui/mainWindow.h"
 #include "kemaiConfig.h"
 #include "misc/customFmt.h"
+#include "misc/fontAwesomeHolder.h"
 #include "misc/helpers.h"
 #include "models/loggerTreeModel.h"
 #include "settings/settings.h"
@@ -88,6 +89,9 @@ int main(int argc, char* argv[])
 
     // Setup trusted certificates
     KimaiClient::addTrustedCertificates(kemaiSettings.trustedCertificates);
+
+    // Init QtAwesome
+    FontAwesomeHolder::get()->initFontAwesome();
 
     // Startup
     MainWindow mainWindow;
