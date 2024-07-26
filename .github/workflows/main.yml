@@ -56,15 +56,15 @@ jobs:
 
       - name: Configure
         run: |
-          cmake --preset release-win
+          cmake --preset release
 
       - name: Build
         run: |
-          cmake --build --preset release-win
+          cmake --build --preset release
 
       - name: Create Windows package
         run: |
-          cmake --build --preset release-win --target package
+          cmake --build --preset release --target package
 
       # Create release if on built on a tag
       - if: startsWith(github.ref, 'refs/tags/')
@@ -73,7 +73,7 @@ jobs:
         with:
           allowUpdates: true
           draft: true
-          artifacts: 'cmake-build-release-win/Kemai-*.msi'
+          artifacts: 'cmake-build-release/Kemai-*.msi'
 
       # Create continuous release on some branches
       - if: github.ref == 'refs/heads/develop'
@@ -85,7 +85,7 @@ jobs:
           allowUpdates: true
           updateOnlyUnreleased: true
           prerelease: true
-          artifacts: 'cmake-build-release-win/Kemai-*.msi'
+          artifacts: 'cmake-build-release/Kemai-*.msi'
       - if: github.ref == 'refs/heads/feature/98-break-ui'
         name: Create/Update prerelease
         uses: ncipollo/release-action@v1
@@ -95,14 +95,14 @@ jobs:
           allowUpdates: true
           updateOnlyUnreleased: true
           prerelease: true
-          artifacts: 'cmake-build-release-win/Kemai-*.msi'
+          artifacts: 'cmake-build-release/Kemai-*.msi'
 
   MacOSJob:
     name: MacOS
     runs-on: macos-latest
     strategy:
       matrix:
-        preset: ["release-macos", "release-macos-noupdate"]
+        preset: ["release", "release-macos-noupdate"]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4

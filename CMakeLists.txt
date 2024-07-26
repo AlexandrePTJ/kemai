@@ -8,30 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Options
 option(KEMAI_ENABLE_UPDATE_CHECK "Allow Kemai to check for update from Github releases" ON)
-option(KEMAI_BUILD_LOCAL_DEPENDENCIES "Download and build dependencies (except Qt6)" ON)
 
 # Install dependencies sources to build if required
-if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
-    set(SPDLOG_FMT_EXTERNAL ON)
-
-    include(FetchContent)
-    FetchContent_Declare(fmt
-            GIT_REPOSITORY https://github.com/fmtlib/fmt
-            GIT_TAG 10.2.1
-            OVERRIDE_FIND_PACKAGE)
-    FetchContent_Declare(magic_enum
-            GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-            GIT_TAG v0.9.5
-            OVERRIDE_FIND_PACKAGE)
-    FetchContent_Declare(spdlog
-            GIT_REPOSITORY https://github.com/gabime/spdlog.git
-            GIT_TAG v1.14.0
-            OVERRIDE_FIND_PACKAGE)
-    FetchContent_Declare(QtAwesome
-            GIT_REPOSITORY https://github.com/gamecreature/QtAwesome.git
-            GIT_TAG font-awesome-6.5.1
-            OVERRIDE_FIND_PACKAGE)
-endif (KEMAI_BUILD_LOCAL_DEPENDENCIES)
+include(FetchContent)
+FetchContent_Declare(QtAwesome
+        GIT_REPOSITORY https://github.com/gamecreature/QtAwesome.git
+        GIT_TAG font-awesome-6.5.1
+        OVERRIDE_FIND_PACKAGE)
 
 # Find external dependencies
 find_package(fmt REQUIRED)

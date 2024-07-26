@@ -59,3 +59,6 @@ out/
 
 # ---> Visual Studio
 .vs/
+
+# ---> vcpkg
+vcpkg-configuration.json

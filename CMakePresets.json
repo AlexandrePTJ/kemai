@@ -1,96 +1,58 @@
 {
-  "version": 3,
-  "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 21,
-    "patch": 0
-  },
-  "configurePresets": [
-    {
-      "name": "default",
-      "hidden": true,
-      "displayName": "Default Config",
-      "description": "Default build using Ninja generator",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/cmake-build-${presetName}",
-      "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "/usr"
-      }
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21,
+        "patch": 0
     },
-    {
-      "name": "default-windows",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "c:/Qt/6.7.2/msvc2019_64",
-        "CMAKE_INSTALL_PREFIX": "dist"
-      }
-    },
-    {
-      "name": "default-macos",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "$env{HOME}/Qt/6.7.2/macos",
-        "CMAKE_INSTALL_PREFIX": "dist"
-      }
-    },
-    {
-      "name": "debug",
-      "inherits": "default",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "release",
-      "inherits": "default",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "debug-win",
-      "inherits": ["default-windows", "debug"]
-    },
-    {
-      "name": "release-win",
-      "inherits": ["default-windows", "release"]
-    },
-    {
-      "name": "release-macos",
-      "inherits": ["default-macos", "release"]
-    },
-    {
-      "name": "release-macos-noupdate",
-      "inherits": ["default-macos", "release"],
-      "cacheVariables": {
-        "KEMAI_ENABLE_UPDATE_CHECK": "OFF"
-      }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "debug",
-      "configurePreset": "debug"
-    },
-    {
-      "name": "release",
-      "configurePreset": "release"
-    },
-    {
-      "name": "debug-win",
-      "configurePreset": "debug-win"
-    },
-    {
-      "name": "release-win",
-      "configurePreset": "release-win"
-    },
-    {
-      "name": "release-macos",
-      "configurePreset": "release-macos"
-    },
-    {
-      "name": "release-macos-noupdate",
-      "configurePreset": "release-macos-noupdate"
-    }
-  ]
+    "configurePresets": [
+        {
+            "name": "default",
+            "displayName": "Default Config",
+            "description": "Default build using Ninja generator",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/cmake-build-${presetName}",
+            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        {
+            "name": "debug",
+            "inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "release",
+            "inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "release-macos-noupdate",
+            "inherits": "release",
+            "cacheVariables": {
+                "KEMAI_ENABLE_UPDATE_CHECK": "OFF"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "debug",
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
+        },
+        {
+            "name": "release-macos-noupdate",
+            "configurePreset": "release-macos-noupdate"
+        }
+    ]
 }
