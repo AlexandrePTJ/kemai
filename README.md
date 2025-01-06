@@ -1,5 +1,7 @@
 # Kemai, a Kimai Desktop Client
 
+> ⚠️ **Looking for a C++ developer with a Mac**:  
+I need help debugging a specific issue on macOS. Please reach out if interested!
 
 ## Build Status
 
