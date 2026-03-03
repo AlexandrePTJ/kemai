@@ -34,6 +34,15 @@ set(KEMAI_RESX_FILES
 
 set(KEMAI_CPP_FILES
         cpp/main.cpp
+        cpp/client/kimaiData.h
+        cpp/client/kimaiData.cpp
+        cpp/client/kimaiClient.h
+        cpp/client/kimaiClient_p.h
+        cpp/client/kimaiClient.cpp
+        cpp/client/kimaiReply.h
+        cpp/client/kimaiReply.cpp
+        cpp/client/parser.h
+        cpp/client/parser.cpp
         cpp/data/profile.cpp
         cpp/data/profile.h
         cpp/misc/jsonHelpers.h
@@ -96,7 +105,7 @@ target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE Qt6::Gui Qt6::Quick spdlog::spdlog magic_enum::magic_enum qt6keychain)
+        PRIVATE Qt6::Gui Qt6::Network Qt6::Quick spdlog::spdlog magic_enum::magic_enum qt6keychain)
 
 #
 # Install
