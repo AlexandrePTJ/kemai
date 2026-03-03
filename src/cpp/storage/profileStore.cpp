@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+// SPDX-License-Identifier: MIT
 #include "profileStore.h"
 
 // 3rd party headers

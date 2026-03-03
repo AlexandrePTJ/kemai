@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+// SPDX-License-Identifier: MIT
 #include "secretStorage.h"
 
 #include <qtkeychain/keychain.h>
