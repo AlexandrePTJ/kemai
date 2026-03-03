@@ -1,7 +1,8 @@
 # Kemai, a Kimai Desktop Client
 
-> ⚠️ **Looking for a C++ developer with a Mac**:  
-I need help debugging a specific issue on macOS (#120). Please reach out if interested!
+> 🔄 **Complete rewrite in progress**:
+A complete rewrite of the application has started on the `develop` branch.
+Development will be focused on this refactoring effort. Current open bugs and feature requests will be addressed as part of this rewrite rather than in the existing codebase.
 
 ## Build Status
 
