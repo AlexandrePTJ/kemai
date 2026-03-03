@@ -2,7 +2,7 @@
   "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 21,
+    "minor": 30,
     "patch": 0
   },
   "configurePresets": [
@@ -12,27 +12,7 @@
       "displayName": "Default Config",
       "description": "Default build using Ninja generator",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/cmake-build-${presetName}",
-      "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "/usr"
-      }
-    },
-    {
-      "name": "default-windows",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "c:/Qt/6.7.2/msvc2019_64",
-        "OPENSSL_ROOT": "c:/Qt/Tools/OpenSSLv3/Win_x64",
-        "CMAKE_INSTALL_PREFIX": "dist"
-      }
-    },
-    {
-      "name": "default-macos",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "$env{HOME}/Qt/6.7.2/macos",
-        "CMAKE_INSTALL_PREFIX": "dist"
-      }
+      "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
       "name": "debug",
@@ -47,25 +27,6 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
-    },
-    {
-      "name": "debug-win",
-      "inherits": ["default-windows", "debug"]
-    },
-    {
-      "name": "release-win",
-      "inherits": ["default-windows", "release"]
-    },
-    {
-      "name": "release-macos",
-      "inherits": ["default-macos", "release"]
-    },
-    {
-      "name": "release-macos-noupdate",
-      "inherits": ["default-macos", "release"],
-      "cacheVariables": {
-        "KEMAI_ENABLE_UPDATE_CHECK": "OFF"
-      }
     }
   ],
   "buildPresets": [
@@ -76,22 +37,6 @@
     {
       "name": "release",
       "configurePreset": "release"
-    },
-    {
-      "name": "debug-win",
-      "configurePreset": "debug-win"
-    },
-    {
-      "name": "release-win",
-      "configurePreset": "release-win"
-    },
-    {
-      "name": "release-macos",
-      "configurePreset": "release-macos"
-    },
-    {
-      "name": "release-macos-noupdate",
-      "configurePreset": "release-macos-noupdate"
     }
   ]
 }
