@@ -34,15 +34,15 @@ set(KEMAI_RESX_FILES
 
 set(KEMAI_CPP_FILES
         cpp/main.cpp
-        cpp/client/kimaiData.h
-        cpp/client/kimaiData.cpp
+        cpp/client/kimaiSystem.h
+        cpp/client/kimaiSystem.cpp
+        cpp/client/kimaiResources.h
+        cpp/client/kimaiResources.cpp
+        cpp/client/kimaiTimesheets.h
+        cpp/client/kimaiTimesheets.cpp
         cpp/client/kimaiClient.h
         cpp/client/kimaiClient_p.h
         cpp/client/kimaiClient.cpp
-        cpp/client/kimaiReply.h
-        cpp/client/kimaiReply.cpp
-        cpp/client/parser.h
-        cpp/client/parser.cpp
         cpp/data/profile.cpp
         cpp/data/profile.h
         cpp/misc/jsonHelpers.h

@@ -3,76 +3,58 @@
 #pragma once
 
 // STL headers
-#include <memory>
 #include <optional>
 
 // Qt headers
-#include <client/kimaiData.h>
-#include <client/kimaiReply.h>
+#include <QFuture>
+#include <QObject>
 
-namespace kemai {
+// Project headers
+#include <client/kimaiResources.h>
+#include <client/kimaiSystem.h>
+#include <client/kimaiTimesheets.h>
 
-using VersionRequestResult  = KimaiApiResult<KimaiVersion>*;
-using MeRequestResult       = KimaiApiResult<User>*;
-using TimeSheetConfigResult = KimaiApiResult<TimeSheetConfig>*;
-using PluginsResult         = KimaiApiResult<Plugins>*;
-using CustomersResult       = KimaiApiResult<Customers>*;
-using TimeSheetsResult      = KimaiApiResult<TimeSheets>*;
-using ProjectsResult        = KimaiApiResult<Projects>*;
-using ActivitiesResult      = KimaiApiResult<Activities>*;
-using CustomerAddResult     = KimaiApiResult<Customer>*;
-using ProjectAddResult      = KimaiApiResult<Project>*;
-using ActivityAddResult     = KimaiApiResult<Activity>*;
-using TimeSheetResult       = KimaiApiResult<TimeSheet>*;
-using TaskResult            = KimaiApiResult<Task>*;
-using TasksResult           = KimaiApiResult<Tasks>*;
-
-class KimaiClient : public QObject
+namespace kemai
 {
-    Q_OBJECT
+    class KimaiClient : public QObject
+    {
+        Q_OBJECT
 
-public:
-    explicit KimaiClient(QObject* parent = nullptr);
-    ~KimaiClient() override;
+    public:
+        explicit KimaiClient(QObject *parent = nullptr);
+        ~KimaiClient() override;
 
-    void setHost(const QString& host);
-    QString host() const;
+        void setHost(const QString &host);
+        void setToken(const QString &token);
 
-    void setLegacyAuth(const QString& username, const QString& token);
-    bool isUsingLegacyAuth() const;
+        QFuture<KimaiVersion>         requestKimaiVersion();
+        QFuture<KimaiUser>            requestMeUserInfo();
+        QFuture<KimaiTimeSheetConfig> requestTimeSheetConfig();
+        QFuture<KimaiPlugins>         requestPlugins();
+        QFuture<KimaiCustomers>       requestCustomers();
+        QFuture<KimaiTimeSheets>      requestActiveTimeSheets();
+        QFuture<KimaiTimeSheets>      requestRecentTimeSheets();
+        QFuture<KimaiProjects>        requestProjects(std::optional<int> customerId = std::nullopt);
+        QFuture<KimaiActivities>      requestActivities(std::optional<int> projectId = std::nullopt);
 
-    void setAPIToken(const QString& token);
+        QFuture<KimaiCustomer>  addCustomer(const KimaiCustomer &customer);
+        QFuture<KimaiProject>   addProject(const KimaiProject &project);
+        QFuture<KimaiActivity>  addActivity(const KimaiActivity &activity);
 
-    VersionRequestResult requestKimaiVersion();
-    MeRequestResult requestMeUserInfo();
-    TimeSheetConfigResult requestTimeSheetConfig();
-    PluginsResult requestPlugins();
-    CustomersResult requestCustomers();
-    TimeSheetsResult requestActiveTimeSheets();
-    TimeSheetsResult requestRecentTimeSheets();
-    ProjectsResult requestProjects(std::optional<int> customerId = std::nullopt);
-    ActivitiesResult requestActivities(std::optional<int> projectId = std::nullopt);
+        QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode);
+        QFuture<KimaiTimeSheet> updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode);
 
-    CustomerAddResult addCustomer(const Customer& customer);
-    ProjectAddResult addProject(const Project& project);
-    ActivityAddResult addActivity(const Activity& activity);
+        QFuture<KimaiTasks> requestTasks();
+        QFuture<KimaiTask>  startTask(int taskId);
+        QFuture<KimaiTask>  closeTask(int taskId);
 
-    TimeSheetResult startTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode);
-    TimeSheetResult updateTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode);
+        static void addTrustedCertificates(const QStringList &trustedCertificates);
 
-    TasksResult requestTasks();
-    TaskResult startTask(int taskId);
-    TaskResult closeTask(int taskId);
+    signals:
+        void sslError(const QString &msg, const QByteArray &certSN, const QByteArray &certPem);
 
-    static void addTrustedCertificates(const QStringList& trustedCertificates);
-
-signals:
-    void requestError(const QString& errorMsg);
-    void sslError(const QString& msg, const QByteArray& certSN, const QByteArray& certPem);
-
-private:
-    class KimaiClientPrivate;
-    QScopedPointer<KimaiClientPrivate> mD;
-};
-
+    private:
+        class KimaiClientPrivate;
+        std::unique_ptr<KimaiClientPrivate> m_d;
+    };
 } // namespace kemai

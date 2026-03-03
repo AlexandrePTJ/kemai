@@ -3,30 +3,22 @@
 #include "kimaiClient.h"
 #include "kimaiClient_p.h"
 
+// 3rd party headers
+#include <spdlog/spdlog.h>
+
+// Qt headers
 #include <QCoreApplication>
+#include <QFuture>
 #include <QUrlQuery>
 
-#include <spdlog/spdlog.h>
+// Project headers
+#include <misc/jsonHelpers.h>
 
 using namespace kemai;
 
 /*
  * Static helpers
  */
-static QByteArray toPostData(const QJsonValue& jsonValue)
-{
-    QJsonDocument jdoc;
-    if (jsonValue.isArray())
-    {
-        jdoc = QJsonDocument(jsonValue.toArray());
-    }
-    else
-    {
-        jdoc = QJsonDocument(jsonValue.toObject());
-    }
-    return jdoc.toJson(QJsonDocument::Compact);
-}
-
 QString kemai::apiMethodToString(ApiMethod method)
 {
     switch (method)
@@ -85,20 +77,16 @@ QString kemai::apiMethodToString(ApiMethod method)
 /*
  * Private impl
  */
-KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient* c) : networkAccessManager(new QNetworkAccessManager), mQ(c)
+KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient *c):
+networkAccessManager(std::make_unique<QNetworkAccessManager>()),
+m_q(c)
 {
     connect(networkAccessManager.get(), &QNetworkAccessManager::sslErrors, this, &KimaiClientPrivate::onNamSslErrors);
 }
 
-QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method, const std::map<QString, QString>& parameters, const QByteArray& data,
-                                                                const QString& subPath) const
+QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method, const std::map<QString, QString> &parameters, const QByteArray &data, const QString &subPath) const
 {
-    /*
-     * Create url
-     */
-    auto url = QUrl::fromUserInput(host);
-
-    // Update existing path to work with custom path instances
+    auto url  = QUrl::fromUserInput(host);
     auto path = QString("%1/api/%2").arg(url.path(), apiMethodToString(method));
     if (!subPath.isEmpty())
     {
@@ -107,15 +95,12 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
     url.setPath(path);
 
     QUrlQuery query;
-    for (const auto& [key, value] : parameters)
+    for (const auto &[key, value] : parameters)
     {
         query.addQueryItem(key, value);
     }
     url.setQuery(query);
 
-    /*
-     * Create request
-     */
     QNetworkRequest networkRequest;
     networkRequest.setUrl(url);
 
@@ -131,6 +116,8 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
     }
     networkRequest.setHeader(QNetworkRequest::UserAgentHeader, QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()));
     networkRequest.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+    networkRequest.setRawHeader("Accept", "application/json");
+
     if (!data.isEmpty())
     {
         networkRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -140,119 +127,108 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
     return networkRequest;
 }
 
-QNetworkReply* KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkRequest& networkRequest) const
+QNetworkReply *KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkRequest &networkRequest) const
 {
     spdlog::debug("[GET] {}", networkRequest.url().toString());
     return networkAccessManager->get(networkRequest);
 }
 
-QNetworkReply* KimaiClient::KimaiClientPrivate::sendPostRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const
+QNetworkReply *KimaiClient::KimaiClientPrivate::sendPostRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const
 {
     spdlog::debug("[POST] {}", networkRequest.url().toString());
     return networkAccessManager->post(networkRequest, data);
 }
 
-QNetworkReply* KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkRequest& networkRequest, const QByteArray& data) const
+QNetworkReply *KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const
 {
     spdlog::debug("[PATCH] {}", networkRequest.url().toString());
     return networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);
 }
 
-void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply* /*reply*/, const QList<QSslError>& errors)
+void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply * /*reply*/, const QList<QSslError> &errors)
 {
-    for (const auto& error : errors)
+    for (const auto &error : errors)
     {
         spdlog::error("SSL Error: {}", error.errorString());
     }
 
-    // Process certificate errors one by one.
-    const auto& crtError = errors.first();
-    emit mQ->sslError(crtError.errorString(), crtError.certificate().serialNumber(), crtError.certificate().toPem());
+    const auto &crtError = errors.first();
+    emit        m_q->sslError(crtError.errorString(), crtError.certificate().serialNumber(), crtError.certificate().toPem());
 }
 
 /*
  * Public impl
  */
-KimaiClient::KimaiClient(QObject* parent) : QObject(parent), mD(new KimaiClientPrivate(this)) {}
+KimaiClient::KimaiClient(QObject *parent):
+QObject(parent),
+m_d(std::make_unique<KimaiClientPrivate>(this))
+{
+}
 
 KimaiClient::~KimaiClient() = default;
 
-void KimaiClient::setHost(const QString& host)
+void KimaiClient::setHost(const QString &host)
 {
-    mD->host = host;
+    m_d->host = host;
 }
 
-QString KimaiClient::host() const
+void KimaiClient::setToken(const QString &token)
 {
-    return mD->host;
+    m_d->apiToken = token;
 }
 
-void KimaiClient::setLegacyAuth(const QString& username, const QString& token)
+QFuture<KimaiVersion> KimaiClient::requestKimaiVersion()
 {
-    mD->username = username;
-    mD->token    = token;
+    auto request = m_d->prepareRequest(ApiMethod::Version);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplySingleObject<KimaiVersion>(ApiMethod::Version, reply);
 }
 
-bool KimaiClient::isUsingLegacyAuth() const
+QFuture<KimaiUser> KimaiClient::requestMeUserInfo()
 {
-    return mD->apiToken.isEmpty();
+    auto request = m_d->prepareRequest(ApiMethod::MeUsers);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplySingleObject<KimaiUser>(ApiMethod::MeUsers, reply);
 }
 
-void KimaiClient::setAPIToken(const QString& token)
+QFuture<KimaiTimeSheetConfig> KimaiClient::requestTimeSheetConfig()
 {
-    mD->apiToken = token;
+    auto request = m_d->prepareRequest(ApiMethod::TimeSheetConfig);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplySingleObject<KimaiTimeSheetConfig>(ApiMethod::TimeSheetConfig, reply);
 }
 
-VersionRequestResult KimaiClient::requestKimaiVersion()
+QFuture<KimaiPlugins> KimaiClient::requestPlugins()
 {
-    auto request = mD->prepareRequest(ApiMethod::Version);
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplySingleObject<KimaiVersion>(ApiMethod::Version, reply);
+    auto request = m_d->prepareRequest(ApiMethod::Plugins);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplyArray<KimaiPlugin>(ApiMethod::Plugins, reply);
 }
 
-MeRequestResult KimaiClient::requestMeUserInfo()
+QFuture<KimaiCustomers> KimaiClient::requestCustomers()
 {
-    auto request = mD->prepareRequest(ApiMethod::MeUsers);
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplySingleObject<User>(ApiMethod::MeUsers, reply);
+    auto request = m_d->prepareRequest(ApiMethod::Customers);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplyArray<KimaiCustomer>(ApiMethod::Customers, reply);
 }
 
-TimeSheetConfigResult KimaiClient::requestTimeSheetConfig()
+QFuture<KimaiTimeSheets> KimaiClient::requestActiveTimeSheets()
 {
-    auto request = mD->prepareRequest(ApiMethod::TimeSheetConfig);
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplySingleObject<TimeSheetConfig>(ApiMethod::TimeSheetConfig, reply);
+    auto request = m_d->prepareRequest(ApiMethod::ActiveTimeSheets);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplyArray<KimaiTimeSheet>(ApiMethod::ActiveTimeSheets, reply);
 }
 
-PluginsResult KimaiClient::requestPlugins()
+QFuture<KimaiTimeSheets> KimaiClient::requestRecentTimeSheets()
 {
-    auto request = mD->prepareRequest(ApiMethod::Plugins);
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplyArray<Plugin>(ApiMethod::Plugins, reply);
+    auto request = m_d->prepareRequest(ApiMethod::RecentTimeSheets, std::map<QString, QString>{
+                                                                        {"size", "5"}
+    });
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplyArray<KimaiTimeSheet>(ApiMethod::RecentTimeSheets, reply);
 }
 
-CustomersResult KimaiClient::requestCustomers()
-{
-    auto request = mD->prepareRequest(ApiMethod::Customers);
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplyArray<Customer>(ApiMethod::Customers, reply);
-}
-
-TimeSheetsResult KimaiClient::requestActiveTimeSheets()
-{
-    auto request = mD->prepareRequest(ApiMethod::ActiveTimeSheets);
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::ActiveTimeSheets, reply);
-}
-
-TimeSheetsResult KimaiClient::requestRecentTimeSheets()
-{
-    auto request = mD->prepareRequest(ApiMethod::RecentTimeSheets, std::map<QString, QString>{{"size", "5"}});
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplyArray<TimeSheet>(ApiMethod::RecentTimeSheets, reply);
-}
-
-ProjectsResult KimaiClient::requestProjects(std::optional<int> customerId)
+QFuture<KimaiProjects> KimaiClient::requestProjects(std::optional<int> customerId)
 {
     std::map<QString, QString> parameters;
     if (customerId.has_value())
@@ -260,12 +236,12 @@ ProjectsResult KimaiClient::requestProjects(std::optional<int> customerId)
         parameters.emplace("customer", QString::number(customerId.value()));
     }
 
-    auto request = mD->prepareRequest(ApiMethod::Projects, parameters);
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplyArray<Project>(ApiMethod::Projects, reply);
+    auto request = m_d->prepareRequest(ApiMethod::Projects, parameters);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplyArray<KimaiProject>(ApiMethod::Projects, reply);
 }
 
-ActivitiesResult KimaiClient::requestActivities(std::optional<int> projectId)
+QFuture<KimaiActivities> KimaiClient::requestActivities(std::optional<int> projectId)
 {
     std::map<QString, QString> parameters;
     if (projectId.has_value())
@@ -273,81 +249,76 @@ ActivitiesResult KimaiClient::requestActivities(std::optional<int> projectId)
         parameters.emplace("project", QString::number(projectId.value()));
     }
 
-    auto request = mD->prepareRequest(ApiMethod::Activities, parameters);
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplyArray<Activity>(ApiMethod::Activities, reply);
+    auto request = m_d->prepareRequest(ApiMethod::Activities, parameters);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplyArray<KimaiActivity>(ApiMethod::Activities, reply);
 }
 
-CustomerAddResult KimaiClient::addCustomer(const Customer& customer)
+QFuture<KimaiCustomer> KimaiClient::addCustomer(const KimaiCustomer &customer)
 {
-    auto json    = KimaiApiTypesParser::toJson(customer);
-    auto data    = toPostData(json);
-    auto request = mD->prepareRequest(ApiMethod::CustomerAdd, {}, data);
-    auto reply   = mD->sendPostRequest(request, data);
-    return mD->processApiNetworkReplySingleObject<Customer>(ApiMethod::CustomerAdd, reply);
+    auto data    = JsonHelpers::toByteArray(customer.toJson());
+    auto request = m_d->prepareRequest(ApiMethod::CustomerAdd, {}, data);
+    auto reply   = m_d->sendPostRequest(request, data);
+    return m_d->processApiNetworkReplySingleObject<KimaiCustomer>(ApiMethod::CustomerAdd, reply);
 }
 
-ProjectAddResult KimaiClient::addProject(const Project& project)
+QFuture<KimaiProject> KimaiClient::addProject(const KimaiProject &project)
 {
-    auto json    = KimaiApiTypesParser::toJson(project);
-    auto data    = toPostData(json);
-    auto request = mD->prepareRequest(ApiMethod::ProjectAdd, {}, data);
-    auto reply   = mD->sendPostRequest(request, data);
-    return mD->processApiNetworkReplySingleObject<Project>(ApiMethod::ProjectAdd, reply);
+    auto data    = JsonHelpers::toByteArray(project.toJson());
+    auto request = m_d->prepareRequest(ApiMethod::ProjectAdd, {}, data);
+    auto reply   = m_d->sendPostRequest(request, data);
+    return m_d->processApiNetworkReplySingleObject<KimaiProject>(ApiMethod::ProjectAdd, reply);
 }
 
-ActivityAddResult KimaiClient::addActivity(const Activity& activity)
+QFuture<KimaiActivity> KimaiClient::addActivity(const KimaiActivity &activity)
 {
-    auto json    = KimaiApiTypesParser::toJson(activity);
-    auto data    = toPostData(json);
-    auto request = mD->prepareRequest(ApiMethod::ActivityAdd, {}, data);
-    auto reply   = mD->sendPostRequest(request, data);
-    return mD->processApiNetworkReplySingleObject<Activity>(ApiMethod::ActivityAdd, reply);
+    auto data    = JsonHelpers::toByteArray(activity.toJson());
+    auto request = m_d->prepareRequest(ApiMethod::ActivityAdd, {}, data);
+    auto reply   = m_d->sendPostRequest(request, data);
+    return m_d->processApiNetworkReplySingleObject<KimaiActivity>(ApiMethod::ActivityAdd, reply);
 }
 
-TimeSheetResult KimaiClient::startTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode)
+QFuture<KimaiTimeSheet> KimaiClient::startTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode)
 {
-    auto json    = KimaiApiTypesParser::toJson(timeSheet, trackingMode);
-    auto data    = toPostData(json);
-    auto request = mD->prepareRequest(ApiMethod::TimeSheets, {}, data);
-    auto reply   = mD->sendPostRequest(request, data);
-    return mD->processApiNetworkReplySingleObject<TimeSheet>(ApiMethod::TimeSheets, reply);
+    auto data    = JsonHelpers::toByteArray(timeSheet.toJson(trackingMode));
+    auto request = m_d->prepareRequest(ApiMethod::TimeSheets, {}, data);
+    auto reply   = m_d->sendPostRequest(request, data);
+    return m_d->processApiNetworkReplySingleObject<KimaiTimeSheet>(ApiMethod::TimeSheets, reply);
 }
 
-TimeSheetResult KimaiClient::updateTimeSheet(const TimeSheet& timeSheet, TimeSheetConfig::TrackingMode trackingMode)
+QFuture<KimaiTimeSheet> KimaiClient::updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode)
 {
-    auto json    = KimaiApiTypesParser::toJson(timeSheet, trackingMode);
-    auto data    = toPostData(json);
-    auto request = mD->prepareRequest(ApiMethod::TimeSheets, {}, data, QString::number(timeSheet.id));
-    auto reply   = mD->sendPatchRequest(request, data);
-    return mD->processApiNetworkReplySingleObject<TimeSheet>(ApiMethod::TimeSheets, reply);
+    auto data    = JsonHelpers::toByteArray(timeSheet.toJson(trackingMode));
+    auto request = m_d->prepareRequest(ApiMethod::TimeSheets, {}, data, QString::number(timeSheet.id));
+    auto reply   = m_d->sendPatchRequest(request, data);
+    return m_d->processApiNetworkReplySingleObject<KimaiTimeSheet>(ApiMethod::TimeSheets, reply);
 }
 
-TasksResult KimaiClient::requestTasks()
+QFuture<KimaiTasks> KimaiClient::requestTasks()
 {
-    auto request = mD->prepareRequest(ApiMethod::Tasks);
-    auto reply   = mD->sendGetRequest(request);
-    return mD->processApiNetworkReplyArray<Task>(ApiMethod::Tasks, reply);
+    auto request = m_d->prepareRequest(ApiMethod::Tasks);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplyArray<KimaiTask>(ApiMethod::Tasks, reply);
 }
 
-TaskResult KimaiClient::startTask(int taskId)
+QFuture<KimaiTask> KimaiClient::startTask(int taskId)
 {
-    auto request = mD->prepareRequest(ApiMethod::TaskStart, {}, {}, QString("%1/start").arg(taskId));
-    auto reply   = mD->sendPatchRequest(request, {});
-    return mD->processApiNetworkReplySingleObject<Task>(ApiMethod::TaskStart, reply);
+    auto request = m_d->prepareRequest(ApiMethod::TaskStart, {}, {}, QString("%1/start").arg(taskId));
+    auto reply   = m_d->sendPatchRequest(request, {});
+    return m_d->processApiNetworkReplySingleObject<KimaiTask>(ApiMethod::TaskStart, reply);
 }
 
-TaskResult KimaiClient::closeTask(int taskId)
+QFuture<KimaiTask> KimaiClient::closeTask(int taskId)
 {
-    auto request = mD->prepareRequest(ApiMethod::TaskClose, {}, {}, QString("%1/close").arg(taskId));
-    auto reply   = mD->sendPatchRequest(request, {});
-    return mD->processApiNetworkReplySingleObject<Task>(ApiMethod::TaskClose, reply);
+    auto request = m_d->prepareRequest(ApiMethod::TaskClose, {}, {}, QString("%1/close").arg(taskId));
+    auto reply   = m_d->sendPatchRequest(request, {});
+    return m_d->processApiNetworkReplySingleObject<KimaiTask>(ApiMethod::TaskClose, reply);
 }
 
-void KimaiClient::addTrustedCertificates(const QStringList& trustedCertificates)
+void KimaiClient::addTrustedCertificates(const QStringList &trustedCertificates)
 {
     auto sslConfiguration = QSslConfiguration::defaultConfiguration();
-    for (const auto& pemStr : trustedCertificates)
+    for (const auto &pemStr : trustedCertificates)
     {
         auto certificates = sslConfiguration.caCertificates();
         certificates << QSslCertificate::fromData(pemStr.toLocal8Bit());

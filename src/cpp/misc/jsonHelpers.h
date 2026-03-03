@@ -35,5 +35,10 @@ namespace kemai
          * @throw std::runtime_error When cannot write document
          */
         static void saveJsonToFile(const QJsonValue &json, const QString &jsonFilePath);
+
+        static QByteArray toByteArray(const QJsonValue &json, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
+
+        static void checkKeysOrThrow(const QString &objectName, const QJsonObject &jsonObject, const QStringList &requiredKeys);
+        static void checkTypeOrThrow(const QString &objectName, const QJsonValue &jsonValue, const std::vector<QJsonValue::Type> &allowedTypes);
     };
 } // namespace kemai
