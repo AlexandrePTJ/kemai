@@ -4,6 +4,7 @@
 #include <QFontDatabase>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QDirIterator>
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
         }
 
         // Load fonts
-        if (const auto fontId = QFontDatabase::addApplicationFont(":/Kemai/assets/fonts/RaveoVF.ttf"); fontId == -1)
+        if (const auto fontId = QFontDatabase::addApplicationFont(":/assets/fonts/RaveoVF.ttf"); fontId == -1)
         {
             spdlog::warn("Failed to load font RaveoVF.ttf");
         }

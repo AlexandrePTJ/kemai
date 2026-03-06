@@ -30,7 +30,7 @@ Page {
             spacing: Theme.spacingMedium
 
             Image {
-                source: "qrc:/Kemai/assets/images/kimai_logo_transparent.svg"
+                source: "qrc:/assets/images/kimai_logo.svg"
                 sourceSize: Qt.size(56, 56)
                 fillMode: Image.PreserveAspectFit
             }

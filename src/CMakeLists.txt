@@ -27,11 +27,6 @@ set(KEMAI_QML_SOURCES
         cpp/context/profileManager.h
 )
 
-set(KEMAI_RESX_FILES
-        assets/fonts/RaveoVF.ttf
-        assets/images/kimai_logo_transparent.svg
-)
-
 set(KEMAI_CPP_FILES
         cpp/main.cpp
         cpp/client/kimaiSystem.h
@@ -63,7 +58,7 @@ set(KEMAI_CPP_FILES
 qt_standard_project_setup(
         REQUIRES 6.10
         # I18N_TRANSLATED_LANGUAGES fr
-        )
+)
 
 qt_add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${KEMAI_CPP_FILES})
 
@@ -79,8 +74,6 @@ set_source_files_properties(qml/Theme.qml
 qt_add_qml_module(${PROJECT_NAME}
         URI Kemai
         QML_FILES ${KEMAI_QML_FILES}
-        RESOURCE_PREFIX /
-        RESOURCES ${KEMAI_RESX_FILES}
         SOURCES ${KEMAI_QML_SOURCES}
 )
 
@@ -89,17 +82,23 @@ qt_add_qml_module(${PROJECT_NAME}
 # )
 
 qt_add_resources(
+        ${PROJECT_NAME} "assets"
+        FILES
+        assets/fonts/RaveoVF.ttf
+        assets/images/kimai_logo.svg
+)
+
+qt_add_resources(
         ${PROJECT_NAME} "controls_conf"
-        PREFIX "/"
         FILES "qtquickcontrols2.conf")
 
 configure_file(cpp/kemaiConfig.h.in ${PROJECT_BINARY_DIR}/cpp/kemaiConfig.h)
 
 target_include_directories(${PROJECT_NAME}
         PRIVATE
-                ${CMAKE_CURRENT_BINARY_DIR}/cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/cpp/context)
+        ${CMAKE_CURRENT_BINARY_DIR}/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/context)
 
 target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
