@@ -7,6 +7,17 @@ import QtQuick.Layouts
 Page {
     id: root
 
+    required property KemaiContext kemaiContext
+
+    property bool loginPending: false
+    property string loginError: ""
+
+    Connections {
+        target: root.kemaiContext
+        function onLoginSucceeded() { root.loginPending = false }
+        function onLoginFailed(error) { root.loginPending = false; root.loginError = error }
+    }
+
     background: Rectangle {
         color: Theme.colorBackground
     }
@@ -186,6 +197,17 @@ Page {
         // -- Save profile
 
 
+        // -- Error message
+        Text {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            visible: root.loginError.length > 0
+            text: root.loginError
+            color: "red"
+            font.pixelSize: Theme.fontSizeSmall
+            wrapMode: Text.WordWrap
+        }
+
         // -- Connect Button
         Button {
             Layout.fillWidth: true
@@ -193,7 +215,7 @@ Page {
             font.bold: true
             implicitHeight: 48
 
-            enabled: hostField.text && tokenField.text
+            enabled: hostField.text && tokenField.text && !root.loginPending
 
             background: Rectangle {
                 color: {
@@ -214,7 +236,11 @@ Page {
                 verticalAlignment: Text.AlignVCenter
             }
 
-            // onClicked: root.appCtx.login(hostField.text, tokenField.text)
+            onClicked: {
+                root.loginError = ""
+                root.loginPending = true
+                root.kemaiContext.login(hostField.text, tokenField.text)
+            }
         }
 
         // -- Footer

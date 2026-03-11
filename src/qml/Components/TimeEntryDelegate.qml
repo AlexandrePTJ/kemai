@@ -4,7 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import kemai
+import Kemai
 
 Rectangle {
     id: root

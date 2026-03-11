@@ -1,8 +1,9 @@
 project(Kemai)
 
-#
-# Source listing
-#
+###############################################################################
+# Source lists
+###############################################################################
+
 set(KEMAI_QML_FILES
         qml/Components/CurrentTimesheetSelectionItem.qml
         qml/Components/KemaiTextField.qml
@@ -21,14 +22,15 @@ set(KEMAI_QML_FILES
 )
 
 set(KEMAI_QML_SOURCES
-        cpp/context/applicationContext.cpp
-        cpp/context/applicationContext.h
+        cpp/context/kemaiContext.cpp
+        cpp/context/kemaiContext.h
+        cpp/context/sessionContext.cpp
+        cpp/context/sessionContext.h
         cpp/context/profileManager.cpp
         cpp/context/profileManager.h
 )
 
-set(KEMAI_CPP_FILES
-        cpp/main.cpp
+set(KEMAI_LIB_SOURCES
         cpp/client/kimaiSystem.h
         cpp/client/kimaiSystem.cpp
         cpp/client/kimaiResources.h
@@ -52,15 +54,27 @@ set(KEMAI_CPP_FILES
         cpp/storage/secretStorage.h
 )
 
-#
-# Target configuration
-#
-qt_standard_project_setup(
-        REQUIRES 6.10
-        # I18N_TRANSLATED_LANGUAGES fr
-)
+###############################################################################
+# kemai_core (static library)
+###############################################################################
 
-qt_add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${KEMAI_CPP_FILES})
+configure_file(cpp/kemaiConfig.h.in ${PROJECT_BINARY_DIR}/cpp/kemaiConfig.h)
+
+add_library(kemai_core STATIC ${KEMAI_LIB_SOURCES})
+
+target_include_directories(kemai_core
+        PUBLIC
+        ${CMAKE_CURRENT_BINARY_DIR}/cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp)
+
+target_link_libraries(kemai_core
+        PUBLIC Qt6::Network spdlog::spdlog fmt::fmt magic_enum::magic_enum qt6keychain)
+
+###############################################################################
+# Kemai (executable + QML module)
+###############################################################################
+
+qt_add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE cpp/main.cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
         WIN32_EXECUTABLE TRUE
@@ -92,23 +106,20 @@ qt_add_resources(
         ${PROJECT_NAME} "controls_conf"
         FILES "qtquickcontrols2.conf")
 
-configure_file(cpp/kemaiConfig.h.in ${PROJECT_BINARY_DIR}/cpp/kemaiConfig.h)
-
 target_include_directories(${PROJECT_NAME}
         PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}/cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/context)
 
 target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE Qt6::Gui Qt6::Network Qt6::Quick spdlog::spdlog magic_enum::magic_enum qt6keychain)
+        PRIVATE kemai_core Qt6::Gui Qt6::Quick)
 
-#
+###############################################################################
 # Install
-#
+###############################################################################
+
 install(TARGETS ${PROJECT_NAME}
         BUNDLE DESTINATION .
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

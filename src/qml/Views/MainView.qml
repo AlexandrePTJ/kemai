@@ -7,6 +7,8 @@ import QtQuick.Layouts
 Page {
     id: root
 
+    required property SessionContext sessionContext
+
     // Active timer state: 02:34:15 = 9255 seconds
     property int activeSeconds: 9255
 

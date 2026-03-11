@@ -13,11 +13,20 @@ ApplicationWindow {
     height: 800
     visible: true
 
+    KemaiContext {
+        id: kemaiContext
+        onLoginSucceeded: (session) => stackView.replace(null, mainViewComponent, { sessionContext: session })
+    }
+
+    Component {
+        id: mainViewComponent
+        Views.MainView {}
+    }
+
     StackView {
         id: stackView
         anchors.fill: parent
 
-        initialItem: Views.LoginView { }
-//        initialItem: Views.MainView { }
+        initialItem: Views.LoginView { kemaiContext: kemaiContext }
     }
 }
