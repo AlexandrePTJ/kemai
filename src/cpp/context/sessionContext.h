@@ -19,6 +19,7 @@ namespace kemai
     {
         Q_OBJECT
         QML_ELEMENT
+        QML_UNCREATABLE("SessionContext is created by the application")
 
         Q_PROPERTY(QString host READ host CONSTANT)
         Q_PROPERTY(QString username READ username CONSTANT)

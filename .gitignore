@@ -55,6 +55,7 @@ out/
 /dist/
 *.AppImage
 runtime/
+.env
 
 # ---> MacOSX
 .DS_Store

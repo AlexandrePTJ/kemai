@@ -11,6 +11,7 @@
 // Project helpers
 #include <misc/customFmt.h>
 #include <misc/jsonHelpers.h>
+#include <misc/pathHelpers.h>
 
 namespace
 {
@@ -116,10 +117,20 @@ namespace kemai
     {
         if (profile.isValid())
         {
-            auto profiles = loadProfilesFromJson(m_storePath);
-            auto it       = std::ranges::find_if(profiles, [&profile](const Profile &p)
-                                           { return p.id == profile.id; });
+            std::vector<Profile> profiles;
+            try
+            {
+                profiles = loadProfilesFromJson(m_storePath);
+            }
+            catch (const std::runtime_error &)
+            {
+                // File doesn't exist yet — start with an empty list and ensure
+                // the parent directory exists before writing
+                PathHelpers::ensureDirectoryExists(m_storePath);
+            }
 
+            auto it = std::ranges::find_if(profiles, [&profile](const Profile &p)
+                                           { return p.id == profile.id; });
             if (it != profiles.end())
             {
                 *it = profile;
@@ -137,7 +148,17 @@ namespace kemai
 
     void ProfileStore::remove(const ProfileId &profileId)
     {
-        auto profiles = loadProfilesFromJson(m_storePath);
+        std::vector<Profile> profiles;
+        try
+        {
+            profiles = loadProfilesFromJson(m_storePath);
+        }
+        catch (const std::runtime_error &)
+        {
+            // File doesn't exist — nothing to remove
+            return;
+        }
+
         std::erase_if(profiles, [&profileId](const Profile &p)
                       { return p.id == profileId; });
 

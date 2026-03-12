@@ -31,6 +31,8 @@ set(KEMAI_QML_SOURCES
 )
 
 set(KEMAI_LIB_SOURCES
+        cpp/context/profileController.h
+        cpp/context/profileController.cpp
         cpp/client/kimaiSystem.h
         cpp/client/kimaiSystem.cpp
         cpp/client/kimaiResources.h
