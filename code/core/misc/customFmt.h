@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
-//
+// fmt headers
 #include <fmt/format.h>
 
 // Qt headers

@@ -9,7 +9,7 @@ qt_add_executable(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    kemai_core
+    KemaiCore
     Catch2::Catch2
 )
 

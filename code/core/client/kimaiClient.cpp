@@ -78,15 +78,15 @@ QString kemai::apiMethodToString(ApiMethod method)
  * Private impl
  */
 KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient *c):
-networkAccessManager(std::make_unique<QNetworkAccessManager>()),
+m_networkAccessManager(std::make_unique<QNetworkAccessManager>()),
 m_q(c)
 {
-    connect(networkAccessManager.get(), &QNetworkAccessManager::sslErrors, this, &KimaiClientPrivate::onNamSslErrors);
+    connect(m_networkAccessManager.get(), &QNetworkAccessManager::sslErrors, this, &KimaiClientPrivate::onNamSslErrors);
 }
 
 QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method, const std::map<QString, QString> &parameters, const QByteArray &data, const QString &subPath) const
 {
-    auto url  = QUrl::fromUserInput(host);
+    auto url  = QUrl::fromUserInput(m_host);
     auto path = QString("%1/api/%2").arg(url.path(), apiMethodToString(method));
     if (!subPath.isEmpty())
     {
@@ -105,14 +105,14 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
     networkRequest.setUrl(url);
 
     // Until kimai 2.13, use username/password to identify. Use API Token from 2.14
-    if (apiToken.isEmpty())
+    if (m_apiToken.isEmpty())
     {
-        networkRequest.setRawHeader("X-AUTH-USER", username.toUtf8());
-        networkRequest.setRawHeader("X-AUTH-TOKEN", token.toUtf8());
+        networkRequest.setRawHeader("X-AUTH-USER", m_username.toUtf8());
+        networkRequest.setRawHeader("X-AUTH-TOKEN", m_token.toUtf8());
     }
     else
     {
-        networkRequest.setRawHeader("Authorization", QString("Bearer %1").arg(apiToken).toLatin1());
+        networkRequest.setRawHeader("Authorization", QString("Bearer %1").arg(m_apiToken).toLatin1());
     }
     networkRequest.setHeader(QNetworkRequest::UserAgentHeader, QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()));
     networkRequest.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
@@ -130,19 +130,19 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
 QNetworkReply *KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkRequest &networkRequest) const
 {
     spdlog::debug("[GET] {}", networkRequest.url().toString());
-    return networkAccessManager->get(networkRequest);
+    return m_networkAccessManager->get(networkRequest);
 }
 
 QNetworkReply *KimaiClient::KimaiClientPrivate::sendPostRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const
 {
     spdlog::debug("[POST] {}", networkRequest.url().toString());
-    return networkAccessManager->post(networkRequest, data);
+    return m_networkAccessManager->post(networkRequest, data);
 }
 
 QNetworkReply *KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const
 {
     spdlog::debug("[PATCH] {}", networkRequest.url().toString());
-    return networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);
+    return m_networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);
 }
 
 void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply * /*reply*/, const QList<QSslError> &errors)
@@ -169,12 +169,12 @@ KimaiClient::~KimaiClient() = default;
 
 void KimaiClient::setHost(const QString &host)
 {
-    m_d->host = host;
+    m_d->m_host = host;
 }
 
 void KimaiClient::setToken(const QString &token)
 {
-    m_d->apiToken = token;
+    m_d->m_apiToken = token;
 }
 
 QFuture<KimaiVersion> KimaiClient::requestKimaiVersion()

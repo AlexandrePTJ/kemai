@@ -166,8 +166,8 @@ namespace kemai
 
         void onNamSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 
-        QString                                username, host, token, apiToken;
-        std::unique_ptr<QNetworkAccessManager> networkAccessManager;
+        QString                                m_username, m_host, m_token, m_apiToken;
+        std::unique_ptr<QNetworkAccessManager> m_networkAccessManager;
 
     private:
         KimaiClient *const m_q;

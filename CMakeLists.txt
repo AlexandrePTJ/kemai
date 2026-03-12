@@ -29,7 +29,7 @@ if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
     CPMAddPackage("gh:Neargye/magic_enum#v0.9.7")
     CPMAddPackage("gh:catchorg/Catch2#v3.8.1")
     CPMAddPackage(URI "gh:gabime/spdlog#v1.17.0" OPTIONS "SPDLOG_FMT_EXTERNAL ON")
-    CPMAddPackage(URI "gh:frankosterfeld/qtkeychain#0.15.0" OPTIONS "BUILD_WITH_QT6 ON" "BUILD_SHARED_LIBS OFF" "BUILD_TRANSLATIONS OFF")
+    CPMAddPackage(URI "gh:frankosterfeld/qtkeychain#0.15.0" OPTIONS "BUILD_WITH_QT6 ON" "BUILD_SHARED_LIBS OFF" "BUILD_TRANSLATIONS OFF" "BUILD_TESTING OFF")
 endif (KEMAI_BUILD_LOCAL_DEPENDENCIES)
 
 # Find dependencies
@@ -47,12 +47,7 @@ file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${PROJECT_VERSION})
 
 # Project code
 include(CTest)
-add_subdirectory(src)
-
-# Tests (opt-in via BUILD_TESTING, default OFF)
-if (BUILD_TESTING)
-    add_subdirectory(tests)
-endif()
+add_subdirectory(code)
 
 # Common package configuration
 set(KEMAI_GUID "88815E44-85A0-469C-9740-B4887D456BAA")

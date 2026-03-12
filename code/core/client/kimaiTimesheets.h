@@ -4,8 +4,6 @@
 
 // Qt headers
 #include <QList>
-
-// Qt headers
 #include <QStringList>
 
 // Internal headers
