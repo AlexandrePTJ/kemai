@@ -12,6 +12,7 @@
 // Project headers
 #include "client/kimaiClient.h"
 #include "sessionContext.h"
+#include <storage/appSettingsStore.h>
 
 namespace kemai
 {
@@ -25,13 +26,18 @@ namespace kemai
         ~KemaiContext() override;
 
         Q_INVOKABLE void initialize();
-        Q_INVOKABLE void login(const QString &host, const QString &token);
+        Q_INVOKABLE void login(const QString &host, const QString &token, bool rememberLogin);
 
     signals:
         void loginSucceeded(SessionContext *session);
         void loginFailed(const QString &error);
 
     private:
-        std::unique_ptr<KimaiClient> m_pendingClient;
+        void updateAutoLoginSettings(const QString &host, const QString &token, bool rememberLogin);
+        void onSettingsLoaded(const AppSettings &settings);
+
+        std::unique_ptr<AppSettingsStore> m_settingsStore;
+        std::unique_ptr<AppSettings>      m_pendingSettings;
+        std::unique_ptr<KimaiClient>      m_pendingClient;
     };
 } // namespace kemai

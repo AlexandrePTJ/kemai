@@ -14,6 +14,8 @@ set(KEMAI_LIB_SOURCES
         client/kimaiClient.h
         client/kimaiClient_p.h
         client/kimaiClient.cpp
+        data/appSettings.cpp
+        data/appSettings.h
         data/profile.cpp
         data/profile.h
         misc/jsonHelpers.h
@@ -22,6 +24,8 @@ set(KEMAI_LIB_SOURCES
         misc/pathHelpers.cpp
         model/profile.cpp
         model/profile.h
+        storage/appSettingsStore.cpp
+        storage/appSettingsStore.h
         storage/profileStore.cpp
         storage/profileStore.h
         storage/secretStorage.cpp

@@ -62,7 +62,13 @@ runtime/
 
 # ---> Visual Studio
 .vs/
-.vscode/
+
+# ---> VS Code (keep shared project config, ignore machine-specific)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
 
 # ---> Tools
 aqtinstall.log

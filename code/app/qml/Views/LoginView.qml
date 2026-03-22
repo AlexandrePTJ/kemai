@@ -190,6 +190,11 @@ Page {
                     }
                 }
             }
+
+            CheckBox {
+                id: autoLoginCheckBox
+                text: "Auto-login"
+            }
         }
 
         Item { Layout.fillHeight: true }
@@ -239,7 +244,7 @@ Page {
             onClicked: {
                 root.loginError = ""
                 root.loginPending = true
-                root.kemaiContext.login(hostField.text, tokenField.text)
+                root.kemaiContext.login(hostField.text, tokenField.text, autoLoginCheckBox.checked)
             }
         }
 

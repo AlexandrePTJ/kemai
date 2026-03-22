@@ -23,6 +23,7 @@ namespace
         switch (type)
         {
         case kemai::PathHelpers::FilePathType::Profiles:
+        case kemai::PathHelpers::FilePathType::AppSettings:
             return {QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)};
 
         default:
@@ -36,6 +37,9 @@ namespace
         {
         case kemai::PathHelpers::FilePathType::Profiles:
             return "profiles.json";
+
+        case kemai::PathHelpers::FilePathType::AppSettings:
+            return "settings.json";
 
         default:
             throw std::runtime_error("Unknown path type");

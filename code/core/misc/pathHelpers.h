@@ -12,7 +12,8 @@ namespace kemai
     public:
         enum class FilePathType
         {
-            Profiles
+            Profiles,
+            AppSettings
         };
 
         /*!

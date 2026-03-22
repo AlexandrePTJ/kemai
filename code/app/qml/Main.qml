@@ -29,4 +29,6 @@ ApplicationWindow {
 
         initialItem: Views.LoginView { kemaiContext: kemaiContext }
     }
+
+    Component.onCompleted: kemaiContext.initialize()
 }
