@@ -11,34 +11,38 @@ QtObject {
     readonly property color colorBackgroundDark:    "#1e1c2e"
     readonly property color colorSurface:           "#3d3b4d"
     readonly property color colorSurfaceLight:      "#282A35"
+    readonly property color colorSurfaceDark:       "#2a2c38"
     readonly property color colorActiveEntry:       "#1a2a1a"
 
     // -- Text
     readonly property color colorTextPrimary:       "#ffffff"
+    readonly property color colorTextDarkPrimary:   "#0d1a09"
     readonly property color colorTextSecondary:     "#9E9E9E"
     readonly property color colorTextTertiary:      "#BCBCBC"
 
     // -- Accent
     readonly property color colorAccentGreen:         "#4CAF50"
     readonly property color colorAccentGreenTint:     "#194CB04F"
-    readonly property color colorAccentGreenHover:    "#a3d7a5"
+    readonly property color colorAccentGreenHover:    "#4CAF50"
     readonly property color colorAccentGreenDisabled: "#255627"
-    readonly property color colorBorder:              "#1a2a1a"
+    readonly property color colorBorder:              "#3d3b4d"
+    readonly property color colorBorderHighlight:     "#5a5c70"
 
     readonly property color colorAccentRed:         "#E53935"
     readonly property color colorAccentRedTint:     "#66751919"
-    readonly property color colorAccentRedHover:    "#f4a8a6"
+    readonly property color colorAccentRedHover:    "#E53935"
     readonly property color colorAccentRedDisabled: "#891412"
 
     // -- Buttons 
     readonly property color colorButtonStop:        "#B71C1C"
-    readonly property color colorButtonStopDown:    "#E53935"
+    readonly property color colorButtonStopDown:    "#f4a8a6"
     readonly property color colorButtonStart:       "#388E3C"
-    readonly property color colorButtonStartDown:   "#4CAF50"
+    readonly property color colorButtonStartDown:   "#a3d7a5"
     readonly property color colorButtonEdit:        "#37474F"
     readonly property color colorButtonEditDown:    "#455A64"
     readonly property color colorButtonPrimary:     "#1565C0"
     readonly property color colorButtonPrimaryDown: "#2196F3"
+    readonly property color colorInputBackground:   "#23242f"
 
     // -- Font 
     readonly property int fontSizeXSmall:  11

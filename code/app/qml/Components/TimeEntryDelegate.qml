@@ -18,19 +18,41 @@ Rectangle {
     required property string duration
     required property string timeRange
 
-    width: ListView.view ? ListView.view.width : 0
-    height: mainLayout.implicitHeight + 16
-    color: status === "active" ? Theme.colorActiveEntry : "transparent"
-    radius: 4
+    property bool isRunning: status === "active"
 
-    // Left border strip
+    width: ListView.view ? ListView.view.width : 0
+    implicitHeight: mainLayout.implicitHeight + 22
+    color: {
+        if (isRunning)
+            return Theme.colorAccentGreenTint
+        if (hoverArea.containsMouse)
+            return Qt.rgba(1, 1, 1, 0.025)
+        return "transparent"
+    }
+
+    // Bottom border
+    Rectangle {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: 1
+        color: Theme.colorBorder
+    }
+
+    // Left color strip
     Rectangle {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 3
+        width: 2
         color: root.activityColor
-        radius: 2
+    }
+
+    MouseArea {
+        id: hoverArea
+        anchors.fill: parent
+        hoverEnabled: true
+        acceptedButtons: Qt.NoButton
     }
 
     RowLayout {
@@ -39,42 +61,51 @@ Rectangle {
             left: parent.left
             right: parent.right
             verticalCenter: parent.verticalCenter
-            leftMargin: 12
-            rightMargin: 8
+            leftMargin: 16
+            rightMargin: 18
         }
-        spacing: 10
+        spacing: 12
 
-
-        // Project / description column
+        // Entry info (name + description)
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 2
 
             RowLayout {
-                spacing: 4
+                spacing: 7
+
                 Text {
                     text: root.projectName
                     color: Theme.colorTextPrimary
-                    font.pixelSize: Theme.fontSizeNormal
+                    font.pixelSize: Theme.fontSizeMedium
                     font.bold: true
+                    elide: Text.ElideRight
+                    Layout.maximumWidth: 300
                 }
+
                 Text {
-                    text: " - " + root.activityName
+                    text: "\u2014"
                     color: Theme.colorTextSecondary
-                    font.pixelSize: Theme.fontSizeNormal
+                    font.pixelSize: Theme.fontSizeSmall
+                }
+
+                Text {
+                    text: root.activityName
+                    color: Theme.colorTextSecondary
+                    font.pixelSize: Theme.fontSizeSmall
                 }
             }
 
             Text {
                 text: root.description
                 color: Theme.colorTextSecondary
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeXSmall
                 elide: Text.ElideRight
                 Layout.fillWidth: true
             }
         }
 
-        // Duration / time range column
+        // Duration + time range
         ColumnLayout {
             spacing: 2
             Layout.alignment: Qt.AlignVCenter
@@ -82,58 +113,47 @@ Rectangle {
             Text {
                 text: root.duration
                 color: Theme.colorAccentGreen
-                font.pixelSize: Theme.fontSizeNormal
-                font.bold: true
                 font.family: Theme.fontFamilyMono
+                font.pixelSize: Theme.fontSizeMedium
+                font.bold: true
                 Layout.alignment: Qt.AlignRight
+
+                SequentialAnimation on opacity {
+                    running: root.isRunning
+                    loops: Animation.Infinite
+                    NumberAnimation { to: 0.7; duration: 500; easing.type: Easing.InOutQuad }
+                    NumberAnimation { to: 1.0; duration: 500; easing.type: Easing.InOutQuad }
+                }
             }
 
             Text {
                 text: root.timeRange
                 color: Theme.colorTextSecondary
+                font.family: Theme.fontFamilyMono
                 font.pixelSize: Theme.fontSizeXSmall
                 Layout.alignment: Qt.AlignRight
             }
         }
 
-        // Play / Edit buttons (non-active entries only)
+        // Action buttons
         RowLayout {
-            spacing: 6
-            visible: root.status !== "active"
+            spacing: 5
             Layout.alignment: Qt.AlignVCenter
+            Layout.minimumWidth: 120
 
-            Button {
-                text: "✎ Edit"
-                padding: 6
-                font.pixelSize: Theme.fontSizeSmall
-                background: Rectangle {
-                    color: parent.down ? Theme.colorButtonEditDown : Theme.colorButtonEdit
-                    radius: 4
-                }
-                contentItem: Text {
-                    text: parent.text
-                    color: Theme.colorTextPrimary
-                    font: parent.font
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
+            // Edit button (always visible)
+             SecondaryButton {
+                text: "\u270E Edit"
+                implicitHeight: 40
+                implicitWidth: 50
             }
 
-            Button {
-                text: "▶ Play"
-                padding: 6
-                font.pixelSize: Theme.fontSizeSmall
-                background: Rectangle {
-                    color: parent.down ? Theme.colorButtonStartDown : Theme.colorButtonStart
-                    radius: 4
-                }
-                contentItem: Text {
-                    text: parent.text
-                    color: Theme.colorTextPrimary
-                    font: parent.font
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
+            // Play button (non-running entries only)
+            StartStopButton {
+                visible: !root.isRunning
+                implicitHeight: 40
+                implicitWidth: 50
+                textSize: Theme.fontSizeXSmall
             }
         }
     }

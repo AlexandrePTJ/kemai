@@ -9,7 +9,7 @@ Page {
 
     required property SessionContext sessionContext
 
-    // Active timer state: 02:34:15 = 9255 seconds
+    property bool timerRunning: true
     property int activeSeconds: 9255
 
     function formatDuration(secs) {
@@ -21,78 +21,42 @@ Page {
                String(s).padStart(2, "0")
     }
 
-    /*Timer {
-        interval: 1000
-        repeat: true
-        running: true
-        onTriggered: {
-            root.activeSeconds++
-            timeEntries.setProperty(0, "duration", root.formatDuration(root.activeSeconds))
-        }
-    }*/
-
     background: Rectangle {
         color: Theme.colorBackground
     }
 
-    header: ToolBar {
-        background: Rectangle {
-            color: Theme.colorBackgroundDark
-        }
-
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: 8
-            anchors.rightMargin: 8
-
-            Item { Layout.fillWidth: true }
-
-            Text {
-                text: "⏱ Kemai"
-                color: Theme.colorTextPrimary
-                font.pixelSize: Theme.fontSizeXLarge
-                font.bold: true
-                Layout.alignment: Qt.AlignHCenter
-            }
-
-            Item { Layout.fillWidth: true }
-
-            Button {
-                text: "⚙"
-                flat: true
-                font.pixelSize: 18
-                contentItem: Text {
-                    text: parent.text
-                    color: Theme.colorTextPrimary
-                    font: parent.font
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: Item {}
-            }
-        }
-    }
-
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Theme.marginsMain
-        spacing: Theme.spacingMedium
+        spacing: 0
 
-        // Timesheet selection and/or current running
-        CurrentTimesheetSelectionItem {
+        TimerBar {
             Layout.fillWidth: true
-            height: 50
+            timerText: root.formatDuration(root.activeSeconds)
+            entryDescription: "Kemai Refactoring - Development"
+            isRunning: root.timerRunning
+            onStopClicked: root.timerRunning = false
+            onStartClicked: root.timerRunning = true
         }
 
-        // Separator
         Rectangle {
             Layout.fillWidth: true
             height: 1
-            color: Theme.colorSurface
+            color: Theme.colorBorder
         }
 
-        // Timeheets history
-        TimesheetHistoryItem {
+        ActiveHintBar {
+            Layout.fillWidth: true
+            isActive: root.timerRunning
+            entryName: "Kemai Refactoring - Development"
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: Theme.colorBorder
+        }
+
+        TimesheetHistoryView {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
