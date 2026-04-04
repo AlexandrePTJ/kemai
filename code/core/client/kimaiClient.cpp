@@ -219,11 +219,16 @@ QFuture<KimaiTimeSheets> KimaiClient::requestActiveTimeSheets()
     return m_d->processApiNetworkReplyArray<KimaiTimeSheet>(ApiMethod::ActiveTimeSheets, reply);
 }
 
-QFuture<KimaiTimeSheets> KimaiClient::requestRecentTimeSheets()
+QFuture<KimaiTimeSheets> KimaiClient::requestRecentTimeSheets(const std::optional<QDateTime> &beginDatetime, size_t limit)
 {
-    auto request = m_d->prepareRequest(ApiMethod::RecentTimeSheets, std::map<QString, QString>{
-                                                                        {"size", "5"}
-    });
+    std::map<QString, QString> parameters;
+    if (beginDatetime.has_value())
+    {
+        parameters.emplace("begin", beginDatetime.value().toString(Qt::ISODate));
+    }
+    parameters.emplace("size", QString::number(limit));
+
+    auto request = m_d->prepareRequest(ApiMethod::RecentTimeSheets, parameters);
     auto reply   = m_d->sendGetRequest(request);
     return m_d->processApiNetworkReplyArray<KimaiTimeSheet>(ApiMethod::RecentTimeSheets, reply);
 }

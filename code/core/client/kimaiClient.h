@@ -33,13 +33,13 @@ namespace kemai
         QFuture<KimaiPlugins>         requestPlugins();
         QFuture<KimaiCustomers>       requestCustomers();
         QFuture<KimaiTimeSheets>      requestActiveTimeSheets();
-        QFuture<KimaiTimeSheets>      requestRecentTimeSheets();
+        QFuture<KimaiTimeSheets>      requestRecentTimeSheets(const std::optional<QDateTime> &beginDatetime = std::nullopt, size_t limit = 10);
         QFuture<KimaiProjects>        requestProjects(std::optional<int> customerId = std::nullopt);
         QFuture<KimaiActivities>      requestActivities(std::optional<int> projectId = std::nullopt);
 
-        QFuture<KimaiCustomer>  addCustomer(const KimaiCustomer &customer);
-        QFuture<KimaiProject>   addProject(const KimaiProject &project);
-        QFuture<KimaiActivity>  addActivity(const KimaiActivity &activity);
+        QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer);
+        QFuture<KimaiProject>  addProject(const KimaiProject &project);
+        QFuture<KimaiActivity> addActivity(const KimaiActivity &activity);
 
         QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode);
         QFuture<KimaiTimeSheet> updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode);

@@ -28,6 +28,8 @@ set(KEMAI_QML_SOURCES
         context/sessionContext.h
         context/profileManager.cpp
         context/profileManager.h
+        helpers/qmlFormatHelpers.cpp
+        helpers/qmlFormatHelpers.h
 )
 
 qt_add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE main.cpp)
@@ -64,7 +66,8 @@ qt_add_resources(
 
 target_include_directories(${PROJECT_NAME}
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/context)
+        ${CMAKE_CURRENT_SOURCE_DIR}/context
+        ${CMAKE_CURRENT_SOURCE_DIR}/helpers)
 
 target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)

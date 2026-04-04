@@ -12,15 +12,6 @@ Page {
     property bool timerRunning: true
     property int activeSeconds: 9255
 
-    function formatDuration(secs) {
-        var h = Math.floor(secs / 3600)
-        var m = Math.floor((secs % 3600) / 60)
-        var s = secs % 60
-        return String(h).padStart(2, "0") + ":" +
-               String(m).padStart(2, "0") + ":" +
-               String(s).padStart(2, "0")
-    }
-
     background: Rectangle {
         color: Theme.colorBackground
     }
@@ -31,7 +22,7 @@ Page {
 
         TimerBar {
             Layout.fillWidth: true
-            timerText: root.formatDuration(root.activeSeconds)
+            timerText: FormatHelpers.formatDuration(root.activeSeconds)
             entryDescription: "Kemai Refactoring - Development"
             isRunning: root.timerRunning
             onStopClicked: root.timerRunning = false
@@ -59,6 +50,7 @@ Page {
         TimesheetHistoryView {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            sessionContext: root.sessionContext
         }
     }
 }

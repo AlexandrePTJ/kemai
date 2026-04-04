@@ -38,6 +38,5 @@ namespace kemai
 
         std::unique_ptr<AppSettingsStore> m_settingsStore;
         std::unique_ptr<AppSettings>      m_pendingSettings;
-        std::unique_ptr<KimaiClient>      m_pendingClient;
     };
 } // namespace kemai

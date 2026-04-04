@@ -7,11 +7,13 @@
 
 // Qt headers
 #include <QObject>
+#include <QTimer>
 #include <QtQmlIntegration/qqmlintegration.h>
 
 // Project headers
 #include "client/kimaiClient.h"
 #include "client/kimaiSystem.h"
+#include "model/timesheetModel.h"
 
 namespace kemai
 {
@@ -22,15 +24,21 @@ namespace kemai
         QML_UNCREATABLE("SessionContext is created by the application")
 
         Q_PROPERTY(QString username READ username CONSTANT)
+        Q_PROPERTY(kemai::TimesheetModel *recentTimeSheets READ recentTimeSheets CONSTANT)
 
     public:
-        explicit SessionContext(std::unique_ptr<KimaiClient> client, const KimaiUser &user, QObject *parent = nullptr);
+        explicit SessionContext(std::shared_ptr<KimaiClient> client, const KimaiUser &user, QObject *parent = nullptr);
         ~SessionContext() override;
 
-        QString username() const;
+        QString         username() const;
+        TimesheetModel *recentTimeSheets() const;
 
     private:
-        std::unique_ptr<KimaiClient> m_client;
-        KimaiUser                    m_user;
+        void refreshRecentTimeSheets();
+
+        std::shared_ptr<KimaiClient>    m_client;
+        KimaiUser                       m_user;
+        std::unique_ptr<TimesheetModel> m_recentTimeSheets;
+        QTimer                          m_activeEntryTimer;
     };
 } // namespace kemai

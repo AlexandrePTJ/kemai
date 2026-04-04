@@ -7,6 +7,17 @@
 
 namespace kemai
 {
+    QString getColorSafe(const QJsonObject &jsonObject)
+    {
+        if (jsonObject.contains("color-safe"))
+        {
+            return jsonObject.value("color-safe").toString();
+        }
+        else
+        {
+            return jsonObject.value("color").toString();
+        }
+    }
 
     KimaiCustomer KimaiCustomer::fromJson(const QJsonValue &json)
     {
@@ -37,7 +48,7 @@ namespace kemai
         customer.email       = jsonObject.value("email").toString();
         customer.homepage    = jsonObject.value("homepage").toString();
         customer.timezone    = jsonObject.value("timezone").toString();
-        customer.color       = jsonObject.value("color").toString();
+        customer.color       = getColorSafe(jsonObject);
         customer.budget      = jsonObject.value("budget").toDouble();
         customer.timeBudget  = jsonObject.value("timeBudget").toInt();
         customer.visible     = jsonObject.value("visible").toBool();
@@ -94,7 +105,7 @@ namespace kemai
         project.orderDate   = jsonObject.value("orderDate").toString();
         project.start       = jsonObject.value("start").toString();
         project.end         = jsonObject.value("end").toString();
-        project.color       = jsonObject.value("color").toString();
+        project.color       = getColorSafe(jsonObject);
         project.budget      = jsonObject.value("budget").toDouble();
         project.timeBudget  = jsonObject.value("timeBudget").toInt();
         project.visible     = jsonObject.value("visible").toBool();
@@ -148,7 +159,7 @@ namespace kemai
         activity.id         = jsonObject.value("id").toInt();
         activity.name       = jsonObject.value("name").toString();
         activity.comment    = jsonObject.value("comment").toString();
-        activity.color      = jsonObject.value("color").toString();
+        activity.color      = jsonObject.value("color-safe").toString();
         activity.budget     = jsonObject.value("budget").toDouble();
         activity.timeBudget = jsonObject.value("timeBudget").toInt();
         activity.visible    = jsonObject.value("visible").toBool();

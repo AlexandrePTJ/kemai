@@ -18,12 +18,16 @@ set(KEMAI_LIB_SOURCES
         data/appSettings.h
         data/profile.cpp
         data/profile.h
+        misc/formatHelpers.h
+        misc/formatHelpers.cpp
         misc/jsonHelpers.h
         misc/jsonHelpers.cpp
         misc/pathHelpers.h
         misc/pathHelpers.cpp
         model/profile.cpp
         model/profile.h
+        model/timesheetModel.cpp
+        model/timesheetModel.h
         storage/appSettingsStore.cpp
         storage/appSettingsStore.h
         storage/profileStore.cpp

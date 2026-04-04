@@ -27,21 +27,20 @@ namespace kemai
 
     void KemaiContext::login(const QString &host, const QString &token, bool rememberLogin)
     {
-        m_pendingClient = std::make_unique<KimaiClient>();
-        m_pendingClient->setHost(host);
-        m_pendingClient->setToken(token);
+        auto client = std::make_shared<KimaiClient>();
+        client->setHost(host);
+        client->setToken(token);
 
         // clang-format off
-        m_pendingClient->requestMeUserInfo()
-            .then(this, [this, host, token, rememberLogin](KimaiUser user)
+        client->requestMeUserInfo()
+            .then(this, [this, client, host, token, rememberLogin](KimaiUser user)
                 {
-                    auto* session = new SessionContext(std::move(m_pendingClient), user, this);
+                    auto* session = new SessionContext(std::move(client), user, this);
                     emit loginSucceeded(session);
                     updateAutoLoginSettings(host, token, rememberLogin);
                 })
             .onFailed(this, [this](const std::exception &e)
                 {
-                    m_pendingClient.reset();
                     emit loginFailed(QString::fromStdString(e.what()));
                     updateAutoLoginSettings("", "", false);
                 });
