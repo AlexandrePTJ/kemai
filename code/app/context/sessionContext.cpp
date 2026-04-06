@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 #include "sessionContext.h"
 
-// Qt headers
-#include <QTimer>
-
 // spdlog headers
 #include <spdlog/spdlog.h>
+
+// Project headers
+#include <misc/formatHelpers.h>
 
 namespace kemai
 {
@@ -16,10 +16,14 @@ namespace kemai
     m_user(user),
     m_recentTimeSheets(std::make_unique<TimesheetModel>(this))
     {
-        m_activeEntryTimer.setInterval(std::chrono::minutes(1));
-        connect(&m_activeEntryTimer, &QTimer::timeout, m_recentTimeSheets.get(), &TimesheetModel::refreshActiveDurations);
+        m_recentRefreshTimer.setInterval(std::chrono::minutes(1));
+        connect(&m_recentRefreshTimer, &QTimer::timeout, m_recentTimeSheets.get(), &TimesheetModel::refreshActiveDurations);
+
+        m_activeDurationTimer.setInterval(std::chrono::seconds(1));
+        connect(&m_activeDurationTimer, &QTimer::timeout, this, &SessionContext::activeTimesheetChanged);
 
         refreshRecentTimeSheets();
+        refreshActiveTimeSheets();
     }
 
     SessionContext::~SessionContext() = default;
@@ -34,6 +38,29 @@ namespace kemai
         return m_recentTimeSheets.get();
     }
 
+    bool SessionContext::hasActiveTimesheet() const
+    {
+        return m_activeTimeSheet.has_value();
+    }
+
+    QString SessionContext::activeTimesheetLabel() const
+    {
+        if (!m_activeTimeSheet)
+        {
+            return {};
+        }
+        return QStringLiteral("%1 - %2").arg(m_activeTimeSheet->project.name, m_activeTimeSheet->activity.name);
+    }
+
+    QString SessionContext::activeTimesheetDuration() const
+    {
+        if (!m_activeTimeSheet)
+        {
+            return QStringLiteral("00:00:00");
+        }
+        return FormatHelpers::formatDuration(m_activeTimeSheet->beginAt.secsTo(QDateTime::currentDateTimeUtc()));
+    }
+
     void SessionContext::refreshRecentTimeSheets()
     {
         m_client->requestRecentTimeSheets(std::nullopt, 30)
@@ -41,20 +68,37 @@ namespace kemai
                   [this](const KimaiTimeSheets &sheets)
                   {
                       m_recentTimeSheets->setTimeSheets(sheets);
-
-                      const auto hasActive = std::any_of(sheets.begin(), sheets.end(), [](const KimaiTimeSheet &ts)
-                                                         { return !ts.endAt.isValid(); });
-                      if (hasActive)
-                      {
-                          m_activeEntryTimer.start();
-                      }
-                      else
-                      {
-                          m_activeEntryTimer.stop();
-                      }
+                      m_recentRefreshTimer.start();
                   })
             .onFailed(this, [](const std::exception &e)
                       { spdlog::error("Failed to fetch recent timesheets: {}", e.what()); });
+    }
+
+    void SessionContext::refreshActiveTimeSheets()
+    {
+        m_client->requestActiveTimeSheets()
+            .then(this,
+                  [this](const KimaiTimeSheets &sheets)
+                  {
+                      const auto hadActive = m_activeTimeSheet.has_value();
+                      m_activeTimeSheet    = sheets.isEmpty() ? std::nullopt : std::make_optional(sheets.first());
+
+                      if (m_activeTimeSheet)
+                      {
+                          m_activeDurationTimer.start();
+                      }
+                      else
+                      {
+                          m_activeDurationTimer.stop();
+                      }
+
+                      if (hadActive != m_activeTimeSheet.has_value())
+                      {
+                          emit activeTimesheetChanged();
+                      }
+                  })
+            .onFailed(this, [](const std::exception &e)
+                      { spdlog::error("Failed to fetch active timesheets: {}", e.what()); });
     }
 
 } // namespace kemai

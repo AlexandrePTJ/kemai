@@ -9,9 +9,6 @@ Page {
 
     required property SessionContext sessionContext
 
-    property bool timerRunning: true
-    property int activeSeconds: 9255
-
     background: Rectangle {
         color: Theme.colorBackground
     }
@@ -22,11 +19,9 @@ Page {
 
         TimerBar {
             Layout.fillWidth: true
-            timerText: FormatHelpers.formatDuration(root.activeSeconds)
-            entryDescription: "Kemai Refactoring - Development"
-            isRunning: root.timerRunning
-            onStopClicked: root.timerRunning = false
-            onStartClicked: root.timerRunning = true
+            timerText: root.sessionContext.activeTimesheetDuration
+            entryDescription: root.sessionContext.activeTimesheetLabel
+            isRunning: root.sessionContext.hasActiveTimesheet
         }
 
         Rectangle {
@@ -37,8 +32,8 @@ Page {
 
         ActiveHintBar {
             Layout.fillWidth: true
-            isActive: root.timerRunning
-            entryName: "Kemai Refactoring - Development"
+            isActive: root.sessionContext.hasActiveTimesheet
+            entryName: root.sessionContext.activeTimesheetLabel
         }
 
         Rectangle {
