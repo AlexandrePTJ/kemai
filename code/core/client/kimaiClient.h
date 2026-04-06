@@ -32,8 +32,9 @@ namespace kemai
         QFuture<KimaiTimeSheetConfig> requestTimeSheetConfig();
         QFuture<KimaiPlugins>         requestPlugins();
         QFuture<KimaiCustomers>       requestCustomers();
+        QFuture<KimaiTimeSheets>      requestTimeSheets();
         QFuture<KimaiTimeSheets>      requestActiveTimeSheets();
-        QFuture<KimaiTimeSheets>      requestRecentTimeSheets(const std::optional<QDateTime> &beginDatetime = std::nullopt, size_t limit = 10);
+        QFuture<KimaiTimeSheets>      requestRecentTimeSheets();
         QFuture<KimaiProjects>        requestProjects(std::optional<int> customerId = std::nullopt);
         QFuture<KimaiActivities>      requestActivities(std::optional<int> projectId = std::nullopt);
 

@@ -3,6 +3,7 @@
 #include "timesheetModel.h"
 
 // magic_enum headers
+#include <algorithm>
 #include <magic_enum/magic_enum.hpp>
 
 // Qt headers
@@ -50,8 +51,8 @@ namespace kemai
         m_timeSheets = timeSheets;
 
         // Show most recent timesheets first, with active timesheets (without endAt) on top
-        std::sort(m_timeSheets.begin(), m_timeSheets.end(), [](const KimaiTimeSheet &a, const KimaiTimeSheet &b)
-                  { return a.endAt < b.endAt; });
+        std::ranges::sort(m_timeSheets, [](const KimaiTimeSheet &a, const KimaiTimeSheet &b)
+                  { return a.beginAt > b.beginAt; });
 
         computeAggregates();
 

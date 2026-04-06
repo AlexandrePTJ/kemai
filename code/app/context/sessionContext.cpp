@@ -63,7 +63,7 @@ namespace kemai
 
     void SessionContext::refreshRecentTimeSheets()
     {
-        m_client->requestRecentTimeSheets(std::nullopt, 30)
+        m_client->requestTimeSheets()
             .then(this,
                   [this](const KimaiTimeSheets &sheets)
                   {

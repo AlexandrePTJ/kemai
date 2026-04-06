@@ -212,6 +212,19 @@ QFuture<KimaiCustomers> KimaiClient::requestCustomers()
     return m_d->processApiNetworkReplyArray<KimaiCustomer>(ApiMethod::Customers, reply);
 }
 
+QFuture<KimaiTimeSheets> KimaiClient::requestTimeSheets()
+{
+    std::map<QString, QString> parameters = {
+        {"full",    "true" },
+        {"order",   "DESC" },
+        {"orderBy", "begin"}
+    };
+
+    auto request = m_d->prepareRequest(ApiMethod::TimeSheets, parameters);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplyArray<KimaiTimeSheet>(ApiMethod::TimeSheets, reply);
+}
+
 QFuture<KimaiTimeSheets> KimaiClient::requestActiveTimeSheets()
 {
     auto request = m_d->prepareRequest(ApiMethod::ActiveTimeSheets);
@@ -219,16 +232,9 @@ QFuture<KimaiTimeSheets> KimaiClient::requestActiveTimeSheets()
     return m_d->processApiNetworkReplyArray<KimaiTimeSheet>(ApiMethod::ActiveTimeSheets, reply);
 }
 
-QFuture<KimaiTimeSheets> KimaiClient::requestRecentTimeSheets(const std::optional<QDateTime> &beginDatetime, size_t limit)
+QFuture<KimaiTimeSheets> KimaiClient::requestRecentTimeSheets()
 {
-    std::map<QString, QString> parameters;
-    if (beginDatetime.has_value())
-    {
-        parameters.emplace("begin", beginDatetime.value().toString(Qt::ISODate));
-    }
-    parameters.emplace("size", QString::number(limit));
-
-    auto request = m_d->prepareRequest(ApiMethod::RecentTimeSheets, parameters);
+    auto request = m_d->prepareRequest(ApiMethod::RecentTimeSheets);
     auto reply   = m_d->sendGetRequest(request);
     return m_d->processApiNetworkReplyArray<KimaiTimeSheet>(ApiMethod::RecentTimeSheets, reply);
 }
