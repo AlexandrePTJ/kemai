@@ -22,6 +22,8 @@ set(KEMAI_LIB_SOURCES
         data/profile.h
         misc/formatHelpers.h
         misc/formatHelpers.cpp
+        misc/fuzzyMatch.h
+        misc/fuzzyMatch.cpp
         misc/jsonHelpers.h
         misc/jsonHelpers.cpp
         misc/pathHelpers.h

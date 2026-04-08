@@ -16,6 +16,7 @@ namespace kemai
     m_client(std::move(client)),
     m_user(user),
     m_recentTimeSheets(std::make_unique<TimesheetModel>(this)),
+    m_activityModel(std::make_unique<ActivityListModel>(this)),
     m_cache(std::make_unique<KimaiCache>(this))
     {
         m_recentRefreshTimer.setInterval(std::chrono::minutes(1));
@@ -24,7 +25,7 @@ namespace kemai
         m_activeDurationTimer.setInterval(std::chrono::seconds(1));
         connect(&m_activeDurationTimer, &QTimer::timeout, this, &SessionContext::activeTimesheetChanged);
 
-        connect(m_cache.get(), &KimaiCache::loaded, this, &SessionContext::activitySuggestionsChanged);
+        connect(m_cache.get(), &KimaiCache::loaded, this, &SessionContext::onCacheLoaded);
 
         refreshRecentTimeSheets();
         refreshActiveTimeSheets();
@@ -66,6 +67,11 @@ namespace kemai
         return FormatHelpers::formatDuration(m_activeTimeSheet->beginAt.secsTo(QDateTime::currentDateTimeUtc()));
     }
 
+    ActivityListModel *SessionContext::activityModel() const
+    {
+        return m_activityModel.get();
+    }
+
     void SessionContext::refreshRecentTimeSheets()
     {
         m_client->requestTimeSheets()
@@ -104,6 +110,11 @@ namespace kemai
                   })
             .onFailed(this, [](const std::exception &e)
                       { spdlog::error("Failed to fetch active timesheets: {}", e.what()); });
+    }
+
+    void SessionContext::onCacheLoaded()
+    {
+        m_activityModel->setActivities(m_cache->activities());
     }
 
 } // namespace kemai

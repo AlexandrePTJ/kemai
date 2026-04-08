@@ -2,6 +2,7 @@ project(Kemai)
 
 set(KEMAI_QML_FILES
         qml/Components/ActiveHintBar.qml
+        qml/Components/ActivityComboBox.qml
         qml/Components/EntriesHeader.qml
         qml/Components/KemaiTextField.qml
         qml/Components/PrimaryEditButton.qml
@@ -30,6 +31,10 @@ set(KEMAI_QML_SOURCES
         context/profileManager.h
         helpers/qmlFormatHelpers.cpp
         helpers/qmlFormatHelpers.h
+        model/activityListModel.cpp
+        model/activityListModel.h
+        model/activityFilterProxyModel.cpp
+        model/activityFilterProxyModel.h
 )
 
 qt_add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE main.cpp)
@@ -67,13 +72,14 @@ qt_add_resources(
 target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/context
-        ${CMAKE_CURRENT_SOURCE_DIR}/helpers)
+        ${CMAKE_CURRENT_SOURCE_DIR}/helpers
+        ${CMAKE_CURRENT_SOURCE_DIR}/model)
 
 target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE KemaiCore Qt6::Gui Qt6::Quick spdlog::spdlog)
+        PRIVATE KemaiCore Qt6::Gui Qt6::Quick spdlog::spdlog magic_enum::magic_enum)
 
 install(TARGETS ${PROJECT_NAME}
         BUNDLE DESTINATION .

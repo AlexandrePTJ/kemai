@@ -12,6 +12,7 @@
 #include <QtQmlIntegration/qqmlintegration.h>
 
 // Project headers
+#include <activityListModel.h>
 #include <client/kimaiCache.h>
 #include <client/kimaiClient.h>
 #include <client/kimaiSystem.h>
@@ -31,16 +32,18 @@ namespace kemai
         Q_PROPERTY(bool hasActiveTimesheet READ hasActiveTimesheet NOTIFY activeTimesheetChanged)
         Q_PROPERTY(QString activeTimesheetLabel READ activeTimesheetLabel NOTIFY activeTimesheetChanged)
         Q_PROPERTY(QString activeTimesheetDuration READ activeTimesheetDuration NOTIFY activeTimesheetChanged)
+        Q_PROPERTY(kemai::ActivityListModel *activityModel READ activityModel CONSTANT)
 
     public:
         explicit SessionContext(std::shared_ptr<KimaiClient> client, const KimaiUser &user, QObject *parent = nullptr);
         ~SessionContext() override;
 
-        QString         username() const;
-        TimesheetModel *recentTimeSheets() const;
-        bool            hasActiveTimesheet() const;
-        QString         activeTimesheetLabel() const;
-        QString         activeTimesheetDuration() const;
+        QString            username() const;
+        TimesheetModel    *recentTimeSheets() const;
+        bool               hasActiveTimesheet() const;
+        QString            activeTimesheetLabel() const;
+        QString            activeTimesheetDuration() const;
+        ActivityListModel *activityModel() const;
 
     signals:
         void activeTimesheetChanged();
@@ -48,13 +51,15 @@ namespace kemai
     private:
         void refreshRecentTimeSheets();
         void refreshActiveTimeSheets();
+        void onCacheLoaded();
 
-        std::shared_ptr<KimaiClient>    m_client;
-        KimaiUser                       m_user;
-        std::unique_ptr<TimesheetModel> m_recentTimeSheets;
-        std::unique_ptr<KimaiCache>     m_cache;
-        std::optional<KimaiTimeSheet>   m_activeTimeSheet;
-        QTimer                          m_recentRefreshTimer;
-        QTimer                          m_activeDurationTimer;
+        std::shared_ptr<KimaiClient>       m_client;
+        KimaiUser                          m_user;
+        std::unique_ptr<TimesheetModel>    m_recentTimeSheets;
+        std::unique_ptr<ActivityListModel> m_activityModel;
+        std::unique_ptr<KimaiCache>        m_cache;
+        std::optional<KimaiTimeSheet>      m_activeTimeSheet;
+        QTimer                             m_recentRefreshTimer;
+        QTimer                             m_activeDurationTimer;
     };
 } // namespace kemai

@@ -22,6 +22,7 @@ Page {
             timerText: root.sessionContext.activeTimesheetDuration
             entryDescription: root.sessionContext.activeTimesheetLabel
             isRunning: root.sessionContext.hasActiveTimesheet
+            activityModel: root.sessionContext.activityModel
         }
 
         Rectangle {

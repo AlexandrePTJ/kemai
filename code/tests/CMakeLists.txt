@@ -6,6 +6,7 @@ qt_add_executable(${PROJECT_NAME}
     main.cpp
     client/tst_kimaiClient.cpp
     context/tst_profileManager.cpp
+    misc/tst_fuzzyMatch.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

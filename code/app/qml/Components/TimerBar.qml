@@ -3,6 +3,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Kemai
 
 Rectangle {
     id: root
@@ -10,6 +11,7 @@ Rectangle {
     property string timerText: "00:00:00"
     property string entryDescription: ""
     property bool isRunning: false
+    required property ActivityListModel activityModel
 
     signal stopClicked()
     signal startClicked()
@@ -33,8 +35,10 @@ Rectangle {
             Layout.minimumWidth: 110
         }
 
-        KemaiTextField {
+        ActivityComboBox {
+            id: descriptionField
             Layout.fillWidth: true
+            sourceModel: root.activityModel
             text: root.entryDescription
         }
 
