@@ -109,19 +109,39 @@ namespace kemai
 
     void KimaiCache::consolidateActivities()
     {
-        for (auto &activity : m_activities)
+        KimaiActivities consolidated;
+        consolidated.reserve(m_activities.size());
+
+        for (const auto &activity : m_activities)
         {
             if (activity.project.has_value())
             {
                 const int  pid = activity.project->id;
                 const auto it  = std::ranges::find_if(m_projects, [pid](const KimaiProject &p)
                                                       { return p.id == pid; });
+
+                KimaiActivity resolved = activity;
                 if (it != m_projects.cend())
                 {
-                    activity.project = *it;
+                    resolved.project = *it;
+                }
+                consolidated.append(std::move(resolved));
+            }
+            else
+            {
+                // Global activity (no project in the API payload): available for all
+                // projects. Fan it out so each project gets its own "Project - Activity"
+                // entry in the cache.
+                for (const auto &project : m_projects)
+                {
+                    KimaiActivity fanned = activity;
+                    fanned.project       = project;
+                    consolidated.append(std::move(fanned));
                 }
             }
         }
+
+        m_activities = std::move(consolidated);
     }
 
     const KimaiCustomers &KimaiCache::customers() const
