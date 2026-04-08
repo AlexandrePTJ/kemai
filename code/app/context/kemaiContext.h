@@ -10,8 +10,8 @@
 #include <QtQmlIntegration/qqmlintegration.h>
 
 // Project headers
-#include "client/kimaiClient.h"
-#include "sessionContext.h"
+#include <client/kimaiClient.h>
+#include <context/sessionContext.h>
 #include <storage/appSettingsStore.h>
 
 namespace kemai

@@ -12,10 +12,11 @@
 #include <QtQmlIntegration/qqmlintegration.h>
 
 // Project headers
-#include "client/kimaiClient.h"
-#include "client/kimaiSystem.h"
-#include "client/kimaiTimesheets.h"
-#include "model/timesheetModel.h"
+#include <client/kimaiCache.h>
+#include <client/kimaiClient.h>
+#include <client/kimaiSystem.h>
+#include <client/kimaiTimesheets.h>
+#include <model/timesheetModel.h>
 
 namespace kemai
 {
@@ -51,6 +52,7 @@ namespace kemai
         std::shared_ptr<KimaiClient>    m_client;
         KimaiUser                       m_user;
         std::unique_ptr<TimesheetModel> m_recentTimeSheets;
+        std::unique_ptr<KimaiCache>     m_cache;
         std::optional<KimaiTimeSheet>   m_activeTimeSheet;
         QTimer                          m_recentRefreshTimer;
         QTimer                          m_activeDurationTimer;

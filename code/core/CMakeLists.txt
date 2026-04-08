@@ -11,6 +11,8 @@ set(KEMAI_LIB_SOURCES
         client/kimaiResources.cpp
         client/kimaiTimesheets.h
         client/kimaiTimesheets.cpp
+        client/kimaiCache.h
+        client/kimaiCache.cpp
         client/kimaiClient.h
         client/kimaiClient_p.h
         client/kimaiClient.cpp
