@@ -24,8 +24,6 @@ namespace kemai
         m_activeDurationTimer.setInterval(std::chrono::seconds(1));
         connect(&m_activeDurationTimer, &QTimer::timeout, this, &SessionContext::activeTimesheetChanged);
 
-        connect(m_cache.get(), &KimaiCache::loaded, this, &SessionContext::activitySuggestionsChanged);
-
         refreshRecentTimeSheets();
         refreshActiveTimeSheets();
         m_cache->load(m_client.get());
