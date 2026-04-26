@@ -112,6 +112,57 @@ namespace kemai
                       { spdlog::error("Failed to fetch active timesheets: {}", e.what()); });
     }
 
+    void SessionContext::startTimeSheet(int activityId, int projectId)
+    {
+        if (m_activeTimeSheet)
+        {
+            spdlog::warn("Start ignored: a timesheet is already active");
+            return;
+        }
+        if (activityId <= 0 || projectId <= 0)
+        {
+            spdlog::error("Start ignored: invalid activityId={} or projectId={}", activityId, projectId);
+            return;
+        }
+
+        KimaiTimeSheet ts;
+        ts.activity.id = activityId;
+        ts.project.id  = projectId;
+        ts.beginAt     = QDateTime::currentDateTimeUtc();
+
+        m_client->startTimeSheet(ts, m_cache->timesheetConfig().trackingMode)
+            .then(this,
+                  [this](const KimaiTimeSheet &)
+                  {
+                      refreshActiveTimeSheets();
+                      refreshRecentTimeSheets();
+                  })
+            .onFailed(this, [](const std::exception &e)
+                      { spdlog::error("Failed to start timesheet: {}", e.what()); });
+    }
+
+    void SessionContext::stopActiveTimeSheet()
+    {
+        if (!m_activeTimeSheet)
+        {
+            spdlog::warn("Stop ignored: no active timesheet");
+            return;
+        }
+
+        KimaiTimeSheet ts = *m_activeTimeSheet;
+        ts.endAt          = QDateTime::currentDateTimeUtc();
+
+        m_client->updateTimeSheet(ts, m_cache->timesheetConfig().trackingMode)
+            .then(this,
+                  [this](const KimaiTimeSheet &)
+                  {
+                      refreshActiveTimeSheets();
+                      refreshRecentTimeSheets();
+                  })
+            .onFailed(this, [](const std::exception &e)
+                      { spdlog::error("Failed to stop timesheet: {}", e.what()); });
+    }
+
     void SessionContext::onCacheLoaded()
     {
         m_activityModel->setActivities(m_cache->activities());

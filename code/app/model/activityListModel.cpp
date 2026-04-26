@@ -60,6 +60,9 @@ namespace kemai
 
         case Role::ActivityId:
             return activity.id;
+
+        case Role::ProjectId:
+            return activity.project.has_value() ? activity.project->id : 0;
         }
 
         return {};
@@ -73,6 +76,7 @@ namespace kemai
             {magic_enum::enum_integer(Role::ProjectName),   "projectName"  },
             {magic_enum::enum_integer(Role::ActivityColor), "activityColor"},
             {magic_enum::enum_integer(Role::ActivityId),    "activityId"   },
+            {magic_enum::enum_integer(Role::ProjectId),     "projectId"    },
         };
     }
 } // namespace kemai

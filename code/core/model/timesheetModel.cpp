@@ -108,6 +108,12 @@ namespace kemai
         case TimesheetRole::TimeRange:
             return formatTimeRange(ts.beginAt, ts.endAt);
 
+        case TimesheetRole::ActivityId:
+            return ts.activity.id;
+
+        case TimesheetRole::ProjectId:
+            return ts.project.id;
+
         default:
             return {};
         }
@@ -122,7 +128,9 @@ namespace kemai
             {magic_enum::enum_integer(TimesheetRole::ActivityName),  "activityName" },
             {magic_enum::enum_integer(TimesheetRole::Description),   "description"  },
             {magic_enum::enum_integer(TimesheetRole::Duration),      "duration"     },
-            {magic_enum::enum_integer(TimesheetRole::TimeRange),     "timeRange"    }
+            {magic_enum::enum_integer(TimesheetRole::TimeRange),     "timeRange"    },
+            {magic_enum::enum_integer(TimesheetRole::ActivityId),    "activityId"   },
+            {magic_enum::enum_integer(TimesheetRole::ProjectId),     "projectId"    }
         };
     }
 

@@ -17,8 +17,12 @@ Rectangle {
     required property string description
     required property string duration
     required property string timeRange
+    required property int activityId
+    required property int projectId
 
     property bool isRunning: status === "active"
+
+    signal startRequested(int activityId, int projectId)
 
     width: ListView.view ? ListView.view.width : 0
     implicitHeight: mainLayout.implicitHeight + 22
@@ -154,6 +158,7 @@ Rectangle {
                 implicitHeight: 40
                 implicitWidth: 50
                 textSize: Theme.fontSizeXSmall
+                onClicked: root.startRequested(root.activityId, root.projectId)
             }
         }
     }

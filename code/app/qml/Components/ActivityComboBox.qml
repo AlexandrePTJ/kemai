@@ -11,8 +11,10 @@ Item {
     property string placeholderText: ""
     property alias text: inputField.text
     readonly property int selectedActivityId: inputField.text === _committedLabel ? _committedActivityId : 0
+    readonly property int selectedProjectId: inputField.text === _committedLabel ? _committedProjectId : 0
 
     property int _committedActivityId: 0
+    property int _committedProjectId: 0
     property string _committedLabel: ""
 
     signal activitySelected(string label)
@@ -94,6 +96,7 @@ Item {
 
                 required property int index
                 required property int activityId
+                required property int projectId
                 required property string label
                 required property string activityColor
                 required property string projectName
@@ -126,6 +129,7 @@ Item {
 
                 onClicked: {
                     root._committedActivityId = entryDelegate.activityId
+                    root._committedProjectId = entryDelegate.projectId
                     root._committedLabel = entryDelegate.label
                     inputField.text = entryDelegate.label
                     root.activitySelected(entryDelegate.label)

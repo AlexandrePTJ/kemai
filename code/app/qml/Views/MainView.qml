@@ -23,6 +23,8 @@ Page {
             entryDescription: root.sessionContext.activeTimesheetLabel
             isRunning: root.sessionContext.hasActiveTimesheet
             activityModel: root.sessionContext.activityModel
+            onStartClicked: (activityId, projectId) => root.sessionContext.startTimeSheet(activityId, projectId)
+            onStopClicked: root.sessionContext.stopActiveTimeSheet()
         }
 
         Rectangle {

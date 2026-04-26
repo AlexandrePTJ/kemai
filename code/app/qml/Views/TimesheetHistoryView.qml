@@ -31,7 +31,9 @@ Item {
 
             model: root.sessionContext.recentTimeSheets
 
-            delegate: TimeEntryDelegate {}
+            delegate: TimeEntryDelegate {
+                onStartRequested: (activityId, projectId) => root.sessionContext.startTimeSheet(activityId, projectId)
+            }
         }
     }
 }

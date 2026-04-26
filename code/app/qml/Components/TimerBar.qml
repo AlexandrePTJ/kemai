@@ -15,7 +15,7 @@ Rectangle {
     readonly property bool hasValidActivity: descriptionField.selectedActivityId > 0
 
     signal stopClicked()
-    signal startClicked()
+    signal startClicked(int activityId, int projectId)
 
     implicitHeight: 56
     color: Theme.colorSurfaceLight
@@ -49,7 +49,9 @@ Rectangle {
 
             isStarted: root.isRunning
             enabled: root.isRunning || root.hasValidActivity
-            onClicked: root.isRunning ? root.stopClicked() : root.startClicked()
+            onClicked: root.isRunning
+                ? root.stopClicked()
+                : root.startClicked(descriptionField.selectedActivityId, descriptionField.selectedProjectId)
         }
     }
 }

@@ -25,6 +25,7 @@ namespace kemai
             ProjectName,
             ActivityColor,
             ActivityId,
+            ProjectId,
         };
 
         explicit ActivityListModel(QObject *parent = nullptr);

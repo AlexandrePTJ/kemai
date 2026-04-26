@@ -45,6 +45,9 @@ namespace kemai
         QString            activeTimesheetDuration() const;
         ActivityListModel *activityModel() const;
 
+        Q_INVOKABLE void startTimeSheet(int activityId, int projectId);
+        Q_INVOKABLE void stopActiveTimeSheet();
+
     signals:
         void activeTimesheetChanged();
 

@@ -27,7 +27,9 @@ namespace kemai
             ActivityName,
             Description,
             Duration,
-            TimeRange
+            TimeRange,
+            ActivityId,
+            ProjectId
         };
 
         explicit TimesheetModel(QObject *parent = nullptr);
