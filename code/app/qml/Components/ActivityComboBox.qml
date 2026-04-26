@@ -10,8 +10,28 @@ Item {
     required property ActivityListModel sourceModel
     property string placeholderText: ""
     property alias text: inputField.text
+    readonly property int selectedActivityId: inputField.text === _committedLabel ? _committedActivityId : 0
+
+    property int _committedActivityId: 0
+    property string _committedLabel: ""
 
     signal activitySelected(string label)
+
+    function _updateDropdown() {
+        // Suppress the popup while the field still contains the committed
+        // selection — the user already picked, no need to nag them. Editing
+        // the text (even by one char) clears this branch and re-enables the
+        // popup.
+        if (_committedLabel !== "" && inputField.text === _committedLabel) {
+            if (dropdown.opened) dropdown.close()
+            return
+        }
+        if (inputField.activeFocus && suggestionList.count > 0) {
+            if (!dropdown.opened) dropdown.open()
+        } else if (suggestionList.count === 0 || !dropdown.hovered) {
+            if (dropdown.opened) dropdown.close()
+        }
+    }
 
     implicitHeight: 40
 
@@ -37,13 +57,8 @@ Item {
             implicitHeight: 40
         }
 
-        onActiveFocusChanged: {
-            if (activeFocus) {
-                dropdown.open()
-            } else if (!dropdown.hovered) {
-                dropdown.close()
-            }
-        }
+        onActiveFocusChanged: root._updateDropdown()
+        onTextChanged: root._updateDropdown()
 
         Keys.onEscapePressed: {
             dropdown.close()
@@ -72,11 +87,13 @@ Item {
             clip: true
             model: filterProxy
             implicitHeight: Math.min(contentHeight, 240)
+            onCountChanged: root._updateDropdown()
 
             delegate: ItemDelegate {
                 id: entryDelegate
 
                 required property int index
+                required property int activityId
                 required property string label
                 required property string activityColor
                 required property string projectName
@@ -108,6 +125,8 @@ Item {
                 }
 
                 onClicked: {
+                    root._committedActivityId = entryDelegate.activityId
+                    root._committedLabel = entryDelegate.label
                     inputField.text = entryDelegate.label
                     root.activitySelected(entryDelegate.label)
                     dropdown.close()

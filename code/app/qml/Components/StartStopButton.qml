@@ -9,6 +9,8 @@ Button {
     leftPadding: 10
     rightPadding: 10
 
+    opacity: enabled ? 1.0 : 0.5
+
     property alias isStarted: root.checked
     property alias textSize: buttonText.font.pixelSize
 

@@ -42,9 +42,10 @@ namespace kemai
         while (qi < q.size() && wi < words.size())
         {
             const QChar qc = q[qi];
-            if (qc == QLatin1Char(' '))
+            if (!qc.isLetterOrNumber())
             {
-                // Explicit word boundary: advance to next word if mid-word.
+                // Any non-alphanumeric (space, dash, parenthesis...) is a word
+                // boundary in the query, mirroring how the entry was split.
                 if (ci > 0)
                 {
                     wi++;
@@ -70,7 +71,7 @@ namespace kemai
             }
         }
 
-        while (qi < q.size() && q[qi] == QLatin1Char(' '))
+        while (qi < q.size() && !q[qi].isLetterOrNumber())
         {
             qi++;
         }

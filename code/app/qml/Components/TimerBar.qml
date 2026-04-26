@@ -12,6 +12,7 @@ Rectangle {
     property string entryDescription: ""
     property bool isRunning: false
     required property ActivityListModel activityModel
+    readonly property bool hasValidActivity: descriptionField.selectedActivityId > 0
 
     signal stopClicked()
     signal startClicked()
@@ -47,6 +48,7 @@ Rectangle {
             implicitWidth: 80
 
             isStarted: root.isRunning
+            enabled: root.isRunning || root.hasValidActivity
             onClicked: root.isRunning ? root.stopClicked() : root.startClicked()
         }
     }

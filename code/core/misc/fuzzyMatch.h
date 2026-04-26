@@ -13,9 +13,12 @@ namespace kemai
         // Smart word-prefix sequential filter.
         //
         // Splits `entry` into alphanumeric words, then walks `query` left-to-right.
-        // Each query character must either extend the current word (matching its
-        // next character) or jump to a later word and match its first character.
-        // A space in the query forces a word boundary.
+        // Each alphanumeric query character must either extend the current word
+        // (matching its next character) or jump to a later word and match its
+        // first character. Any non-alphanumeric query character (space, dash,
+        // parenthesis, etc.) acts as a word boundary, mirroring the way the
+        // entry was tokenized — so a label can fuzzy-match itself even when it
+        // contains separators.
         //
         // Example: "devk" matches "Development - Kemai" because 'd','e','v'
         // extend "development" and 'k' starts "kemai". "kdev" does NOT match

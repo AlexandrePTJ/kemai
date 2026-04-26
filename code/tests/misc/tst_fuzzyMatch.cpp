@@ -67,6 +67,18 @@ TEST_CASE("FuzzyMatch::wordPrefixMatch space forces a word boundary", "[fuzzy]")
     CHECK(FuzzyMatch::wordPrefixMatch("dev ", "Development - Kemai"));
 }
 
+TEST_CASE("FuzzyMatch::wordPrefixMatch any separator acts as a word boundary in the query", "[fuzzy]")
+{
+    // The entry's own separators must round-trip — typing the label exactly
+    // (or removing one trailing letter) must still match.
+    CHECK(FuzzyMatch::wordPrefixMatch("Development - Kemai", "Development - Kemai"));
+    CHECK(FuzzyMatch::wordPrefixMatch("Development - Kema", "Development - Kemai"));
+    CHECK(FuzzyMatch::wordPrefixMatch("Development -", "Development - Kemai"));
+    // Parentheses also work as boundaries.
+    CHECK(FuzzyMatch::wordPrefixMatch("project (v2)", "Project (v2) - Backend"));
+    CHECK(FuzzyMatch::wordPrefixMatch("project(v2)b", "Project (v2) - Backend"));
+}
+
 TEST_CASE("FuzzyMatch::wordPrefixMatch handles numbers and punctuation", "[fuzzy]")
 {
     CHECK(FuzzyMatch::wordPrefixMatch("v2", "Project v2 - Backend"));
