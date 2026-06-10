@@ -19,10 +19,14 @@ Rectangle {
     required property string timeRange
     required property int activityId
     required property int projectId
+    required property int timesheetId
+    required property date beginAt
+    required property date endAt
 
     property bool isRunning: status === "active"
 
     signal startRequested(int activityId, int projectId)
+    signal editRequested(int timesheetId, bool editEnd, date beginAt, date endAt)
 
     width: ListView.view ? ListView.view.width : 0
     implicitHeight: mainLayout.implicitHeight + 22
@@ -147,9 +151,52 @@ Rectangle {
 
             // Edit button (always visible)
              SecondaryButton {
+                id: editButton
                 text: "\u270E Edit"
                 implicitHeight: 40
                 implicitWidth: 50
+                onClicked: editMenu.popup(editButton, 0, editButton.height)
+
+                Menu {
+                    id: editMenu
+
+                    background: Rectangle {
+                        implicitWidth: 150
+                        color: Theme.colorSurfaceDark
+                        border.color: Theme.colorBorder
+                        border.width: 1
+                        radius: Theme.radiusSmall
+                    }
+
+                    delegate: MenuItem {
+                        id: menuItem
+                        implicitHeight: 32
+
+                        contentItem: Text {
+                            text: menuItem.text
+                            color: menuItem.enabled ? Theme.colorTextPrimary : Theme.colorTextSecondary
+                            font.pixelSize: Theme.fontSizeSmall
+                            verticalAlignment: Text.AlignVCenter
+                            leftPadding: 4
+                        }
+
+                        background: Rectangle {
+                            color: menuItem.highlighted ? Theme.colorSurface : "transparent"
+                            radius: Theme.radiusSmall
+                        }
+                    }
+
+                    Action {
+                        text: "Edit start time"
+                        onTriggered: root.editRequested(root.timesheetId, false, root.beginAt, root.endAt)
+                    }
+
+                    Action {
+                        text: "Edit end time"
+                        enabled: !root.isRunning
+                        onTriggered: root.editRequested(root.timesheetId, true, root.beginAt, root.endAt)
+                    }
+                }
             }
 
             // Play button (non-running entries only)

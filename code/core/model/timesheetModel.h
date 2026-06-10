@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
+// STL headers
+#include <optional>
+
 // Qt headers
 #include <QAbstractListModel>
 
@@ -29,13 +32,18 @@ namespace kemai
             Duration,
             TimeRange,
             ActivityId,
-            ProjectId
+            ProjectId,
+            TimesheetId,
+            BeginAt,
+            EndAt
         };
 
         explicit TimesheetModel(QObject *parent = nullptr);
         ~TimesheetModel() override;
 
         void setTimeSheets(const KimaiTimeSheets &timeSheets);
+
+        std::optional<KimaiTimeSheet> findById(int timesheetId) const;
 
         int                    rowCount(const QModelIndex &parent = {}) const override;
         QVariant               data(const QModelIndex &index, int role) const override;

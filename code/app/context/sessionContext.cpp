@@ -163,6 +163,43 @@ namespace kemai
                       { spdlog::error("Failed to stop timesheet: {}", e.what()); });
     }
 
+    void SessionContext::updateTimeSheetTimes(int timesheetId, const QDateTime &beginAt, const QDateTime &endAt)
+    {
+        const auto timeSheet = m_recentTimeSheets->findById(timesheetId);
+        if (!timeSheet)
+        {
+            spdlog::error("Update ignored: no timesheet with id={}", timesheetId);
+            return;
+        }
+
+        // Invalid datetimes mean "leave unchanged" (e.g. active entries have no end)
+        KimaiTimeSheet updated = *timeSheet;
+        if (beginAt.isValid())
+        {
+            updated.beginAt = beginAt.toUTC();
+        }
+        if (endAt.isValid())
+        {
+            updated.endAt = endAt.toUTC();
+        }
+
+        if (updated.endAt.isValid() && updated.endAt <= updated.beginAt)
+        {
+            spdlog::warn("Update ignored: end time must be after begin time");
+            return;
+        }
+
+        m_client->updateTimeSheet(updated, m_cache->timesheetConfig().trackingMode)
+            .then(this,
+                  [this](const KimaiTimeSheet &)
+                  {
+                      refreshActiveTimeSheets();
+                      refreshRecentTimeSheets();
+                  })
+            .onFailed(this, [](const std::exception &e)
+                      { spdlog::error("Failed to update timesheet: {}", e.what()); });
+    }
+
     void SessionContext::onCacheLoaded()
     {
         m_activityModel->setActivities(m_cache->activities());

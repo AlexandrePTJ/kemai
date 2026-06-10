@@ -47,6 +47,7 @@ namespace kemai
 
         Q_INVOKABLE void startTimeSheet(int activityId, int projectId);
         Q_INVOKABLE void stopActiveTimeSheet();
+        Q_INVOKABLE void updateTimeSheetTimes(int timesheetId, const QDateTime &beginAt, const QDateTime &endAt);
 
     signals:
         void activeTimesheetChanged();

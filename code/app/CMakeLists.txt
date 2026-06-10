@@ -3,6 +3,7 @@ project(Kemai)
 set(KEMAI_QML_FILES
         qml/Components/ActiveHintBar.qml
         qml/Components/ActivityComboBox.qml
+        qml/Components/CalendarView.qml
         qml/Components/EntriesHeader.qml
         qml/Components/KemaiTextField.qml
         qml/Components/PrimaryEditButton.qml
@@ -13,7 +14,9 @@ set(KEMAI_QML_FILES
         qml/Components/SecondaryButton.qml
         qml/Components/StartStopButton.qml
         qml/Components/TimeEntryDelegate.qml
+        qml/Components/TimeWheel.qml
         qml/Components/TimerBar.qml
+        qml/Views/DateTimeEditDialog.qml
         qml/Views/LoginView.qml
         qml/Views/MainView.qml
         qml/Views/ProfileManagerDialog.qml

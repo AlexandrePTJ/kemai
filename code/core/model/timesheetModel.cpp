@@ -114,6 +114,15 @@ namespace kemai
         case TimesheetRole::ProjectId:
             return ts.project.id;
 
+        case TimesheetRole::TimesheetId:
+            return ts.id;
+
+        case TimesheetRole::BeginAt:
+            return ts.beginAt.toLocalTime();
+
+        case TimesheetRole::EndAt:
+            return ts.endAt.isValid() ? ts.endAt.toLocalTime() : QDateTime();
+
         default:
             return {};
         }
@@ -130,8 +139,22 @@ namespace kemai
             {magic_enum::enum_integer(TimesheetRole::Duration),      "duration"     },
             {magic_enum::enum_integer(TimesheetRole::TimeRange),     "timeRange"    },
             {magic_enum::enum_integer(TimesheetRole::ActivityId),    "activityId"   },
-            {magic_enum::enum_integer(TimesheetRole::ProjectId),     "projectId"    }
+            {magic_enum::enum_integer(TimesheetRole::ProjectId),     "projectId"    },
+            {magic_enum::enum_integer(TimesheetRole::TimesheetId),   "timesheetId"  },
+            {magic_enum::enum_integer(TimesheetRole::BeginAt),       "beginAt"      },
+            {magic_enum::enum_integer(TimesheetRole::EndAt),         "endAt"        }
         };
+    }
+
+    std::optional<KimaiTimeSheet> TimesheetModel::findById(int timesheetId) const
+    {
+        const auto it = std::ranges::find_if(m_timeSheets, [timesheetId](const KimaiTimeSheet &ts)
+                                             { return ts.id == timesheetId; });
+        if (it == m_timeSheets.cend())
+        {
+            return std::nullopt;
+        }
+        return *it;
     }
 
     void TimesheetModel::refreshActiveDurations()

@@ -33,7 +33,29 @@ Item {
 
             delegate: TimeEntryDelegate {
                 onStartRequested: (activityId, projectId) => root.sessionContext.startTimeSheet(activityId, projectId)
+                onEditRequested: (timesheetId, editEnd, beginAt, endAt) => {
+                    editDialog.timesheetId = timesheetId
+                    editDialog.editEnd = editEnd
+                    editDialog.title = editEnd ? "Edit End Time" : "Edit Start Time"
+                    editDialog.initialDateTime = editEnd ? endAt : beginAt
+                    editDialog.open()
+                }
             }
+        }
+    }
+
+    DateTimeEditDialog {
+        id: editDialog
+
+        property int timesheetId: 0
+        property bool editEnd: false
+
+        // Invalid dates mean "leave unchanged" on the session context side
+        onConfirmed: (dateTime) => {
+            if (editEnd)
+                root.sessionContext.updateTimeSheetTimes(timesheetId, new Date(NaN), dateTime)
+            else
+                root.sessionContext.updateTimeSheetTimes(timesheetId, dateTime, new Date(NaN))
         }
     }
 }
