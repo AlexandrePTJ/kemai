@@ -24,11 +24,11 @@ Screens follow design.md decision 9: functional brief → Claude Design (Alexand
 
 ## 4. Session logic for editing and deleting
 
-- [ ] 4.1 Add the `tags` role to `TimesheetModel`; verify with a unit test that a sheet with tags exposes them through the role
-- [ ] 4.2 Replace `updateTimeSheetTimes` by `SessionController::updateTimeSheet(id, projectId, activityId, description, tags, begin, end)` with the same validation and refresh; keep the current Edit menu working on it; port the two existing tests and add cases for description/tags/project change, verified through `FakeKimaiClient::lastUpdatedTimeSheet`
-- [ ] 4.3 Add `SessionController::deleteTimeSheet(id)` routing failures through `handleApiError`; verify tests: success refreshes active + recent, deleting the active entry leaves `hasActiveTimesheet` false, 403 notifies `Forbidden`, 401 emits `sessionExpired`
-- [ ] 4.4 Expose tag suggestions to QML (invokable request + result signal, failures through `handleApiError`); verify a test where the fake's tags reach the signal
-- [ ] 4.5 Update CLAUDE.md (Timesheet editing pattern replaces "Timesheet time editing") and commit (e.g. "Add timesheet update and delete to session"); verify `ctest` passes
+- [x] 4.1 Add the `tags` role to `TimesheetModel`; verify with a unit test that a sheet with tags exposes them through the role
+- [x] 4.2 Replace `updateTimeSheetTimes` by `SessionController::updateTimeSheet(id, projectId, activityId, description, tags, begin, end)` with the same validation and refresh; keep the current Edit menu working on it; port the two existing tests and add cases for description/tags/project change, verified through `FakeKimaiClient::lastUpdatedTimeSheet`
+- [x] 4.3 Add `SessionController::deleteTimeSheet(id)` routing failures through `handleApiError`; verify tests: success refreshes active + recent, deleting the active entry leaves `hasActiveTimesheet` false, 403 notifies `Forbidden`, 401 emits `sessionExpired`
+- [x] 4.4 Expose tag suggestions to QML (invokable request + result signal, failures through `handleApiError`); verify a test where the fake's tags reach the signal
+- [x] 4.5 Update CLAUDE.md (Timesheet editing pattern replaces "Timesheet time editing") and commit (e.g. "Add timesheet update and delete to session"); verify `ctest` passes
 
 ## 5. Logout without UI
 

@@ -105,6 +105,9 @@ namespace kemai
         case TimesheetRole::EndAt:
             return ts.endAt.isValid() ? ts.endAt.toLocalTime() : QDateTime();
 
+        case TimesheetRole::Tags:
+            return ts.tags;
+
         default:
             return {};
         }
@@ -124,7 +127,8 @@ namespace kemai
             {magic_enum::enum_integer(TimesheetRole::ProjectId),     "projectId"    },
             {magic_enum::enum_integer(TimesheetRole::TimesheetId),   "timesheetId"  },
             {magic_enum::enum_integer(TimesheetRole::BeginAt),       "beginAt"      },
-            {magic_enum::enum_integer(TimesheetRole::EndAt),         "endAt"        }
+            {magic_enum::enum_integer(TimesheetRole::EndAt),         "endAt"        },
+            {magic_enum::enum_integer(TimesheetRole::Tags),          "tags"         }
         };
     }
 

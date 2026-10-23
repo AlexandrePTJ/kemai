@@ -35,7 +35,8 @@ namespace kemai
             ProjectId,
             TimesheetId,
             BeginAt,
-            EndAt
+            EndAt,
+            Tags
         };
 
         explicit TimesheetModel(QObject *parent = nullptr);

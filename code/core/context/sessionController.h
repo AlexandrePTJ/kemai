@@ -77,7 +77,14 @@ namespace kemai
 
         Q_INVOKABLE void startTimeSheet(int activityId, int projectId);
         Q_INVOKABLE void stopActiveTimeSheet();
-        Q_INVOKABLE void updateTimeSheetTimes(int timesheetId, const QDateTime &beginAt, const QDateTime &endAt);
+        // Applies every field as given, except begin/end: an invalid QDateTime leaves it unchanged,
+        // and a running entry keeps no end. Rejected when end <= begin or project/activity are invalid.
+        Q_INVOKABLE void updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
+                                         const QDateTime &beginAt, const QDateTime &endAt);
+        // Deletes the timesheet on the server, then refreshes active + recent (stops tracking if it was active)
+        Q_INVOKABLE void deleteTimeSheet(int timesheetId);
+        // Existing server tags containing `text`; answered by tagSuggestionsReady
+        Q_INVOKABLE void requestTagSuggestions(const QString &text);
 
         // Reloads the cache (unless a load is in flight) and the timesheets.
         Q_INVOKABLE void refresh();
@@ -87,6 +94,8 @@ namespace kemai
     signals:
         void activeTimesheetChanged();
         void refreshingChanged();
+        // `query` is the text the suggestions answer, so the UI can drop stale replies
+        void tagSuggestionsReady(const QString &query, const QStringList &tags);
         // Auth is no longer valid (401): the UI must drop the session and return to login.
         void sessionExpired();
         // Single UI notification channel; the QML banner composes the human message from kind.

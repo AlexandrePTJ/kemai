@@ -22,6 +22,7 @@ Rectangle {
     required property int timesheetId
     required property date beginAt
     required property date endAt
+    required property var tags
 
     property bool isRunning: status === "active"
 

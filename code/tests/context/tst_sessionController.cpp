@@ -148,7 +148,7 @@ TEST_CASE("SessionController - cache failure on 401 expires the session", "[sess
     REQUIRE(probe.notificationCount == 0);
 }
 
-TEST_CASE("SessionController::updateTimeSheetTimes - rejects end before begin", "[session][unit]")
+TEST_CASE("SessionController::updateTimeSheet - rejects end before begin", "[session][unit]")
 {
     const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
     const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
@@ -160,13 +160,13 @@ TEST_CASE("SessionController::updateTimeSheetTimes - rejects end before begin", 
     processEvents();
 
     fake->calls.clear();
-    controller.updateTimeSheetTimes(42, {}, begin.addSecs(-60));
+    controller.updateTimeSheet(42, 7, 11, {}, {}, {}, begin.addSecs(-60));
     processEvents();
 
     REQUIRE_FALSE(fake->calls.contains("updateTimeSheet"));
 }
 
-TEST_CASE("SessionController::updateTimeSheetTimes - invalid datetime leaves field unchanged", "[session][unit]")
+TEST_CASE("SessionController::updateTimeSheet - invalid datetime leaves field unchanged", "[session][unit]")
 {
     const auto begin  = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
     const auto end    = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
@@ -178,13 +178,78 @@ TEST_CASE("SessionController::updateTimeSheetTimes - invalid datetime leaves fie
     SessionController controller(fake, KimaiUser{});
     processEvents();
 
-    controller.updateTimeSheetTimes(42, {}, newEnd);
+    controller.updateTimeSheet(42, 7, 11, {}, {}, {}, newEnd);
     processEvents();
 
     REQUIRE(fake->calls.contains("updateTimeSheet"));
     REQUIRE(fake->lastUpdatedTimeSheet.id == 42);
     REQUIRE(fake->lastUpdatedTimeSheet.beginAt == begin);
     REQUIRE(fake->lastUpdatedTimeSheet.endAt == newEnd.toUTC());
+}
+
+TEST_CASE("SessionController::updateTimeSheet - applies project, activity, description and tags", "[session][unit]")
+{
+    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
+    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    auto ts   = makeTimeSheet(42, begin, end);
+    ts.description = "Old";
+    ts.tags        = {"Legacy"};
+    fake->timeSheets.append(ts);
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    fake->calls.clear();
+    controller.updateTimeSheet(42, 8, 12, "New description", {"QML", "Frontend"}, {}, {});
+    processEvents();
+
+    REQUIRE(fake->calls.contains("updateTimeSheet"));
+    REQUIRE(fake->lastUpdatedTimeSheet.project.id == 8);
+    REQUIRE(fake->lastUpdatedTimeSheet.activity.id == 12);
+    REQUIRE(fake->lastUpdatedTimeSheet.description == "New description");
+    REQUIRE(fake->lastUpdatedTimeSheet.tags == QStringList{"QML", "Frontend"});
+    REQUIRE(fake->lastUpdatedTimeSheet.beginAt == begin);
+    REQUIRE(fake->lastUpdatedTimeSheet.endAt == end);
+    // Success refreshes the lists
+    REQUIRE(fake->calls.contains("requestActiveTimeSheets"));
+    REQUIRE(fake->calls.contains("requestTimeSheets"));
+}
+
+TEST_CASE("SessionController::updateTimeSheet - running entry keeps no end", "[session][unit]")
+{
+    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->timeSheets.append(makeTimeSheet(42, begin));
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    controller.updateTimeSheet(42, 7, 11, "Described while running", {}, {}, begin.addSecs(3600));
+    processEvents();
+
+    REQUIRE(fake->lastUpdatedTimeSheet.description == "Described while running");
+    REQUIRE_FALSE(fake->lastUpdatedTimeSheet.endAt.isValid());
+}
+
+TEST_CASE("SessionController::updateTimeSheet - rejects an invalid project or activity", "[session][unit]")
+{
+    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
+    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->timeSheets.append(makeTimeSheet(42, begin, end));
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    fake->calls.clear();
+    controller.updateTimeSheet(42, 0, 11, {}, {}, {}, {});
+    processEvents();
+
+    REQUIRE_FALSE(fake->calls.contains("updateTimeSheet"));
 }
 
 TEST_CASE("SessionController - failed refresh warns and keeps the activities", "[session][error][unit]")
@@ -286,4 +351,126 @@ TEST_CASE("SessionController::refresh - coalesces with a cache load in flight", 
 
     REQUIRE_FALSE(fake->calls.contains("requestActivities"));
     REQUIRE(fake->calls.contains("requestTimeSheets"));
+}
+
+TEST_CASE("SessionController::deleteTimeSheet - deletes then refreshes the lists", "[session][unit]")
+{
+    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
+    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->timeSheets.append(makeTimeSheet(42, begin, end));
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    fake->calls.clear();
+    controller.deleteTimeSheet(42);
+    processEvents();
+
+    REQUIRE(fake->lastDeletedTimeSheetId == 42);
+    REQUIRE(fake->calls.indexOf("deleteTimeSheet") < fake->calls.indexOf("requestActiveTimeSheets"));
+    REQUIRE(fake->calls.contains("requestTimeSheets"));
+}
+
+TEST_CASE("SessionController::deleteTimeSheet - deleting the active entry stops tracking", "[session][unit]")
+{
+    const auto begin = QDateTime::currentDateTimeUtc().addSecs(-600);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->activeTimeSheets.append(makeTimeSheet(42, begin));
+    fake->timeSheets.append(makeTimeSheet(42, begin));
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    REQUIRE(controller.hasActiveTimesheet());
+
+    // The server no longer has it after deletion
+    fake->activeTimeSheets.clear();
+    fake->timeSheets.clear();
+    controller.deleteTimeSheet(42);
+    processEvents();
+
+    REQUIRE_FALSE(controller.hasActiveTimesheet());
+}
+
+TEST_CASE("SessionController::deleteTimeSheet - 403 notifies Forbidden", "[session][error][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+
+    fake->failWith("deleteTimeSheet", ApiErrorKind::Forbidden, 403);
+    controller.deleteTimeSheet(42);
+    processEvents();
+
+    REQUIRE(probe.notificationCount == 1);
+    REQUIRE(probe.lastLevel == SessionController::NotificationLevel::Error);
+    REQUIRE(probe.lastKind == SessionController::NotificationKind::Forbidden);
+    REQUIRE(probe.sessionExpiredCount == 0);
+}
+
+TEST_CASE("SessionController::deleteTimeSheet - 401 expires the session", "[session][error][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+
+    fake->failWith("deleteTimeSheet", ApiErrorKind::AuthFailed, 401);
+    controller.deleteTimeSheet(42);
+    processEvents();
+
+    REQUIRE(probe.sessionExpiredCount == 1);
+    REQUIRE(probe.notificationCount == 0);
+}
+
+TEST_CASE("SessionController::requestTagSuggestions - server tags reach the signal with their query", "[session][unit]")
+{
+    auto fake  = std::make_shared<FakeKimaiClient>();
+    fake->tags = {"Frontend", "Front office"};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    QString     receivedQuery;
+    QStringList receivedTags;
+    QObject::connect(&controller, &SessionController::tagSuggestionsReady,
+                     [&](const QString &query, const QStringList &tags)
+                     {
+                         receivedQuery = query;
+                         receivedTags  = tags;
+                     });
+
+    controller.requestTagSuggestions("Fro");
+    processEvents();
+
+    REQUIRE(fake->lastTagsQuery == "Fro");
+    REQUIRE(receivedQuery == "Fro");
+    REQUIRE(receivedTags == QStringList{"Frontend", "Front office"});
+}
+
+TEST_CASE("SessionController::requestTagSuggestions - failure goes through the error policy", "[session][error][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+
+    fake->failWith("requestTags", ApiErrorKind::NoNetwork);
+    controller.requestTagSuggestions("Fro");
+    processEvents();
+
+    REQUIRE(probe.notificationCount == 1);
+    REQUIRE(probe.lastKind == SessionController::NotificationKind::NoNetwork);
 }

@@ -11,6 +11,7 @@ qt_add_executable(${PROJECT_NAME}
     context/tst_sessionController.cpp
     misc/tst_formatHelpers.cpp
     misc/tst_fuzzyMatch.cpp
+    model/tst_timesheetModel.cpp
     storage/tst_profileStore.cpp
 )
 

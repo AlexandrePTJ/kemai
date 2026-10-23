@@ -225,7 +225,8 @@ namespace kemai
                       { handleApiError(e, "Failed to stop timesheet"); });
     }
 
-    void SessionController::updateTimeSheetTimes(int timesheetId, const QDateTime &beginAt, const QDateTime &endAt)
+    void SessionController::updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
+                                            const QDateTime &beginAt, const QDateTime &endAt)
     {
         const auto timeSheet = m_recentTimeSheets->findById(timesheetId);
         if (!timeSheet)
@@ -233,14 +234,24 @@ namespace kemai
             spdlog::error("Update ignored: no timesheet with id={}", timesheetId);
             return;
         }
+        if (projectId <= 0 || activityId <= 0)
+        {
+            spdlog::error("Update ignored: invalid projectId={} or activityId={}", projectId, activityId);
+            return;
+        }
 
-        // Invalid datetimes mean "leave unchanged" (e.g. active entries have no end)
         KimaiTimeSheet updated = *timeSheet;
+        updated.project.id     = projectId;
+        updated.activity.id    = activityId;
+        updated.description    = description;
+        updated.tags           = tags;
+
+        // Invalid datetimes mean "leave unchanged"; a running entry never gets an end here
         if (beginAt.isValid())
         {
             updated.beginAt = beginAt.toUTC();
         }
-        if (endAt.isValid())
+        if (endAt.isValid() && timeSheet->endAt.isValid())
         {
             updated.endAt = endAt.toUTC();
         }
@@ -260,6 +271,33 @@ namespace kemai
                   })
             .onFailed(this, [this](const KimaiApiError &e)
                       { handleApiError(e, "Failed to update timesheet"); });
+    }
+
+    void SessionController::deleteTimeSheet(int timesheetId)
+    {
+        if (timesheetId <= 0)
+        {
+            spdlog::error("Delete ignored: invalid timesheetId={}", timesheetId);
+            return;
+        }
+
+        m_client->deleteTimeSheet(timesheetId)
+            .then(this,
+                  [this]()
+                  {
+                      refreshActiveTimeSheets();
+                      refreshRecentTimeSheets();
+                  })
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { handleApiError(e, "Failed to delete timesheet"); });
+    }
+
+    void SessionController::requestTagSuggestions(const QString &text)
+    {
+        m_client->requestTags(text)
+            .then(this, [this, text](const QStringList &tags) { emit tagSuggestionsReady(text, tags); })
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { handleApiError(e, "Failed to fetch tag suggestions"); });
     }
 
     void SessionController::onCacheLoaded()
