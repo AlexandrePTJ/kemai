@@ -32,8 +32,8 @@ Screens follow design.md decision 9: functional brief → Claude Design (Alexand
 
 ## 5. Logout without UI
 
-- [ ] 5.1 Add `KemaiContext::logout(session)` clearing auto-login and deleting the session; make the `sessionExpired` path in `Main.qml` delete the dropped session too; verify with logs that the session is destroyed on expiry and when `logout` is called from a QML harness
-- [ ] 5.2 Update CLAUDE.md (login flow, logout) and commit (e.g. "Add logout to app context"); verify the build passes
+- [x] 5.1 Add `KemaiContext::logout(session)` clearing auto-login and deleting the session; make the `sessionExpired` path in `Main.qml` delete the dropped session too; verify with logs that the session is destroyed on expiry and when `logout` is called from a QML harness
+- [x] 5.2 Update CLAUDE.md (login flow, logout) and commit (e.g. "Add logout to app context"); verify the build passes
 
 ## 6. CI integration tests
 

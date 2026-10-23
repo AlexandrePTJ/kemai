@@ -27,10 +27,15 @@ namespace kemai
 
         Q_INVOKABLE void initialize();
         Q_INVOKABLE void login(const QString &host, const QString &token, bool rememberLogin);
+        // Ends the session on purpose: disables auto-login, then emits loggedOut for the UI to leave the session
+        Q_INVOKABLE void logout();
+        // Releases a session the UI no longer shows (logout or expiry); call once its view is gone
+        Q_INVOKABLE void closeSession(kemai::SessionContext *session);
 
     signals:
         void loginSucceeded(kemai::SessionContext *session);
         void loginFailed(const QString &error);
+        void loggedOut();
 
     private:
         void updateAutoLoginSettings(const QString &host, const QString &token, bool rememberLogin);

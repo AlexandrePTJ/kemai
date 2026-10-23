@@ -56,7 +56,10 @@ namespace kemai
         refresh();
     }
 
-    SessionController::~SessionController() = default;
+    SessionController::~SessionController()
+    {
+        spdlog::debug("Session of {} closed", m_user.username);
+    }
 
     QString SessionController::username() const
     {

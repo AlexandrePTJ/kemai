@@ -22,11 +22,16 @@ ApplicationWindow {
             session.sessionExpired.connect(() => stackView.replace(null, loginViewComponent))
             stackView.replace(null, mainViewComponent, { sessionContext: session })
         }
+        onLoggedOut: stackView.replace(null, loginViewComponent)
     }
 
     Component {
         id: mainViewComponent
-        Views.MainView {}
+        Views.MainView {
+            // The session lives as long as its view: released once the view is gone (logout or expiry),
+            // never while a transition still binds to it
+            Component.onDestruction: appContext.closeSession(sessionContext)
+        }
     }
 
     Component {

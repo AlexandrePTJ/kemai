@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 #include "kemaiContext.h"
 
+// spdlog headers
+#include <spdlog/spdlog.h>
+
 // Project headers
 #include <client/kimaiSystem.h>
 #include <misc/pathHelpers.h>
@@ -45,6 +48,21 @@ namespace kemai
                     updateAutoLoginSettings("", "", false);
                 });
         // clang-format on
+    }
+
+    void KemaiContext::logout()
+    {
+        spdlog::info("Logging out");
+        updateAutoLoginSettings("", "", false);
+        emit loggedOut();
+    }
+
+    void KemaiContext::closeSession(SessionContext *session)
+    {
+        if (session != nullptr)
+        {
+            session->deleteLater();
+        }
     }
 
     void KemaiContext::updateAutoLoginSettings(const QString &host, const QString &token, bool rememberLogin)
