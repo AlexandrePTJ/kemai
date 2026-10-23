@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -274,6 +276,7 @@ Popup {
 
             SecondaryButton {
                 text: "Cancel"
+                textSize: Theme.fontSizeSmall
                 Layout.preferredHeight: 32
                 Layout.preferredWidth: 80
                 onClicked: root.close()

@@ -16,7 +16,7 @@ AbstractButton {
     }
 
     background: Rectangle {
-        color: parent.hovered ? Theme.colorAccentRedHover : Theme.colorButtonStop
+        color: root.hovered ? Theme.colorAccentRedHover : Theme.colorButtonStop
         radius: Theme.radiusSmall
     }
 }

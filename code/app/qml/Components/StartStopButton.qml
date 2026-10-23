@@ -16,8 +16,8 @@ Button {
 
     contentItem: Text {
         id: buttonText
-        text: isStarted ? "\u25A0 Stop" : "\u25B6 Start"
-        color: isStarted ? Theme.colorTextPrimary : Theme.colorTextDarkPrimary
+        text: root.isStarted ? "\u25A0 Stop" : "\u25B6 Start"
+        color: root.isStarted ? Theme.colorTextPrimary : Theme.colorTextDarkPrimary
         font.pixelSize: Theme.fontSizeMedium
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

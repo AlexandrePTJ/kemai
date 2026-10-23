@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import Kemai
@@ -30,7 +32,7 @@ Item {
         }
         if (inputField.activeFocus && suggestionList.count > 0) {
             if (!dropdown.opened) dropdown.open()
-        } else if (suggestionList.count === 0 || !dropdown.hovered) {
+        } else if (suggestionList.count === 0 || !dropdownHover.hovered) {
             if (dropdown.opened) dropdown.close()
         }
     }
@@ -90,6 +92,11 @@ Item {
             model: filterProxy
             implicitHeight: Math.min(contentHeight, 240)
             onCountChanged: root._updateDropdown()
+
+            // Popup has no hovered property: track it to keep the list open while pointed at
+            HoverHandler {
+                id: dropdownHover
+            }
 
             delegate: ItemDelegate {
                 id: entryDelegate

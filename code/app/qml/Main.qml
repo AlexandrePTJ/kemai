@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 

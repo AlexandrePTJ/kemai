@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -35,7 +37,7 @@ Popup {
         // -- Header
         Rectangle {
             Layout.fillWidth: true
-            height: 52
+            Layout.preferredHeight: 52
             color: Theme.colorBackgroundDark
             radius: Theme.radiusLarge
 
@@ -70,7 +72,7 @@ Popup {
 
                 delegate: ProfileEntryDelegate {
                     isSelected: profileList.currentIndex === index
-                    isLast: profileList.model.count - 1 === index
+                    isLast: profileList.count - 1 === index
 
                     onSelectionRequested: (index) => profileList.currentIndex = index
                     onDeleteConfirmRequested: (profileId) => root.profileManager.remove(profileId)
@@ -104,7 +106,7 @@ Popup {
             Layout.leftMargin: Theme.spacingLarge
             Layout.rightMargin: Theme.spacingLarge
 
-            height: 260
+            Layout.preferredHeight: 260
         }
 
         // -- Footer
@@ -135,7 +137,7 @@ Popup {
                 text: profileForm.isEditing ? "Save" : "Add"
                 enabled: profileForm.isValid
 
-                onClicked: profileManager.upsert(profileForm.profileId === null ? "" : profileForm.profileId, profileForm.name, profileForm.host, profileForm.token)
+                onClicked: root.profileManager.upsert(profileForm.profileId === null ? "" : profileForm.profileId, profileForm.name, profileForm.host, profileForm.token)
             }
 
             // AbstractButton {

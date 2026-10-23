@@ -21,10 +21,10 @@ Rectangle {
         // Pulsing green dot
         Rectangle {
             id: dot
-            width: 7
-            height: 7
+            Layout.preferredWidth: 7
+            Layout.preferredHeight: 7
             radius: 3.5
-            color: isActive ? Theme.colorAccentGreen : Theme.colorAccentGreenTint
+            color: root.isActive ? Theme.colorAccentGreen : Theme.colorAccentGreenTint
 
             SequentialAnimation on opacity {
                 running: root.isActive

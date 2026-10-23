@@ -9,6 +9,14 @@ Button {
     leftPadding: 10
     rightPadding: 10
 
+    // Material's Button insets the background (6px top/bottom): fill the size given by the layout
+    topInset: 0
+    bottomInset: 0
+    leftInset: 0
+    rightInset: 0
+
+    property alias textSize: buttonText.font.pixelSize
+
     contentItem: Text {
         id: buttonText
         text: root.text

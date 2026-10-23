@@ -155,6 +155,9 @@ Rectangle {
                 text: "\u270E Edit"
                 implicitHeight: 40
                 implicitWidth: 50
+                // Same visual height as the neighbouring StartStopButton (Material insets)
+                topInset: 6
+                bottomInset: 6
                 onClicked: editMenu.popup(editButton, 0, editButton.height)
 
                 Menu {

@@ -16,7 +16,7 @@ AbstractButton {
     }
 
     background: Rectangle {
-        color: parent.hovered ? Theme.colorButtonEditDown : Theme.colorButtonEdit
+        color: root.hovered ? Theme.colorButtonEditDown : Theme.colorButtonEdit
         radius: Theme.radiusSmall
     }
 }

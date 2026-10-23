@@ -82,6 +82,7 @@ Item {
 
         // Normal: trash icon
         AbstractButton {
+            id: trashButton
             visible: !root.isConfirming
             implicitWidth: 28
             implicitHeight: 28
@@ -96,7 +97,7 @@ Item {
             onClicked: root.isConfirming = true
 
             background: Rectangle {
-                color: parent.hovered ? Theme.colorBackground : "transparent"
+                color: trashButton.hovered ? Theme.colorBackground : "transparent"
                 radius: Theme.radiusLarge
             }
         }
@@ -132,7 +133,7 @@ Item {
 
     // Inter-row separator
     Rectangle {
-        visible: !isLast
+        visible: !root.isLast
         anchors.bottom: parent.bottom
         width: parent.width
         height: 1

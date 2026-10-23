@@ -59,3 +59,6 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
         PUBLIC Qt6::Network
         PRIVATE spdlog::spdlog fmt::fmt magic_enum::magic_enum qt6keychain)
+
+# Publish the core metatypes so the app's QML_FOREIGN registrations (and qmllint/qmlcachegen) see them
+qt_extract_metatypes(${PROJECT_NAME})

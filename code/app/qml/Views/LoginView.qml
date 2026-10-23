@@ -118,7 +118,7 @@ Page {
                 spacing: Theme.spacingSmall
 
                 Rectangle {
-                    height: 1
+                    Layout.preferredHeight: 1
                     Layout.fillWidth: true
                     color: Theme.colorSurface
                 }
@@ -130,7 +130,7 @@ Page {
                 }
 
                 Rectangle {
-                    height: 1
+                    Layout.preferredHeight: 1
                     Layout.fillWidth: true
                     color: Theme.colorSurface
                 }
@@ -215,6 +215,7 @@ Page {
 
         // -- Connect Button
         Button {
+            id: connectButton
             Layout.fillWidth: true
             font.pixelSize: Theme.fontSizeLarge
             font.bold: true
@@ -224,10 +225,10 @@ Page {
 
             background: Rectangle {
                 color: {
-                    if (!enabled) {
+                    if (!connectButton.enabled) {
                         Theme.colorAccentGreenDisabled
                     } else {
-                        parent.down ? Theme.colorButtonStartDown : Theme.colorButtonStart
+                        connectButton.down ? Theme.colorButtonStartDown : Theme.colorButtonStart
                     }
                 }
                 radius: Theme.radiusMedium
@@ -236,7 +237,7 @@ Page {
             contentItem: Text {
                 text: "Connect"
                 color: Theme.colorTextPrimary
-                font: parent.font
+                font: connectButton.font
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }

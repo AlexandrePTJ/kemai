@@ -29,7 +29,7 @@ namespace kemai
         Q_INVOKABLE void login(const QString &host, const QString &token, bool rememberLogin);
 
     signals:
-        void loginSucceeded(SessionContext *session);
+        void loginSucceeded(kemai::SessionContext *session);
         void loginFailed(const QString &error);
 
     private:

@@ -20,7 +20,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.10.2'
+          version: '6.11.3'
 
       - name: Install linux packages
         if: runner.os == 'Linux'
@@ -38,3 +38,16 @@ jobs:
       
       - name: Test
         run: ctest --preset release
+
+      # qmllint exits 0 on warnings and the Qt-generated target takes no extra args:
+      # fail on any "Warning:" line. QML output is platform-independent, Linux is enough.
+      - name: QML lint
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -o pipefail
+          cmake --build --preset release --target Kemai_qmllint 2>&1 | tee qmllint.log
+          if grep -q "^Warning:" qmllint.log; then
+            echo "::error::qmllint reported $(grep -c '^Warning:' qmllint.log) warning(s)"
+            exit 1
+          fi

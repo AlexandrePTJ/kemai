@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 
@@ -23,16 +25,21 @@ ComboBox {
     }
 
     delegate: ItemDelegate {
+        id: entry
+
+        required property int index
+        required property string name
+
         width: root.width
-        highlighted: root.highlightedIndex === index
+        highlighted: root.highlightedIndex === entry.index
         contentItem: Text {
-            text: model.name
+            text: entry.name
             color: Theme.colorTextPrimary
             font.pixelSize: Theme.fontSizeNormal
             verticalAlignment: Text.AlignVCenter
         }
         background: Rectangle {
-            color: highlighted ? Theme.colorBackground : "transparent"
+            color: entry.highlighted ? Theme.colorBackground : "transparent"
         }
     }
 
