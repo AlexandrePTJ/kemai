@@ -25,11 +25,11 @@ option(KEMAI_BUILD_LOCAL_DEPENDENCIES "Download and build dependencies (except Q
 # Install dependencies sources to build if required
 if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
     include(cmake/get_cpm.cmake)
-    CPMAddPackage("gh:fmtlib/fmt#12.1.0")
-    CPMAddPackage("gh:Neargye/magic_enum#v0.9.7")
-    CPMAddPackage("gh:catchorg/Catch2#v3.8.1")
+    CPMAddPackage("gh:fmtlib/fmt#12.2.0")
+    CPMAddPackage("gh:Neargye/magic_enum#v0.9.8")
+    CPMAddPackage("gh:catchorg/Catch2#v3.16.1")
     CPMAddPackage(URI "gh:gabime/spdlog#v1.17.0" OPTIONS "SPDLOG_FMT_EXTERNAL ON")
-    CPMAddPackage(URI "gh:frankosterfeld/qtkeychain#0.15.0" OPTIONS "BUILD_WITH_QT6 ON" "BUILD_SHARED_LIBS OFF" "BUILD_TRANSLATIONS OFF" "BUILD_TESTING OFF")
+    CPMAddPackage(URI "gh:frankosterfeld/qtkeychain#0.17.0" OPTIONS "BUILD_WITH_QT6 ON" "BUILD_SHARED_LIBS OFF" "BUILD_TRANSLATIONS OFF" "BUILD_TESTING OFF")
 endif (KEMAI_BUILD_LOCAL_DEPENDENCIES)
 
 # Find dependencies
@@ -40,7 +40,7 @@ find_package(Qt6 REQUIRED COMPONENTS Gui Network LinguistTools Quick)
 find_package(qtkeychain REQUIRED)
 
 # Enable Qt auto-tools globally (AUTOMOC, AUTOUIC, AUTORCC) for all subdirectories
-qt_standard_project_setup(REQUIRES 6.10)
+qt_standard_project_setup(REQUIRES 6.11)
 
 # Write version to file to ease packaging
 file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${PROJECT_VERSION})
