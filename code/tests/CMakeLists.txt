@@ -9,6 +9,7 @@ qt_add_executable(${PROJECT_NAME}
     client/tst_kimaiClient.cpp
     context/tst_profileManager.cpp
     context/tst_sessionController.cpp
+    misc/tst_formatHelpers.cpp
     misc/tst_fuzzyMatch.cpp
     storage/tst_profileStore.cpp
 )

@@ -14,24 +14,6 @@
 // Project headers
 #include <misc/formatHelpers.h>
 
-namespace
-{
-
-    QString formatTimeRange(const QDateTime &beginAt, const QDateTime &endAt)
-    {
-        const auto beginTime = beginAt.toLocalTime().toString(QStringLiteral("HH:mm"));
-
-        if (!endAt.isValid())
-        {
-            return QStringLiteral("%1 \u2013 now").arg(beginTime);
-        }
-
-        const auto endTime = endAt.toLocalTime().toString(QStringLiteral("HH:mm"));
-        return QStringLiteral("%1 \u2013 %2").arg(beginTime, endTime);
-    }
-
-} // namespace
-
 namespace kemai
 {
     TimesheetModel::TimesheetModel(QObject *parent):
@@ -106,7 +88,7 @@ namespace kemai
         }
 
         case TimesheetRole::TimeRange:
-            return formatTimeRange(ts.beginAt, ts.endAt);
+            return FormatHelpers::formatTimeRange(ts.beginAt, ts.endAt);
 
         case TimesheetRole::ActivityId:
             return ts.activity.id;
@@ -215,6 +197,12 @@ namespace kemai
         const auto newToday = FormatHelpers::formatDurationShort(todaySeconds);
         const auto newWeek  = FormatHelpers::formatDurationShort(weekSeconds);
         const auto newLabel = QLocale().toString(todayLocal, QStringLiteral("ddd, MMM d"));
+
+        // Day changed (midnight): every range's "Yesterday"/day prefix shifts, not only active rows
+        if (m_dateLabel != newLabel && !m_timeSheets.isEmpty())
+        {
+            emit dataChanged(index(0), index(static_cast<int>(m_timeSheets.size()) - 1), {magic_enum::enum_integer(TimesheetRole::TimeRange)});
+        }
 
         if (m_todayDuration != newToday || m_weekDuration != newWeek || m_dateLabel != newLabel)
         {
