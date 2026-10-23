@@ -14,7 +14,7 @@ ApplicationWindow {
     visible: true
 
     KemaiContext {
-        id: kemaiContext
+        id: appContext
         onLoginSucceeded: (session) => {
             // Central 401 handling: an expired session drops back to the login view
             session.sessionExpired.connect(() => stackView.replace(null, loginViewComponent))
@@ -29,7 +29,7 @@ ApplicationWindow {
 
     Component {
         id: loginViewComponent
-        Views.LoginView { kemaiContext: kemaiContext }
+        Views.LoginView { kemaiContext: appContext }
     }
 
     StackView {
@@ -39,5 +39,5 @@ ApplicationWindow {
         initialItem: loginViewComponent
     }
 
-    Component.onCompleted: kemaiContext.initialize()
+    Component.onCompleted: appContext.initialize()
 }
