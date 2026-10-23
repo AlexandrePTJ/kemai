@@ -17,10 +17,10 @@ Screens follow design.md decision 9: functional brief → Claude Design (Alexand
 
 ## 3. REST client: factored replies, delete, tags
 
-- [ ] 3.1 Factor `processApiNetworkReplySingleObject`/`Array` in `kimaiClient_p.h` around one helper taking a parser; verify the build passes and all existing tests (unit + `KimaiClient` integration with `KEMAI_TEST_HOST`/`KEMAI_TEST_TOKEN` set) still pass
-- [ ] 3.2 Add a body-less `QFuture<void>` reply variant, `sendDeleteRequest`, and `deleteTimeSheet(int id)` to `IKimaiClient`/`KimaiClient`/`FakeKimaiClient`; verify with a new integration test that creates then deletes a timesheet on the test instance
-- [ ] 3.3 Add `requestTags(const QString &name)` (`GET /api/tags/find`, tolerant to name-list and object-list responses) to the interface, client and fake; verify with an integration test returning at least one known tag of the test instance
-- [ ] 3.4 Update CLAUDE.md (client layout, reply-processing helper) and commit (e.g. "Add timesheet delete and tag search to client"); verify CLAUDE.md mentions both methods
+- [x] 3.1 Factor `processApiNetworkReplySingleObject`/`Array` in `kimaiClient_p.h` around one helper taking a parser; verify the build passes and all existing tests (unit + `KimaiClient` integration with `KEMAI_TEST_HOST`/`KEMAI_TEST_TOKEN` set) still pass
+- [x] 3.2 Add a body-less `QFuture<void>` reply variant, `sendDeleteRequest`, and `deleteTimeSheet(int id)` to `IKimaiClient`/`KimaiClient`/`FakeKimaiClient`; verify with a new integration test that creates then deletes a timesheet on the test instance
+- [x] 3.3 Add `requestTags(const QString &name)` (`GET /api/tags/find`, tolerant to name-list and object-list responses) to the interface, client and fake; verify with an integration test returning at least one known tag of the test instance
+- [x] 3.4 Update CLAUDE.md (client layout, reply-processing helper) and commit (e.g. "Add timesheet delete and tag search to client"); verify CLAUDE.md mentions both methods
 
 ## 4. Session logic for editing and deleting
 

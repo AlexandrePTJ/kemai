@@ -56,6 +56,9 @@ QString kemai::apiMethodToString(ApiMethod method)
     case ApiMethod::Tags:
         return "tags";
 
+    case ApiMethod::TagsFind:
+        return "tags/find";
+
     case ApiMethod::Tasks:
     case ApiMethod::TaskLog:
     case ApiMethod::TaskStart:
@@ -143,6 +146,12 @@ QNetworkReply *KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkR
 {
     spdlog::debug("[PATCH] {}", networkRequest.url().toString());
     return m_networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);
+}
+
+QNetworkReply *KimaiClient::KimaiClientPrivate::sendDeleteRequest(const QNetworkRequest &networkRequest) const
+{
+    spdlog::debug("[DELETE] {}", networkRequest.url().toString());
+    return m_networkAccessManager->deleteResource(networkRequest);
 }
 
 KimaiApiError KimaiClient::KimaiClientPrivate::makeReplyError(ApiMethod method, QNetworkReply *networkReply)
@@ -240,6 +249,33 @@ QFuture<KimaiTimeSheetConfig> KimaiClient::requestTimeSheetConfig()
     auto request = m_d->prepareRequest(ApiMethod::TimeSheetConfig);
     auto reply   = m_d->sendGetRequest(request);
     return m_d->processApiNetworkReplySingleObject<KimaiTimeSheetConfig>(ApiMethod::TimeSheetConfig, reply);
+}
+
+QFuture<QStringList> KimaiClient::requestTags(const QString &name)
+{
+    auto request = m_d->prepareRequest(ApiMethod::TagsFind, {{"name", name}});
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReply<QStringList>(ApiMethod::TagsFind, reply, &KimaiClient::tagNamesFromJson);
+}
+
+QStringList KimaiClient::tagNamesFromJson(const QJsonDocument &doc)
+{
+    if (!doc.isArray())
+    {
+        throw std::runtime_error("JSON response is not an array");
+    }
+
+    // tags/find returns tag objects; older endpoints return plain names
+    QStringList names;
+    for (const auto &value : doc.array())
+    {
+        const auto name = value.isObject() ? value.toObject().value("name").toString() : value.toString();
+        if (!name.isEmpty())
+        {
+            names.append(name);
+        }
+    }
+    return names;
 }
 
 QFuture<KimaiPlugins> KimaiClient::requestPlugins()
@@ -347,6 +383,13 @@ QFuture<KimaiTimeSheet> KimaiClient::updateTimeSheet(const KimaiTimeSheet &timeS
     auto request = m_d->prepareRequest(ApiMethod::TimeSheets, {}, data, QString::number(timeSheet.id));
     auto reply   = m_d->sendPatchRequest(request, data);
     return m_d->processApiNetworkReplySingleObject<KimaiTimeSheet>(ApiMethod::TimeSheets, reply);
+}
+
+QFuture<void> KimaiClient::deleteTimeSheet(int timeSheetId)
+{
+    auto request = m_d->prepareRequest(ApiMethod::TimeSheets, {}, {}, QString::number(timeSheetId));
+    auto reply   = m_d->sendDeleteRequest(request);
+    return m_d->processApiNetworkReplyNoContent(ApiMethod::TimeSheets, reply);
 }
 
 QFuture<KimaiTasks> KimaiClient::requestTasks()

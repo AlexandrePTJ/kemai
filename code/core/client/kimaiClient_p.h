@@ -5,6 +5,9 @@
 // 3rd party headers
 #include <spdlog/spdlog.h>
 
+// STL headers
+#include <type_traits>
+
 // Qt headers
 #include <QFuture>
 #include <QJsonArray>
@@ -37,6 +40,7 @@ namespace kemai
         Users,
         MeUsers,
         Tags,
+        TagsFind,
         Plugins,
         Tasks,
         TaskLog,
@@ -59,12 +63,50 @@ namespace kemai
         QNetworkReply *sendGetRequest(const QNetworkRequest &networkRequest) const;
         QNetworkReply *sendPostRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const;
         QNetworkReply *sendPatchRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const;
+        QNetworkReply *sendDeleteRequest(const QNetworkRequest &networkRequest) const;
 
         static KimaiApiError makeReplyError(ApiMethod method, QNetworkReply *networkReply);
         static KimaiApiError makeParseError(ApiMethod method, const QString &reason);
 
         template<class ResultType>
         QFuture<ResultType> processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply *networkReply)
+        {
+            return processApiNetworkReply<ResultType>(method, networkReply, [](const QJsonDocument &doc) { return ResultType::fromJson(doc.object()); });
+        }
+
+        template<class ResultType>
+        QFuture<QList<ResultType>> processApiNetworkReplyArray(ApiMethod method, QNetworkReply *networkReply)
+        {
+            return processApiNetworkReply<QList<ResultType>>(method, networkReply,
+                                                             [](const QJsonDocument &doc)
+                                                             {
+                                                                 if (!doc.isArray())
+                                                                 {
+                                                                     throw std::runtime_error("JSON response is not an array");
+                                                                 }
+
+                                                                 QList<ResultType> items;
+                                                                 for (const auto &val : doc.array())
+                                                                 {
+                                                                     items.push_back(ResultType::fromJson(val));
+                                                                 }
+                                                                 return items;
+                                                             });
+        }
+
+        // For replies without body (e.g. DELETE answering 204 No Content)
+        QFuture<void> processApiNetworkReplyNoContent(ApiMethod method, QNetworkReply *networkReply)
+        {
+            return processApiNetworkReply<void>(method, networkReply, [](const QJsonDocument &) {});
+        }
+
+        /*!
+         * Resolves a future from a network reply: `parse` turns the JSON body into the result
+         * (unused when ResultType is void). Transport/HTTP errors and parse exceptions are set
+         * on the future as a KimaiApiError.
+         */
+        template<class ResultType, class Parser>
+        QFuture<ResultType> processApiNetworkReply(ApiMethod method, QNetworkReply *networkReply, Parser parse)
         {
             QPromise<ResultType> promise;
             promise.start();
@@ -75,7 +117,7 @@ namespace kemai
                 networkReply,
                 &QNetworkReply::finished,
                 this,
-                [networkReply, promise = std::move(promise), method]() mutable
+                [networkReply, promise = std::move(promise), method, parse = std::move(parse)]() mutable
                 {
                     if (networkReply->error() == QNetworkReply::NoError)
                     {
@@ -83,70 +125,17 @@ namespace kemai
                         {
                             spdlog::debug("[RECV] {}", apiMethodToString(method));
 
-                            QJsonParseError parseError;
-                            auto            doc = QJsonDocument::fromJson(networkReply->readAll(), &parseError);
-                            if (parseError.error != QJsonParseError::NoError)
+                            if constexpr (!std::is_void_v<ResultType>)
                             {
-                                throw std::runtime_error(parseError.errorString().toStdString());
+                                QJsonParseError parseError;
+                                auto            doc = QJsonDocument::fromJson(networkReply->readAll(), &parseError);
+                                if (parseError.error != QJsonParseError::NoError)
+                                {
+                                    throw std::runtime_error(parseError.errorString().toStdString());
+                                }
+
+                                promise.addResult(parse(doc));
                             }
-
-                            promise.addResult(ResultType::fromJson(doc.object()));
-                        }
-                        catch (const std::exception &e)
-                        {
-                            promise.setException(std::make_exception_ptr(makeParseError(method, QString::fromUtf8(e.what()))));
-                        }
-                    }
-                    else
-                    {
-                        promise.setException(std::make_exception_ptr(makeReplyError(method, networkReply)));
-                    }
-                    promise.finish();
-                    networkReply->deleteLater();
-                }
-            );
-            // clang-format on
-
-            return future;
-        }
-
-        template<class ResultType>
-        QFuture<QList<ResultType>> processApiNetworkReplyArray(ApiMethod method, QNetworkReply *networkReply)
-        {
-            QPromise<QList<ResultType>> promise;
-            promise.start();
-            auto future = promise.future();
-
-            // clang-format off
-            connect(
-                networkReply,
-                &QNetworkReply::finished,
-                this,
-                [networkReply, promise = std::move(promise), method]() mutable
-                {
-                    if (networkReply->error() == QNetworkReply::NoError)
-                    {
-                        try
-                        {
-                            spdlog::debug("[RECV] {}", apiMethodToString(method));
-
-                            QJsonParseError parseError;
-                            auto doc = QJsonDocument::fromJson(networkReply->readAll(), &parseError);
-                            if (parseError.error != QJsonParseError::NoError)
-                            {
-                                throw std::runtime_error(parseError.errorString().toStdString());
-                            }
-                            if (!doc.isArray())
-                            {
-                                throw std::runtime_error("JSON response is not an array");
-                            }
-
-                            QList<ResultType> items;
-                            for (const auto &val : doc.array())
-                            {
-                                items.push_back(ResultType::fromJson(val));
-                            }
-                            promise.addResult(std::move(items));
                         }
                         catch (const std::exception &e)
                         {

@@ -40,6 +40,7 @@ namespace kemai
         KimaiTimeSheets      activeTimeSheets;
         KimaiTasks           tasks;
         KimaiTimeSheet       timeSheetResult;
+        QStringList          tags;
         KimaiTask            taskResult;
 
         // Method name -> error to fail with
@@ -63,6 +64,11 @@ namespace kemai
         QFuture<KimaiTimeSheets>      requestRecentTimeSheets() override { return result("requestRecentTimeSheets", timeSheets); }
         QFuture<KimaiProjects>        requestProjects(std::optional<int> = std::nullopt) override { return result("requestProjects", projects); }
         QFuture<KimaiActivities>      requestActivities(std::optional<int> = std::nullopt) override { return result("requestActivities", activities); }
+        QFuture<QStringList>          requestTags(const QString &name) override
+        {
+            lastTagsQuery = name;
+            return result("requestTags", tags);
+        }
 
         QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer) override { return result("addCustomer", customer); }
         QFuture<KimaiProject>  addProject(const KimaiProject &project) override { return result("addProject", project); }
@@ -74,14 +80,49 @@ namespace kemai
             lastUpdatedTimeSheet = timeSheet;
             return result("updateTimeSheet", timeSheetResult);
         }
+        QFuture<void> deleteTimeSheet(int timeSheetId) override
+        {
+            lastDeletedTimeSheetId = timeSheetId;
+            return result("deleteTimeSheet");
+        }
 
         QFuture<KimaiTasks> requestTasks() override { return result("requestTasks", tasks); }
         QFuture<KimaiTask>  startTask(int) override { return result("startTask", taskResult); }
         QFuture<KimaiTask>  closeTask(int) override { return result("closeTask", taskResult); }
 
         KimaiTimeSheet lastUpdatedTimeSheet;
+        int            lastDeletedTimeSheetId = 0;
+        QString        lastTagsQuery;
 
     private:
+        // Body-less variant (e.g. DELETE): resolves or fails like result()
+        QFuture<void> result(const char *method)
+        {
+            const auto key = QString::fromLatin1(method);
+            calls.append(key);
+
+            std::optional<KimaiApiError> error;
+            if (const auto it = errors.constFind(key); it != errors.constEnd())
+            {
+                error = it.value();
+            }
+
+            auto promise = std::make_shared<QPromise<void>>();
+            promise->start();
+
+            QTimer::singleShot(0, QCoreApplication::instance(),
+                               [promise, error]()
+                               {
+                                   if (error)
+                                   {
+                                       promise->setException(std::make_exception_ptr(*error));
+                                   }
+                                   promise->finish();
+                               });
+
+            return promise->future();
+        }
+
         // Resolves through the event loop (like the real network client) so that
         // continuations never run synchronously inside the caller.
         template<typename T>
