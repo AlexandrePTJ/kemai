@@ -36,8 +36,12 @@ jobs:
       - name: Build
         run: cmake --build --preset release
       
+      # Kimai integration tests run only when both secrets are set; empty values make them skip
       - name: Test
-        run: ctest --preset release
+        env:
+          KEMAI_TEST_HOST: ${{ secrets.KEMAI_TEST_HOST }}
+          KEMAI_TEST_TOKEN: ${{ secrets.KEMAI_TEST_TOKEN }}
+        run: ctest --preset release --output-on-failure
 
       # qmllint exits 0 on warnings and the Qt-generated target takes no extra args:
       # fail on any "Warning:" line. QML output is platform-independent, Linux is enough.

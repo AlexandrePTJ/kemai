@@ -32,13 +32,13 @@ Screens follow design.md decision 9: functional brief → Claude Design (Alexand
 
 ## 5. Logout without UI
 
-- [x] 5.1 Add `KemaiContext::logout(session)` clearing auto-login and deleting the session; make the `sessionExpired` path in `Main.qml` delete the dropped session too; verify with logs that the session is destroyed on expiry and when `logout` is called from a QML harness
+- [x] 5.1 Add `KemaiContext::logout()` clearing auto-login, and release the session (`closeSession`) once its view is gone, on logout and on `sessionExpired`; verify with logs that the session is destroyed on expiry and when `logout` is called from a QML harness
 - [x] 5.2 Update CLAUDE.md (login flow, logout) and commit (e.g. "Add logout to app context"); verify the build passes
 
 ## 6. CI integration tests
 
-- [ ] 6.1 Pass `KEMAI_TEST_HOST`/`KEMAI_TEST_TOKEN` secrets to the CI test step; verify the workflow YAML parses and, locally, that the tests skip with empty variables
-- [ ] 6.2 Update CLAUDE.md ("CI (future)" becomes current) and commit (e.g. "Run integration tests in CI when secrets are set")
+- [x] 6.1 Pass `KEMAI_TEST_HOST`/`KEMAI_TEST_TOKEN` secrets to the CI test step; verify the workflow YAML parses and, locally, that the tests skip with empty variables
+- [x] 6.2 Update CLAUDE.md ("CI (future)" becomes current) and commit (e.g. "Run integration tests in CI when secrets are set")
 
 ## 7. Edit Time Entry dialog (from handoff)
 
