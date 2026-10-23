@@ -9,7 +9,7 @@
 #include <spdlog/spdlog.h>
 
 // Project headers
-#include "kimaiClient.h"
+#include "iKimaiClient.h"
 
 namespace kemai
 {
@@ -18,9 +18,10 @@ namespace kemai
     {
     }
 
-    void KimaiCache::load(KimaiClient *client)
+    void KimaiCache::load(IKimaiClient *client)
     {
         m_pendingResources = {Resource::Customers, Resource::Projects, Resource::Activities, Resource::TimesheetConfig};
+        m_lastError.reset();
 
         client->requestCustomers()
             .then(this,
@@ -29,12 +30,8 @@ namespace kemai
                       m_customers = customers;
                       onResourceLoaded(Resource::Customers);
                   })
-            .onFailed(this,
-                      [this](const std::exception &e)
-                      {
-                          spdlog::error("KimaiCache: failed to fetch customers: {}", e.what());
-                          onResourceLoaded(Resource::Customers);
-                      });
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { onResourceFailed(Resource::Customers, e); });
 
         client->requestProjects()
             .then(this,
@@ -43,12 +40,8 @@ namespace kemai
                       m_projects = projects;
                       onResourceLoaded(Resource::Projects);
                   })
-            .onFailed(this,
-                      [this](const std::exception &e)
-                      {
-                          spdlog::error("KimaiCache: failed to fetch projects: {}", e.what());
-                          onResourceLoaded(Resource::Projects);
-                      });
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { onResourceFailed(Resource::Projects, e); });
 
         client->requestActivities()
             .then(this,
@@ -57,12 +50,8 @@ namespace kemai
                       m_activities = activities;
                       onResourceLoaded(Resource::Activities);
                   })
-            .onFailed(this,
-                      [this](const std::exception &e)
-                      {
-                          spdlog::error("KimaiCache: failed to fetch activities: {}", e.what());
-                          onResourceLoaded(Resource::Activities);
-                      });
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { onResourceFailed(Resource::Activities, e); });
 
         client->requestTimeSheetConfig()
             .then(this,
@@ -71,23 +60,37 @@ namespace kemai
                       m_timesheetConfig = config;
                       onResourceLoaded(Resource::TimesheetConfig);
                   })
-            .onFailed(this,
-                      [this](const std::exception &e)
-                      {
-                          spdlog::error("KimaiCache: failed to fetch timesheet config: {}", e.what());
-                          onResourceLoaded(Resource::TimesheetConfig);
-                      });
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { onResourceFailed(Resource::TimesheetConfig, e); });
     }
 
     void KimaiCache::onResourceLoaded(Resource resource)
     {
         m_pendingResources.remove(resource);
-        if (m_pendingResources.isEmpty())
+        if (!m_pendingResources.isEmpty())
         {
-            consolidateProjects();
-            consolidateActivities();
-            emit loaded();
+            return;
         }
+
+        if (m_lastError)
+        {
+            emit loadFailed();
+            return;
+        }
+
+        consolidateProjects();
+        consolidateActivities();
+        emit loaded();
+    }
+
+    void KimaiCache::onResourceFailed(Resource resource, const KimaiApiError &error)
+    {
+        spdlog::error("KimaiCache: resource load failed: {}", error.what());
+        if (!m_lastError)
+        {
+            m_lastError = error;
+        }
+        onResourceLoaded(resource);
     }
 
     void KimaiCache::consolidateProjects()
@@ -162,5 +165,10 @@ namespace kemai
     const KimaiTimeSheetConfig &KimaiCache::timesheetConfig() const
     {
         return m_timesheetConfig;
+    }
+
+    const std::optional<KimaiApiError> &KimaiCache::lastError() const
+    {
+        return m_lastError;
     }
 } // namespace kemai

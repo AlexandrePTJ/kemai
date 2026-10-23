@@ -145,8 +145,52 @@ QNetworkReply *KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkR
     return m_networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);
 }
 
+KimaiApiError KimaiClient::KimaiClientPrivate::makeReplyError(ApiMethod method, QNetworkReply *networkReply)
+{
+    const auto httpStatus = networkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+    auto kind = ApiErrorKind::Unknown;
+    switch (httpStatus)
+    {
+    case 0: // no HTTP exchange happened: offline, timeout, DNS, connection refused...
+        kind = ApiErrorKind::NoNetwork;
+        break;
+    case 401:
+        kind = ApiErrorKind::AuthFailed;
+        break;
+    case 403:
+        kind = ApiErrorKind::Forbidden;
+        break;
+    case 404:
+        kind = ApiErrorKind::NotFound;
+        break;
+    default:
+        kind = httpStatus >= 500 ? ApiErrorKind::ServerError : ApiErrorKind::Unknown;
+        break;
+    }
+
+    // Kimai returns errors as {"message": "..."}
+    auto serverMessage = networkReply->errorString();
+    if (const auto doc = QJsonDocument::fromJson(networkReply->readAll()); doc.isObject() && doc.object().contains("message"))
+    {
+        serverMessage = doc.object().value("message").toString();
+    }
+
+    return {kind, httpStatus, apiMethodToString(method), serverMessage};
+}
+
+KimaiApiError KimaiClient::KimaiClientPrivate::makeParseError(ApiMethod method, const QString &reason)
+{
+    return {ApiErrorKind::InvalidResponse, 0, apiMethodToString(method), reason};
+}
+
 void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply * /*reply*/, const QList<QSslError> &errors)
 {
+    if (errors.isEmpty())
+    {
+        return;
+    }
+
     for (const auto &error : errors)
     {
         spdlog::error("SSL Error: {}", error.errorString());

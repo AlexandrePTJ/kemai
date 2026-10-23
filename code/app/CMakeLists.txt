@@ -6,6 +6,7 @@ set(KEMAI_QML_FILES
         qml/Components/CalendarView.qml
         qml/Components/EntriesHeader.qml
         qml/Components/KemaiTextField.qml
+        qml/Components/NotificationBanner.qml
         qml/Components/PrimaryEditButton.qml
         qml/Components/PrimaryRedButton.qml
         qml/Components/ProfileComboBox.qml
@@ -34,8 +35,6 @@ set(KEMAI_QML_SOURCES
         context/profileManager.h
         helpers/qmlFormatHelpers.cpp
         helpers/qmlFormatHelpers.h
-        model/activityListModel.cpp
-        model/activityListModel.h
         model/activityFilterProxyModel.cpp
         model/activityFilterProxyModel.h
 )

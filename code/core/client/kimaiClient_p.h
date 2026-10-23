@@ -16,6 +16,7 @@
 #include <misc/customFmt.h>
 
 // Local headers
+#include "kimaiApiError.h"
 #include "kimaiClient.h"
 
 namespace kemai
@@ -59,6 +60,9 @@ namespace kemai
         QNetworkReply *sendPostRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const;
         QNetworkReply *sendPatchRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const;
 
+        static KimaiApiError makeReplyError(ApiMethod method, QNetworkReply *networkReply);
+        static KimaiApiError makeParseError(ApiMethod method, const QString &reason);
+
         template<class ResultType>
         QFuture<ResultType> processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply *networkReply)
         {
@@ -88,15 +92,14 @@ namespace kemai
 
                             promise.addResult(ResultType::fromJson(doc.object()));
                         }
-                        catch (...)
+                        catch (const std::exception &e)
                         {
-                            promise.setException(std::current_exception());
+                            promise.setException(std::make_exception_ptr(makeParseError(method, QString::fromUtf8(e.what()))));
                         }
                     }
                     else
                     {
-                        auto error = tr("Error on request [%1]: %2\n%3").arg(apiMethodToString(method), networkReply->errorString(), networkReply->readAll());
-                        promise.setException(std::make_exception_ptr(std::runtime_error(error.toStdString())));
+                        promise.setException(std::make_exception_ptr(makeReplyError(method, networkReply)));
                     }
                     promise.finish();
                     networkReply->deleteLater();
@@ -145,15 +148,14 @@ namespace kemai
                             }
                             promise.addResult(std::move(items));
                         }
-                        catch (...)
+                        catch (const std::exception &e)
                         {
-                            promise.setException(std::current_exception());
+                            promise.setException(std::make_exception_ptr(makeParseError(method, QString::fromUtf8(e.what()))));
                         }
                     }
                     else
                     {
-                        auto error = tr("Error on request [%1]: %2\n%3").arg(apiMethodToString(method), networkReply->errorString(), networkReply->readAll());
-                        promise.setException(std::make_exception_ptr(std::runtime_error(error.toStdString())));
+                        promise.setException(std::make_exception_ptr(makeReplyError(method, networkReply)));
                     }
                     promise.finish();
                     networkReply->deleteLater();

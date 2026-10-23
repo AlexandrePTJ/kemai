@@ -10,7 +10,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 // Project headers
-#include "activityListModel.h"
+#include <model/activityListModel.h>
 #include <misc/fuzzyMatch.h>
 
 namespace kemai

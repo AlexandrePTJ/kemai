@@ -15,7 +15,11 @@ ApplicationWindow {
 
     KemaiContext {
         id: kemaiContext
-        onLoginSucceeded: (session) => stackView.replace(null, mainViewComponent, { sessionContext: session })
+        onLoginSucceeded: (session) => {
+            // Central 401 handling: an expired session drops back to the login view
+            session.sessionExpired.connect(() => stackView.replace(null, loginViewComponent))
+            stackView.replace(null, mainViewComponent, { sessionContext: session })
+        }
     }
 
     Component {
@@ -23,11 +27,16 @@ ApplicationWindow {
         Views.MainView {}
     }
 
+    Component {
+        id: loginViewComponent
+        Views.LoginView { kemaiContext: kemaiContext }
+    }
+
     StackView {
         id: stackView
         anchors.fill: parent
 
-        initialItem: Views.LoginView { kemaiContext: kemaiContext }
+        initialItem: loginViewComponent
     }
 
     Component.onCompleted: kemaiContext.initialize()

@@ -13,9 +13,21 @@ Page {
         color: Theme.colorBackground
     }
 
+    Connections {
+        target: root.sessionContext
+        function onNotificationRequested(level, kind, detail) {
+            notificationBanner.show(level, kind, detail)
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
+
+        NotificationBanner {
+            id: notificationBanner
+            Layout.fillWidth: true
+        }
 
         TimerBar {
             Layout.fillWidth: true

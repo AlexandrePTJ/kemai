@@ -5,6 +5,11 @@ add_library(${PROJECT_NAME} STATIC)
 set(KEMAI_LIB_SOURCES
         context/profileController.h
         context/profileController.cpp
+        context/sessionController.h
+        context/sessionController.cpp
+        client/iKimaiClient.h
+        client/kimaiApiError.h
+        client/kimaiApiError.cpp
         client/kimaiSystem.h
         client/kimaiSystem.cpp
         client/kimaiResources.h
@@ -28,6 +33,8 @@ set(KEMAI_LIB_SOURCES
         misc/jsonHelpers.cpp
         misc/pathHelpers.h
         misc/pathHelpers.cpp
+        model/activityListModel.cpp
+        model/activityListModel.h
         model/profile.cpp
         model/profile.h
         model/timesheetModel.cpp

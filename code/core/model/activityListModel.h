@@ -4,7 +4,6 @@
 
 // Qt headers
 #include <QAbstractListModel>
-#include <QtQmlIntegration/qqmlintegration.h>
 
 // Project headers
 #include <client/kimaiResources.h>
@@ -14,8 +13,6 @@ namespace kemai
     class ActivityListModel : public QAbstractListModel
     {
         Q_OBJECT
-        QML_ELEMENT
-        QML_UNCREATABLE("ActivityListModel is created by the application")
 
     public:
         enum class Role

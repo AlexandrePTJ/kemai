@@ -2,68 +2,46 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
-// STL headers
-#include <memory>
-#include <optional>
-
 // Qt headers
-#include <QObject>
-#include <QTimer>
 #include <QtQmlIntegration/qqmlintegration.h>
 
 // Project headers
-#include <activityListModel.h>
-#include <client/kimaiCache.h>
-#include <client/kimaiClient.h>
-#include <client/kimaiSystem.h>
-#include <client/kimaiTimesheets.h>
-#include <model/timesheetModel.h>
+#include <context/sessionController.h>
 
 namespace kemai
 {
-    class SessionContext : public QObject
+    class SessionContext : public SessionController
     {
         Q_OBJECT
         QML_ELEMENT
         QML_UNCREATABLE("SessionContext is created by the application")
 
-        Q_PROPERTY(QString username READ username CONSTANT)
-        Q_PROPERTY(kemai::TimesheetModel *recentTimeSheets READ recentTimeSheets CONSTANT)
-        Q_PROPERTY(bool hasActiveTimesheet READ hasActiveTimesheet NOTIFY activeTimesheetChanged)
-        Q_PROPERTY(QString activeTimesheetLabel READ activeTimesheetLabel NOTIFY activeTimesheetChanged)
-        Q_PROPERTY(QString activeTimesheetDuration READ activeTimesheetDuration NOTIFY activeTimesheetChanged)
-        Q_PROPERTY(kemai::ActivityListModel *activityModel READ activityModel CONSTANT)
-
     public:
-        explicit SessionContext(std::shared_ptr<KimaiClient> client, const KimaiUser &user, QObject *parent = nullptr);
-        ~SessionContext() override;
+        using SessionController::SessionController;
+    };
 
-        QString            username() const;
-        TimesheetModel    *recentTimeSheets() const;
-        bool               hasActiveTimesheet() const;
-        QString            activeTimesheetLabel() const;
-        QString            activeTimesheetDuration() const;
-        ActivityListModel *activityModel() const;
+    // QML registrations for core types used as QML property types
+    struct SessionControllerForeign
+    {
+        Q_GADGET
+        QML_FOREIGN(SessionController)
+        QML_NAMED_ELEMENT(SessionController)
+        QML_UNCREATABLE("SessionController is exposed through SessionContext")
+    };
 
-        Q_INVOKABLE void startTimeSheet(int activityId, int projectId);
-        Q_INVOKABLE void stopActiveTimeSheet();
-        Q_INVOKABLE void updateTimeSheetTimes(int timesheetId, const QDateTime &beginAt, const QDateTime &endAt);
+    struct ActivityListModelForeign
+    {
+        Q_GADGET
+        QML_FOREIGN(ActivityListModel)
+        QML_NAMED_ELEMENT(ActivityListModel)
+        QML_UNCREATABLE("ActivityListModel is created by the application")
+    };
 
-    signals:
-        void activeTimesheetChanged();
-
-    private:
-        void refreshRecentTimeSheets();
-        void refreshActiveTimeSheets();
-        void onCacheLoaded();
-
-        std::shared_ptr<KimaiClient>       m_client;
-        KimaiUser                          m_user;
-        std::unique_ptr<TimesheetModel>    m_recentTimeSheets;
-        std::unique_ptr<ActivityListModel> m_activityModel;
-        std::unique_ptr<KimaiCache>        m_cache;
-        std::optional<KimaiTimeSheet>      m_activeTimeSheet;
-        QTimer                             m_recentRefreshTimer;
-        QTimer                             m_activeDurationTimer;
+    struct TimesheetModelForeign
+    {
+        Q_GADGET
+        QML_FOREIGN(TimesheetModel)
+        QML_NAMED_ELEMENT(TimesheetModel)
+        QML_UNCREATABLE("TimesheetModel is created by the application")
     };
 } // namespace kemai
