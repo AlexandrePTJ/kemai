@@ -4,6 +4,7 @@
 
 // STL headers
 #include <algorithm>
+#include <utility>
 
 // spdlog headers
 #include <spdlog/spdlog.h>
@@ -20,89 +21,124 @@ namespace kemai
 
     void KimaiCache::load(IKimaiClient *client)
     {
+        // A new generation supersedes any load in flight: its responses are dropped.
+        const int generation = ++m_generation;
+
+        m_staging          = {};
+        m_stagingError.reset();
         m_pendingResources = {Resource::Customers, Resource::Projects, Resource::Activities, Resource::TimesheetConfig};
-        m_lastError.reset();
 
         client->requestCustomers()
             .then(this,
-                  [this](const KimaiCustomers &customers)
+                  [this, generation](const KimaiCustomers &customers)
                   {
-                      m_customers = customers;
-                      onResourceLoaded(Resource::Customers);
+                      if (generation == m_generation)
+                      {
+                          m_staging.customers = customers;
+                      }
+                      onResourceLoaded(generation, Resource::Customers);
                   })
-            .onFailed(this, [this](const KimaiApiError &e)
-                      { onResourceFailed(Resource::Customers, e); });
+            .onFailed(this, [this, generation](const KimaiApiError &e)
+                      { onResourceFailed(generation, Resource::Customers, e); });
 
         client->requestProjects()
             .then(this,
-                  [this](const KimaiProjects &projects)
+                  [this, generation](const KimaiProjects &projects)
                   {
-                      m_projects = projects;
-                      onResourceLoaded(Resource::Projects);
+                      if (generation == m_generation)
+                      {
+                          m_staging.projects = projects;
+                      }
+                      onResourceLoaded(generation, Resource::Projects);
                   })
-            .onFailed(this, [this](const KimaiApiError &e)
-                      { onResourceFailed(Resource::Projects, e); });
+            .onFailed(this, [this, generation](const KimaiApiError &e)
+                      { onResourceFailed(generation, Resource::Projects, e); });
 
         client->requestActivities()
             .then(this,
-                  [this](const KimaiActivities &activities)
+                  [this, generation](const KimaiActivities &activities)
                   {
-                      m_activities = activities;
-                      onResourceLoaded(Resource::Activities);
+                      if (generation == m_generation)
+                      {
+                          m_staging.activities = activities;
+                      }
+                      onResourceLoaded(generation, Resource::Activities);
                   })
-            .onFailed(this, [this](const KimaiApiError &e)
-                      { onResourceFailed(Resource::Activities, e); });
+            .onFailed(this, [this, generation](const KimaiApiError &e)
+                      { onResourceFailed(generation, Resource::Activities, e); });
 
         client->requestTimeSheetConfig()
             .then(this,
-                  [this](const KimaiTimeSheetConfig &config)
+                  [this, generation](const KimaiTimeSheetConfig &config)
                   {
-                      m_timesheetConfig = config;
-                      onResourceLoaded(Resource::TimesheetConfig);
+                      if (generation == m_generation)
+                      {
+                          m_staging.timesheetConfig = config;
+                      }
+                      onResourceLoaded(generation, Resource::TimesheetConfig);
                   })
-            .onFailed(this, [this](const KimaiApiError &e)
-                      { onResourceFailed(Resource::TimesheetConfig, e); });
+            .onFailed(this, [this, generation](const KimaiApiError &e)
+                      { onResourceFailed(generation, Resource::TimesheetConfig, e); });
     }
 
-    void KimaiCache::onResourceLoaded(Resource resource)
+    void KimaiCache::onResourceLoaded(int generation, Resource resource)
     {
+        if (generation != m_generation)
+        {
+            return;
+        }
+
         m_pendingResources.remove(resource);
         if (!m_pendingResources.isEmpty())
         {
             return;
         }
 
-        if (m_lastError)
+        if (m_stagingError)
         {
+            // Keep the previous complete snapshot (if any): never publish partial data.
+            m_lastError = std::exchange(m_stagingError, std::nullopt);
+            m_staging   = {};
             emit loadFailed();
             return;
         }
 
-        consolidateProjects();
-        consolidateActivities();
+        consolidateProjects(m_staging);
+        consolidateActivities(m_staging);
+
+        m_current      = std::exchange(m_staging, {});
+        m_lastLoadedAt = QDateTime::currentDateTimeUtc();
+        m_lastError.reset();
         emit loaded();
     }
 
-    void KimaiCache::onResourceFailed(Resource resource, const KimaiApiError &error)
+    void KimaiCache::onResourceFailed(int generation, Resource resource, const KimaiApiError &error)
     {
-        spdlog::error("KimaiCache: resource load failed: {}", error.what());
-        if (!m_lastError)
+        if (generation != m_generation)
         {
-            m_lastError = error;
+            // Superseded load: its outcome no longer matters.
+            spdlog::debug("KimaiCache: ignoring failure of superseded load: {}", error.what());
+            return;
         }
-        onResourceLoaded(resource);
+
+        spdlog::error("KimaiCache: resource load failed: {}", error.what());
+        if (!m_stagingError)
+        {
+            m_stagingError = error;
+        }
+        onResourceLoaded(generation, resource);
     }
 
-    void KimaiCache::consolidateProjects()
+    void KimaiCache::consolidateProjects(Snapshot &snapshot)
     {
-        for (auto &project : m_projects)
+        for (auto &project : snapshot.projects)
         {
             if (project.customer.id != 0)
             {
                 const int  cid = project.customer.id;
-                const auto it  = std::ranges::find_if(m_customers, [cid](const KimaiCustomer &c)
+                const auto it  = std::ranges::find_if(snapshot.customers, [cid](const KimaiCustomer &c)
                                                       { return c.id == cid; });
-                if (it != m_customers.cend())
+                if (it != snapshot.customers.cend())
                 {
                     project.customer = *it;
                 }
@@ -110,21 +146,21 @@ namespace kemai
         }
     }
 
-    void KimaiCache::consolidateActivities()
+    void KimaiCache::consolidateActivities(Snapshot &snapshot)
     {
         KimaiActivities consolidated;
-        consolidated.reserve(m_activities.size());
+        consolidated.reserve(snapshot.activities.size());
 
-        for (const auto &activity : m_activities)
+        for (const auto &activity : snapshot.activities)
         {
             if (activity.project.has_value())
             {
                 const int  pid = activity.project->id;
-                const auto it  = std::ranges::find_if(m_projects, [pid](const KimaiProject &p)
+                const auto it  = std::ranges::find_if(snapshot.projects, [pid](const KimaiProject &p)
                                                       { return p.id == pid; });
 
                 KimaiActivity resolved = activity;
-                if (it != m_projects.cend())
+                if (it != snapshot.projects.cend())
                 {
                     resolved.project = *it;
                 }
@@ -135,7 +171,7 @@ namespace kemai
                 // Global activity (no project in the API payload): available for all
                 // projects. Fan it out so each project gets its own "Project - Activity"
                 // entry in the cache.
-                for (const auto &project : m_projects)
+                for (const auto &project : snapshot.projects)
                 {
                     KimaiActivity fanned = activity;
                     fanned.project       = project;
@@ -144,27 +180,42 @@ namespace kemai
             }
         }
 
-        m_activities = std::move(consolidated);
+        snapshot.activities = std::move(consolidated);
+    }
+
+    bool KimaiCache::isLoading() const
+    {
+        return !m_pendingResources.isEmpty();
+    }
+
+    bool KimaiCache::hasData() const
+    {
+        return m_lastLoadedAt.isValid();
+    }
+
+    QDateTime KimaiCache::lastLoadedAt() const
+    {
+        return m_lastLoadedAt;
     }
 
     const KimaiCustomers &KimaiCache::customers() const
     {
-        return m_customers;
+        return m_current.customers;
     }
 
     const KimaiProjects &KimaiCache::projects() const
     {
-        return m_projects;
+        return m_current.projects;
     }
 
     const KimaiActivities &KimaiCache::activities() const
     {
-        return m_activities;
+        return m_current.activities;
     }
 
     const KimaiTimeSheetConfig &KimaiCache::timesheetConfig() const
     {
-        return m_timesheetConfig;
+        return m_current.timesheetConfig;
     }
 
     const std::optional<KimaiApiError> &KimaiCache::lastError() const

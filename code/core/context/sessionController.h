@@ -3,6 +3,7 @@
 #pragma once
 
 // STL headers
+#include <chrono>
 #include <memory>
 #include <optional>
 
@@ -36,6 +37,7 @@ namespace kemai
         Q_PROPERTY(QString activeTimesheetLabel READ activeTimesheetLabel NOTIFY activeTimesheetChanged)
         Q_PROPERTY(QString activeTimesheetDuration READ activeTimesheetDuration NOTIFY activeTimesheetChanged)
         Q_PROPERTY(kemai::ActivityListModel *activityModel READ activityModel CONSTANT)
+        Q_PROPERTY(bool refreshing READ isRefreshing NOTIFY refreshingChanged)
 
     public:
         enum class NotificationLevel
@@ -54,7 +56,8 @@ namespace kemai
             ServerError,
             InvalidResponse,
             UnknownError,
-            CacheLoadFailed
+            CacheLoadFailed,   // initial load: no usable cache
+            CacheRefreshFailed // refresh: previous cache kept
         };
         Q_ENUM(NotificationKind)
 
@@ -67,13 +70,23 @@ namespace kemai
         QString            activeTimesheetLabel() const;
         QString            activeTimesheetDuration() const;
         ActivityListModel *activityModel() const;
+        bool               isRefreshing() const;
+
+        // Cache age beyond which refreshIfStale() reloads it.
+        void setStaleAfter(std::chrono::seconds staleAfter);
 
         Q_INVOKABLE void startTimeSheet(int activityId, int projectId);
         Q_INVOKABLE void stopActiveTimeSheet();
         Q_INVOKABLE void updateTimeSheetTimes(int timesheetId, const QDateTime &beginAt, const QDateTime &endAt);
 
+        // Reloads the cache (unless a load is in flight) and the timesheets.
+        Q_INVOKABLE void refresh();
+        // refresh() only when the cache is missing or older than the stale threshold.
+        Q_INVOKABLE void refreshIfStale();
+
     signals:
         void activeTimesheetChanged();
+        void refreshingChanged();
         // Auth is no longer valid (401): the UI must drop the session and return to login.
         void sessionExpired();
         // Single UI notification channel; the QML banner composes the human message from kind.
@@ -96,5 +109,6 @@ namespace kemai
         std::optional<KimaiTimeSheet>      m_activeTimeSheet;
         QTimer                             m_recentRefreshTimer;
         QTimer                             m_activeDurationTimer;
+        std::chrono::seconds               m_staleAfter = std::chrono::minutes(10);
     };
 } // namespace kemai

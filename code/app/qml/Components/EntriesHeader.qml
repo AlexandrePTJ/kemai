@@ -9,6 +9,9 @@ Item {
     property string todayDuration: "0h 00m"
     property string weekDuration: "0h 00m"
     property string dateLabel: ""
+    property bool refreshing: false
+
+    signal refreshClicked()
 
     implicitHeight: 38
 
@@ -87,6 +90,32 @@ Item {
                 color: Theme.colorTextSecondary
                 font.pixelSize: Theme.fontSizeSmall
                 visible: root.dateLabel.length > 0
+            }
+        }
+
+        // Refresh (projects/activities cache + timesheets)
+        Text {
+            id: refreshIcon
+            text: "\u21BB"
+            color: root.refreshing ? Theme.colorTextSecondary : Theme.colorTextPrimary
+            font.pixelSize: Theme.fontSizeMedium
+            Layout.leftMargin: 8
+
+            RotationAnimator on rotation {
+                running: root.refreshing
+                from: 0
+                to: 360
+                duration: 1000
+                loops: Animation.Infinite
+                onStopped: refreshIcon.rotation = 0
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                anchors.margins: -6
+                enabled: !root.refreshing
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.refreshClicked()
             }
         }
     }

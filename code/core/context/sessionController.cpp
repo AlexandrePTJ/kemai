@@ -53,9 +53,7 @@ namespace kemai
         connect(m_cache.get(), &KimaiCache::loaded, this, &SessionController::onCacheLoaded);
         connect(m_cache.get(), &KimaiCache::loadFailed, this, &SessionController::onCacheLoadFailed);
 
-        refreshRecentTimeSheets();
-        refreshActiveTimeSheets();
-        m_cache->load(m_client.get());
+        refresh();
     }
 
     SessionController::~SessionController() = default;
@@ -96,6 +94,44 @@ namespace kemai
     ActivityListModel *SessionController::activityModel() const
     {
         return m_activityModel.get();
+    }
+
+    bool SessionController::isRefreshing() const
+    {
+        return m_cache->isLoading();
+    }
+
+    void SessionController::setStaleAfter(std::chrono::seconds staleAfter)
+    {
+        m_staleAfter = staleAfter;
+    }
+
+    void SessionController::refresh()
+    {
+        refreshRecentTimeSheets();
+        refreshActiveTimeSheets();
+
+        // Coalesce: a load in flight already brings fresh data.
+        if (!m_cache->isLoading())
+        {
+            m_cache->load(m_client.get());
+            emit refreshingChanged();
+        }
+    }
+
+    void SessionController::refreshIfStale()
+    {
+        if (m_cache->isLoading())
+        {
+            return;
+        }
+
+        // No cache yet means the initial load failed: retrying is the point.
+        const auto lastLoadedAt = m_cache->lastLoadedAt();
+        if (!lastLoadedAt.isValid() || lastLoadedAt.secsTo(QDateTime::currentDateTimeUtc()) >= m_staleAfter.count())
+        {
+            refresh();
+        }
     }
 
     void SessionController::refreshRecentTimeSheets()
@@ -229,17 +265,29 @@ namespace kemai
     void SessionController::onCacheLoaded()
     {
         m_activityModel->setActivities(m_cache->activities());
+        emit refreshingChanged();
     }
 
     void SessionController::onCacheLoadFailed()
     {
+        emit refreshingChanged();
+
         // An incomplete cache is useless: surface the failure as a whole.
         if (m_cache->lastError() && m_cache->lastError()->kind() == ApiErrorKind::AuthFailed)
         {
             emit sessionExpired();
             return;
         }
-        emit notificationRequested(NotificationLevel::Error, NotificationKind::CacheLoadFailed, m_cache->lastError() ? m_cache->lastError()->endpoint() : QString{});
+
+        const auto detail = m_cache->lastError() ? m_cache->lastError()->endpoint() : QString{};
+
+        // A failed refresh keeps the previous complete cache: a warning is enough.
+        if (m_cache->hasData())
+        {
+            emit notificationRequested(NotificationLevel::Warning, NotificationKind::CacheRefreshFailed, detail);
+            return;
+        }
+        emit notificationRequested(NotificationLevel::Error, NotificationKind::CacheLoadFailed, detail);
     }
 
     void SessionController::handleApiError(const KimaiApiError &error, const char *context)

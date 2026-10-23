@@ -36,6 +36,8 @@ Rectangle {
             return qsTr("Unexpected response from the server.")
         case SessionController.CacheLoadFailed:
             return qsTr("Failed to load projects and activities.")
+        case SessionController.CacheRefreshFailed:
+            return qsTr("Could not refresh projects and activities — showing the previous list.")
         default:
             return qsTr("An unexpected error occurred.")
         }

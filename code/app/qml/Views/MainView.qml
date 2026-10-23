@@ -9,6 +9,10 @@ Page {
 
     required property SessionContext sessionContext
 
+    // Back to the foreground: reload what may have changed on the server meanwhile
+    readonly property bool windowActive: Window.active
+    onWindowActiveChanged: if (windowActive) sessionContext.refreshIfStale()
+
     background: Rectangle {
         color: Theme.colorBackground
     }

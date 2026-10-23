@@ -186,3 +186,104 @@ TEST_CASE("SessionController::updateTimeSheetTimes - invalid datetime leaves fie
     REQUIRE(fake->lastUpdatedTimeSheet.beginAt == begin);
     REQUIRE(fake->lastUpdatedTimeSheet.endAt == newEnd.toUTC());
 }
+
+TEST_CASE("SessionController - failed refresh warns and keeps the activities", "[session][error][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    KimaiProject project;
+    project.id   = 7;
+    project.name = "Rocket";
+    fake->projects.append(project);
+
+    KimaiActivity activity;
+    activity.id   = 11;
+    activity.name = "Meeting"; // global: fanned out to "Rocket"
+    fake->activities.append(activity);
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    REQUIRE(controller.activityModel()->rowCount() == 1);
+
+    SignalProbe probe;
+    probe.attach(controller);
+
+    fake->failWith("requestActivities", ApiErrorKind::NoNetwork);
+    controller.refresh();
+    REQUIRE(controller.isRefreshing());
+    processEvents();
+
+    REQUIRE_FALSE(controller.isRefreshing());
+    REQUIRE(probe.notificationCount == 1);
+    REQUIRE(probe.lastLevel == SessionController::NotificationLevel::Warning);
+    REQUIRE(probe.lastKind == SessionController::NotificationKind::CacheRefreshFailed);
+    REQUIRE(controller.activityModel()->rowCount() == 1);
+}
+
+TEST_CASE("SessionController - 401 during refresh expires the session", "[session][error][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+
+    fake->failWith("requestProjects", ApiErrorKind::AuthFailed, 401);
+    controller.refresh();
+    processEvents();
+
+    REQUIRE(probe.sessionExpiredCount >= 1);
+}
+
+TEST_CASE("SessionController::refreshIfStale - only reloads a stale or missing cache", "[session][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    // Fresh cache: nothing to do
+    fake->calls.clear();
+    controller.refreshIfStale();
+    processEvents();
+    REQUIRE_FALSE(fake->calls.contains("requestActivities"));
+
+    // Stale cache: reload cache and timesheets
+    controller.setStaleAfter(std::chrono::seconds(0));
+    controller.refreshIfStale();
+    processEvents();
+    REQUIRE(fake->calls.contains("requestActivities"));
+    REQUIRE(fake->calls.contains("requestTimeSheets"));
+}
+
+TEST_CASE("SessionController::refreshIfStale - retries after a failed initial load", "[session][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->failWith("requestCustomers", ApiErrorKind::NoNetwork);
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    fake->errors.clear();
+    fake->calls.clear();
+    controller.refreshIfStale();
+    processEvents();
+
+    REQUIRE(fake->calls.contains("requestCustomers"));
+}
+
+TEST_CASE("SessionController::refresh - coalesces with a cache load in flight", "[session][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    // Initial load still in flight
+    fake->calls.clear();
+    controller.refresh();
+    processEvents();
+
+    REQUIRE_FALSE(fake->calls.contains("requestActivities"));
+    REQUIRE(fake->calls.contains("requestTimeSheets"));
+}

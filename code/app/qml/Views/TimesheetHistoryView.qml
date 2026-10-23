@@ -21,6 +21,8 @@ Item {
             todayDuration: root.sessionContext.recentTimeSheets.todayDuration
             weekDuration: root.sessionContext.recentTimeSheets.weekDuration
             dateLabel: root.sessionContext.recentTimeSheets.dateLabel
+            refreshing: root.sessionContext.refreshing
+            onRefreshClicked: root.sessionContext.refresh()
         }
 
         ListView {
