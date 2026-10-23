@@ -10,6 +10,7 @@ qt_add_executable(${PROJECT_NAME}
     context/tst_profileManager.cpp
     context/tst_sessionController.cpp
     misc/tst_fuzzyMatch.cpp
+    storage/tst_profileStore.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

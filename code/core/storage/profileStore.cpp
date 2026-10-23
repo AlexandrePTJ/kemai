@@ -6,6 +6,7 @@
 #include <spdlog/spdlog.h>
 
 // Qt headers
+#include <QFileInfo>
 #include <QVersionNumber>
 
 // Project helpers
@@ -18,28 +19,17 @@ namespace
     /* Changelog
      * =========
      * 2026-02-27    1.0    Initial version
+     *
+     * Versioning policy
+     * - minor bump: additive change only; an older Kemai reads the file and ignores unknown fields.
+     * - major bump: breaking change; add a migration from the previous major in profilesFromJson().
+     *   An older Kemai refuses to read or overwrite a file with a newer major.
      */
-    const auto gProfilesVersion_1_0    = QString("1.0");
-    const auto gProfilesCurrentVersion = gProfilesVersion_1_0;
+    const auto gProfilesCurrentVersion = QVersionNumber(1, 0);
 
     std::vector<kemai::Profile> loadProfilesFromJson(const QString &storePath)
     {
-        std::vector<kemai::Profile> profiles;
-
-        auto json = kemai::JsonHelpers::loadJsonObjectFromFile(storePath);
-
-        // TODO: Handle profiles list version
-        // auto currentVersion = QVersionNumber::fromString(gProfilesCurrentVersion);
-        // auto version        = QVersionNumber::fromString(json.value("version").toString(gProfilesCurrentVersion));
-
-        auto profileArray = json.value("profiles").toArray();
-
-        for (const auto &profileValue : profileArray)
-        {
-            profiles.emplace_back(kemai::Profile::fromJson(profileValue.toObject()));
-        }
-
-        return profiles;
+        return kemai::ProfileStore::profilesFromJson(kemai::JsonHelpers::loadJsonObjectFromFile(storePath));
     }
 
     void saveProfilesToJson(const QString &storePath, const std::vector<kemai::Profile> &profiles)
@@ -49,7 +39,7 @@ namespace
                                { return profile.toJson(); });
 
         QJsonObject json;
-        json.insert("version", gProfilesCurrentVersion);
+        json.insert("version", gProfilesCurrentVersion.toString());
         json.insert("profiles", profileArray);
 
         kemai::JsonHelpers::saveJsonToFile(json, storePath);
@@ -85,6 +75,31 @@ namespace kemai
 
     ProfileStore::~ProfileStore() = default;
 
+    std::vector<Profile> ProfileStore::profilesFromJson(const QJsonObject &json)
+    {
+        const auto versionString = json.value("version").toString();
+        const auto version       = QVersionNumber::fromString(versionString);
+        if (version.isNull())
+        {
+            throw std::runtime_error(fmt::format("Missing or invalid profiles version '{}'", versionString));
+        }
+
+        if (version.majorVersion() > gProfilesCurrentVersion.majorVersion())
+        {
+            throw std::runtime_error(fmt::format("Profiles version {} was written by a newer Kemai (supports up to {}.x)", versionString,
+                                                 gProfilesCurrentVersion.majorVersion()));
+        }
+
+        // Migrations from older majors go here, oldest first (none yet: 1.0 is the first format).
+
+        std::vector<Profile> profiles;
+        for (const auto &profileValue : json.value("profiles").toArray())
+        {
+            profiles.emplace_back(Profile::fromJson(profileValue.toObject()));
+        }
+        return profiles;
+    }
+
     void ProfileStore::setStorePath(const QString &storePath)
     {
         m_storePath = storePath;
@@ -118,14 +133,22 @@ namespace kemai
         if (profile.isValid())
         {
             std::vector<Profile> profiles;
-            try
+            if (QFileInfo::exists(m_storePath))
             {
-                profiles = loadProfilesFromJson(m_storePath);
+                try
+                {
+                    profiles = loadProfilesFromJson(m_storePath);
+                }
+                catch (const std::runtime_error &e)
+                {
+                    // Unreadable, corrupt or newer-format file: overwriting it would lose every
+                    // other profile. No UI channel for profile errors yet: log and keep the file.
+                    spdlog::error("Profile not saved, {} left untouched: {}", m_storePath, e.what());
+                    return;
+                }
             }
-            catch (const std::runtime_error &)
+            else
             {
-                // File doesn't exist yet — start with an empty list and ensure
-                // the parent directory exists before writing
                 PathHelpers::ensureDirectoryExists(m_storePath);
             }
 
@@ -153,9 +176,10 @@ namespace kemai
         {
             profiles = loadProfilesFromJson(m_storePath);
         }
-        catch (const std::runtime_error &)
+        catch (const std::runtime_error &e)
         {
-            // File doesn't exist — nothing to remove
+            // Missing file: nothing to remove. Unreadable or newer-format file: keep it as is.
+            spdlog::debug("Profile not removed from {}: {}", m_storePath, e.what());
             return;
         }
 

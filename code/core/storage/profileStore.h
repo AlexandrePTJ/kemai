@@ -3,6 +3,7 @@
 #pragma once
 
 // Qt headers
+#include <QJsonObject>
 #include <QObject>
 
 // Project headers
@@ -18,6 +19,10 @@ namespace kemai
     public:
         explicit ProfileStore(QObject *parent = nullptr);
         ~ProfileStore() override;
+
+        // Parses a profiles file content; throws std::runtime_error on a missing/invalid
+        // version or a version from a newer major (see the versioning policy in the .cpp).
+        static std::vector<Profile> profilesFromJson(const QJsonObject &json);
 
         void setStorePath(const QString &storePath);
 
