@@ -4,6 +4,7 @@
 
 #include <QEventLoop>
 #include <QFutureWatcher>
+#include <QTcpServer>
 #include <QTimer>
 
 #include "client/kimaiApiError.h"
@@ -80,6 +81,29 @@ TEST_CASE("KimaiClient - bad token returns error", "[client][integration]")
     client.setToken("invalid-token");
 
     REQUIRE_THROWS(waitForFuture(client.requestMeUserInfo()));
+}
+
+TEST_CASE("KimaiClient - silent server times out as NoNetwork", "[client][unit]")
+{
+    // Accepts connections and never answers, like a connection whose network went away
+    QTcpServer server;
+    REQUIRE(server.listen(QHostAddress::LocalHost));
+
+    KimaiClient client;
+    client.setHost(QString("http://127.0.0.1:%1").arg(server.serverPort()));
+    client.setToken("token");
+    client.setTransferTimeout(std::chrono::milliseconds(300));
+
+    auto kind = ApiErrorKind::Unknown;
+    try
+    {
+        waitForFuture(client.requestKimaiVersion(), 5000);
+    }
+    catch (const KimaiApiError &e)
+    {
+        kind = e.kind();
+    }
+    REQUIRE(kind == ApiErrorKind::NoNetwork);
 }
 
 TEST_CASE("KimaiClient - deleteTimeSheet removes a created timesheet", "[client][integration]")

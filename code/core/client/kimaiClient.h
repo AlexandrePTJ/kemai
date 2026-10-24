@@ -3,6 +3,7 @@
 #pragma once
 
 // STL headers
+#include <chrono>
 #include <optional>
 
 // Qt headers
@@ -25,6 +26,10 @@ namespace kemai
 
         void setHost(const QString &host);
         void setToken(const QString &token);
+
+        // A request that transfers nothing for this long fails as NoNetwork: a dead connection never errors on its own
+        static constexpr std::chrono::milliseconds DefaultTransferTimeout{15000};
+        void setTransferTimeout(std::chrono::milliseconds timeout);
 
         QFuture<KimaiVersion>         requestKimaiVersion() override;
         QFuture<KimaiUser>            requestMeUserInfo() override;

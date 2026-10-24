@@ -84,6 +84,7 @@ KimaiClient::KimaiClientPrivate::KimaiClientPrivate(KimaiClient *c):
 m_networkAccessManager(std::make_unique<QNetworkAccessManager>()),
 m_q(c)
 {
+    m_networkAccessManager->setTransferTimeout(KimaiClient::DefaultTransferTimeout);
     connect(m_networkAccessManager.get(), &QNetworkAccessManager::sslErrors, this, &KimaiClientPrivate::onNamSslErrors);
 }
 
@@ -223,6 +224,11 @@ KimaiClient::~KimaiClient() = default;
 void KimaiClient::setHost(const QString &host)
 {
     m_d->m_host = host;
+}
+
+void KimaiClient::setTransferTimeout(std::chrono::milliseconds timeout)
+{
+    m_d->m_networkAccessManager->setTransferTimeout(timeout);
 }
 
 void KimaiClient::setToken(const QString &token)
