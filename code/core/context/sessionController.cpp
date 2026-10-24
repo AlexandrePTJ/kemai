@@ -29,6 +29,8 @@ namespace
             return Kind::ServerError;
         case ApiErrorKind::InvalidResponse:
             return Kind::InvalidResponse;
+        case ApiErrorKind::InvalidValue:
+            return Kind::InvalidValue;
         default:
             return Kind::UnknownError;
         }

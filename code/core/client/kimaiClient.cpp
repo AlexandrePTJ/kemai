@@ -174,19 +174,32 @@ KimaiApiError KimaiClient::KimaiClientPrivate::makeReplyError(ApiMethod method, 
     case 404:
         kind = ApiErrorKind::NotFound;
         break;
+    case 400:
+        kind = ApiErrorKind::InvalidValue;
+        break;
     default:
         kind = httpStatus >= 500 ? ApiErrorKind::ServerError : ApiErrorKind::Unknown;
         break;
     }
 
-    // Kimai returns errors as {"message": "..."}
-    auto serverMessage = networkReply->errorString();
-    if (const auto doc = QJsonDocument::fromJson(networkReply->readAll()); doc.isObject() && doc.object().contains("message"))
+    // Kimai returns errors as {"message": "..."}; validation errors (400) add the field messages
+    auto       serverMessage = networkReply->errorString();
+    QString    field;
+    const auto doc = QJsonDocument::fromJson(networkReply->readAll());
+    if (doc.isObject() && doc.object().contains("message"))
     {
         serverMessage = doc.object().value("message").toString();
     }
+    if (kind == ApiErrorKind::InvalidValue)
+    {
+        if (const auto [errorField, message] = validationErrorFromJson(doc); !message.isEmpty())
+        {
+            field         = errorField;
+            serverMessage = message;
+        }
+    }
 
-    return {kind, httpStatus, apiMethodToString(method), serverMessage};
+    return {kind, httpStatus, apiMethodToString(method), serverMessage, field};
 }
 
 KimaiApiError KimaiClient::KimaiClientPrivate::makeParseError(ApiMethod method, const QString &reason)
@@ -262,6 +275,28 @@ QFuture<QStringList> KimaiClient::requestTags(const QString &name)
     auto request = m_d->prepareRequest(ApiMethod::TagsFind, {{"name", name}});
     auto reply   = m_d->sendGetRequest(request);
     return m_d->processApiNetworkReply<QStringList>(ApiMethod::TagsFind, reply, &KimaiClient::tagNamesFromJson);
+}
+
+std::pair<QString, QString> KimaiClient::validationErrorFromJson(const QJsonDocument &doc)
+{
+    const auto errors = doc.object().value("errors").toObject();
+
+    const auto children = errors.value("children").toObject();
+    for (auto it = children.begin(); it != children.end(); ++it)
+    {
+        const auto messages = it.value().toObject().value("errors").toArray();
+        if (!messages.isEmpty())
+        {
+            return {it.key(), messages.first().toString()};
+        }
+    }
+
+    // Form-level error, e.g. "This form should not contain extra fields."
+    if (const auto messages = errors.value("errors").toArray(); !messages.isEmpty())
+    {
+        return {QString(), messages.first().toString()};
+    }
+    return {};
 }
 
 QStringList KimaiClient::tagNamesFromJson(const QJsonDocument &doc)

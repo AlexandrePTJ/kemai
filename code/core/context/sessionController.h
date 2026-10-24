@@ -62,6 +62,7 @@ namespace kemai
             NotFound,
             ServerError,
             InvalidResponse,
+            InvalidValue,       // detail: Kimai's message
             UnknownError,
             CacheLoadFailed,   // initial load: no usable cache
             CacheRefreshFailed, // refresh: previous cache kept

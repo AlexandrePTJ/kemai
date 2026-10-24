@@ -6,6 +6,8 @@
 #include <QFutureWatcher>
 #include <QCoreApplication>
 #include <QElapsedTimer>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
@@ -294,6 +296,87 @@ TEST_CASE("KimaiClient - a running timesheet stops at a given end or now", "[cli
     REQUIRE(stopped.endAt.isValid());
     REQUIRE(std::abs(stopped.endAt.secsTo(QDateTime::currentDateTimeUtc())) <= 120);
     REQUIRE_NOTHROW(waitForFuture(client.deleteTimeSheet(running2.id)));
+}
+
+TEST_CASE("KimaiClient::validationErrorFromJson - field and form errors", "[client][unit]")
+{
+    const auto fieldError = QJsonDocument::fromJson(
+        R"({"code":400,"message":"Validation Failed","errors":{"children":{"name":{},"country":{"errors":["Please select a valid country."]}}}})");
+    REQUIRE(KimaiClient::validationErrorFromJson(fieldError) == std::pair<QString, QString>{"country", "Please select a valid country."});
+
+    const auto formError = QJsonDocument::fromJson(
+        R"({"code":400,"message":"Validation Failed","errors":{"errors":["This form should not contain extra fields."],"children":{"name":{}}}})");
+    REQUIRE(KimaiClient::validationErrorFromJson(formError) == std::pair<QString, QString>{"", "This form should not contain extra fields."});
+
+    REQUIRE(KimaiClient::validationErrorFromJson(QJsonDocument::fromJson(R"({"message":"Not found"})")).second.isEmpty());
+}
+
+TEST_CASE("KimaiClient - creates a customer, project and activity", "[client][integration]")
+{
+    if (host.isEmpty() || token.isEmpty())
+    {
+        SKIP("Set KEMAI_TEST_HOST and KEMAI_TEST_TOKEN to run integration tests");
+    }
+
+    KimaiClient client;
+    client.setHost(host);
+    client.setToken(token);
+
+    // The client has no delete for these: cleanup goes straight to the API, newest first
+    QNetworkAccessManager network;
+    const auto            remove = [&](const QString &path)
+    {
+        QNetworkRequest request(QUrl(host + "/api/" + path));
+        request.setRawHeader("Authorization", QString("Bearer %1").arg(token).toLatin1());
+        auto      *reply = network.deleteResource(request);
+        QEventLoop loop;
+        QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+        loop.exec();
+        reply->deleteLater();
+    };
+
+    KimaiCustomer customer;
+    customer.name        = QStringLiteral("kemai integration test customer");
+    customer.countryKey  = "FR";
+    customer.currencyKey = "EUR";
+    customer.timezone    = "Europe/Paris";
+    const auto createdCustomer = waitForFuture(client.addCustomer(customer));
+    REQUIRE(createdCustomer.id > 0);
+    REQUIRE(createdCustomer.name == customer.name);
+
+    KimaiProject project;
+    project.name        = QStringLiteral("kemai integration test project");
+    project.customer.id = createdCustomer.id;
+    const auto createdProject = waitForFuture(client.addProject(project));
+    REQUIRE(createdProject.id > 0);
+
+    KimaiActivity activity;
+    activity.name    = QStringLiteral("kemai integration test activity");
+    activity.project = createdProject;
+    const auto createdActivity = waitForFuture(client.addActivity(activity));
+    REQUIRE(createdActivity.id > 0);
+    REQUIRE(createdActivity.project.has_value());
+    REQUIRE(createdActivity.project->id == createdProject.id);
+
+    // An invalid value comes back with Kimai's field message
+    auto invalid       = customer;
+    invalid.countryKey = "XX";
+    try
+    {
+        const auto unexpected = waitForFuture(client.addCustomer(invalid));
+        remove(QString("customers/%1").arg(unexpected.id));
+        FAIL("An invalid country should be refused");
+    }
+    catch (const KimaiApiError &e)
+    {
+        REQUIRE(e.kind() == ApiErrorKind::InvalidValue);
+        REQUIRE(e.field() == "country");
+        REQUIRE_FALSE(e.serverMessage().isEmpty());
+    }
+
+    remove(QString("activities/%1").arg(createdActivity.id));
+    remove(QString("projects/%1").arg(createdProject.id));
+    remove(QString("customers/%1").arg(createdCustomer.id));
 }
 
 TEST_CASE("KimaiClient::tagNamesFromJson - accepts tag objects and plain names", "[client][unit]")

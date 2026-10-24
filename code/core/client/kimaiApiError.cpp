@@ -10,11 +10,12 @@
 
 namespace kemai
 {
-    KimaiApiError::KimaiApiError(ApiErrorKind kind, int httpStatus, QString endpoint, QString serverMessage):
+    KimaiApiError::KimaiApiError(ApiErrorKind kind, int httpStatus, QString endpoint, QString serverMessage, QString field):
     m_kind(kind),
     m_httpStatus(httpStatus),
     m_endpoint(std::move(endpoint)),
-    m_serverMessage(std::move(serverMessage))
+    m_serverMessage(std::move(serverMessage)),
+    m_field(std::move(field))
     {
         m_what = fmt::format("[{}] http={} endpoint={} message={}", magic_enum::enum_name(m_kind), m_httpStatus, m_endpoint.toStdString(), m_serverMessage.toStdString());
     }
@@ -37,6 +38,11 @@ namespace kemai
     const QString &KimaiApiError::serverMessage() const noexcept
     {
         return m_serverMessage;
+    }
+
+    const QString &KimaiApiError::field() const noexcept
+    {
+        return m_field;
     }
 
     const char *KimaiApiError::what() const noexcept

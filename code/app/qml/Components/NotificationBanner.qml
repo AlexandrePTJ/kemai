@@ -34,6 +34,8 @@ Rectangle {
             return qsTr("The Kimai server returned an error.")
         case SessionController.InvalidResponse:
             return qsTr("Unexpected response from the server.")
+        case SessionController.InvalidValue:
+            return detail !== "" ? qsTr("Kimai refused a value: %1").arg(detail) : qsTr("Kimai refused a value.")
         case SessionController.CacheLoadFailed:
             return qsTr("Failed to load projects and activities.")
         case SessionController.CacheRefreshFailed:

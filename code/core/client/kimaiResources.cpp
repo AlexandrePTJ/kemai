@@ -57,29 +57,18 @@ namespace kemai
 
     QJsonObject KimaiCustomer::toJson() const
     {
-        QJsonObject jo;
-
-        if (id > 0)
+        // Kimai rejects unknown fields ("extra fields") and validates every one sent: only what creation needs
+        QJsonObject jo{
+            {"name",     name       },
+            {"country",  countryKey },
+            {"currency", currencyKey},
+            {"timezone", timezone   },
+            {"visible",  visible    }
+        };
+        if (!comment.isEmpty())
         {
-            jo["id"] = id;
+            jo["comment"] = comment;
         }
-
-        jo["name"]       = name;
-        jo["number"]     = number;
-        jo["comment"]    = comment;
-        jo["company"]    = company;
-        jo["address"]    = address;
-        jo["country"]    = countryKey;
-        jo["currency"]   = currencyKey;
-        jo["phone"]      = phone;
-        jo["fax"]        = fax;
-        jo["mobile"]     = mobile;
-        jo["email"]      = email;
-        jo["homepage"]   = homepage;
-        jo["timezone"]   = timezone;
-        jo["budget"]     = budget;
-        jo["timeBudget"] = timeBudget;
-        jo["visible"]    = visible;
         return jo;
     }
 
@@ -120,24 +109,15 @@ namespace kemai
 
     QJsonObject KimaiProject::toJson() const
     {
-        QJsonObject jo;
-
-        if (id > 0)
+        QJsonObject jo{
+            {"name",     name       },
+            {"customer", customer.id},
+            {"visible",  visible    }
+        };
+        if (!comment.isEmpty())
         {
-            jo["id"] = id;
+            jo["comment"] = comment;
         }
-
-        jo["name"]        = name;
-        jo["visible"]     = visible;
-        jo["comment"]     = comment;
-        jo["orderNumber"] = orderNumber;
-        jo["orderDate"]   = orderDate;
-        jo["start"]       = start;
-        jo["end"]         = end;
-        jo["color"]       = color;
-        jo["customer"]    = customer.id;
-        jo["budget"]      = budget;
-        jo["timeBudget"]  = timeBudget;
         return jo;
     }
 
@@ -174,17 +154,19 @@ namespace kemai
 
     QJsonObject KimaiActivity::toJson() const
     {
-        QJsonObject jo;
-
-        jo["name"]    = name;
-        jo["visible"] = visible;
-        jo["comment"] = comment;
+        QJsonObject jo{
+            {"name",    name   },
+            {"visible", visible}
+        };
+        // No project: a global activity
         if (project)
         {
             jo["project"] = project->id;
         }
-        jo["budget"]     = budget;
-        jo["timeBudget"] = timeBudget;
+        if (!comment.isEmpty())
+        {
+            jo["comment"] = comment;
+        }
         return jo;
     }
 
