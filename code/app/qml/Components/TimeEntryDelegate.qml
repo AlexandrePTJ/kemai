@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 
 import Kemai
@@ -27,7 +26,7 @@ Rectangle {
     property bool isRunning: status === "active"
 
     signal startRequested(int activityId, int projectId)
-    signal editRequested(int timesheetId, bool editEnd, date beginAt, date endAt)
+    signal editRequested()
 
     width: ListView.view ? ListView.view.width : 0
     implicitHeight: mainLayout.implicitHeight + 22
@@ -151,56 +150,14 @@ Rectangle {
             Layout.minimumWidth: 120
 
             // Edit button (always visible)
-             SecondaryButton {
-                id: editButton
+            SecondaryButton {
                 text: "\u270E Edit"
                 implicitHeight: 40
                 implicitWidth: 50
                 // Same visual height as the neighbouring StartStopButton (Material insets)
                 topInset: 6
                 bottomInset: 6
-                onClicked: editMenu.popup(editButton, 0, editButton.height)
-
-                Menu {
-                    id: editMenu
-
-                    background: Rectangle {
-                        implicitWidth: 150
-                        color: Theme.colorSurfaceDark
-                        border.color: Theme.colorBorder
-                        border.width: 1
-                        radius: Theme.radiusSmall
-                    }
-
-                    delegate: MenuItem {
-                        id: menuItem
-                        implicitHeight: 32
-
-                        contentItem: Text {
-                            text: menuItem.text
-                            color: menuItem.enabled ? Theme.colorTextPrimary : Theme.colorTextSecondary
-                            font.pixelSize: Theme.fontSizeSmall
-                            verticalAlignment: Text.AlignVCenter
-                            leftPadding: 4
-                        }
-
-                        background: Rectangle {
-                            color: menuItem.highlighted ? Theme.colorSurface : "transparent"
-                            radius: Theme.radiusSmall
-                        }
-                    }
-
-                    Action {
-                        text: "Edit start time"
-                        onTriggered: root.editRequested(root.timesheetId, false, root.beginAt, root.endAt)
-                    }
-
-                    Action {
-                        text: "Edit end time"
-                        enabled: !root.isRunning
-                        onTriggered: root.editRequested(root.timesheetId, true, root.beginAt, root.endAt)
-                    }
-                }
+                onClicked: root.editRequested()
             }
 
             // Play button (non-running entries only)

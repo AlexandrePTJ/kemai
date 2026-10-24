@@ -19,6 +19,8 @@ QtObject {
     readonly property color colorTextDarkPrimary:   "#0d1a09"
     readonly property color colorTextSecondary:     "#9E9E9E"
     readonly property color colorTextTertiary:      "#BCBCBC"
+    readonly property color colorTextDim:           "#6b6a82"
+    readonly property color colorTextLabel:         "#9d9bb3"
 
     // -- Accent
     readonly property color colorAccentGreen:         "#4CAF50"
@@ -27,6 +29,14 @@ QtObject {
     readonly property color colorAccentGreenDisabled: "#255627"
     readonly property color colorBorder:              "#3d3b4d"
     readonly property color colorBorderHighlight:     "#5a5c70"
+    readonly property color colorDivider:             Qt.rgba(1, 1, 1, 0.06)
+    readonly property color colorBorderSubtle:        Qt.rgba(1, 1, 1, 0.08)
+    // Translucent accents (focus rings, chips, error boxes)
+    readonly property color colorAccentGreenSoft:     Qt.rgba(0.298, 0.686, 0.314, 0.18)
+    readonly property color colorAccentGreenDim:      Qt.rgba(0.298, 0.686, 0.314, 0.55)
+    readonly property color colorAccentRedSoft:       Qt.rgba(0.898, 0.224, 0.208, 0.12)
+    readonly property color colorAccentRedLine:       Qt.rgba(0.898, 0.224, 0.208, 0.5)
+    readonly property color colorBackdrop:            Qt.rgba(0.047, 0.047, 0.078, 0.62)
 
     readonly property color colorAccentRed:         "#E53935"
     readonly property color colorAccentRedTint:     "#66751919"
@@ -54,11 +64,14 @@ QtObject {
     readonly property int fontSizeTimer:   28
 
     readonly property string fontFamilyMono: "monospace"
+    // Times and durations in the UI font: tabular figures keep digits aligned (font.features)
+    readonly property var fontFeaturesTabular: ({ "tnum": 1 })
 
     // -- Spacing & Radius
     readonly property int radiusSmall: 4
     readonly property int radiusMedium: 6
     readonly property int radiusLarge: 8
+    readonly property int radiusDialog: 10
     readonly property int marginsMain: 24
     readonly property int spacingSmall: 6
     readonly property int spacingMedium: 16

@@ -4,16 +4,23 @@ set(KEMAI_QML_FILES
         qml/Components/ActiveHintBar.qml
         qml/Components/ActivityComboBox.qml
         qml/Components/CalendarView.qml
+        qml/Components/DashedBorder.qml
+        qml/Components/DialogButton.qml
         qml/Components/EntriesHeader.qml
+        qml/Components/Icon.qml
         qml/Components/KemaiTextField.qml
+        qml/Components/LucideIcons.js
         qml/Components/NotificationBanner.qml
         qml/Components/PrimaryEditButton.qml
         qml/Components/PrimaryRedButton.qml
         qml/Components/ProfileComboBox.qml
         qml/Components/ProfileEntryDelegate.qml
         qml/Components/ProfileForm.qml
+        qml/Components/ProjectActivityField.qml
         qml/Components/SecondaryButton.qml
+        qml/Components/Spinner.qml
         qml/Components/StartStopButton.qml
+        qml/Components/TagsInput.qml
         qml/Components/TimeEntryDelegate.qml
         qml/Components/TimeWheel.qml
         qml/Components/TimerBar.qml
@@ -21,6 +28,7 @@ set(KEMAI_QML_FILES
         qml/Views/LoginView.qml
         qml/Views/MainView.qml
         qml/Views/ProfileManagerDialog.qml
+        qml/Views/TimeEntryEditDialog.qml
         qml/Views/TimesheetHistoryView.qml
         qml/Main.qml
         qml/Theme.qml
