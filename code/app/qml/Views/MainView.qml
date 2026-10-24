@@ -9,6 +9,8 @@ Page {
 
     required property SessionContext sessionContext
 
+    signal logoutRequested()
+
     // Back to the foreground: reload what may have changed on the server meanwhile
     readonly property bool windowActive: Window.active
     onWindowActiveChanged: if (windowActive) sessionContext.refreshIfStale()
@@ -65,6 +67,7 @@ Page {
             Layout.fillWidth: true
             Layout.fillHeight: true
             sessionContext: root.sessionContext
+            onLogoutRequested: root.logoutRequested()
         }
     }
 }

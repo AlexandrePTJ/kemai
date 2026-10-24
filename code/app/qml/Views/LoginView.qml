@@ -64,6 +64,44 @@ Page {
             }
         }
 
+        // -- After a logout: why Kemai did not connect by itself
+        Rectangle {
+            visible: root.kemaiContext.justLoggedOut
+            Layout.fillWidth: true
+            Layout.preferredHeight: logoutNotice.implicitHeight + 20
+            radius: Theme.radiusMedium
+            color: Theme.colorSurfaceDark
+            border.width: 1
+            border.color: Theme.colorBorderSubtle
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 10
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+                spacing: 10
+
+                Icon {
+                    Layout.alignment: Qt.AlignTop
+                    name: "info"
+                    size: 15
+                    color: Theme.colorAccentGreen
+                }
+
+                Text {
+                    id: logoutNotice
+                    Layout.fillWidth: true
+                    text: "<b><font color='" + Theme.colorTextPrimary + "'>Logged out of "
+                          + root.kemaiContext.lastAccountName.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+                          + ".</font></b> Auto-login is off, so Kemai won't connect by itself next time."
+                    textFormat: Text.StyledText
+                    color: Theme.colorTextSecondary
+                    font.pixelSize: Theme.fontSizeSmall
+                    wrapMode: Text.Wrap
+                }
+            }
+        }
+
         // -- Profile
         ColumnLayout {
             Layout.fillWidth: true
@@ -94,11 +132,21 @@ Page {
             }
 
             ProfileComboBox {
+                id: profileCombo
                 Layout.fillWidth: true
 
                 model: profileManager.model
                 textRole: "name"
                 valueRole: "profileId"
+
+                // Back from a session: keep the profile it was opened from
+                function selectLastProfile() {
+                    const index = profileCombo.find(root.kemaiContext.lastAccountName)
+                    if (index >= 0)
+                        profileCombo.currentIndex = index
+                }
+                Component.onCompleted: profileCombo.selectLastProfile()
+                onCountChanged: profileCombo.selectLastProfile()
 
                 onCurrentValueChanged: {
                     const profile = profileManager.model.getById(currentValue);
@@ -245,7 +293,11 @@ Page {
             onClicked: {
                 root.loginError = ""
                 root.loginPending = true
-                root.kemaiContext.login(hostField.text, tokenField.text, autoLoginCheckBox.checked)
+                // Name the session after the selected profile only if its credentials are the ones used
+                const profile = profileCombo.currentIndex >= 0 ? profileManager.model.getById(profileCombo.currentValue) : null
+                const fromProfile = profile && profile.host === hostField.text && profile.token === tokenField.text
+                root.kemaiContext.login(hostField.text, tokenField.text, autoLoginCheckBox.checked,
+                                        fromProfile ? profileCombo.currentText : "")
             }
         }
 

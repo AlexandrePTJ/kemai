@@ -1,6 +1,7 @@
 project(Kemai)
 
 set(KEMAI_QML_FILES
+        qml/Components/AccountMenu.qml
         qml/Components/ActiveHintBar.qml
         qml/Components/ActivityComboBox.qml
         qml/Components/CalendarView.qml
@@ -26,6 +27,7 @@ set(KEMAI_QML_FILES
         qml/Components/TimerBar.qml
         qml/Views/DateTimeEditDialog.qml
         qml/Views/LoginView.qml
+        qml/Views/LogoutConfirmDialog.qml
         qml/Views/MainView.qml
         qml/Views/ProfileManagerDialog.qml
         qml/Views/TimeEntryEditDialog.qml

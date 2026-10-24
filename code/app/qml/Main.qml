@@ -31,6 +31,7 @@ ApplicationWindow {
             // The session lives as long as its view: released once the view is gone (logout or expiry),
             // never while a transition still binds to it
             Component.onDestruction: appContext.closeSession(sessionContext)
+            onLogoutRequested: appContext.logout()
         }
     }
 

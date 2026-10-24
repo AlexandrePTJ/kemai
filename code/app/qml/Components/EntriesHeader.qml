@@ -11,6 +11,9 @@ Item {
     property string dateLabel: ""
     property bool refreshing: false
 
+    // Extra controls at the far right, after a divider (e.g. the account menu)
+    default property alias trailing: trailingRow.data
+
     signal refreshClicked()
 
     implicitHeight: 38
@@ -117,6 +120,20 @@ Item {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.refreshClicked()
             }
+        }
+
+        Rectangle {
+            visible: trailingRow.children.length > 0
+            Layout.leftMargin: 6
+            Layout.rightMargin: 6
+            Layout.preferredWidth: 1
+            Layout.preferredHeight: 20
+            color: Theme.colorDivider
+        }
+
+        RowLayout {
+            id: trailingRow
+            spacing: 8
         }
     }
 }

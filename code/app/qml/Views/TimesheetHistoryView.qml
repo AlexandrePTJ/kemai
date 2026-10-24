@@ -12,6 +12,9 @@ Item {
 
     required property SessionContext sessionContext
 
+    // The user chose to log out (and confirmed it if a timer runs)
+    signal logoutRequested()
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -25,6 +28,13 @@ Item {
             dateLabel: root.sessionContext.recentTimeSheets.dateLabel
             refreshing: root.sessionContext.refreshing
             onRefreshClicked: root.sessionContext.refresh()
+
+            AccountMenu {
+                accountName: root.sessionContext.accountName
+                host: root.sessionContext.host
+                timerRunning: root.sessionContext.hasActiveTimesheet
+                onLogoutRequested: root.sessionContext.hasActiveTimesheet ? logoutConfirm.open() : root.logoutRequested()
+            }
         }
 
         ListView {
@@ -42,6 +52,12 @@ Item {
                 onEditRequested: editDialog.openFor(entryDelegate)
             }
         }
+    }
+
+    LogoutConfirmDialog {
+        id: logoutConfirm
+        sessionContext: root.sessionContext
+        onConfirmed: root.logoutRequested()
     }
 
     TimeEntryEditDialog {
