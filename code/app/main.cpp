@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         spdlog::set_level(spdlog::level::debug);
         spdlog::set_default_logger(logger);
 
-        spdlog::info("===== Starting Kemai {} =====", KEMAI_VERSION);
+        spdlog::info("===== Starting Kemai {} ({}) =====", KEMAI_VERSION, KEMAI_CHANNEL);
 
         // Check CLI options
         if (parser.isSet("root"))
