@@ -133,25 +133,25 @@ QNetworkRequest KimaiClient::KimaiClientPrivate::prepareRequest(ApiMethod method
 
 QNetworkReply *KimaiClient::KimaiClientPrivate::sendGetRequest(const QNetworkRequest &networkRequest) const
 {
-    spdlog::debug("[GET] {}", networkRequest.url().toString());
+    spdlog::debug("[GET] {}", networkRequest.url().toString(QUrl::RemoveUserInfo));
     return m_networkAccessManager->get(networkRequest);
 }
 
 QNetworkReply *KimaiClient::KimaiClientPrivate::sendPostRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const
 {
-    spdlog::debug("[POST] {}", networkRequest.url().toString());
+    spdlog::debug("[POST] {}", networkRequest.url().toString(QUrl::RemoveUserInfo));
     return m_networkAccessManager->post(networkRequest, data);
 }
 
 QNetworkReply *KimaiClient::KimaiClientPrivate::sendPatchRequest(const QNetworkRequest &networkRequest, const QByteArray &data) const
 {
-    spdlog::debug("[PATCH] {}", networkRequest.url().toString());
+    spdlog::debug("[PATCH] {}", networkRequest.url().toString(QUrl::RemoveUserInfo));
     return m_networkAccessManager->sendCustomRequest(networkRequest, "PATCH", data);
 }
 
 QNetworkReply *KimaiClient::KimaiClientPrivate::sendDeleteRequest(const QNetworkRequest &networkRequest) const
 {
-    spdlog::debug("[DELETE] {}", networkRequest.url().toString());
+    spdlog::debug("[DELETE] {}", networkRequest.url().toString(QUrl::RemoveUserInfo));
     return m_networkAccessManager->deleteResource(networkRequest);
 }
 

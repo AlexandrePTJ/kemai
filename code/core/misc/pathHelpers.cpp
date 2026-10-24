@@ -26,6 +26,9 @@ namespace
         case kemai::PathHelpers::FilePathType::AppSettings:
             return {QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)};
 
+        case kemai::PathHelpers::FilePathType::LogFile:
+            return {QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)};
+
         default:
             throw std::runtime_error("Unknown path type");
         }
@@ -41,6 +44,10 @@ namespace
         case kemai::PathHelpers::FilePathType::AppSettings:
             // Not "settings.json": Kemai 0.11.x keeps its profiles in that file, same directory
             return "appSettings.json";
+
+        case kemai::PathHelpers::FilePathType::LogFile:
+            // Not "kemai.log" at the root: Kemai 0.11.x writes its own log files there
+            return "logs/kemai.log";
 
         default:
             throw std::runtime_error("Unknown path type");

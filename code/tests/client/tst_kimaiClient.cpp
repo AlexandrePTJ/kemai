@@ -7,6 +7,9 @@
 #include <QTcpServer>
 #include <QTimer>
 
+#include <spdlog/sinks/ringbuffer_sink.h>
+#include <spdlog/spdlog.h>
+
 #include "client/kimaiApiError.h"
 #include "client/kimaiClient.h"
 
@@ -104,6 +107,44 @@ TEST_CASE("KimaiClient - silent server times out as NoNetwork", "[client][unit]"
         kind = e.kind();
     }
     REQUIRE(kind == ApiErrorKind::NoNetwork);
+}
+
+TEST_CASE("KimaiClient - token and URL credentials never reach the log", "[client][unit]")
+{
+    QTcpServer server;
+    REQUIRE(server.listen(QHostAddress::LocalHost));
+
+    // Capture everything logged while the request runs
+    auto capture  = std::make_shared<spdlog::sinks::ringbuffer_sink_mt>(1000);
+    auto previous = spdlog::default_logger();
+    spdlog::set_default_logger(std::make_shared<spdlog::logger>("capture", capture));
+    spdlog::set_level(spdlog::level::trace);
+
+    {
+        KimaiClient client;
+        client.setHost(QString("http://someone:url-password@127.0.0.1:%1").arg(server.serverPort()));
+        client.setToken("secret-api-token-1234");
+        client.setTransferTimeout(std::chrono::milliseconds(300));
+
+        try
+        {
+            waitForFuture(client.requestMeUserInfo(), 5000);
+        }
+        catch (const KimaiApiError &e)
+        {
+            spdlog::error("Login failed: {}", e.what());
+        }
+    }
+
+    spdlog::set_default_logger(previous);
+
+    const auto lines = capture->last_formatted();
+    REQUIRE_FALSE(lines.empty());
+    for (const auto &line : lines)
+    {
+        REQUIRE(line.find("secret-api-token-1234") == std::string::npos);
+        REQUIRE(line.find("url-password") == std::string::npos);
+    }
 }
 
 TEST_CASE("KimaiClient - deleteTimeSheet removes a created timesheet", "[client][integration]")

@@ -10,6 +10,7 @@
 
 #include "kemaiConfig.h"
 #include "misc/customFmt.h"
+#include "misc/logFiles.h"
 #include "misc/pathHelpers.h"
 
 void kemaiQtMessageOutputHandler(QtMsgType type, const QMessageLogContext & /*context*/, const QString &msg)
@@ -56,9 +57,21 @@ int main(int argc, char *argv[])
 
         parser.process(app);
 
+        // Before the logger: the log file lives under the root
+        if (parser.isSet("root"))
+        {
+            kemai::PathHelpers::overrideDefaultRootPath(parser.value("root"));
+        }
+
         // Logger setup
         std::vector<spdlog::sink_ptr> sinks;
         sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+
+        const auto logFilePath = kemai::PathHelpers::getFilePath(kemai::PathHelpers::FilePathType::LogFile);
+        if (auto fileSink = kemai::LogFiles::makeRotatingSink(logFilePath); fileSink != nullptr)
+        {
+            sinks.emplace_back(std::move(fileSink));
+        }
 
         auto logger = std::make_shared<spdlog::logger>("kemai", sinks.begin(), sinks.end());
         spdlog::register_logger(logger);
@@ -66,12 +79,14 @@ int main(int argc, char *argv[])
         spdlog::set_default_logger(logger);
 
         spdlog::info("===== Starting Kemai {} ({}) =====", KEMAI_VERSION, KEMAI_CHANNEL);
+        if (sinks.size() < 2)
+        {
+            spdlog::error("Cannot write log file {}: logging to the console only", logFilePath);
+        }
 
-        // Check CLI options
         if (parser.isSet("root"))
         {
             spdlog::warn("Override default OS configuration and data directories to {}", parser.value("root"));
-            kemai::PathHelpers::overrideDefaultRootPath(parser.value("root"));
         }
 
         // Load fonts

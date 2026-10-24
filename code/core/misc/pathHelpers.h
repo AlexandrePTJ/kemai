@@ -13,7 +13,8 @@ namespace kemai
         enum class FilePathType
         {
             Profiles,
-            AppSettings
+            AppSettings,
+            LogFile
         };
 
         /*!

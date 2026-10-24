@@ -11,6 +11,7 @@ qt_add_executable(${PROJECT_NAME}
     context/tst_sessionController.cpp
     misc/tst_formatHelpers.cpp
     misc/tst_fuzzyMatch.cpp
+    misc/tst_logFiles.cpp
     misc/tst_windowPlacement.cpp
     model/tst_timesheetModel.cpp
     storage/tst_appSettingsStore.cpp
@@ -20,6 +21,7 @@ qt_add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE
     KemaiCore
     Catch2::Catch2
+    spdlog::spdlog # tests capture or write logs themselves (core links it privately)
 )
 
 include(CTest)

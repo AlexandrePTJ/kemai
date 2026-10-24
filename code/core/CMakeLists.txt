@@ -31,6 +31,8 @@ set(KEMAI_LIB_SOURCES
         misc/fuzzyMatch.cpp
         misc/jsonHelpers.h
         misc/jsonHelpers.cpp
+        misc/logFiles.h
+        misc/logFiles.cpp
         misc/pathHelpers.h
         misc/pathHelpers.cpp
         misc/windowPlacement.h
