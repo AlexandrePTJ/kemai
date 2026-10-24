@@ -53,8 +53,8 @@ namespace kemai
         QFuture<KimaiTimeSheet> stopTimeSheet(int timeSheetId) override;
         QFuture<void>           createTag(const QString &name) override;
 
-        QFuture<KimaiTasks> requestTasks() override;
-        QFuture<KimaiTask>  startTask(int taskId) override;
+        QFuture<KimaiTasks> requestTasks(int userId) override;
+        QFuture<KimaiTimeSheet> startTask(int taskId) override;
         QFuture<KimaiTask>  closeTask(int taskId) override;
 
         static void addTrustedCertificates(const QStringList &trustedCertificates);

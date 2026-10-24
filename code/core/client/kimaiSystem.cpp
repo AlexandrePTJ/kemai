@@ -41,7 +41,8 @@ namespace kemai
         }
 
         auto jsonObject = json.toObject();
-        JsonHelpers::checkKeysOrThrow("KimaiUser", jsonObject, {"id", "username", "memberships"});
+        // Users embedded in other objects (e.g. a task) carry no memberships: only what Kemai reads is required
+        JsonHelpers::checkKeysOrThrow("KimaiUser", jsonObject, {"id", "username"});
 
         KimaiUser user;
         user.id       = jsonObject.value("id").toInt();

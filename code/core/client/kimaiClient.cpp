@@ -449,18 +449,23 @@ QFuture<KimaiTimeSheet> KimaiClient::stopTimeSheet(int timeSheetId)
     return m_d->processApiNetworkReplySingleObject<KimaiTimeSheet>(ApiMethod::TimeSheets, reply);
 }
 
-QFuture<KimaiTasks> KimaiClient::requestTasks()
+QFuture<KimaiTasks> KimaiClient::requestTasks(int userId)
 {
-    auto request = m_d->prepareRequest(ApiMethod::Tasks);
+    // Default statuses: pending and in progress. One page holds them all in practice (default size is 50).
+    auto request = m_d->prepareRequest(ApiMethod::Tasks, {
+                                                             {"users[]", QString::number(userId)},
+                                                             {"size",    "500"                  }
+    });
     auto reply   = m_d->sendGetRequest(request);
     return m_d->processApiNetworkReplyArray<KimaiTask>(ApiMethod::Tasks, reply);
 }
 
-QFuture<KimaiTask> KimaiClient::startTask(int taskId)
+QFuture<KimaiTimeSheet> KimaiClient::startTask(int taskId)
 {
     auto request = m_d->prepareRequest(ApiMethod::TaskStart, {}, {}, QString("%1/start").arg(taskId));
     auto reply   = m_d->sendPatchRequest(request, {});
-    return m_d->processApiNetworkReplySingleObject<KimaiTask>(ApiMethod::TaskStart, reply);
+    // The API documentation says Task; Kimai 2.70 answers with the started timesheet
+    return m_d->processApiNetworkReplySingleObject<KimaiTimeSheet>(ApiMethod::TaskStart, reply);
 }
 
 QFuture<KimaiTask> KimaiClient::closeTask(int taskId)

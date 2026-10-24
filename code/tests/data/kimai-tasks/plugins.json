@@ -1,0 +1,42 @@
+[
+ {
+  "name": "KioskBundle",
+  "version": "2.17.0"
+ },
+ {
+  "name": "WorkContractBundle",
+  "version": "1.38.0"
+ },
+ {
+  "name": "ImportBundle",
+  "version": "2.29.0"
+ },
+ {
+  "name": "InvoiceBundle",
+  "version": "2.11.0"
+ },
+ {
+  "name": "AuditTrailBundle",
+  "version": "2.15.1"
+ },
+ {
+  "name": "CustomerPortalBundle",
+  "version": "4.6.0"
+ },
+ {
+  "name": "ExpensesBundle",
+  "version": "2.27.0"
+ },
+ {
+  "name": "TranslationBundle",
+  "version": "2.8.0"
+ },
+ {
+  "name": "MetaFieldsBundle",
+  "version": "2.15.0"
+ },
+ {
+  "name": "TaskManagementBundle",
+  "version": "2.18.2"
+ }
+]

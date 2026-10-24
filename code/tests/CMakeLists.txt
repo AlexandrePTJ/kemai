@@ -7,6 +7,7 @@ qt_add_executable(${PROJECT_NAME}
     mocks/fakeKimaiClient.h
     client/tst_kimaiCache.cpp
     client/tst_kimaiClient.cpp
+    client/tst_kimaiTasks.cpp
     context/tst_profileManager.cpp
     context/tst_sessionController.cpp
     misc/tst_formatHelpers.cpp
@@ -23,6 +24,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Catch2::Catch2
     spdlog::spdlog # tests capture or write logs themselves (core links it privately)
 )
+
+# Recorded Kimai replies (data/)
+target_compile_definitions(${PROJECT_NAME} PRIVATE KEMAI_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 include(CTest)
 include(Catch)

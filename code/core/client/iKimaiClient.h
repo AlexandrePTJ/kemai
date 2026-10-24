@@ -50,8 +50,10 @@ namespace kemai
         // Stops a running timesheet now (server time); works in punch mode, where an update cannot send an end
         virtual QFuture<KimaiTimeSheet> stopTimeSheet(int timeSheetId)                                                                   = 0;
 
-        virtual QFuture<KimaiTasks> requestTasks()      = 0;
-        virtual QFuture<KimaiTask>  startTask(int taskId) = 0;
+        // Open tasks (pending, in progress) assigned to the user, Task Management plugin
+        virtual QFuture<KimaiTasks> requestTasks(int userId) = 0;
+        // Starts a timer on the task (Kimai answers with that timesheet; stops a running one when only one may run)
+        virtual QFuture<KimaiTimeSheet> startTask(int taskId) = 0;
         virtual QFuture<KimaiTask>  closeTask(int taskId) = 0;
     };
 } // namespace kemai
