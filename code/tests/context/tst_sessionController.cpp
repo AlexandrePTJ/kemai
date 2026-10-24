@@ -921,3 +921,78 @@ TEST_CASE("SessionController::stopActiveTimeSheetAt - failure keeps the timer an
     REQUIRE(probe.notificationCount == 1);
     REQUIRE(probe.lastKind == SessionController::NotificationKind::NoNetwork);
 }
+
+TEST_CASE("SessionController::create* - creates and reports the new id, without reloading", "[session][create][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    QList<std::pair<SessionController::ResourceKind, int>> created;
+    QObject::connect(&controller, &SessionController::resourceCreated,
+                     [&](SessionController::ResourceKind kind, int id) { created.append({kind, id}); });
+
+    fake->calls.clear();
+    controller.createCustomer("  Acme  ", "FR", "EUR", "Europe/Paris");
+    processEvents();
+    controller.createProject("Website", 100);
+    processEvents();
+    controller.createActivity("Code review", 101);
+    processEvents();
+    controller.createActivity("Meetings", 0);
+    processEvents();
+
+    REQUIRE(created.size() == 4);
+    REQUIRE(created[0] == std::pair{SessionController::ResourceKind::Customer, 100});
+    REQUIRE(created[2] == std::pair{SessionController::ResourceKind::Activity, 102});
+    REQUIRE(fake->lastAddedCustomer.name == "Acme");
+    REQUIRE(fake->lastAddedCustomer.countryKey == "FR");
+    REQUIRE(fake->lastAddedProject.customer.id == 100);
+    REQUIRE_FALSE(fake->lastAddedActivity.project.has_value()); // global
+    REQUIRE_FALSE(fake->calls.contains("requestActivities"));
+
+    controller.reloadResources();
+    processEvents();
+    REQUIRE(fake->calls.count("requestActivities") == 1);
+}
+
+TEST_CASE("SessionController::create* - refusals go to the form, 401 expires the session", "[session][create][error][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+
+    std::optional<SessionController::NotificationKind> failure;
+    QString                                            detail;
+    QString                                            field;
+    QObject::connect(&controller, &SessionController::resourceCreateFailed,
+                     [&](SessionController::ResourceKind, SessionController::NotificationKind kind, const QString &d, const QString &f)
+                     {
+                         failure = kind;
+                         detail  = d;
+                         field   = f;
+                     });
+
+    fake->failWith("addProject", ApiErrorKind::Forbidden, 403);
+    controller.createProject("Website", 100);
+    processEvents();
+    REQUIRE(failure == SessionController::NotificationKind::Forbidden);
+
+    fake->errors.insert("addCustomer", KimaiApiError{ApiErrorKind::InvalidValue, 400, "customers", "Please select a valid country.", "country"});
+    controller.createCustomer("Acme", "XX", "EUR", "Europe/Paris");
+    processEvents();
+    REQUIRE(failure == SessionController::NotificationKind::InvalidValue);
+    REQUIRE(detail == "Please select a valid country.");
+    REQUIRE(field == "country");
+    REQUIRE(probe.notificationCount == 0); // the form shows it, not the banner
+
+    fake->failWith("addActivity", ApiErrorKind::AuthFailed, 401);
+    controller.createActivity("Code review", 101);
+    processEvents();
+    REQUIRE(probe.sessionExpiredCount == 1);
+}

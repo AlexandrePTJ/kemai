@@ -160,6 +160,73 @@ namespace kemai
         return m_cache->timesheetConfig().trackingMode == KimaiTimeSheetConfig::TrackingMode::Punch;
     }
 
+    QString SessionController::userTimezone() const
+    {
+        return m_user.timezone;
+    }
+
+    void SessionController::createCustomer(const QString &name, const QString &country, const QString &currency, const QString &timezone)
+    {
+        KimaiCustomer customer;
+        customer.name        = name.trimmed();
+        customer.countryKey  = country;
+        customer.currencyKey = currency;
+        customer.timezone    = timezone;
+
+        m_client->addCustomer(customer)
+            .then(this, [this](const KimaiCustomer &created) { emit resourceCreated(ResourceKind::Customer, created.id); })
+            .onFailed(this, [this](const KimaiApiError &e) { handleCreateError(e, ResourceKind::Customer); });
+    }
+
+    void SessionController::createProject(const QString &name, int customerId)
+    {
+        KimaiProject project;
+        project.name        = name.trimmed();
+        project.customer.id = customerId;
+
+        m_client->addProject(project)
+            .then(this, [this](const KimaiProject &created) { emit resourceCreated(ResourceKind::Project, created.id); })
+            .onFailed(this, [this](const KimaiApiError &e) { handleCreateError(e, ResourceKind::Project); });
+    }
+
+    void SessionController::createActivity(const QString &name, int projectId)
+    {
+        KimaiActivity activity;
+        activity.name = name.trimmed();
+        if (projectId > 0)
+        {
+            KimaiProject project;
+            project.id       = projectId;
+            activity.project = project;
+        }
+
+        m_client->addActivity(activity)
+            .then(this, [this](const KimaiActivity &created) { emit resourceCreated(ResourceKind::Activity, created.id); })
+            .onFailed(this, [this](const KimaiApiError &e) { handleCreateError(e, ResourceKind::Activity); });
+    }
+
+    void SessionController::reloadResources()
+    {
+        if (!m_cache->isLoading())
+        {
+            m_cache->load(m_client.get());
+            emit refreshingChanged();
+        }
+    }
+
+    void SessionController::handleCreateError(const KimaiApiError &error, ResourceKind kind)
+    {
+        spdlog::error("Failed to create {}: {}", magic_enum::enum_name(kind), error.what());
+
+        if (error.kind() == ApiErrorKind::AuthFailed)
+        {
+            emit sessionExpired();
+            return;
+        }
+
+        emit resourceCreateFailed(kind, notificationKindFromError(error.kind()), error.serverMessage(), error.field());
+    }
+
     void SessionController::setStaleAfter(std::chrono::seconds staleAfter)
     {
         m_staleAfter = staleAfter;

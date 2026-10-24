@@ -45,6 +45,8 @@ namespace kemai
         Q_PROPERTY(kemai::ActivityListModel *activityModel READ activityModel CONSTANT)
         Q_PROPERTY(bool refreshing READ isRefreshing NOTIFY refreshingChanged)
         Q_PROPERTY(bool punchMode READ isPunchMode NOTIFY punchModeChanged)
+        // IANA timezone of the Kimai user (prefill of new customers)
+        Q_PROPERTY(QString userTimezone READ userTimezone CONSTANT)
 
     public:
         enum class NotificationLevel
@@ -79,6 +81,14 @@ namespace kemai
         };
         Q_ENUM(AwayReason)
 
+        enum class ResourceKind
+        {
+            Customer,
+            Project,
+            Activity
+        };
+        Q_ENUM(ResourceKind)
+
         explicit SessionController(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, QObject *parent = nullptr);
         ~SessionController() override;
 
@@ -97,6 +107,7 @@ namespace kemai
         bool               isRefreshing() const;
         // Kimai manages begin/end itself: they are never sent on update
         bool               isPunchMode() const;
+        QString            userTimezone() const;
 
         // Where the session comes from, for display: `profileName` may be empty (credentials typed by hand)
         void setAccount(const QString &profileName, const QString &host);
@@ -122,6 +133,15 @@ namespace kemai
         // Existing server tags containing `text`; answered by tagSuggestionsReady
         Q_INVOKABLE void requestTagSuggestions(const QString &text);
 
+        // Create a Kimai customer / project / activity (projectId 0: global activity). Answered by resourceCreated
+        // with the new id, or resourceCreateFailed for the form to show (401 still emits sessionExpired). Nothing is
+        // reloaded: after the last step of a creation, reloadResources() makes the new items searchable.
+        Q_INVOKABLE void createCustomer(const QString &name, const QString &country, const QString &currency, const QString &timezone);
+        Q_INVOKABLE void createProject(const QString &name, int customerId);
+        Q_INVOKABLE void createActivity(const QString &name, int projectId);
+        // Reloads customers, projects and activities (unless a load is in flight); `refreshing` follows it
+        Q_INVOKABLE void reloadResources();
+
         // Reloads the cache (unless a load is in flight) and the timesheets.
         Q_INVOKABLE void refresh();
         // refresh() only when the cache is missing or older than the stale threshold.
@@ -144,6 +164,10 @@ namespace kemai
         void timeSheetSaveFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
         void timeSheetDeleted(int timesheetId);
         void timeSheetDeleteFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
+        void resourceCreated(kemai::SessionController::ResourceKind kind, int id);
+        // `field`: the Kimai field a refused value belongs to, when known
+        void resourceCreateFailed(kemai::SessionController::ResourceKind kind, kemai::SessionController::NotificationKind error, const QString &detail,
+                                  const QString &field);
         // `query` is the text the suggestions answer, so the UI can drop stale replies
         void tagSuggestionsReady(const QString &query, const QStringList &tags);
         // The running timesheet was stopped by stopActiveTimeSheetAt; `end` is the end it got
@@ -162,6 +186,7 @@ namespace kemai
         void invalidateSync();
         // Creates `names` one after the other, then runs `next`; a failure reports timeSheetSaveFailed instead
         void createTagsThen(QStringList names, int timesheetId, std::function<void()> next);
+        void handleCreateError(const KimaiApiError &error, ResourceKind kind);
         void onCacheLoaded();
         void onCacheLoadFailed();
 

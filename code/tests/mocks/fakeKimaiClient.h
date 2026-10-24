@@ -70,9 +70,25 @@ namespace kemai
             return result("requestTags", tags);
         }
 
-        QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer) override { return result("addCustomer", customer); }
-        QFuture<KimaiProject>  addProject(const KimaiProject &project) override { return result("addProject", project); }
-        QFuture<KimaiActivity> addActivity(const KimaiActivity &activity) override { return result("addActivity", activity); }
+        // Created resources echo what was sent, with the next id
+        QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer) override
+        {
+            lastAddedCustomer    = customer;
+            lastAddedCustomer.id = nextCreatedId++;
+            return result("addCustomer", lastAddedCustomer);
+        }
+        QFuture<KimaiProject> addProject(const KimaiProject &project) override
+        {
+            lastAddedProject    = project;
+            lastAddedProject.id = nextCreatedId++;
+            return result("addProject", lastAddedProject);
+        }
+        QFuture<KimaiActivity> addActivity(const KimaiActivity &activity) override
+        {
+            lastAddedActivity    = activity;
+            lastAddedActivity.id = nextCreatedId++;
+            return result("addActivity", lastAddedActivity);
+        }
         QFuture<void>          createTag(const QString &name) override
         {
             createdTags.append(name);
@@ -104,6 +120,10 @@ namespace kemai
         KimaiTimeSheet lastUpdatedTimeSheet;
         int            lastDeletedTimeSheetId = 0;
         int            lastStoppedTimeSheetId = 0;
+        KimaiCustomer  lastAddedCustomer;
+        KimaiProject   lastAddedProject;
+        KimaiActivity  lastAddedActivity;
+        int            nextCreatedId = 100;
         QString        lastTagsQuery;
         QStringList    createdTags;
 
