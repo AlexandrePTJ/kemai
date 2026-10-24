@@ -39,6 +39,10 @@ Item {
 
         ListView {
             id: entriesList
+
+            WheelScroller {
+                flickable: entriesList
+            }
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true

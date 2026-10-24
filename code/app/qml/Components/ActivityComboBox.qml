@@ -88,6 +88,10 @@ Item {
 
         contentItem: ListView {
             id: suggestionList
+
+            WheelScroller {
+                flickable: suggestionList
+            }
             clip: true
             model: filterProxy
             implicitHeight: Math.min(contentHeight, 240)

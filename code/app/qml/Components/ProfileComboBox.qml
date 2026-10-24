@@ -52,7 +52,12 @@ ComboBox {
             radius: Theme.radiusMedium
         }
         contentItem: ListView {
+            id: popupList
             clip: true
+
+            WheelScroller {
+                flickable: popupList
+            }
             implicitHeight: contentHeight
             model: root.popup.visible ? root.delegateModel : null
             currentIndex: root.highlightedIndex

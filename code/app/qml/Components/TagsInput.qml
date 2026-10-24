@@ -349,6 +349,10 @@ FocusScope {
             // Matches (a short query can match hundreds of tags)
             ListView {
                 id: resultsList
+
+                WheelScroller {
+                    flickable: resultsList
+                }
                 visible: root._state === "results"
                 Layout.fillWidth: true
                 Layout.preferredHeight: Math.min(resultsList.contentHeight, 6 * 32)

@@ -22,6 +22,7 @@ set(KEMAI_QML_FILES
         qml/Components/Spinner.qml
         qml/Components/StartStopButton.qml
         qml/Components/TagsInput.qml
+        qml/Components/WheelScroller.qml
         qml/Components/TimeEntryDelegate.qml
         qml/Components/TimeWheel.qml
         qml/Components/TimerBar.qml
