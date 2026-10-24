@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 #include "sessionController.h"
 
-// spdlog headers
+// 3rd party headers
+#include <magic_enum/magic_enum.hpp>
 #include <spdlog/spdlog.h>
 
 // Project headers
@@ -336,11 +337,8 @@ namespace kemai
             return;
         }
 
-        KimaiTimeSheet ts = *m_activeTimeSheet;
-        ts.endAt          = QDateTime::currentDateTimeUtc();
-
         invalidateSync();
-        m_client->updateTimeSheet(ts, m_cache->timesheetConfig().trackingMode)
+        m_client->stopTimeSheet(m_activeTimeSheet->id)
             .then(this,
                   [this](const KimaiTimeSheet &)
                   {
@@ -349,6 +347,42 @@ namespace kemai
                   })
             .onFailed(this, [this](const KimaiApiError &e)
                       { handleApiError(e, "Failed to stop timesheet"); });
+    }
+
+    void SessionController::stopActiveTimeSheetAt(const QDateTime &end, AwayReason reason)
+    {
+        if (!m_activeTimeSheet)
+        {
+            spdlog::warn("Away stop ignored: no active timesheet");
+            return;
+        }
+
+        const auto onStopped = [this, reason](const KimaiTimeSheet &stopped)
+        {
+            spdlog::info("Timer stopped while away ({}), ended at {}", magic_enum::enum_name(reason), stopped.endAt.toString(Qt::ISODate));
+            refreshActiveTimeSheets();
+            refreshRecentTimeSheets();
+            emit timeSheetStoppedAway(reason, stopped.endAt.isValid() ? stopped.endAt : QDateTime::currentDateTimeUtc());
+        };
+
+        invalidateSync();
+
+        // Kimai sets the end itself in punch mode; an end before the begin (timer started while away) cannot be kept
+        if (isPunchMode() || !end.isValid() || end.toUTC() <= m_activeTimeSheet->beginAt)
+        {
+            m_client->stopTimeSheet(m_activeTimeSheet->id)
+                .then(this, onStopped)
+                .onFailed(this, [this](const KimaiApiError &e)
+                          { handleApiError(e, "Failed to stop timesheet while away"); });
+            return;
+        }
+
+        KimaiTimeSheet ts = *m_activeTimeSheet;
+        ts.endAt          = end.toUTC();
+        m_client->updateTimeSheet(ts, m_cache->timesheetConfig().trackingMode)
+            .then(this, onStopped)
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { handleApiError(e, "Failed to stop timesheet at the time the user left"); });
     }
 
     bool SessionController::updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 #include <catch2/catch_test_macros.hpp>
 
+#include <optional>
+
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QElapsedTimer>
@@ -100,7 +102,7 @@ TEST_CASE("SessionController - network failure on stop notifies the UI", "[sessi
 {
     auto fake = std::make_shared<FakeKimaiClient>();
     fake->activeTimeSheets.append(makeTimeSheet(42, QDateTime::currentDateTimeUtc().addSecs(-600)));
-    fake->failWith("updateTimeSheet", ApiErrorKind::NoNetwork);
+    fake->failWith("stopTimeSheet", ApiErrorKind::NoNetwork);
 
     SessionController controller(fake, KimaiUser{});
     processEvents();
@@ -801,4 +803,121 @@ TEST_CASE("SessionController::syncActiveTimeSheet - 401 expires the session", "[
 
     REQUIRE(probe.sessionExpiredCount == 1);
     REQUIRE(probe.notificationCount == 0);
+}
+
+TEST_CASE("SessionController::stopActiveTimeSheet - stops through the stop endpoint", "[session][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->activeTimeSheets.append(makeTimeSheet(42, QDateTime::currentDateTimeUtc().addSecs(-600)));
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    // Also in punch mode, where an update cannot carry an end
+    fake->calls.clear();
+    controller.stopActiveTimeSheet();
+    processEvents();
+
+    REQUIRE(fake->lastStoppedTimeSheetId == 42);
+    REQUIRE_FALSE(fake->calls.contains("updateTimeSheet"));
+}
+
+TEST_CASE("SessionController::stopActiveTimeSheetAt - ends the entry when the user left", "[session][away][unit]")
+{
+    const auto begin = QDateTime::currentDateTimeUtc().addSecs(-3600);
+    const auto left  = begin.addSecs(1800);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->activeTimeSheets.append(makeTimeSheet(42, begin));
+    fake->timeSheetResult = makeTimeSheet(42, begin, left);
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    std::optional<SessionController::AwayReason> reason;
+    QDateTime                                     reportedEnd;
+    QObject::connect(&controller, &SessionController::timeSheetStoppedAway,
+                     [&](SessionController::AwayReason r, const QDateTime &end)
+                     {
+                         reason      = r;
+                         reportedEnd = end;
+                     });
+
+    fake->activeTimeSheets.clear();
+    controller.stopActiveTimeSheetAt(left, SessionController::AwayReason::Idle);
+    processEvents();
+
+    REQUIRE(fake->calls.contains("updateTimeSheet"));
+    REQUIRE(fake->lastUpdatedTimeSheet.id == 42);
+    REQUIRE(fake->lastUpdatedTimeSheet.endAt == left);
+    REQUIRE(fake->lastStoppedTimeSheetId == 0);
+    REQUIRE(reason == SessionController::AwayReason::Idle);
+    REQUIRE(reportedEnd == left);
+    REQUIRE_FALSE(controller.hasActiveTimesheet());
+}
+
+TEST_CASE("SessionController::stopActiveTimeSheetAt - plain stop in punch mode", "[session][away][unit]")
+{
+    const auto begin = QDateTime::currentDateTimeUtc().addSecs(-3600);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->activeTimeSheets.append(makeTimeSheet(42, begin));
+    fake->timesheetConfig.trackingMode = KimaiTimeSheetConfig::TrackingMode::Punch;
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    REQUIRE(controller.isPunchMode());
+
+    int stopped = 0;
+    QObject::connect(&controller, &SessionController::timeSheetStoppedAway, [&] { ++stopped; });
+
+    controller.stopActiveTimeSheetAt(begin.addSecs(600), SessionController::AwayReason::Locked);
+    processEvents();
+
+    REQUIRE(fake->lastStoppedTimeSheetId == 42);
+    REQUIRE_FALSE(fake->calls.contains("updateTimeSheet"));
+    REQUIRE(stopped == 1);
+}
+
+TEST_CASE("SessionController::stopActiveTimeSheetAt - end before the begin is a plain stop", "[session][away][unit]")
+{
+    // Timer started from the web while the user was already away
+    const auto begin = QDateTime::currentDateTimeUtc().addSecs(-60);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->activeTimeSheets.append(makeTimeSheet(42, begin));
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    controller.stopActiveTimeSheetAt(begin.addSecs(-300), SessionController::AwayReason::Idle);
+    processEvents();
+
+    REQUIRE(fake->lastStoppedTimeSheetId == 42);
+    REQUIRE_FALSE(fake->calls.contains("updateTimeSheet"));
+}
+
+TEST_CASE("SessionController::stopActiveTimeSheetAt - failure keeps the timer and notifies", "[session][away][error][unit]")
+{
+    const auto begin = QDateTime::currentDateTimeUtc().addSecs(-3600);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->activeTimeSheets.append(makeTimeSheet(42, begin));
+    fake->failWith("updateTimeSheet", ApiErrorKind::NoNetwork);
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+    int stopped = 0;
+    QObject::connect(&controller, &SessionController::timeSheetStoppedAway, [&] { ++stopped; });
+
+    controller.stopActiveTimeSheetAt(begin.addSecs(600), SessionController::AwayReason::Idle);
+    processEvents();
+
+    REQUIRE(stopped == 0);
+    REQUIRE(controller.hasActiveTimesheet());
+    REQUIRE(probe.notificationCount == 1);
+    REQUIRE(probe.lastKind == SessionController::NotificationKind::NoNetwork);
 }

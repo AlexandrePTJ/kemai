@@ -407,6 +407,13 @@ QFuture<void> KimaiClient::deleteTimeSheet(int timeSheetId)
     return m_d->processApiNetworkReplyNoContent(ApiMethod::TimeSheets, reply);
 }
 
+QFuture<KimaiTimeSheet> KimaiClient::stopTimeSheet(int timeSheetId)
+{
+    auto request = m_d->prepareRequest(ApiMethod::TimeSheets, {}, {}, QString("%1/stop").arg(timeSheetId));
+    auto reply   = m_d->sendPatchRequest(request, {});
+    return m_d->processApiNetworkReplySingleObject<KimaiTimeSheet>(ApiMethod::TimeSheets, reply);
+}
+
 QFuture<KimaiTasks> KimaiClient::requestTasks()
 {
     auto request = m_d->prepareRequest(ApiMethod::Tasks);

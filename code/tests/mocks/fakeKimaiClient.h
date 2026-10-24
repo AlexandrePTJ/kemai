@@ -91,12 +91,19 @@ namespace kemai
             return result("deleteTimeSheet");
         }
 
+        QFuture<KimaiTimeSheet> stopTimeSheet(int timeSheetId) override
+        {
+            lastStoppedTimeSheetId = timeSheetId;
+            return result("stopTimeSheet", timeSheetResult);
+        }
+
         QFuture<KimaiTasks> requestTasks() override { return result("requestTasks", tasks); }
         QFuture<KimaiTask>  startTask(int) override { return result("startTask", taskResult); }
         QFuture<KimaiTask>  closeTask(int) override { return result("closeTask", taskResult); }
 
         KimaiTimeSheet lastUpdatedTimeSheet;
         int            lastDeletedTimeSheetId = 0;
+        int            lastStoppedTimeSheetId = 0;
         QString        lastTagsQuery;
         QStringList    createdTags;
 

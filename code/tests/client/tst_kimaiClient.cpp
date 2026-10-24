@@ -241,6 +241,61 @@ TEST_CASE("KimaiClient - deleteTimeSheet removes a created timesheet", "[client]
     }
 }
 
+TEST_CASE("KimaiClient - a running timesheet stops at a given end or now", "[client][integration]")
+{
+    if (host.isEmpty() || token.isEmpty())
+    {
+        SKIP("Set KEMAI_TEST_HOST and KEMAI_TEST_TOKEN to run integration tests");
+    }
+
+    KimaiClient client;
+    client.setHost(host);
+    client.setToken(token);
+
+    // Starting a timer may stop the user's own running one: never touch an account that has one
+    if (!waitForFuture(client.requestActiveTimeSheets()).isEmpty())
+    {
+        SKIP("A timer is running on this account");
+    }
+
+    const auto config = waitForFuture(client.requestTimeSheetConfig());
+    if (config.trackingMode == KimaiTimeSheetConfig::TrackingMode::Punch)
+    {
+        SKIP("Punch mode: begin cannot be set");
+    }
+
+    const auto activities = waitForFuture(client.requestActivities());
+    const auto it         = std::ranges::find_if(activities, [](const KimaiActivity &a) { return a.project.has_value(); });
+    REQUIRE(it != activities.cend());
+
+    KimaiTimeSheet ts;
+    ts.project.id  = it->project->id;
+    ts.activity.id = it->id;
+    ts.description = QStringLiteral("kemai integration test (stop)");
+    ts.beginAt     = QDateTime::currentDateTimeUtc().addSecs(-10 * 60);
+
+    // Backdated: the end the user left at (server rounding rules may move it by up to a minute)
+    const auto running = waitForFuture(client.startTimeSheet(ts, config.trackingMode));
+    REQUIRE(running.id > 0);
+    REQUIRE_FALSE(running.endAt.isValid());
+
+    auto       backdated = running;
+    const auto left      = running.beginAt.addSecs(60);
+    backdated.endAt      = left;
+    const auto ended     = waitForFuture(client.updateTimeSheet(backdated, config.trackingMode));
+    REQUIRE(ended.endAt.isValid());
+    REQUIRE(std::abs(ended.endAt.secsTo(left)) <= 60);
+    REQUIRE(waitForFuture(client.requestActiveTimeSheets()).isEmpty());
+    REQUIRE_NOTHROW(waitForFuture(client.deleteTimeSheet(running.id)));
+
+    // Plain stop: ends now
+    const auto running2 = waitForFuture(client.startTimeSheet(ts, config.trackingMode));
+    const auto stopped  = waitForFuture(client.stopTimeSheet(running2.id));
+    REQUIRE(stopped.endAt.isValid());
+    REQUIRE(std::abs(stopped.endAt.secsTo(QDateTime::currentDateTimeUtc())) <= 120);
+    REQUIRE_NOTHROW(waitForFuture(client.deleteTimeSheet(running2.id)));
+}
+
 TEST_CASE("KimaiClient::tagNamesFromJson - accepts tag objects and plain names", "[client][unit]")
 {
     const auto objects = QJsonDocument::fromJson(R"([{"id": 1, "name": "QML", "color": null}, {"id": 2, "name": "Frontend"}])");

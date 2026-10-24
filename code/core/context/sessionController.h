@@ -64,9 +64,19 @@ namespace kemai
             InvalidResponse,
             UnknownError,
             CacheLoadFailed,   // initial load: no usable cache
-            CacheRefreshFailed // refresh: previous cache kept
+            CacheRefreshFailed, // refresh: previous cache kept
+            TimerStoppedIdle,   // detail: end time, reported when the user is back
+            TimerStoppedLocked
         };
         Q_ENUM(NotificationKind)
+
+        // Why the timer was stopped while the user was away
+        enum class AwayReason
+        {
+            Idle,
+            Locked
+        };
+        Q_ENUM(AwayReason)
 
         explicit SessionController(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, QObject *parent = nullptr);
         ~SessionController() override;
@@ -95,6 +105,10 @@ namespace kemai
 
         Q_INVOKABLE void startTimeSheet(int activityId, int projectId);
         Q_INVOKABLE void stopActiveTimeSheet();
+        // Stops the running timesheet with `end` as its end (the user left at that time): applied through an update,
+        // except in punch mode or when `end` is not after the begin, where it is a plain stop. Answered by
+        // timeSheetStoppedAway on success; a failure goes through the error policy.
+        Q_INVOKABLE void stopActiveTimeSheetAt(const QDateTime &end, kemai::SessionController::AwayReason reason);
         // Applies every field as given, except begin/end: an invalid QDateTime leaves it unchanged,
         // and a running entry keeps no end. Returns false (nothing sent) when end <= begin or project/activity
         // are invalid; otherwise answered by timeSheetSaved or timeSheetSaveFailed.
@@ -131,6 +145,8 @@ namespace kemai
         void timeSheetDeleteFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
         // `query` is the text the suggestions answer, so the UI can drop stale replies
         void tagSuggestionsReady(const QString &query, const QStringList &tags);
+        // The running timesheet was stopped by stopActiveTimeSheetAt; `end` is the end it got
+        void timeSheetStoppedAway(kemai::SessionController::AwayReason reason, const QDateTime &end);
         // Auth is no longer valid (401): the UI must drop the session and return to login.
         void sessionExpired();
         // Single UI notification channel; the QML banner composes the human message from kind.

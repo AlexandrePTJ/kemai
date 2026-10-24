@@ -47,6 +47,8 @@ namespace kemai
         virtual QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode)  = 0;
         virtual QFuture<KimaiTimeSheet> updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode) = 0;
         virtual QFuture<void>           deleteTimeSheet(int timeSheetId)                                                                 = 0;
+        // Stops a running timesheet now (server time); works in punch mode, where an update cannot send an end
+        virtual QFuture<KimaiTimeSheet> stopTimeSheet(int timeSheetId)                                                                   = 0;
 
         virtual QFuture<KimaiTasks> requestTasks()      = 0;
         virtual QFuture<KimaiTask>  startTask(int taskId) = 0;
