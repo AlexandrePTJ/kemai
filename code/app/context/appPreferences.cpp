@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 #include "appPreferences.h"
 
+// STL headers
+#include <algorithm>
+
 namespace kemai
 {
     AppPreferences::AppPreferences(QObject *parent): QObject(parent) {}
@@ -14,6 +17,45 @@ namespace kemai
     QJsonObject AppPreferences::json() const
     {
         return m_json;
+    }
+
+    bool AppPreferences::stopOnIdle() const
+    {
+        return value("stopOnIdle", false).toBool();
+    }
+
+    void AppPreferences::setStopOnIdle(bool stop)
+    {
+        if (setValue("stopOnIdle", stop))
+        {
+            emit stopOnIdleChanged();
+        }
+    }
+
+    int AppPreferences::idleMinutes() const
+    {
+        return std::clamp(value("idleMinutes", int(DefaultIdleMinutes)).toInt(DefaultIdleMinutes), int(MinIdleMinutes), int(MaxIdleMinutes));
+    }
+
+    void AppPreferences::setIdleMinutes(int minutes)
+    {
+        if (setValue("idleMinutes", std::clamp(minutes, int(MinIdleMinutes), int(MaxIdleMinutes))))
+        {
+            emit idleMinutesChanged();
+        }
+    }
+
+    bool AppPreferences::stopOnLock() const
+    {
+        return value("stopOnLock", false).toBool();
+    }
+
+    void AppPreferences::setStopOnLock(bool stop)
+    {
+        if (setValue("stopOnLock", stop))
+        {
+            emit stopOnLockChanged();
+        }
     }
 
     QJsonValue AppPreferences::value(const QString &key, const QJsonValue &defaultValue) const

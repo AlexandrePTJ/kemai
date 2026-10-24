@@ -8,6 +8,8 @@ Page {
     id: root
 
     required property SessionContext sessionContext
+    required property AppPreferences preferences
+    required property PresenceMonitor presence
 
     // At least one settings section exists: the account menu offers the settings
     property bool settingsAvailable: false
@@ -33,6 +35,13 @@ Page {
         function onNotificationRequested(level, kind, detail) {
             notificationBanner.show(level, kind, detail)
         }
+    }
+
+    AwayStopper {
+        sessionContext: root.sessionContext
+        preferences: root.preferences
+        presence: root.presence
+        onBackAfterStop: (kind, detail) => notificationBanner.show(SessionController.Info, kind, detail)
     }
 
     ColumnLayout {

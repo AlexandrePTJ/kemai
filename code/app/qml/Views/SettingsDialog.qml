@@ -16,9 +16,85 @@ Popup {
     id: root
 
     required property KemaiContext kemaiContext
+    required property PresenceMonitor presence
     // Header context: before login the dialog says so
     property bool signedIn: false
-    property list<SettingsSection> sections
+    property list<SettingsSection> sections: [inactivitySection]
+
+    SettingsSection {
+        id: inactivitySection
+        key: "inactivity"
+        title: "Inactivity"
+        description: "Stop a running timer when you step away."
+        icon: "moon"
+        content: Component {
+            ColumnLayout {
+                id: inactivityRows
+
+                readonly property AppPreferences preferences: root.kemaiContext.preferences
+
+                spacing: 0
+
+                SettingsRow {
+                    Layout.fillWidth: true
+                    title: "Stop the timer when idle"
+                    description: "No keyboard or mouse activity for the chosen time. The entry ends when activity stopped."
+                    unavailableReason: root.presence.idleSupported ? "" : "This desktop session doesn't report idle time."
+                    control: SettingsToggle {
+                        objectName: "stopOnIdleToggle"
+                        checked: inactivityRows.preferences.stopOnIdle
+                        onToggled: inactivityRows.preferences.stopOnIdle = checked
+                    }
+
+                    RowLayout {
+                        Layout.topMargin: 10
+                        spacing: 10
+                        enabled: root.presence.idleSupported
+
+                        Text {
+                            text: "After"
+                            color: root.presence.idleSupported ? Theme.colorTextPrimary : Theme.colorTextDim
+                            font.pixelSize: Theme.fontSizeMedium
+                        }
+
+                        SettingsStepper {
+                            objectName: "idleMinutesStepper"
+                            from: AppPreferences.MinIdleMinutes
+                            to: AppPreferences.MaxIdleMinutes
+                            value: inactivityRows.preferences.idleMinutes
+                            onEdited: (minutes) => inactivityRows.preferences.idleMinutes = minutes
+                        }
+
+                        Text {
+                            text: "minutes"
+                            color: root.presence.idleSupported ? Theme.colorTextPrimary : Theme.colorTextDim
+                            font.pixelSize: Theme.fontSizeMedium
+                        }
+
+                        Text {
+                            text: AppPreferences.MinIdleMinutes + " – " + AppPreferences.MaxIdleMinutes
+                            color: Theme.colorTextDim
+                            font.pixelSize: Theme.fontSizeXSmall
+                            font.features: Theme.fontFeaturesTabular
+                        }
+                    }
+                }
+
+                SettingsRow {
+                    Layout.fillWidth: true
+                    last: true
+                    title: "Stop the timer when the session is locked"
+                    description: "The entry ends at the moment the screen was locked."
+                    unavailableReason: root.presence.lockSupported ? "" : "This desktop session doesn't report screen locking."
+                    control: SettingsToggle {
+                        objectName: "stopOnLockToggle"
+                        checked: inactivityRows.preferences.stopOnLock
+                        onToggled: inactivityRows.preferences.stopOnLock = checked
+                    }
+                }
+            }
+        }
+    }
 
     readonly property bool hasSections: root.sections.length > 0
 

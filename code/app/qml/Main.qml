@@ -39,14 +39,22 @@ ApplicationWindow {
         onLoggedOut: stackView.replace(null, loginViewComponent)
     }
 
+    // Idle time and session lock, for the inactivity settings and stops
+    PresenceMonitor {
+        id: presenceMonitor
+    }
+
     Views.SettingsDialog {
         id: settingsDialog
         kemaiContext: appContext
+        presence: presenceMonitor
     }
 
     Component {
         id: mainViewComponent
         Views.MainView {
+            preferences: appContext.preferences
+            presence: presenceMonitor
             settingsAvailable: settingsDialog.hasSections
             onSettingsRequested: {
                 settingsDialog.signedIn = true

@@ -69,6 +69,8 @@ _Kemai_ connects to your _Kimai_ instance through its API, with an API token (Ki
 
 Then, on Kemai's login screen, enter the address of your Kimai instance and the token. Saved profiles keep several instances at hand, and the token is stored in the system keychain.
 
+In the settings (gear button), Kemai can stop the running timer when you step away: after a chosen time without keyboard or mouse activity, or when the session is locked. The entry then ends when you left, not when Kemai noticed it. Idle time is read on Windows, macOS, and on Linux under GNOME, KDE Plasma or any X11 session (the latter needs `libxcb-screensaver` at build time); other Wayland desktops do not report it. Session locking is read on Windows, macOS, and on Linux through logind.
+
 
 ## How to help
 

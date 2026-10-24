@@ -3,6 +3,7 @@ project(Kemai)
 set(KEMAI_QML_FILES
         qml/Components/AccountMenu.qml
         qml/Components/ActiveHintBar.qml
+        qml/Components/AwayStopper.qml
         qml/Components/ActivityComboBox.qml
         qml/Components/CalendarView.qml
         qml/Components/DashedBorder.qml
@@ -21,6 +22,7 @@ set(KEMAI_QML_FILES
         qml/Components/SecondaryButton.qml
         qml/Components/SettingsRow.qml
         qml/Components/SettingsSection.qml
+        qml/Components/SettingsStepper.qml
         qml/Components/SettingsToggle.qml
         qml/Components/Spinner.qml
         qml/Components/StartStopButton.qml
