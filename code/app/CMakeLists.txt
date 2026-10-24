@@ -67,6 +67,16 @@ set_source_files_properties(qml/Theme.qml
         PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
 
+# Presence monitor: one backend per platform
+list(APPEND KEMAI_QML_SOURCES monitor/presenceMonitor.cpp monitor/presenceMonitor.h)
+if (WIN32)
+    list(APPEND KEMAI_QML_SOURCES monitor/windowsPresenceBackend.cpp)
+elseif (APPLE)
+    list(APPEND KEMAI_QML_SOURCES monitor/macPresenceBackend.mm)
+else ()
+    list(APPEND KEMAI_QML_SOURCES monitor/linuxPresenceBackend.cpp monitor/linuxPresenceBackend.h)
+endif ()
+
 qt_add_qml_module(${PROJECT_NAME}
         URI Kemai
         QML_FILES ${KEMAI_QML_FILES}
@@ -92,13 +102,31 @@ target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/context
         ${CMAKE_CURRENT_SOURCE_DIR}/helpers
-        ${CMAKE_CURRENT_SOURCE_DIR}/model)
+        ${CMAKE_CURRENT_SOURCE_DIR}/model
+        ${CMAKE_CURRENT_SOURCE_DIR}/monitor)
 
 target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME}
         PRIVATE KemaiCore Qt6::Gui Qt6::Quick spdlog::spdlog magic_enum::magic_enum)
+
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE wtsapi32)
+elseif (APPLE)
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreGraphics" "-framework Foundation")
+else ()
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::DBus)
+    # X11 sessions outside GNOME/KDE: idle time from the screensaver extension, when available at build time
+    find_package(PkgConfig QUIET)
+    if (PkgConfig_FOUND)
+        pkg_check_modules(XCB_SCREENSAVER IMPORTED_TARGET xcb xcb-screensaver)
+    endif ()
+    if (XCB_SCREENSAVER_FOUND)
+        target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::XCB_SCREENSAVER)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE KEMAI_HAS_XCB_SCREENSAVER)
+    endif ()
+endif ()
 
 install(TARGETS ${PROJECT_NAME}
         BUNDLE DESTINATION .

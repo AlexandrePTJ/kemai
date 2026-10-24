@@ -16,6 +16,10 @@ else ()
     set(_kemai_project_version 0.0.0)
 endif ()
 project(KemaiProject VERSION ${_kemai_project_version} LANGUAGES CXX)
+if (APPLE)
+    # macOS presence backend (code/app/monitor/macPresenceBackend.mm)
+    enable_language(OBJCXX)
+endif ()
 
 if (KEMAI_VERSION)
     set(KEMAI_DISPLAY_VERSION ${KEMAI_VERSION})
@@ -56,6 +60,10 @@ option(KEMAI_BUILD_LOCAL_DEPENDENCIES "Download and build dependencies (except Q
 # Qt first: qtkeychain finds it too, and Qt's deploy support (used by cmake --install) must be set up
 # from this scope, otherwise its QML deployment commands are missing at install time
 find_package(Qt6 REQUIRED COMPONENTS Gui Network LinguistTools Quick)
+if (UNIX AND NOT APPLE)
+    # Presence (idle time, session lock) over D-Bus
+    find_package(Qt6 REQUIRED COMPONENTS DBus)
+endif ()
 
 # Install dependencies sources to build if required
 if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
