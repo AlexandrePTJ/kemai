@@ -50,6 +50,10 @@ namespace kemai
         m_activeDurationTimer.setInterval(std::chrono::seconds(1));
         connect(&m_activeDurationTimer, &QTimer::timeout, this, &SessionController::activeTimesheetChanged);
 
+        m_syncTimer.setInterval(DefaultSyncInterval);
+        connect(&m_syncTimer, &QTimer::timeout, this, &SessionController::syncActiveTimeSheet);
+        m_syncTimer.start();
+
         connect(m_cache.get(), &KimaiCache::loaded, this, &SessionController::onCacheLoaded);
         connect(m_cache.get(), &KimaiCache::loadFailed, this, &SessionController::onCacheLoadFailed);
 
@@ -202,28 +206,96 @@ namespace kemai
     void SessionController::refreshActiveTimeSheets()
     {
         m_client->requestActiveTimeSheets()
-            .then(this,
-                  [this](const KimaiTimeSheets &sheets)
-                  {
-                      const auto hadActive = m_activeTimeSheet.has_value();
-                      m_activeTimeSheet    = sheets.isEmpty() ? std::nullopt : std::make_optional(sheets.first());
-
-                      if (m_activeTimeSheet)
-                      {
-                          m_activeDurationTimer.start();
-                      }
-                      else
-                      {
-                          m_activeDurationTimer.stop();
-                      }
-
-                      if (hadActive != m_activeTimeSheet.has_value())
-                      {
-                          emit activeTimesheetChanged();
-                      }
-                  })
+            .then(this, [this](const KimaiTimeSheets &sheets) { applyActiveTimeSheets(sheets); })
             .onFailed(this, [this](const KimaiApiError &e)
                       { handleApiError(e, "Failed to fetch active timesheets"); });
+    }
+
+    bool SessionController::applyActiveTimeSheets(const KimaiTimeSheets &sheets)
+    {
+        auto next = sheets.isEmpty() ? std::nullopt : std::make_optional(sheets.first());
+
+        // An edit of the running entry from elsewhere counts as a change too
+        const auto same = [](const KimaiTimeSheet &a, const KimaiTimeSheet &b)
+        {
+            return a.id == b.id && a.beginAt == b.beginAt && a.project.id == b.project.id && a.activity.id == b.activity.id &&
+                   a.description == b.description;
+        };
+        const auto changed = m_activeTimeSheet.has_value() != next.has_value() || (next && !same(*m_activeTimeSheet, *next));
+
+        m_activeTimeSheet = std::move(next);
+
+        if (m_activeTimeSheet)
+        {
+            m_activeDurationTimer.start();
+        }
+        else
+        {
+            m_activeDurationTimer.stop();
+        }
+
+        if (changed)
+        {
+            emit activeTimesheetChanged();
+        }
+        return changed;
+    }
+
+    void SessionController::setSyncInterval(std::chrono::milliseconds interval)
+    {
+        m_syncTimer.setInterval(interval);
+    }
+
+    void SessionController::invalidateSync()
+    {
+        ++m_syncGeneration;
+    }
+
+    void SessionController::syncActiveTimeSheet()
+    {
+        if (m_syncInFlight)
+        {
+            return;
+        }
+        m_syncInFlight = true;
+
+        const auto generation = m_syncGeneration;
+        m_client->requestActiveTimeSheets()
+            .then(this,
+                  [this, generation](const KimaiTimeSheets &sheets)
+                  {
+                      m_syncInFlight = false;
+                      m_syncFailing  = false;
+
+                      // A local action was sent meanwhile: its own refresh has the newer state
+                      if (generation != m_syncGeneration)
+                      {
+                          return;
+                      }
+                      if (applyActiveTimeSheets(sheets))
+                      {
+                          spdlog::info("Running timer changed on the server");
+                          refreshRecentTimeSheets();
+                      }
+                  })
+            .onFailed(this,
+                      [this](const KimaiApiError &e)
+                      {
+                          m_syncInFlight = false;
+                          spdlog::error("Failed to check the running timer: {}", e.what());
+
+                          if (e.kind() == ApiErrorKind::AuthFailed)
+                          {
+                              emit sessionExpired();
+                              return;
+                          }
+                          // Reported once until a check succeeds: the next ones would repeat the same warning every interval
+                          if (!m_syncFailing)
+                          {
+                              m_syncFailing = true;
+                              emit notificationRequested(NotificationLevel::Warning, notificationKindFromError(e.kind()), e.endpoint());
+                          }
+                      });
     }
 
     void SessionController::startTimeSheet(int activityId, int projectId)
@@ -244,6 +316,7 @@ namespace kemai
         ts.project.id  = projectId;
         ts.beginAt     = QDateTime::currentDateTimeUtc();
 
+        invalidateSync();
         m_client->startTimeSheet(ts, m_cache->timesheetConfig().trackingMode)
             .then(this,
                   [this](const KimaiTimeSheet &)
@@ -266,6 +339,7 @@ namespace kemai
         KimaiTimeSheet ts = *m_activeTimeSheet;
         ts.endAt          = QDateTime::currentDateTimeUtc();
 
+        invalidateSync();
         m_client->updateTimeSheet(ts, m_cache->timesheetConfig().trackingMode)
             .then(this,
                   [this](const KimaiTimeSheet &)
@@ -327,6 +401,7 @@ namespace kemai
         createTagsThen(tagsToCreate, timesheetId,
                        [this, updated, timesheetId]()
                        {
+                           invalidateSync();
                            m_client->updateTimeSheet(updated, m_cache->timesheetConfig().trackingMode)
                                .then(this,
                                      [this, timesheetId](const KimaiTimeSheet &)
@@ -374,6 +449,7 @@ namespace kemai
             return false;
         }
 
+        invalidateSync();
         m_client->deleteTimeSheet(timesheetId)
             .then(this,
                   [this, timesheetId]()

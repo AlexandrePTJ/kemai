@@ -4,6 +4,7 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QElapsedTimer>
 
 #include <context/sessionController.h>
 
@@ -631,4 +632,173 @@ TEST_CASE("SessionController::requestTagSuggestions - failure goes through the e
 
     REQUIRE(probe.notificationCount == 1);
     REQUIRE(probe.lastKind == SessionController::NotificationKind::NoNetwork);
+}
+
+TEST_CASE("SessionController::syncActiveTimeSheet - follows a timer started or stopped elsewhere", "[session][sync][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    REQUIRE_FALSE(controller.hasActiveTimesheet());
+
+    // Started from the web interface
+    fake->activeTimeSheets = {makeTimeSheet(5, QDateTime::currentDateTimeUtc().addSecs(-60))};
+    fake->calls.clear();
+    controller.syncActiveTimeSheet();
+    processEvents();
+
+    REQUIRE(controller.hasActiveTimesheet());
+    REQUIRE(controller.activeProjectName() == "Rocket");
+    REQUIRE(fake->calls.count("requestTimeSheets") == 1);
+
+    // Stopped from another client
+    fake->activeTimeSheets.clear();
+    fake->calls.clear();
+    controller.syncActiveTimeSheet();
+    processEvents();
+
+    REQUIRE_FALSE(controller.hasActiveTimesheet());
+    REQUIRE(fake->calls.count("requestTimeSheets") == 1);
+}
+
+TEST_CASE("SessionController::syncActiveTimeSheet - unchanged timer reloads nothing", "[session][sync][unit]")
+{
+    auto fake              = std::make_shared<FakeKimaiClient>();
+    fake->activeTimeSheets = {makeTimeSheet(5, QDateTime::currentDateTimeUtc().addSecs(-60))};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    int refreshingChanges = 0;
+    QObject::connect(&controller, &SessionController::refreshingChanged, [&] { ++refreshingChanges; });
+
+    fake->calls.clear();
+    controller.syncActiveTimeSheet();
+    processEvents();
+
+    REQUIRE(fake->calls == QStringList{"requestActiveTimeSheets"});
+    REQUIRE(refreshingChanges == 0);
+    REQUIRE(controller.hasActiveTimesheet());
+}
+
+TEST_CASE("SessionController::syncActiveTimeSheet - an edit of the running entry elsewhere is a change", "[session][sync][unit]")
+{
+    auto fake              = std::make_shared<FakeKimaiClient>();
+    fake->activeTimeSheets = {makeTimeSheet(5, QDateTime::currentDateTimeUtc().addSecs(-60))};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    fake->activeTimeSheets.first().description = "Edited on the web";
+    fake->calls.clear();
+    controller.syncActiveTimeSheet();
+    processEvents();
+
+    REQUIRE(fake->calls.count("requestTimeSheets") == 1);
+}
+
+TEST_CASE("SessionController::syncActiveTimeSheet - reply older than a local action is dropped", "[session][sync][unit]")
+{
+    auto fake              = std::make_shared<FakeKimaiClient>();
+    fake->activeTimeSheets = {makeTimeSheet(5, QDateTime::currentDateTimeUtc().addSecs(-60))};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    REQUIRE(controller.hasActiveTimesheet());
+
+    // The check leaves first, then the user stops: only the stop's own refresh may update the lists
+    fake->activeTimeSheets.clear();
+    fake->calls.clear();
+    controller.syncActiveTimeSheet();
+    controller.stopActiveTimeSheet();
+    processEvents();
+
+    REQUIRE_FALSE(controller.hasActiveTimesheet());
+    REQUIRE(fake->calls.count("requestTimeSheets") == 1);
+}
+
+TEST_CASE("SessionController::syncActiveTimeSheet - a check in flight is not restarted", "[session][sync][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    fake->calls.clear();
+    controller.syncActiveTimeSheet();
+    controller.syncActiveTimeSheet();
+    processEvents();
+
+    REQUIRE(fake->calls.count("requestActiveTimeSheets") == 1);
+}
+
+TEST_CASE("SessionController::syncActiveTimeSheet - runs periodically", "[session][sync][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    controller.setSyncInterval(std::chrono::milliseconds(20));
+    processEvents();
+
+    fake->calls.clear();
+    QElapsedTimer elapsed;
+    elapsed.start();
+    while (fake->calls.count("requestActiveTimeSheets") < 2 && elapsed.elapsed() < 2000)
+    {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    }
+
+    REQUIRE(fake->calls.count("requestActiveTimeSheets") >= 2);
+}
+
+TEST_CASE("SessionController::syncActiveTimeSheet - failures are reported once until a success", "[session][sync][error][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+
+    fake->failWith("requestActiveTimeSheets", ApiErrorKind::NoNetwork);
+    for (int i = 0; i < 3; ++i)
+    {
+        controller.syncActiveTimeSheet();
+        processEvents();
+    }
+
+    REQUIRE(probe.notificationCount == 1);
+    REQUIRE(probe.lastLevel == SessionController::NotificationLevel::Warning);
+    REQUIRE(probe.lastKind == SessionController::NotificationKind::NoNetwork);
+
+    // Back online, then lost again: a new warning
+    fake->errors.clear();
+    controller.syncActiveTimeSheet();
+    processEvents();
+    fake->failWith("requestActiveTimeSheets", ApiErrorKind::NoNetwork);
+    controller.syncActiveTimeSheet();
+    processEvents();
+
+    REQUIRE(probe.notificationCount == 2);
+    REQUIRE(probe.sessionExpiredCount == 0);
+}
+
+TEST_CASE("SessionController::syncActiveTimeSheet - 401 expires the session", "[session][sync][error][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+
+    fake->failWith("requestActiveTimeSheets", ApiErrorKind::AuthFailed, 401);
+    controller.syncActiveTimeSheet();
+    processEvents();
+
+    REQUIRE(probe.sessionExpiredCount == 1);
+    REQUIRE(probe.notificationCount == 0);
 }

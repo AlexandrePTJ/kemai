@@ -112,6 +112,13 @@ namespace kemai
         // refresh() only when the cache is missing or older than the stale threshold.
         Q_INVOKABLE void refreshIfStale();
 
+        // Checks the running timer on the server (also every syncInterval): a timer started, stopped or changed
+        // elsewhere updates the active state and reloads the history; an unchanged one causes no visible refresh.
+        Q_INVOKABLE void syncActiveTimeSheet();
+        void             setSyncInterval(std::chrono::milliseconds interval);
+
+        static constexpr std::chrono::seconds DefaultSyncInterval{30};
+
     signals:
         void activeTimesheetChanged();
         void accountChanged();
@@ -132,6 +139,10 @@ namespace kemai
     private:
         void refreshRecentTimeSheets();
         void refreshActiveTimeSheets();
+        // Takes the server's active timesheets as the current state; returns whether it differs from the previous one
+        bool applyActiveTimeSheets(const KimaiTimeSheets &sheets);
+        // Called when a local start/stop/update/delete is sent: sync replies sent before it are outdated
+        void invalidateSync();
         // Creates `names` one after the other, then runs `next`; a failure reports timeSheetSaveFailed instead
         void createTagsThen(QStringList names, int timesheetId, std::function<void()> next);
         void onCacheLoaded();
@@ -153,6 +164,10 @@ namespace kemai
         std::optional<KimaiTimeSheet>      m_activeTimeSheet;
         QTimer                             m_recentRefreshTimer;
         QTimer                             m_activeDurationTimer;
+        QTimer                             m_syncTimer;
+        bool                               m_syncInFlight   = false;
+        bool                               m_syncFailing    = false;
+        int                                m_syncGeneration = 0;
         std::chrono::seconds               m_staleAfter = std::chrono::minutes(10);
     };
 } // namespace kemai
