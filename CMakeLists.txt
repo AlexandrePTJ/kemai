@@ -53,6 +53,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 option(KEMAI_ENABLE_UPDATE_CHECK "Allow Kemai to check for update from Github releases" ON)
 option(KEMAI_BUILD_LOCAL_DEPENDENCIES "Download and build dependencies (except Qt6)" ON)
 
+# Qt first: qtkeychain finds it too, and Qt's deploy support (used by cmake --install) must be set up
+# from this scope, otherwise its QML deployment commands are missing at install time
+find_package(Qt6 REQUIRED COMPONENTS Gui Network LinguistTools Quick)
+
 # Install dependencies sources to build if required
 if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
     include(cmake/get_cpm.cmake)
@@ -67,7 +71,6 @@ endif (KEMAI_BUILD_LOCAL_DEPENDENCIES)
 find_package(fmt REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(Qt6 REQUIRED COMPONENTS Gui Network LinguistTools Quick)
 find_package(qtkeychain REQUIRED)
 
 # Enable Qt auto-tools globally (AUTOMOC, AUTOUIC, AUTORCC) for all subdirectories
