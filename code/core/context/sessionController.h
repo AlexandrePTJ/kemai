@@ -19,6 +19,7 @@
 #include <client/kimaiSystem.h>
 #include <client/kimaiTimesheets.h>
 #include <model/activityListModel.h>
+#include <model/taskModel.h>
 #include <model/timesheetModel.h>
 
 namespace kemai
@@ -45,6 +46,12 @@ namespace kemai
         Q_PROPERTY(kemai::ActivityListModel *activityModel READ activityModel CONSTANT)
         Q_PROPERTY(bool refreshing READ isRefreshing NOTIFY refreshingChanged)
         Q_PROPERTY(bool punchMode READ isPunchMode NOTIFY punchModeChanged)
+        // Task Management plugin installed on the instance: the tasks view exists only then
+        Q_PROPERTY(bool hasTaskManagement READ hasTaskManagement NOTIFY pluginsChanged)
+        Q_PROPERTY(kemai::TaskModel *tasks READ tasks CONSTANT)
+        Q_PROPERTY(kemai::SessionController::TasksLoad tasksLoad READ tasksLoad NOTIFY tasksLoadChanged)
+        // Last load failure (tasksLoad Failed)
+        Q_PROPERTY(kemai::SessionController::NotificationKind tasksError READ tasksError NOTIFY tasksLoadChanged)
         // IANA timezone of the Kimai user (prefill of new customers)
         Q_PROPERTY(QString userTimezone READ userTimezone CONSTANT)
 
@@ -83,6 +90,15 @@ namespace kemai
         };
         Q_ENUM(AwayReason)
 
+        enum class TasksLoad
+        {
+            NotLoaded,
+            Loading, // first load only: later reloads keep the list (Ready) meanwhile
+            Ready,
+            Failed
+        };
+        Q_ENUM(TasksLoad)
+
         enum class ResourceKind
         {
             Customer,
@@ -110,6 +126,10 @@ namespace kemai
         // Kimai manages begin/end itself: they are never sent on update
         bool               isPunchMode() const;
         QString            userTimezone() const;
+        bool               hasTaskManagement() const;
+        TaskModel         *tasks() const;
+        TasksLoad          tasksLoad() const;
+        NotificationKind   tasksError() const;
         // Project of the most recent entry (prefill of new activities), 0 without entries
         Q_INVOKABLE int    lastUsedProjectId() const;
 
@@ -145,6 +165,14 @@ namespace kemai
         Q_INVOKABLE void createActivity(const QString &name, int projectId);
         // Reloads customers, projects and activities (unless a load is in flight); `refreshing` follows it
         Q_INVOKABLE void reloadResources();
+
+        // Task Management: (re)loads the user's open tasks; also done when the running timer changes once loaded
+        Q_INVOKABLE void loadTasks();
+        // Starts a timer on the task (Kimai stops a running one when only one may run), titled after the task.
+        // Answered by taskStarted, or taskActionFailed(id, "start", ...) for the row to show (401 → sessionExpired)
+        Q_INVOKABLE void startTask(int taskId);
+        // Marks the task done (Kimai also stops its running timer). Answered by taskClosed, or taskActionFailed(id, "close", ...)
+        Q_INVOKABLE void closeTask(int taskId);
 
         // Choices for the creation forms, from the cache, sorted by name:
         // customers {id, name, projectCount}, projects {id, name, customerId, customerName, color},
@@ -183,6 +211,11 @@ namespace kemai
         void timeSheetSaveFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
         void timeSheetDeleted(int timesheetId);
         void timeSheetDeleteFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
+        void pluginsChanged();
+        void tasksLoadChanged();
+        void taskStarted(int taskId);
+        void taskClosed(int taskId);
+        void taskActionFailed(int taskId, const QString &action, kemai::SessionController::NotificationKind error, const QString &detail);
         void resourceCreated(kemai::SessionController::ResourceKind kind, int id);
         // `field`: the Kimai field a refused value belongs to, when known
         void resourceCreateFailed(kemai::SessionController::ResourceKind kind, kemai::SessionController::NotificationKind error, const QString &detail,
@@ -206,6 +239,8 @@ namespace kemai
         // Creates `names` one after the other, then runs `next`; a failure reports timeSheetSaveFailed instead
         void createTagsThen(QStringList names, int timesheetId, std::function<void()> next);
         void handleCreateError(const KimaiApiError &error, ResourceKind kind);
+        void handleTaskError(const KimaiApiError &error, int taskId, const QString &action);
+        void requestPlugins();
         void onCacheLoaded();
         void onCacheLoadFailed();
 
@@ -231,5 +266,10 @@ namespace kemai
         int                                m_syncGeneration = 0;
         std::chrono::seconds               m_staleAfter = std::chrono::minutes(10);
         int                                m_lastUsedProjectId = 0;
+        std::unique_ptr<TaskModel>         m_tasks;
+        bool                               m_hasTaskManagement = false;
+        TasksLoad                          m_tasksLoad         = TasksLoad::NotLoaded;
+        NotificationKind                   m_tasksError        = NotificationKind::UnknownError;
+        int                                m_tasksGeneration   = 0;
     };
 } // namespace kemai

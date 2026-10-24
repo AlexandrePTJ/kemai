@@ -41,6 +41,8 @@ set(KEMAI_LIB_SOURCES
         model/activityListModel.h
         model/profile.cpp
         model/profile.h
+        model/taskModel.cpp
+        model/taskModel.h
         model/timesheetModel.cpp
         model/timesheetModel.h
         storage/appSettingsStore.cpp

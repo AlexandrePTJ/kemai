@@ -1065,3 +1065,159 @@ TEST_CASE("SessionController - choices and duplicate lookup for the creation for
     REQUIRE(globalPair.value("isGlobal").toBool());
     REQUIRE(controller.pair(11, 100).isEmpty());
 }
+
+namespace
+{
+    KimaiPlugins taskManagementPlugin()
+    {
+        KimaiPlugin plugin;
+        plugin.name      = "TaskManagementBundle";
+        plugin.apiPlugin = ApiPlugin::TaskManagement;
+        return {plugin};
+    }
+
+    KimaiTask openTask(int id, const QString &title)
+    {
+        KimaiTask task;
+        task.id          = id;
+        task.title       = title;
+        task.status      = KimaiTask::Status::Pending;
+        task.project.id  = 7;
+        task.activity.id = 11;
+        return task;
+    }
+} // namespace
+
+TEST_CASE("SessionController - tasks only with the plugin", "[session][tasks][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    REQUIRE_FALSE(controller.hasTaskManagement());
+
+    fake->calls.clear();
+    controller.loadTasks();
+    processEvents();
+    REQUIRE_FALSE(fake->calls.contains("requestTasks"));
+    REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::NotLoaded);
+}
+
+TEST_CASE("SessionController - loads, starts and closes tasks", "[session][tasks][unit]")
+{
+    auto fake     = std::make_shared<FakeKimaiClient>();
+    fake->plugins = taskManagementPlugin();
+    fake->tasks   = {openTask(1, "Monthly invoices"), openTask(2, "Review")};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    REQUIRE(controller.hasTaskManagement());
+
+    controller.loadTasks();
+    REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::Loading);
+    processEvents();
+    REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::Ready);
+    REQUIRE(controller.tasks()->totalCount() == 2);
+
+    // Start: the task's timer, titled after it
+    int started = 0;
+    QObject::connect(&controller, &SessionController::taskStarted, [&] { ++started; });
+    fake->timeSheetResult = makeTimeSheet(500, QDateTime::currentDateTimeUtc());
+    fake->calls.clear();
+    controller.startTask(1);
+    processEvents();
+    REQUIRE(started == 1);
+    REQUIRE(fake->lastStartedTaskId == 1);
+    REQUIRE(fake->lastUpdatedTimeSheet.description == "Monthly invoices");
+    REQUIRE(fake->calls.contains("requestActiveTimeSheets"));
+
+    // Close: leaves the list
+    int closed = 0;
+    QObject::connect(&controller, &SessionController::taskClosed, [&] { ++closed; });
+    controller.closeTask(2);
+    processEvents();
+    REQUIRE(closed == 1);
+    REQUIRE(controller.tasks()->findById(2) == nullptr);
+}
+
+TEST_CASE("SessionController - a timer change reloads the loaded tasks", "[session][tasks][unit]")
+{
+    auto fake     = std::make_shared<FakeKimaiClient>();
+    fake->plugins = taskManagementPlugin();
+    fake->tasks   = {openTask(1, "Monthly invoices")};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    controller.loadTasks();
+    processEvents();
+
+    fake->activeTimeSheets = {makeTimeSheet(5, QDateTime::currentDateTimeUtc())};
+    fake->calls.clear();
+    controller.syncActiveTimeSheet();
+    processEvents();
+    REQUIRE(fake->calls.count("requestTasks") == 1);
+    REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::Ready); // no skeleton on reload
+}
+
+TEST_CASE("SessionController - task failures go to the row, 401 expires the session", "[session][tasks][error][unit]")
+{
+    auto fake     = std::make_shared<FakeKimaiClient>();
+    fake->plugins = taskManagementPlugin();
+    fake->tasks   = {openTask(1, "Monthly invoices")};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    controller.loadTasks();
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+    QString                                            action;
+    std::optional<SessionController::NotificationKind> failure;
+    QObject::connect(&controller, &SessionController::taskActionFailed,
+                     [&](int, const QString &a, SessionController::NotificationKind kind, const QString &)
+                     {
+                         action  = a;
+                         failure = kind;
+                     });
+
+    fake->failWith("closeTask", ApiErrorKind::Forbidden, 403);
+    controller.closeTask(1);
+    processEvents();
+    REQUIRE(action == "close");
+    REQUIRE(failure == SessionController::NotificationKind::Forbidden);
+    REQUIRE(controller.tasks()->findById(1) != nullptr); // unchanged
+    REQUIRE(probe.notificationCount == 0);
+
+    // A background reload failure keeps the list and warns
+    fake->failWith("requestTasks", ApiErrorKind::NoNetwork);
+    controller.loadTasks();
+    processEvents();
+    REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::Ready);
+    REQUIRE(probe.notificationCount == 1);
+    REQUIRE(probe.lastLevel == SessionController::NotificationLevel::Warning);
+
+    fake->failWith("startTask", ApiErrorKind::AuthFailed, 401);
+    controller.startTask(1);
+    processEvents();
+    REQUIRE(probe.sessionExpiredCount == 1);
+}
+
+TEST_CASE("SessionController - a failed first task load shows in the pane", "[session][tasks][error][unit]")
+{
+    auto fake     = std::make_shared<FakeKimaiClient>();
+    fake->plugins = taskManagementPlugin();
+    fake->failWith("requestTasks", ApiErrorKind::NoNetwork);
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+    controller.loadTasks();
+    processEvents();
+
+    REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::Failed);
+    REQUIRE(controller.tasksError() == SessionController::NotificationKind::NoNetwork);
+    REQUIRE(probe.notificationCount == 0);
+}

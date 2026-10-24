@@ -51,7 +51,8 @@ namespace kemai
     m_user(user),
     m_recentTimeSheets(std::make_unique<TimesheetModel>(this)),
     m_activityModel(std::make_unique<ActivityListModel>(this)),
-    m_cache(std::make_unique<KimaiCache>(this))
+    m_cache(std::make_unique<KimaiCache>(this)),
+    m_tasks(std::make_unique<TaskModel>(this))
     {
         m_recentRefreshTimer.setInterval(std::chrono::minutes(1));
         connect(&m_recentRefreshTimer, &QTimer::timeout, m_recentTimeSheets.get(), &TimesheetModel::refreshActiveDurations);
@@ -67,6 +68,7 @@ namespace kemai
         connect(m_cache.get(), &KimaiCache::loadFailed, this, &SessionController::onCacheLoadFailed);
 
         refresh();
+        requestPlugins();
     }
 
     SessionController::~SessionController()
@@ -353,6 +355,160 @@ namespace kemai
         };
     }
 
+    bool SessionController::hasTaskManagement() const
+    {
+        return m_hasTaskManagement;
+    }
+
+    TaskModel *SessionController::tasks() const
+    {
+        return m_tasks.get();
+    }
+
+    SessionController::TasksLoad SessionController::tasksLoad() const
+    {
+        return m_tasksLoad;
+    }
+
+    SessionController::NotificationKind SessionController::tasksError() const
+    {
+        return m_tasksError;
+    }
+
+    void SessionController::requestPlugins()
+    {
+        m_client->requestPlugins()
+            .then(this,
+                  [this](const KimaiPlugins &plugins)
+                  {
+                      m_hasTaskManagement = std::ranges::any_of(plugins, [](const KimaiPlugin &p) { return p.apiPlugin == ApiPlugin::TaskManagement; });
+                      emit pluginsChanged();
+                  })
+            .onFailed(this,
+                      [this](const KimaiApiError &e)
+                      {
+                          // Without the list, the plugin features stay hidden: nothing else is affected, no banner
+                          spdlog::warn("Failed to fetch plugins: {}", e.what());
+                          if (e.kind() == ApiErrorKind::AuthFailed)
+                          {
+                              emit sessionExpired();
+                          }
+                      });
+    }
+
+    void SessionController::loadTasks()
+    {
+        if (!m_hasTaskManagement)
+        {
+            return;
+        }
+
+        // The skeleton is for the first load; later loads keep the list shown
+        if (m_tasksLoad != TasksLoad::Ready)
+        {
+            m_tasksLoad = TasksLoad::Loading;
+            emit tasksLoadChanged();
+        }
+
+        const auto generation = ++m_tasksGeneration;
+        m_client->requestTasks(m_user.id)
+            .then(this,
+                  [this, generation](const KimaiTasks &tasks)
+                  {
+                      if (generation != m_tasksGeneration)
+                      {
+                          return;
+                      }
+                      m_tasks->setTasks(tasks, m_activeTimeSheet ? m_activeTimeSheet->id : 0);
+                      m_tasksLoad = TasksLoad::Ready;
+                      emit tasksLoadChanged();
+                  })
+            .onFailed(this,
+                      [this, generation](const KimaiApiError &e)
+                      {
+                          if (generation != m_tasksGeneration)
+                          {
+                              return;
+                          }
+                          spdlog::error("Failed to fetch tasks: {}", e.what());
+                          if (e.kind() == ApiErrorKind::AuthFailed)
+                          {
+                              emit sessionExpired();
+                              return;
+                          }
+                          // A list on screen stays (a background reload failed: a warning is enough);
+                          // otherwise the tasks pane shows the failure
+                          if (m_tasksLoad == TasksLoad::Ready)
+                          {
+                              emit notificationRequested(NotificationLevel::Warning, notificationKindFromError(e.kind()), e.endpoint());
+                              return;
+                          }
+                          m_tasksError = notificationKindFromError(e.kind());
+                          m_tasksLoad  = TasksLoad::Failed;
+                          emit tasksLoadChanged();
+                      });
+    }
+
+    void SessionController::startTask(int taskId)
+    {
+        const auto *task = m_tasks->findById(taskId);
+        if (task == nullptr)
+        {
+            spdlog::error("Task start ignored: no task with id={}", taskId);
+            return;
+        }
+        const auto title = task->title;
+
+        invalidateSync();
+        m_client->startTask(taskId)
+            .then(this,
+                  [this, taskId, title](const KimaiTimeSheet &started)
+                  {
+                      emit taskStarted(taskId);
+
+                      // Kimai leaves the description empty: the task title says what the time was spent on
+                      if (started.description.isEmpty() && !title.isEmpty())
+                      {
+                          auto described        = started;
+                          described.description = title;
+                          m_client->updateTimeSheet(described, m_cache->timesheetConfig().trackingMode)
+                              .then(this, [this](const KimaiTimeSheet &) { refreshRecentTimeSheets(); })
+                              .onFailed(this, [this](const KimaiApiError &e) { handleApiError(e, "Failed to describe the task's timesheet"); });
+                      }
+                      refreshActiveTimeSheets();
+                      refreshRecentTimeSheets();
+                  })
+            .onFailed(this, [this, taskId](const KimaiApiError &e) { handleTaskError(e, taskId, "start"); });
+    }
+
+    void SessionController::closeTask(int taskId)
+    {
+        invalidateSync();
+        m_client->closeTask(taskId)
+            .then(this,
+                  [this, taskId](const KimaiTask &)
+                  {
+                      m_tasks->removeTask(taskId);
+                      emit taskClosed(taskId);
+                      // Its running timer, if any, was stopped by Kimai
+                      refreshActiveTimeSheets();
+                      refreshRecentTimeSheets();
+                  })
+            .onFailed(this, [this, taskId](const KimaiApiError &e) { handleTaskError(e, taskId, "close"); });
+    }
+
+    void SessionController::handleTaskError(const KimaiApiError &error, int taskId, const QString &action)
+    {
+        spdlog::error("Failed to {} task {}: {}", action, taskId, error.what());
+
+        if (error.kind() == ApiErrorKind::AuthFailed)
+        {
+            emit sessionExpired();
+            return;
+        }
+        emit taskActionFailed(taskId, action, notificationKindFromError(error.kind()), error.serverMessage());
+    }
+
     void SessionController::handleCreateError(const KimaiApiError &error, ResourceKind kind)
     {
         spdlog::error("Failed to create {}: {}", magic_enum::enum_name(kind), error.what());
@@ -448,6 +604,13 @@ namespace kemai
         if (changed)
         {
             emit activeTimesheetChanged();
+
+            // A timer started or stopped anywhere changes task statuses
+            m_tasks->setActiveTimeSheetId(m_activeTimeSheet ? m_activeTimeSheet->id : 0);
+            if (m_tasksLoad == TasksLoad::Ready || m_tasksLoad == TasksLoad::Failed)
+            {
+                loadTasks();
+            }
         }
         return changed;
     }
