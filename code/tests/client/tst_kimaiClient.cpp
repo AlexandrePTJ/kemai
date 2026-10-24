@@ -340,9 +340,11 @@ TEST_CASE("KimaiClient - creates a customer, project and activity", "[client][in
     customer.countryKey  = "FR";
     customer.currencyKey = "EUR";
     customer.timezone    = "Europe/Paris";
+    customer.language    = "fr";
     const auto createdCustomer = waitForFuture(client.addCustomer(customer));
     REQUIRE(createdCustomer.id > 0);
     REQUIRE(createdCustomer.name == customer.name);
+    REQUIRE(createdCustomer.language == "fr");
 
     KimaiProject project;
     project.name        = QStringLiteral("kemai integration test project");

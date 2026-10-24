@@ -42,6 +42,7 @@ namespace kemai
         customer.address     = jsonObject.value("address").toString();
         customer.countryKey  = jsonObject.value("country").toString();
         customer.currencyKey = jsonObject.value("currency").toString();
+        customer.language    = jsonObject.value("language").toString();
         customer.phone       = jsonObject.value("phone").toString();
         customer.fax         = jsonObject.value("fax").toString();
         customer.mobile      = jsonObject.value("mobile").toString();
@@ -62,6 +63,7 @@ namespace kemai
             {"name",     name       },
             {"country",  countryKey },
             {"currency", currencyKey},
+            {"language", language   },
             {"timezone", timezone   },
             {"visible",  visible    }
         };

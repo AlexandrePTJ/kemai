@@ -926,7 +926,9 @@ TEST_CASE("SessionController::create* - creates and reports the new id, without 
 {
     auto fake = std::make_shared<FakeKimaiClient>();
 
-    SessionController controller(fake, KimaiUser{});
+    KimaiUser user;
+    user.language = "fr";
+    SessionController controller(fake, user);
     processEvents();
 
     QList<std::pair<SessionController::ResourceKind, int>> created;
@@ -948,6 +950,7 @@ TEST_CASE("SessionController::create* - creates and reports the new id, without 
     REQUIRE(created[2] == std::pair{SessionController::ResourceKind::Activity, 102});
     REQUIRE(fake->lastAddedCustomer.name == "Acme");
     REQUIRE(fake->lastAddedCustomer.countryKey == "FR");
+    REQUIRE(fake->lastAddedCustomer.language == "fr");
     REQUIRE(fake->lastAddedProject.customer.id == 100);
     REQUIRE_FALSE(fake->lastAddedActivity.project.has_value()); // global
     REQUIRE_FALSE(fake->calls.contains("requestActivities"));

@@ -24,6 +24,7 @@ namespace kemai
         QString address;
         QString countryKey;
         QString currencyKey;
+        QString language; // required by Kimai when creating a customer
         QString phone;
         QString fax;
         QString mobile;

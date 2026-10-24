@@ -183,6 +183,8 @@ namespace kemai
         customer.countryKey  = country;
         customer.currencyKey = currency;
         customer.timezone    = timezone;
+        // Required by Kimai's customer form: the user's own language (Kimai's default locale "en" if unknown)
+        customer.language = m_user.language.isEmpty() ? QStringLiteral("en") : m_user.language;
 
         m_client->addCustomer(customer)
             .then(this, [this](const KimaiCustomer &created) { emit resourceCreated(ResourceKind::Customer, created.id); })
