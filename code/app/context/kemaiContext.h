@@ -24,6 +24,8 @@ namespace kemai
         // Account of the last session, and whether it ended by logout (not persisted): the login view's notice
         Q_PROPERTY(QString lastAccountName READ lastAccountName NOTIFY lastSessionChanged)
         Q_PROPERTY(bool justLoggedOut READ justLoggedOut NOTIFY lastSessionChanged)
+        // "Kemai <version>", plus " alpha" for an alpha release
+        Q_PROPERTY(QString windowTitle READ windowTitle CONSTANT)
 
     public:
         explicit KemaiContext(QObject *parent = nullptr);
@@ -32,6 +34,7 @@ namespace kemai
         Q_INVOKABLE void initialize();
         QString lastAccountName() const;
         bool    justLoggedOut() const;
+        QString windowTitle() const;
 
         // `profileName`: saved profile the credentials come from, empty when typed by hand
         Q_INVOKABLE void login(const QString &host, const QString &token, bool rememberLogin, const QString &profileName = {});

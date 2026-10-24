@@ -1,4 +1,7 @@
 #pragma once
 
-#define KEMAI_VERSION "@KemaiProject_VERSION@"
+// Display version: the release version, or dev-<commit> for a development build
+#define KEMAI_VERSION "@KEMAI_DISPLAY_VERSION@"
+// alpha, stable or dev
+#define KEMAI_CHANNEL "@KEMAI_BUILD_CHANNEL@"
 #cmakedefine KEMAI_ENABLE_UPDATE_CHECK

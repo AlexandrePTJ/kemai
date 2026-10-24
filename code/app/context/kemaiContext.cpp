@@ -6,6 +6,7 @@
 #include <spdlog/spdlog.h>
 
 // Project headers
+#include "kemaiConfig.h"
 #include <client/kimaiSystem.h>
 #include <misc/pathHelpers.h>
 
@@ -79,6 +80,18 @@ namespace kemai
         {
             session->deleteLater();
         }
+    }
+
+    QString KemaiContext::windowTitle() const
+    {
+        const auto channel = QStringLiteral(KEMAI_CHANNEL);
+        auto       title   = QString("Kemai %1").arg(KEMAI_VERSION);
+        // A development version already reads dev-<commit>
+        if (channel == "alpha")
+        {
+            title += " " + channel;
+        }
+        return title;
     }
 
     void KemaiContext::updateAutoLoginSettings(const QString &host, const QString &token, bool rememberLogin)

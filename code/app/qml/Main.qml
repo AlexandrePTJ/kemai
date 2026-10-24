@@ -14,6 +14,7 @@ ApplicationWindow {
     width: 800
     height: 600
     visible: true
+    title: appContext.windowTitle
 
     KemaiContext {
         id: appContext
