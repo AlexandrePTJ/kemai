@@ -61,6 +61,9 @@ namespace kemai
 
         // Tag names from a tags reply, accepting tag objects ({"name": ...}) or plain names; throws if not an array
         static QStringList tagNamesFromJson(const QJsonDocument &doc);
+        // Host as typed by the user → base URL: https:// when no scheme is given (QUrl::fromUserInput would pick
+        // http://, and servers redirecting to https turn PATCH/POST into GET: 405), no trailing slash
+        static QString normalizedHost(const QString &host);
         // Kimai's 400 body ({"errors": {"children": {field: {"errors": [...]}}}}): the first field with an error and its
         // message, or the form-level error with an empty field; empty pair when the body holds none
         static std::pair<QString, QString> validationErrorFromJson(const QJsonDocument &doc);

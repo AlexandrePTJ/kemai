@@ -236,7 +236,21 @@ KimaiClient::~KimaiClient() = default;
 
 void KimaiClient::setHost(const QString &host)
 {
-    m_d->m_host = host;
+    m_d->m_host = normalizedHost(host);
+}
+
+QString KimaiClient::normalizedHost(const QString &host)
+{
+    auto normalized = host.trimmed();
+    if (!normalized.isEmpty() && !normalized.contains("://"))
+    {
+        normalized.prepend("https://");
+    }
+    while (normalized.endsWith('/'))
+    {
+        normalized.chop(1);
+    }
+    return normalized;
 }
 
 void KimaiClient::setTransferTimeout(std::chrono::milliseconds timeout)

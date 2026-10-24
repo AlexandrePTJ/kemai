@@ -381,6 +381,15 @@ TEST_CASE("KimaiClient - creates a customer, project and activity", "[client][in
     remove(QString("customers/%1").arg(createdCustomer.id));
 }
 
+TEST_CASE("KimaiClient::normalizedHost - https by default, no trailing slash", "[client][unit]")
+{
+    REQUIRE(KimaiClient::normalizedHost("demo.kimai.org") == "https://demo.kimai.org");
+    REQUIRE(KimaiClient::normalizedHost("  kimai.example.lan:8001/kimai/ ") == "https://kimai.example.lan:8001/kimai");
+    REQUIRE(KimaiClient::normalizedHost("https://demo.kimai.org/") == "https://demo.kimai.org");
+    REQUIRE(KimaiClient::normalizedHost("http://192.168.1.40:8001") == "http://192.168.1.40:8001"); // explicit http is kept
+    REQUIRE(KimaiClient::normalizedHost("").isEmpty());
+}
+
 TEST_CASE("KimaiClient::tagNamesFromJson - accepts tag objects and plain names", "[client][unit]")
 {
     const auto objects = QJsonDocument::fromJson(R"([{"id": 1, "name": "QML", "color": null}, {"id": 2, "name": "Frontend"}])");
