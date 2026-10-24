@@ -1,0 +1,45 @@
+name: Release
+# Pushing a calendar tag (YEAR.MONTH.PATCH) publishes a source-only GitHub release: alpha (pre-release) when the
+# tagged commit is only on develop, stable when it is on main or master. No build here: every commit already went
+# through the CI workflow.
+on:
+  push:
+    tags: ['20*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # the channel depends on which remote branches contain the commit
+
+      - name: Version and channel
+        id: release
+        env:
+          TAG: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: .github/scripts/release-channel.sh "$TAG" "$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Release notes
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+          CHANNEL: ${{ steps.release.outputs.channel }}
+        run: .github/scripts/release-notes.sh "$VERSION" "$CHANNEL" > "$RUNNER_TEMP/notes.md"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+          CHANNEL: ${{ steps.release.outputs.channel }}
+        run: |
+          flags=()
+          if [ "$CHANNEL" = alpha ]; then
+            flags+=(--prerelease)
+          fi
+          gh release create "$VERSION" --verify-tag --title "Kemai $VERSION" --notes-file "$RUNNER_TEMP/notes.md" "${flags[@]}"
