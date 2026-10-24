@@ -104,6 +104,11 @@ namespace kemai
         return m_cache->isLoading();
     }
 
+    bool SessionController::isPunchMode() const
+    {
+        return m_cache->timesheetConfig().trackingMode == KimaiTimeSheetConfig::TrackingMode::Punch;
+    }
+
     void SessionController::setStaleAfter(std::chrono::seconds staleAfter)
     {
         m_staleAfter = staleAfter;
@@ -228,19 +233,19 @@ namespace kemai
                       { handleApiError(e, "Failed to stop timesheet"); });
     }
 
-    void SessionController::updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
+    bool SessionController::updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
                                             const QDateTime &beginAt, const QDateTime &endAt)
     {
         const auto timeSheet = m_recentTimeSheets->findById(timesheetId);
         if (!timeSheet)
         {
             spdlog::error("Update ignored: no timesheet with id={}", timesheetId);
-            return;
+            return false;
         }
         if (projectId <= 0 || activityId <= 0)
         {
             spdlog::error("Update ignored: invalid projectId={} or activityId={}", projectId, activityId);
-            return;
+            return false;
         }
 
         KimaiTimeSheet updated = *timeSheet;
@@ -262,37 +267,41 @@ namespace kemai
         if (updated.endAt.isValid() && updated.endAt <= updated.beginAt)
         {
             spdlog::warn("Update ignored: end time must be after begin time");
-            return;
+            return false;
         }
 
         m_client->updateTimeSheet(updated, m_cache->timesheetConfig().trackingMode)
             .then(this,
-                  [this](const KimaiTimeSheet &)
+                  [this, timesheetId](const KimaiTimeSheet &)
                   {
                       refreshActiveTimeSheets();
                       refreshRecentTimeSheets();
+                      emit timeSheetSaved(timesheetId);
                   })
-            .onFailed(this, [this](const KimaiApiError &e)
-                      { handleApiError(e, "Failed to update timesheet"); });
+            .onFailed(this, [this, timesheetId](const KimaiApiError &e)
+                      { handleOperationError(e, "Failed to update timesheet", timesheetId, &SessionController::timeSheetSaveFailed); });
+        return true;
     }
 
-    void SessionController::deleteTimeSheet(int timesheetId)
+    bool SessionController::deleteTimeSheet(int timesheetId)
     {
         if (timesheetId <= 0)
         {
             spdlog::error("Delete ignored: invalid timesheetId={}", timesheetId);
-            return;
+            return false;
         }
 
         m_client->deleteTimeSheet(timesheetId)
             .then(this,
-                  [this]()
+                  [this, timesheetId]()
                   {
                       refreshActiveTimeSheets();
                       refreshRecentTimeSheets();
+                      emit timeSheetDeleted(timesheetId);
                   })
-            .onFailed(this, [this](const KimaiApiError &e)
-                      { handleApiError(e, "Failed to delete timesheet"); });
+            .onFailed(this, [this, timesheetId](const KimaiApiError &e)
+                      { handleOperationError(e, "Failed to delete timesheet", timesheetId, &SessionController::timeSheetDeleteFailed); });
+        return true;
     }
 
     void SessionController::requestTagSuggestions(const QString &text)
@@ -307,6 +316,7 @@ namespace kemai
     {
         m_activityModel->setActivities(m_cache->activities());
         emit refreshingChanged();
+        emit punchModeChanged();
     }
 
     void SessionController::onCacheLoadFailed()
@@ -342,5 +352,20 @@ namespace kemai
         }
 
         emit notificationRequested(NotificationLevel::Error, notificationKindFromError(error.kind()), error.endpoint());
+    }
+
+    template<typename FailedSignal>
+    void SessionController::handleOperationError(const KimaiApiError &error, const char *context, int timesheetId, FailedSignal failed)
+    {
+        spdlog::error("{}: {}", context, error.what());
+
+        if (error.kind() == ApiErrorKind::AuthFailed)
+        {
+            emit sessionExpired();
+            return;
+        }
+
+        // The server message explains refusals such as 400 validation errors
+        emit(this->*failed)(timesheetId, notificationKindFromError(error.kind()), error.serverMessage());
     }
 } // namespace kemai

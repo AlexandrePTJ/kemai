@@ -394,7 +394,7 @@ TEST_CASE("SessionController::deleteTimeSheet - deleting the active entry stops 
     REQUIRE_FALSE(controller.hasActiveTimesheet());
 }
 
-TEST_CASE("SessionController::deleteTimeSheet - 403 notifies Forbidden", "[session][error][unit]")
+TEST_CASE("SessionController::deleteTimeSheet - 403 is reported to the caller, not the banner", "[session][error][unit]")
 {
     auto fake = std::make_shared<FakeKimaiClient>();
 
@@ -404,14 +404,107 @@ TEST_CASE("SessionController::deleteTimeSheet - 403 notifies Forbidden", "[sessi
     SignalProbe probe;
     probe.attach(controller);
 
+    int  failedId   = 0;
+    auto failedKind = SessionController::NotificationKind::UnknownError;
+    QObject::connect(&controller, &SessionController::timeSheetDeleteFailed,
+                     [&](int id, SessionController::NotificationKind kind, const QString &)
+                     {
+                         failedId   = id;
+                         failedKind = kind;
+                     });
+
     fake->failWith("deleteTimeSheet", ApiErrorKind::Forbidden, 403);
-    controller.deleteTimeSheet(42);
+    REQUIRE(controller.deleteTimeSheet(42));
     processEvents();
 
-    REQUIRE(probe.notificationCount == 1);
-    REQUIRE(probe.lastLevel == SessionController::NotificationLevel::Error);
-    REQUIRE(probe.lastKind == SessionController::NotificationKind::Forbidden);
+    REQUIRE(failedId == 42);
+    REQUIRE(failedKind == SessionController::NotificationKind::Forbidden);
+    REQUIRE(probe.notificationCount == 0);
     REQUIRE(probe.sessionExpiredCount == 0);
+}
+
+TEST_CASE("SessionController::deleteTimeSheet - success emits timeSheetDeleted", "[session][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    int deletedId = 0;
+    QObject::connect(&controller, &SessionController::timeSheetDeleted, [&](int id) { deletedId = id; });
+
+    REQUIRE(controller.deleteTimeSheet(42));
+    REQUIRE_FALSE(controller.deleteTimeSheet(0));
+    processEvents();
+
+    REQUIRE(deletedId == 42);
+}
+
+TEST_CASE("SessionController::updateTimeSheet - reports success or failure to the caller", "[session][error][unit]")
+{
+    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
+    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->timeSheets.append(makeTimeSheet(42, begin, end));
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+
+    int     savedId  = 0;
+    int     failedId = 0;
+    auto    kind     = SessionController::NotificationKind::UnknownError;
+    QString detail;
+    QObject::connect(&controller, &SessionController::timeSheetSaved, [&](int id) { savedId = id; });
+    QObject::connect(&controller, &SessionController::timeSheetSaveFailed,
+                     [&](int id, SessionController::NotificationKind k, const QString &d)
+                     {
+                         failedId = id;
+                         kind     = k;
+                         detail   = d;
+                     });
+
+    SECTION("success")
+    {
+        REQUIRE(controller.updateTimeSheet(42, 7, 11, "desc", {}, {}, {}));
+        processEvents();
+        REQUIRE(savedId == 42);
+        REQUIRE(failedId == 0);
+    }
+
+    SECTION("network failure")
+    {
+        fake->failWith("updateTimeSheet", ApiErrorKind::NoNetwork);
+        REQUIRE(controller.updateTimeSheet(42, 7, 11, "desc", {}, {}, {}));
+        processEvents();
+        REQUIRE(failedId == 42);
+        REQUIRE(kind == SessionController::NotificationKind::NoNetwork);
+        REQUIRE(detail == "fake error");
+        REQUIRE(probe.notificationCount == 0);
+    }
+
+    SECTION("rejected locally")
+    {
+        REQUIRE_FALSE(controller.updateTimeSheet(42, 7, 11, "desc", {}, {}, begin.addSecs(-60)));
+        processEvents();
+        REQUIRE(savedId == 0);
+        REQUIRE(failedId == 0);
+    }
+}
+
+TEST_CASE("SessionController - punch mode follows the timesheet config", "[session][unit]")
+{
+    auto fake                          = std::make_shared<FakeKimaiClient>();
+    fake->timesheetConfig.trackingMode = KimaiTimeSheetConfig::TrackingMode::Punch;
+
+    SessionController controller(fake, KimaiUser{});
+    REQUIRE_FALSE(controller.isPunchMode());
+    processEvents();
+
+    REQUIRE(controller.isPunchMode());
 }
 
 TEST_CASE("SessionController::deleteTimeSheet - 401 expires the session", "[session][error][unit]")

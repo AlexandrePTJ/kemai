@@ -38,6 +38,7 @@ namespace kemai
         Q_PROPERTY(QString activeTimesheetDuration READ activeTimesheetDuration NOTIFY activeTimesheetChanged)
         Q_PROPERTY(kemai::ActivityListModel *activityModel READ activityModel CONSTANT)
         Q_PROPERTY(bool refreshing READ isRefreshing NOTIFY refreshingChanged)
+        Q_PROPERTY(bool punchMode READ isPunchMode NOTIFY punchModeChanged)
 
     public:
         enum class NotificationLevel
@@ -71,6 +72,8 @@ namespace kemai
         QString            activeTimesheetDuration() const;
         ActivityListModel *activityModel() const;
         bool               isRefreshing() const;
+        // Kimai manages begin/end itself: they are never sent on update
+        bool               isPunchMode() const;
 
         // Cache age beyond which refreshIfStale() reloads it.
         void setStaleAfter(std::chrono::seconds staleAfter);
@@ -78,11 +81,13 @@ namespace kemai
         Q_INVOKABLE void startTimeSheet(int activityId, int projectId);
         Q_INVOKABLE void stopActiveTimeSheet();
         // Applies every field as given, except begin/end: an invalid QDateTime leaves it unchanged,
-        // and a running entry keeps no end. Rejected when end <= begin or project/activity are invalid.
-        Q_INVOKABLE void updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
+        // and a running entry keeps no end. Returns false (nothing sent) when end <= begin or project/activity
+        // are invalid; otherwise answered by timeSheetSaved or timeSheetSaveFailed.
+        Q_INVOKABLE bool updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
                                          const QDateTime &beginAt, const QDateTime &endAt);
-        // Deletes the timesheet on the server, then refreshes active + recent (stops tracking if it was active)
-        Q_INVOKABLE void deleteTimeSheet(int timesheetId);
+        // Deletes the timesheet on the server, then refreshes active + recent (stops tracking if it was active).
+        // Returns false (nothing sent) for an invalid id; otherwise answered by timeSheetDeleted or timeSheetDeleteFailed.
+        Q_INVOKABLE bool deleteTimeSheet(int timesheetId);
         // Existing server tags containing `text`; answered by tagSuggestionsReady
         Q_INVOKABLE void requestTagSuggestions(const QString &text);
 
@@ -94,6 +99,12 @@ namespace kemai
     signals:
         void activeTimesheetChanged();
         void refreshingChanged();
+        void punchModeChanged();
+        // Update/delete outcomes, for the edit dialog that shows its own failures (never 401: sessionExpired instead)
+        void timeSheetSaved(int timesheetId);
+        void timeSheetSaveFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
+        void timeSheetDeleted(int timesheetId);
+        void timeSheetDeleteFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
         // `query` is the text the suggestions answer, so the UI can drop stale replies
         void tagSuggestionsReady(const QString &query, const QStringList &tags);
         // Auth is no longer valid (401): the UI must drop the session and return to login.
@@ -109,6 +120,9 @@ namespace kemai
 
         // Error policy entry point: log + 401 -> sessionExpired, otherwise notify the UI.
         void handleApiError(const KimaiApiError &error, const char *context);
+        // Same policy, but the failure goes back to the caller through `failed` instead of the banner.
+        template<typename FailedSignal>
+        void handleOperationError(const KimaiApiError &error, const char *context, int timesheetId, FailedSignal failed);
 
         std::shared_ptr<IKimaiClient>      m_client;
         KimaiUser                          m_user;
