@@ -41,7 +41,9 @@ Rectangle {
         case SessionController.TimerStoppedIdle: {
             // detail: "HH:mm|minutes"
             const parts = detail.split("|")
-            return qsTr("Timer stopped at %1 after %2 minutes of inactivity.").arg(parts[0]).arg(parts[1])
+            return Number(parts[1]) === 1
+                    ? qsTr("Timer stopped at %1 after 1 minute of inactivity.").arg(parts[0])
+                    : qsTr("Timer stopped at %1 after %2 minutes of inactivity.").arg(parts[0]).arg(parts[1])
         }
         case SessionController.TimerStoppedLocked:
             return qsTr("Timer stopped at %1, when the session was locked.").arg(detail)
