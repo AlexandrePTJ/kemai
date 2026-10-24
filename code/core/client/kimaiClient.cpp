@@ -202,6 +202,22 @@ KimaiApiError KimaiClient::KimaiClientPrivate::makeReplyError(ApiMethod method, 
     return {kind, httpStatus, apiMethodToString(method), serverMessage, field};
 }
 
+QString KimaiClient::KimaiClientPrivate::httpsRedirectBase(QNetworkReply *networkReply)
+{
+    const auto requested = networkReply->request().url();
+    const auto reached   = networkReply->url();
+    if (requested.scheme() != "http" || reached.scheme() != "https")
+    {
+        return {};
+    }
+
+    // Keep what precedes /api/ (Kimai may live in a sub-path)
+    auto       base = reached.adjusted(QUrl::RemoveQuery | QUrl::RemoveFragment | QUrl::RemoveUserInfo);
+    const auto path = base.path();
+    base.setPath(path.left(std::max<qsizetype>(0, path.indexOf("/api/"))));
+    return base.toString();
+}
+
 KimaiApiError KimaiClient::KimaiClientPrivate::makeParseError(ApiMethod method, const QString &reason)
 {
     return {ApiErrorKind::InvalidResponse, 0, apiMethodToString(method), reason};

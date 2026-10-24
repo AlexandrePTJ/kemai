@@ -20,6 +20,7 @@ namespace kemai
         ServerError,     // 5xx
         InvalidResponse, // invalid JSON or unexpected schema
         InvalidValue,    // 400 — Kimai rejected a value; serverMessage holds its message, field() the field when known
+        HttpsRedirect,   // the http:// host redirects to https (writes would turn into GETs); serverMessage holds the https base URL
         Unknown
     };
 

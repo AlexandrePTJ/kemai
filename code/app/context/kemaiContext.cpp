@@ -97,10 +97,16 @@ namespace kemai
                     emit loginSucceeded(session);
                     updateAutoLoginSettings(host, token, rememberLogin);
                 })
+            .onFailed(this, [this, host](const KimaiApiError &e)
+                {
+                    spdlog::error("Login to {} failed: {}", QUrl(host).toString(QUrl::RemoveUserInfo), e.what());
+                    emit loginFailed(SessionController::notificationKindOf(e.kind()), e.serverMessage());
+                    updateAutoLoginSettings("", "", false);
+                })
             .onFailed(this, [this, host](const std::exception &e)
                 {
                     spdlog::error("Login to {} failed: {}", QUrl(host).toString(QUrl::RemoveUserInfo), e.what());
-                    emit loginFailed(QString::fromStdString(e.what()));
+                    emit loginFailed(SessionController::NotificationKind::UnknownError, {});
                     updateAutoLoginSettings("", "", false);
                 });
         // clang-format on

@@ -67,6 +67,9 @@ namespace kemai
 
         static KimaiApiError makeReplyError(ApiMethod method, QNetworkReply *networkReply);
         static KimaiApiError makeParseError(ApiMethod method, const QString &reason);
+        // Base URL (scheme, host, port, Kimai path) of the https:// address an http:// request was redirected to,
+        // empty when not redirected that way
+        static QString httpsRedirectBase(QNetworkReply *networkReply);
 
         template<class ResultType>
         QFuture<ResultType> processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply *networkReply)
@@ -124,7 +127,12 @@ namespace kemai
                     auto result = std::move(promise);
                     networkReply->deleteLater();
 
-                    if (networkReply->error() == QNetworkReply::NoError)
+                    if (const auto httpsBase = httpsRedirectBase(networkReply); !httpsBase.isEmpty())
+                    {
+                        result.setException(std::make_exception_ptr(
+                            KimaiApiError{ApiErrorKind::HttpsRedirect, 0, apiMethodToString(method), httpsBase}));
+                    }
+                    else if (networkReply->error() == QNetworkReply::NoError)
                     {
                         try
                         {

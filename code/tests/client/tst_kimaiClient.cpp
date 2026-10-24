@@ -390,6 +390,46 @@ TEST_CASE("KimaiClient::normalizedHost - https by default, no trailing slash", "
     REQUIRE(KimaiClient::normalizedHost("").isEmpty());
 }
 
+TEST_CASE("KimaiClient - an http host redirecting to https fails as HttpsRedirect", "[client][unit]")
+{
+    // The https side does not need to answer: only the redirect matters
+    QTcpServer httpsSide;
+    REQUIRE(httpsSide.listen(QHostAddress::LocalHost));
+    const auto httpsBase = QString("https://127.0.0.1:%1/kimai").arg(httpsSide.serverPort());
+
+    QTcpServer httpSide;
+    REQUIRE(httpSide.listen(QHostAddress::LocalHost));
+    QObject::connect(&httpSide, &QTcpServer::newConnection, [&]
+                     {
+                         auto *socket = httpSide.nextPendingConnection();
+                         QObject::connect(socket, &QTcpSocket::readyRead, socket, [socket, httpsBase]
+                                          {
+                                              socket->readAll();
+                                              socket->write(QString("HTTP/1.1 301 Moved Permanently\r\nLocation: %1/api/users/me\r\nContent-Length: 0\r\n"
+                                                                    "Connection: close\r\n\r\n")
+                                                                .arg(httpsBase)
+                                                                .toLatin1());
+                                              socket->disconnectFromHost();
+                                          });
+                     });
+
+    KimaiClient client;
+    client.setHost(QString("http://127.0.0.1:%1/kimai").arg(httpSide.serverPort()));
+    client.setToken("token");
+    client.setTransferTimeout(std::chrono::milliseconds(2000));
+
+    try
+    {
+        waitForFuture(client.requestMeUserInfo(), 5000);
+        FAIL("The redirect should fail the request");
+    }
+    catch (const KimaiApiError &e)
+    {
+        REQUIRE(e.kind() == ApiErrorKind::HttpsRedirect);
+        REQUIRE(e.serverMessage() == httpsBase);
+    }
+}
+
 TEST_CASE("KimaiClient::tagNamesFromJson - accepts tag objects and plain names", "[client][unit]")
 {
     const auto objects = QJsonDocument::fromJson(R"([{"id": 1, "name": "QML", "color": null}, {"id": 2, "name": "Frontend"}])");

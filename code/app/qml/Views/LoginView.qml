@@ -4,6 +4,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import Kemai
+
 Page {
     id: root
 
@@ -16,11 +18,39 @@ Page {
 
     property bool loginPending: false
     property string loginError: ""
+    // https address to use instead of the http:// host typed (HttpsRedirect)
+    property string _httpsHost: ""
+
+    function _loginMessage(kind, detail) {
+        switch (kind) {
+        case SessionController.AuthFailed:
+            return "Kimai refused the API token. Check it in your Kimai profile, under API access."
+        case SessionController.NoNetwork:
+            return "Can't reach this address. Check the host and your connection."
+        case SessionController.NotFound:
+            return "No Kimai API at this address. Check the host, e.g. https://kimai.example.com."
+        case SessionController.HttpsRedirect:
+            return "This server only answers over https: with http, Kemai could read but not save anything. "
+                   + "<a href=\"https\"><font color=\"" + Theme.colorAccentGreen + "\"><b>Use " + detail + "</b></font></a>"
+        case SessionController.Forbidden:
+            return "This Kimai account isn't allowed to use the API."
+        case SessionController.ServerError:
+            return "The Kimai server returned an error. Try again in a moment."
+        case SessionController.InvalidResponse:
+            return "The server answered, but not like Kimai. Check the host."
+        default:
+            return detail !== "" ? "Couldn't connect: " + detail : "Couldn't connect."
+        }
+    }
 
     Connections {
         target: root.kemaiContext
         function onLoginSucceeded() { root.loginPending = false }
-        function onLoginFailed(error) { root.loginPending = false; root.loginError = error }
+        function onLoginFailed(kind, detail) {
+            root.loginPending = false
+            root._httpsHost = kind === SessionController.HttpsRedirect ? detail : ""
+            root.loginError = root._loginMessage(kind, detail)
+        }
     }
 
     background: Rectangle {
@@ -299,9 +329,19 @@ Page {
             Layout.alignment: Qt.AlignHCenter
             visible: root.loginError.length > 0
             text: root.loginError
+            textFormat: Text.StyledText
             color: "red"
             font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.WordWrap
+            // "Use https://…": fix the host, the user connects again
+            onLinkActivated: {
+                hostField.text = root._httpsHost
+                root.loginError = ""
+            }
+
+            HoverHandler {
+                cursorShape: parent.hoveredLink !== "" ? Qt.PointingHandCursor : Qt.ArrowCursor
+            }
         }
 
         // -- Connect Button

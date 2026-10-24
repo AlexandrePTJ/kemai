@@ -35,6 +35,8 @@ Rectangle {
             return qsTr("The Kimai server returned an error.")
         case SessionController.InvalidResponse:
             return qsTr("Unexpected response from the server.")
+        case SessionController.HttpsRedirect:
+            return qsTr("This server only answers over https: connect with %1.").arg(detail)
         case SessionController.InvalidValue:
             return detail !== "" ? qsTr("Kimai refused a value: %1").arg(detail.replace(/&/g, "&amp;").replace(/</g, "&lt;")) : qsTr("Kimai refused a value.")
         case SessionController.CacheLoadFailed:

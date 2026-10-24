@@ -75,6 +75,8 @@ namespace kemai
             ServerError,
             InvalidResponse,
             InvalidValue,       // detail: Kimai's message
+            AuthFailed,         // login only (in a session, 401 ends it): token refused
+            HttpsRedirect,      // detail: the https address the http:// host redirects to
             UnknownError,
             CacheLoadFailed,   // initial load: no usable cache
             CacheRefreshFailed, // refresh: previous cache kept
@@ -110,6 +112,9 @@ namespace kemai
         Q_ENUM(ResourceKind)
 
         explicit SessionController(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, QObject *parent = nullptr);
+
+        // The UI kind of an API error (also used for login failures, before any session)
+        static NotificationKind notificationKindOf(ApiErrorKind kind);
         ~SessionController() override;
 
         QString            username() const;

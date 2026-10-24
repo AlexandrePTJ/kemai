@@ -37,6 +37,10 @@ namespace
             return Kind::InvalidResponse;
         case ApiErrorKind::InvalidValue:
             return Kind::InvalidValue;
+        case ApiErrorKind::AuthFailed:
+            return Kind::AuthFailed;
+        case ApiErrorKind::HttpsRedirect:
+            return Kind::HttpsRedirect;
         default:
             return Kind::UnknownError;
         }
@@ -69,6 +73,11 @@ namespace kemai
 
         refresh();
         requestPlugins();
+    }
+
+    SessionController::NotificationKind SessionController::notificationKindOf(ApiErrorKind kind)
+    {
+        return notificationKindFromError(kind);
     }
 
     SessionController::~SessionController()

@@ -58,7 +58,8 @@ namespace kemai
 
     signals:
         void loginSucceeded(kemai::SessionContext *session);
-        void loginFailed(const QString &error);
+        // The login view words it from `kind`; `detail`: Kimai's message, or the https address (HttpsRedirect)
+        void loginFailed(kemai::SessionController::NotificationKind kind, const QString &detail);
         void loggedOut();
         void lastSessionChanged();
 
