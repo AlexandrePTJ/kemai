@@ -17,6 +17,8 @@ Item {
 
     signal logoutRequested()
     signal settingsRequested()
+    // A resource was created from the edit dialog: NotificationKind.ResourceCreated detail
+    signal resourceCreated(string detail)
 
     ColumnLayout {
         anchors.fill: parent
@@ -72,5 +74,6 @@ Item {
     TimeEntryEditDialog {
         id: editDialog
         sessionContext: root.sessionContext
+        onResourceCreated: (detail) => root.resourceCreated(detail)
     }
 }

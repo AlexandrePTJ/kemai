@@ -2,6 +2,12 @@
 // SPDX-License-Identifier: MIT
 #include "sessionController.h"
 
+// Qt headers
+#include <QSet>
+
+// STL headers
+#include <algorithm>
+
 // 3rd party headers
 #include <magic_enum/magic_enum.hpp>
 #include <spdlog/spdlog.h>
@@ -160,6 +166,11 @@ namespace kemai
         return m_cache->timesheetConfig().trackingMode == KimaiTimeSheetConfig::TrackingMode::Punch;
     }
 
+    int SessionController::lastUsedProjectId() const
+    {
+        return m_lastUsedProjectId;
+    }
+
     QString SessionController::userTimezone() const
     {
         return m_user.timezone;
@@ -214,6 +225,132 @@ namespace kemai
         }
     }
 
+    namespace
+    {
+        bool sameName(const QString &a, const QString &b)
+        {
+            return a.trimmed().compare(b.trimmed(), Qt::CaseInsensitive) == 0;
+        }
+
+        QString colorOf(const KimaiActivity &activity)
+        {
+            if (!activity.color.isEmpty())
+            {
+                return activity.color;
+            }
+            if (activity.project.has_value() && !activity.project->color.isEmpty())
+            {
+                return activity.project->color;
+            }
+            return QStringLiteral("#888888");
+        }
+
+        void sortByName(QVariantList &list)
+        {
+            std::ranges::sort(list, [](const QVariant &a, const QVariant &b)
+                              { return a.toMap().value("name").toString().compare(b.toMap().value("name").toString(), Qt::CaseInsensitive) < 0; });
+        }
+    } // namespace
+
+    QVariantList SessionController::customerChoices() const
+    {
+        QVariantList list;
+        for (const auto &customer : m_cache->customers())
+        {
+            const auto projectCount = std::ranges::count_if(m_cache->projects(), [&customer](const KimaiProject &p) { return p.customer.id == customer.id; });
+            list.append(QVariantMap{
+                {"id",           customer.id                    },
+                {"name",         customer.name                  },
+                {"projectCount", static_cast<int>(projectCount)}
+            });
+        }
+        sortByName(list);
+        return list;
+    }
+
+    QVariantList SessionController::projectChoices() const
+    {
+        QVariantList list;
+        for (const auto &project : m_cache->projects())
+        {
+            list.append(QVariantMap{
+                {"id",           project.id           },
+                {"name",         project.name         },
+                {"customerId",   project.customer.id  },
+                {"customerName", project.customer.name},
+                {"color",        project.color.isEmpty() ? QStringLiteral("#888888") : project.color}
+            });
+        }
+        sortByName(list);
+        return list;
+    }
+
+    QVariantList SessionController::globalActivityChoices() const
+    {
+        // The cache fans global activities out per project: one entry each
+        QVariantList list;
+        QSet<int>    seen;
+        for (const auto &activity : m_cache->activities())
+        {
+            if (activity.global && !seen.contains(activity.id))
+            {
+                seen.insert(activity.id);
+                list.append(QVariantMap{
+                    {"id",    activity.id                                                          },
+                    {"name",  activity.name                                                        },
+                    {"color", activity.color.isEmpty() ? QStringLiteral("#888888") : activity.color}
+                });
+            }
+        }
+        sortByName(list);
+        return list;
+    }
+
+    QVariantMap SessionController::findCustomer(const QString &name) const
+    {
+        const auto &customers = m_cache->customers();
+        const auto  it        = std::ranges::find_if(customers, [&name](const KimaiCustomer &c) { return sameName(c.name, name); });
+        return it == customers.cend() ? QVariantMap{} : QVariantMap{{"id", it->id}, {"name", it->name}};
+    }
+
+    QVariantMap SessionController::findProject(const QString &name, int customerId) const
+    {
+        const auto &projects = m_cache->projects();
+        const auto  it       = std::ranges::find_if(projects, [&](const KimaiProject &p) { return p.customer.id == customerId && sameName(p.name, name); });
+        return it == projects.cend() ? QVariantMap{} : QVariantMap{{"id", it->id}, {"name", it->name}, {"customerName", it->customer.name}};
+    }
+
+    QVariantMap SessionController::findActivity(const QString &name, int projectId) const
+    {
+        const auto &activities = m_cache->activities();
+        const auto  it         = std::ranges::find_if(activities,
+                                                      [&](const KimaiActivity &a)
+                                                      {
+                                                          const auto inScope = projectId > 0 ? (!a.global && a.project && a.project->id == projectId) : a.global;
+                                                          return inScope && sameName(a.name, name);
+                                                      });
+        return it == activities.cend() ? QVariantMap{} : QVariantMap{{"id", it->id}, {"name", it->name}};
+    }
+
+    QVariantMap SessionController::pair(int projectId, int activityId) const
+    {
+        const auto &activities = m_cache->activities();
+        const auto  it         = std::ranges::find_if(activities, [&](const KimaiActivity &a) { return a.id == activityId && a.project && a.project->id == projectId; });
+        if (it == activities.cend())
+        {
+            return {};
+        }
+        return {
+            {"projectId",     projectId                                                     },
+            {"activityId",    activityId                                                    },
+            {"projectName",   it->project->name                                             },
+            {"activityName",  it->name                                                      },
+            {"activityColor", colorOf(*it)                                                  },
+            {"label",         QStringLiteral("%1 - %2").arg(it->project->name, it->name)},
+            {"isGlobal",      it->global                                                    }
+        };
+    }
+
     void SessionController::handleCreateError(const KimaiApiError &error, ResourceKind kind)
     {
         spdlog::error("Failed to create {}: {}", magic_enum::enum_name(kind), error.what());
@@ -266,6 +403,8 @@ namespace kemai
             .then(this,
                   [this](const KimaiTimeSheets &sheets)
                   {
+                      const auto latest = std::ranges::max_element(sheets, {}, &KimaiTimeSheet::beginAt);
+                      m_lastUsedProjectId = latest != sheets.cend() ? latest->project.id : 0;
                       m_recentTimeSheets->setTimeSheets(sheets);
                       m_recentRefreshTimer.start();
                   })

@@ -11,7 +11,8 @@ Rectangle {
 
     height: visible ? 36 : 0
     visible: false
-    color: _level === SessionController.Error ? Theme.colorAccentRedTint : Theme.colorSurfaceDark
+    color: _level === SessionController.Error ? Theme.colorAccentRedTint
+         : _level === SessionController.Success ? Theme.colorAccentGreenSoft : Theme.colorSurfaceDark
 
     property int _level: SessionController.Info
 
@@ -35,7 +36,7 @@ Rectangle {
         case SessionController.InvalidResponse:
             return qsTr("Unexpected response from the server.")
         case SessionController.InvalidValue:
-            return detail !== "" ? qsTr("Kimai refused a value: %1").arg(detail) : qsTr("Kimai refused a value.")
+            return detail !== "" ? qsTr("Kimai refused a value: %1").arg(detail.replace(/&/g, "&amp;").replace(/</g, "&lt;")) : qsTr("Kimai refused a value.")
         case SessionController.CacheLoadFailed:
             return qsTr("Failed to load projects and activities.")
         case SessionController.CacheRefreshFailed:
@@ -46,6 +47,15 @@ Rectangle {
             return Number(parts[1]) === 1
                     ? qsTr("Timer stopped at %1 after 1 minute of inactivity.").arg(parts[0])
                     : qsTr("Timer stopped at %1 after %2 minutes of inactivity.").arg(parts[0]).arg(parts[1])
+        }
+        case SessionController.ResourceCreated: {
+            // detail: "activity|name|project" or "project|name|"
+            const parts = detail.split("|")
+            const name = "<b>" + parts[1].replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</b>"
+            if (parts[0] === "project")
+                return qsTr("Project %1 created").arg(name)
+            return parts[2] !== "" ? qsTr("Activity %1 created in %2").arg(name).arg(parts[2].replace(/&/g, "&amp;").replace(/</g, "&lt;"))
+                                   : qsTr("Global activity %1 created").arg(name)
         }
         case SessionController.TimerStoppedLocked:
             return qsTr("Timer stopped at %1, when the session was locked.").arg(detail)
@@ -62,13 +72,35 @@ Rectangle {
 
     Text {
         id: messageText
-        anchors.left: parent.left
-        anchors.leftMargin: Theme.spacingLarge
+        anchors.left: successIcon.visible ? successIcon.right : parent.left
+        anchors.leftMargin: successIcon.visible ? 10 : Theme.spacingLarge
+        // Messages may hold <b>; data inside them is escaped
+        textFormat: Text.StyledText
         anchors.right: closeButton.left
         anchors.verticalCenter: parent.verticalCenter
         color: root._level === SessionController.Error ? Theme.colorAccentRed : Theme.colorTextPrimary
         font.pixelSize: Theme.fontSizeSmall
         elide: Text.ElideRight
+    }
+
+    Icon {
+        id: successIcon
+        visible: root._level === SessionController.Success
+        anchors.left: parent.left
+        anchors.leftMargin: Theme.spacingLarge
+        anchors.verticalCenter: parent.verticalCenter
+        name: "check"
+        size: 14
+        color: Theme.colorAccentGreen
+    }
+
+    Rectangle {
+        visible: root._level === SessionController.Success
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: 1
+        color: Theme.colorAccentGreenDim
     }
 
     Text {

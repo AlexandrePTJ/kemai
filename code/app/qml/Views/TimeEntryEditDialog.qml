@@ -17,6 +17,9 @@ Popup {
 
     required property SessionContext sessionContext
 
+    // A resource was created from the project — activity search: NotificationKind.ResourceCreated detail
+    signal resourceCreated(string detail)
+
     // Entry as opened
     property int timesheetId: 0
     property int _origProjectId: 0
@@ -252,6 +255,21 @@ Popup {
     }
 
     // Spinner only for requests that last: fast ones don't flash it
+    // Creation of a project or activity the search did not find; the new pair replaces the entry's
+    ResourceCreationDialog {
+        id: creationDialog
+        sessionContext: root.sessionContext
+        onPairChosen: (pair) => {
+            root._projectId = pair.projectId
+            root._activityId = pair.activityId
+            root._projectName = pair.projectName
+            root._activityName = pair.activityName
+            root._activityColor = pair.activityColor
+            descriptionEdit.forceActiveFocus()
+        }
+        onCreated: (detail) => root.resourceCreated(detail)
+    }
+
     Timer {
         id: spinnerDelay
         interval: 150
@@ -579,6 +597,7 @@ Popup {
                         projectName: root._projectName
                         activityName: root._activityName
                         activityColor: root._activityColor
+                        onCreateRequested: (kind, name) => creationDialog.openFor(kind, name, root._projectId)
                         onPairSelected: (projectId, activityId, projectName, activityName, activityColor) => {
                             root._projectId = projectId
                             root._activityId = activityId

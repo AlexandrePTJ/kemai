@@ -53,7 +53,8 @@ namespace kemai
         {
             Info,
             Warning,
-            Error
+            Error,
+            Success
         };
         Q_ENUM(NotificationLevel)
 
@@ -69,7 +70,8 @@ namespace kemai
             CacheLoadFailed,   // initial load: no usable cache
             CacheRefreshFailed, // refresh: previous cache kept
             TimerStoppedIdle,   // detail: end time, reported when the user is back
-            TimerStoppedLocked
+            TimerStoppedLocked,
+            ResourceCreated     // detail: "activity|name|project" (project empty for a global one) or "project|name|"
         };
         Q_ENUM(NotificationKind)
 
@@ -108,6 +110,8 @@ namespace kemai
         // Kimai manages begin/end itself: they are never sent on update
         bool               isPunchMode() const;
         QString            userTimezone() const;
+        // Project of the most recent entry (prefill of new activities), 0 without entries
+        Q_INVOKABLE int    lastUsedProjectId() const;
 
         // Where the session comes from, for display: `profileName` may be empty (credentials typed by hand)
         void setAccount(const QString &profileName, const QString &host);
@@ -141,6 +145,21 @@ namespace kemai
         Q_INVOKABLE void createActivity(const QString &name, int projectId);
         // Reloads customers, projects and activities (unless a load is in flight); `refreshing` follows it
         Q_INVOKABLE void reloadResources();
+
+        // Choices for the creation forms, from the cache, sorted by name:
+        // customers {id, name, projectCount}, projects {id, name, customerId, customerName, color},
+        // global activities {id, name, color}
+        Q_INVOKABLE QVariantList customerChoices() const;
+        Q_INVOKABLE QVariantList projectChoices() const;
+        Q_INVOKABLE QVariantList globalActivityChoices() const;
+        // Existing item with that name (trimmed, case-insensitive), as Kimai accepts duplicates: {id, name, ...} or empty.
+        // findActivity looks in the project (projectId > 0) or among global activities (0).
+        Q_INVOKABLE QVariantMap findCustomer(const QString &name) const;
+        Q_INVOKABLE QVariantMap findProject(const QString &name, int customerId) const;
+        Q_INVOKABLE QVariantMap findActivity(const QString &name, int projectId) const;
+        // A project — activity pair as the pickers show it: {projectId, activityId, projectName, activityName,
+        // activityColor, label, isGlobal}, or empty when the cache does not hold it
+        Q_INVOKABLE QVariantMap pair(int projectId, int activityId) const;
 
         // Reloads the cache (unless a load is in flight) and the timesheets.
         Q_INVOKABLE void refresh();
@@ -211,5 +230,6 @@ namespace kemai
         bool                               m_syncFailing    = false;
         int                                m_syncGeneration = 0;
         std::chrono::seconds               m_staleAfter = std::chrono::minutes(10);
+        int                                m_lastUsedProjectId = 0;
     };
 } // namespace kemai

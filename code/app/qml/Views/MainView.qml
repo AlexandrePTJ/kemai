@@ -37,6 +37,14 @@ Page {
         }
     }
 
+    ResourceCreationDialog {
+        id: timerBarCreation
+        objectName: "timerBarCreation"
+        sessionContext: root.sessionContext
+        onPairChosen: (pair) => timerBar.selectPair(pair)
+        onCreated: (detail) => notificationBanner.show(SessionController.Success, SessionController.ResourceCreated, detail)
+    }
+
     AwayStopper {
         sessionContext: root.sessionContext
         preferences: root.preferences
@@ -54,6 +62,7 @@ Page {
         }
 
         TimerBar {
+            id: timerBar
             Layout.fillWidth: true
             timerText: root.sessionContext.activeTimesheetDuration
             entryDescription: root.sessionContext.activeTimesheetLabel
@@ -61,6 +70,7 @@ Page {
             activityModel: root.sessionContext.activityModel
             onStartClicked: (activityId, projectId) => root.sessionContext.startTimeSheet(activityId, projectId)
             onStopClicked: root.sessionContext.stopActiveTimeSheet()
+            onCreateRequested: (kind, name) => timerBarCreation.openFor(kind, name, root.sessionContext.lastUsedProjectId())
         }
 
         Rectangle {
@@ -88,6 +98,7 @@ Page {
             settingsAvailable: root.settingsAvailable
             onLogoutRequested: root.logoutRequested()
             onSettingsRequested: root.settingsRequested()
+            onResourceCreated: (detail) => notificationBanner.show(SessionController.Success, SessionController.ResourceCreated, detail)
         }
     }
 }

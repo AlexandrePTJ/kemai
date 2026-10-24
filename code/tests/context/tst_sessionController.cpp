@@ -996,3 +996,69 @@ TEST_CASE("SessionController::create* - refusals go to the form, 401 expires the
     processEvents();
     REQUIRE(probe.sessionExpiredCount == 1);
 }
+
+TEST_CASE("SessionController - choices and duplicate lookup for the creation forms", "[session][create][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    KimaiCustomer acme;
+    acme.id   = 1;
+    acme.name = "Acme";
+    KimaiCustomer beta;
+    beta.id   = 2;
+    beta.name = "beta corp";
+    fake->customers = {acme, beta};
+
+    KimaiProject website;
+    website.id          = 10;
+    website.name        = "Website";
+    website.customer.id = 1;
+    KimaiProject internal;
+    internal.id          = 11;
+    internal.name        = "Internal";
+    internal.customer.id = 1;
+    fake->projects = {website, internal};
+
+    KimaiActivity design;
+    design.id      = 100;
+    design.name    = "Design";
+    design.project = website;
+    KimaiActivity meeting; // global
+    meeting.id    = 200;
+    meeting.name  = "Meeting";
+    meeting.color = "#8b5cf6";
+    fake->activities = {design, meeting};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    const auto customers = controller.customerChoices();
+    REQUIRE(customers.size() == 2);
+    REQUIRE(customers[0].toMap().value("name") == "Acme");
+    REQUIRE(customers[0].toMap().value("projectCount") == 2);
+
+    const auto projects = controller.projectChoices();
+    REQUIRE(projects.size() == 2);
+    REQUIRE(projects[0].toMap().value("name") == "Internal");
+    REQUIRE(projects[0].toMap().value("customerName") == "Acme");
+
+    // Global activities once, though the cache fans them out per project
+    const auto globals = controller.globalActivityChoices();
+    REQUIRE(globals.size() == 1);
+    REQUIRE(globals[0].toMap().value("id") == 200);
+
+    REQUIRE(controller.findCustomer("  ACME ").value("id") == 1);
+    REQUIRE(controller.findCustomer("Nobody").isEmpty());
+    REQUIRE(controller.findProject("website", 1).value("id") == 10);
+    REQUIRE(controller.findProject("website", 2).isEmpty());
+    REQUIRE(controller.findActivity("design", 10).value("id") == 100);
+    REQUIRE(controller.findActivity("design", 11).isEmpty());
+    REQUIRE(controller.findActivity("meeting", 0).value("id") == 200);
+    REQUIRE(controller.findActivity("meeting", 10).isEmpty()); // a global one is not "in" the project
+
+    const auto globalPair = controller.pair(11, 200);
+    REQUIRE(globalPair.value("projectName") == "Internal");
+    REQUIRE(globalPair.value("activityName") == "Meeting");
+    REQUIRE(globalPair.value("isGlobal").toBool());
+    REQUIRE(controller.pair(11, 100).isEmpty());
+}

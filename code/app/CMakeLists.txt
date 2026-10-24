@@ -4,11 +4,14 @@ set(KEMAI_QML_FILES
         qml/Components/AccountMenu.qml
         qml/Components/ActiveHintBar.qml
         qml/Components/AwayStopper.qml
+        qml/Components/CreateOffer.qml
         qml/Components/ActivityComboBox.qml
         qml/Components/CalendarView.qml
         qml/Components/DashedBorder.qml
         qml/Components/DialogButton.qml
         qml/Components/EntriesHeader.qml
+        qml/Components/FormField.qml
+        qml/Components/FormTextField.qml
         qml/Components/Icon.qml
         qml/Components/KemaiTextField.qml
         qml/Components/LucideIcons.js
@@ -19,7 +22,9 @@ set(KEMAI_QML_FILES
         qml/Components/ProfileEntryDelegate.qml
         qml/Components/ProfileForm.qml
         qml/Components/ProjectActivityField.qml
+        qml/Components/SearchSelect.qml
         qml/Components/SecondaryButton.qml
+        qml/Components/SegmentedControl.qml
         qml/Components/SettingsRow.qml
         qml/Components/SettingsSection.qml
         qml/Components/SettingsStepper.qml
@@ -36,6 +41,7 @@ set(KEMAI_QML_FILES
         qml/Views/LogoutConfirmDialog.qml
         qml/Views/MainView.qml
         qml/Views/ProfileManagerDialog.qml
+        qml/Views/ResourceCreationDialog.qml
         qml/Views/SettingsDialog.qml
         qml/Views/TimeEntryEditDialog.qml
         qml/Views/TimesheetHistoryView.qml
@@ -48,6 +54,8 @@ set(KEMAI_QML_SOURCES
         context/appPreferences.h
         context/kemaiContext.cpp
         context/kemaiContext.h
+        context/referenceData.cpp
+        context/referenceData.h
         context/sessionContext.cpp
         context/sessionContext.h
         context/profileManager.cpp
@@ -94,6 +102,8 @@ qt_add_resources(
         FILES
         assets/fonts/RaveoVF.ttf
         assets/images/kimai_logo.svg
+        assets/data/countries.json
+        assets/data/currencies.json
 )
 
 qt_add_resources(

@@ -20,6 +20,23 @@ Item {
     property string _committedLabel: ""
 
     signal activitySelected(string label)
+    // The search found nothing and the user chose to create it (kind: "activity" | "project")
+    signal createRequested(string kind, string name)
+
+    // Selects a pair given by the creation dialog (or any {projectId, activityId, label})
+    function selectPair(pair) {
+        root._committedActivityId = pair.activityId
+        root._committedProjectId = pair.projectId
+        root._committedLabel = pair.label
+        inputField.text = pair.label
+        dropdown.close()
+        inputField.focus = false
+        root.activitySelected(pair.label)
+    }
+
+    // Typed text that matches nothing: offer to create it
+    readonly property bool _offering: inputField.activeFocus && inputField.text.trim() !== ""
+                                      && inputField.text !== root._committedLabel && suggestionList.count === 0
 
     function _updateDropdown() {
         // Suppress the popup while the field still contains the committed
@@ -30,9 +47,9 @@ Item {
             if (dropdown.opened) dropdown.close()
             return
         }
-        if (inputField.activeFocus && suggestionList.count > 0) {
+        if (inputField.activeFocus && (suggestionList.count > 0 || root._offering)) {
             if (!dropdown.opened) dropdown.open()
-        } else if (suggestionList.count === 0 || !dropdownHover.hovered) {
+        } else if ((suggestionList.count === 0 && !root._offering) || !dropdownHover.hovered) {
             if (dropdown.opened) dropdown.close()
         }
     }
@@ -68,6 +85,10 @@ Item {
             dropdown.close()
             focus = false
         }
+        Keys.onUpPressed: if (root._offering) createOffer.moveHighlight(-1)
+        Keys.onDownPressed: if (root._offering) createOffer.moveHighlight(1)
+        Keys.onReturnPressed: if (root._offering) createOffer.activate()
+        Keys.onEnterPressed: if (root._offering) createOffer.activate()
     }
 
     Popup {
@@ -86,8 +107,27 @@ Item {
             border.width: 1
         }
 
-        contentItem: ListView {
+        contentItem: Item {
+            implicitHeight: root._offering ? createOffer.implicitHeight : suggestionList.implicitHeight
+            implicitWidth: dropdown.width - 8
+
+        CreateOffer {
+            id: createOffer
+            visible: root._offering
+            anchors.left: parent.left
+            anchors.right: parent.right
+            query: inputField.text
+            onCreateRequested: (kind, name) => {
+                dropdown.close()
+                root.createRequested(kind, name)
+            }
+            onVisibleChanged: if (visible) createOffer.highlight = 0
+        }
+
+        ListView {
             id: suggestionList
+            visible: !root._offering
+            anchors.fill: parent
 
             WheelScroller {
                 flickable: suggestionList
@@ -148,6 +188,7 @@ Item {
                     inputField.focus = false
                 }
             }
+        }
         }
     }
 }

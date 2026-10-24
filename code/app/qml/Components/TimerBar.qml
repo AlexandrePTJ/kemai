@@ -15,6 +15,13 @@ Rectangle {
 
     signal stopClicked()
     signal startClicked(int activityId, int projectId)
+    signal createRequested(string kind, string name)
+
+    // A pair created (or chosen) for the search: selected, ready to start
+    function selectPair(pair) {
+        descriptionField.selectPair(pair)
+        startButton.forceActiveFocus()
+    }
 
     implicitHeight: 56
     color: Theme.colorSurfaceLight
@@ -40,9 +47,11 @@ Rectangle {
             Layout.fillWidth: true
             sourceModel: root.activityModel
             text: root.entryDescription
+            onCreateRequested: (kind, name) => root.createRequested(kind, name)
         }
 
         StartStopButton {
+            id: startButton
             implicitHeight: 46
             implicitWidth: 80
 

@@ -23,6 +23,10 @@ FocusScope {
     readonly property bool searching: dropdown.opened
 
     signal pairSelected(int projectId, int activityId, string projectName, string activityName, string activityColor)
+    // The search found nothing and the user chose to create it (kind: "activity" | "project")
+    signal createRequested(string kind, string name)
+
+    readonly property bool _offering: root.searching && searchInput.text.trim() !== "" && suggestionList.count === 0
 
     function openSearch() {
         searchInput.text = ""
@@ -159,13 +163,21 @@ FocusScope {
 
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Down) {
-                        suggestionList.incrementCurrentIndex()
+                        if (root._offering)
+                            createOffer.moveHighlight(1)
+                        else
+                            suggestionList.incrementCurrentIndex()
                         event.accepted = true
                     } else if (event.key === Qt.Key_Up) {
-                        suggestionList.decrementCurrentIndex()
+                        if (root._offering)
+                            createOffer.moveHighlight(-1)
+                        else
+                            suggestionList.decrementCurrentIndex()
                         event.accepted = true
                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        if (suggestionList.currentItem)
+                        if (root._offering)
+                            createOffer.activate()
+                        else if (suggestionList.currentItem)
                             root._pick(suggestionList.currentItem)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Escape) {
@@ -201,8 +213,27 @@ FocusScope {
             border.color: Theme.colorBorderSubtle
         }
 
-        contentItem: ListView {
+        contentItem: Item {
+            implicitHeight: root._offering ? createOffer.implicitHeight : suggestionList.implicitHeight
+            implicitWidth: dropdown.width - 8
+
+        CreateOffer {
+            id: createOffer
+            visible: root._offering
+            anchors.left: parent.left
+            anchors.right: parent.right
+            query: searchInput.text
+            onCreateRequested: (kind, name) => {
+                root.closeSearch()
+                root.createRequested(kind, name)
+            }
+            onVisibleChanged: if (visible) createOffer.highlight = 0
+        }
+
+        ListView {
             id: suggestionList
+            visible: !root._offering
+            anchors.fill: parent
 
             WheelScroller {
                 flickable: suggestionList
@@ -303,6 +334,7 @@ FocusScope {
                     }
                 }
             }
+        }
         }
     }
 }
