@@ -33,8 +33,16 @@ namespace kemai
         m_timeSheets = timeSheets;
 
         // Show most recent timesheets first, with active timesheets (without endAt) on top
-        std::ranges::sort(m_timeSheets, [](const KimaiTimeSheet &a, const KimaiTimeSheet &b)
-                  { return a.beginAt > b.beginAt; });
+        // (entries planned in the future must not push the running one down)
+        std::ranges::sort(m_timeSheets,
+                          [](const KimaiTimeSheet &a, const KimaiTimeSheet &b)
+                          {
+                              if (a.endAt.isValid() != b.endAt.isValid())
+                              {
+                                  return !a.endAt.isValid();
+                              }
+                              return a.beginAt > b.beginAt;
+                          });
 
         computeAggregates();
 
