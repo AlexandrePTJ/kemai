@@ -41,6 +41,8 @@ namespace kemai
         virtual QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer) = 0;
         virtual QFuture<KimaiProject>  addProject(const KimaiProject &project)    = 0;
         virtual QFuture<KimaiActivity> addActivity(const KimaiActivity &activity) = 0;
+        // Kimai ignores unknown tag names sent with a timesheet: create them first (needs tag management rights)
+        virtual QFuture<void>          createTag(const QString &name)             = 0;
 
         virtual QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode)  = 0;
         virtual QFuture<KimaiTimeSheet> updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode) = 0;

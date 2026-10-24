@@ -495,6 +495,57 @@ TEST_CASE("SessionController::updateTimeSheet - reports success or failure to th
     }
 }
 
+TEST_CASE("SessionController::updateTimeSheet - creates new tags before updating", "[session][unit]")
+{
+    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
+    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->timeSheets.append(makeTimeSheet(42, begin, end));
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    int     failedId = 0;
+    auto    kind     = SessionController::NotificationKind::UnknownError;
+    QObject::connect(&controller, &SessionController::timeSheetSaveFailed,
+                     [&](int id, SessionController::NotificationKind k, const QString &)
+                     {
+                         failedId = id;
+                         kind     = k;
+                     });
+
+    fake->calls.clear();
+
+    SECTION("created then sent; a new tag removed meanwhile is not created")
+    {
+        REQUIRE(controller.updateTimeSheet(42, 7, 11, {}, {"QML", "perf"}, {}, {}, {"perf", "dropped"}));
+        processEvents(20);
+        REQUIRE(fake->createdTags == QStringList{"perf"});
+        REQUIRE(fake->calls.indexOf("createTag") < fake->calls.indexOf("updateTimeSheet"));
+        REQUIRE(fake->lastUpdatedTimeSheet.tags == QStringList{"QML", "perf"});
+    }
+
+    SECTION("an existing name (400) does not block the save")
+    {
+        fake->failWith("createTag", ApiErrorKind::Unknown, 400);
+        REQUIRE(controller.updateTimeSheet(42, 7, 11, {}, {"perf"}, {}, {}, {"perf"}));
+        processEvents(20);
+        REQUIRE(fake->calls.contains("updateTimeSheet"));
+        REQUIRE(failedId == 0);
+    }
+
+    SECTION("no right to create tags fails the save, nothing updated")
+    {
+        fake->failWith("createTag", ApiErrorKind::Forbidden, 403);
+        REQUIRE(controller.updateTimeSheet(42, 7, 11, {}, {"perf"}, {}, {}, {"perf"}));
+        processEvents(20);
+        REQUIRE_FALSE(fake->calls.contains("updateTimeSheet"));
+        REQUIRE(failedId == 42);
+        REQUIRE(kind == SessionController::NotificationKind::Forbidden);
+    }
+}
+
 TEST_CASE("SessionController - punch mode follows the timesheet config", "[session][unit]")
 {
     auto fake                          = std::make_shared<FakeKimaiClient>();

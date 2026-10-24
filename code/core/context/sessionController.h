@@ -4,6 +4,7 @@
 
 // STL headers
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <optional>
 
@@ -83,8 +84,9 @@ namespace kemai
         // Applies every field as given, except begin/end: an invalid QDateTime leaves it unchanged,
         // and a running entry keeps no end. Returns false (nothing sent) when end <= begin or project/activity
         // are invalid; otherwise answered by timeSheetSaved or timeSheetSaveFailed.
+        // `newTags` (among `tags`) do not exist on the server yet: they are created before the update.
         Q_INVOKABLE bool updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
-                                         const QDateTime &beginAt, const QDateTime &endAt);
+                                         const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags = {});
         // Deletes the timesheet on the server, then refreshes active + recent (stops tracking if it was active).
         // Returns false (nothing sent) for an invalid id; otherwise answered by timeSheetDeleted or timeSheetDeleteFailed.
         Q_INVOKABLE bool deleteTimeSheet(int timesheetId);
@@ -115,6 +117,8 @@ namespace kemai
     private:
         void refreshRecentTimeSheets();
         void refreshActiveTimeSheets();
+        // Creates `names` one after the other, then runs `next`; a failure reports timeSheetSaveFailed instead
+        void createTagsThen(QStringList names, int timesheetId, std::function<void()> next);
         void onCacheLoaded();
         void onCacheLoadFailed();
 

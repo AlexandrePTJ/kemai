@@ -369,6 +369,15 @@ QFuture<KimaiActivity> KimaiClient::addActivity(const KimaiActivity &activity)
     return m_d->processApiNetworkReplySingleObject<KimaiActivity>(ApiMethod::ActivityAdd, reply);
 }
 
+QFuture<void> KimaiClient::createTag(const QString &name)
+{
+    // Visible, or Kimai hides it from its own tag lists
+    auto data    = JsonHelpers::toByteArray(QJsonObject{{"name", name}, {"visible", true}});
+    auto request = m_d->prepareRequest(ApiMethod::Tags, {}, data);
+    auto reply   = m_d->sendPostRequest(request, data);
+    return m_d->processApiNetworkReplyNoContent(ApiMethod::Tags, reply);
+}
+
 QFuture<KimaiTimeSheet> KimaiClient::startTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode)
 {
     auto data    = JsonHelpers::toByteArray(timeSheet.toJson(trackingMode));

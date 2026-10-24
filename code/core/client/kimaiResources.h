@@ -69,6 +69,7 @@ namespace kemai
         double                      budget     = 0.0;
         int                         timeBudget = 0;
         std::optional<KimaiProject> project;
+        bool                        global = false; // project-less on the server; set by KimaiCache when fanned out per project
 
         static KimaiActivity fromJson(const QJsonValue &json);
         QJsonObject          toJson() const;

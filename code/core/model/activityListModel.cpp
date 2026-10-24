@@ -19,6 +19,7 @@ namespace kemai
         beginResetModel();
         m_activities = activities;
         endResetModel();
+        emit countChanged();
     }
 
     int ActivityListModel::rowCount(const QModelIndex &parent) const
@@ -63,6 +64,9 @@ namespace kemai
 
         case Role::ProjectId:
             return activity.project.has_value() ? activity.project->id : 0;
+
+        case Role::IsGlobal:
+            return activity.global;
         }
 
         return {};
@@ -77,6 +81,7 @@ namespace kemai
             {magic_enum::enum_integer(Role::ActivityColor), "activityColor"},
             {magic_enum::enum_integer(Role::ActivityId),    "activityId"   },
             {magic_enum::enum_integer(Role::ProjectId),     "projectId"    },
+            {magic_enum::enum_integer(Role::IsGlobal),      "isGlobal"     },
         };
     }
 } // namespace kemai

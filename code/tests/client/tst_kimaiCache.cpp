@@ -80,6 +80,7 @@ TEST_CASE("KimaiCache - nominal load consolidates and emits loaded", "[cache][un
     {
         REQUIRE(activity.project.has_value());
         REQUIRE(activity.project->name == "Rocket");
+        REQUIRE(activity.global == (activity.id == 12));
     }
 
     REQUIRE(cache.timesheetConfig().trackingMode == KimaiTimeSheetConfig::TrackingMode::Punch);

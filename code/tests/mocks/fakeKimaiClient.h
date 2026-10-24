@@ -73,6 +73,11 @@ namespace kemai
         QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer) override { return result("addCustomer", customer); }
         QFuture<KimaiProject>  addProject(const KimaiProject &project) override { return result("addProject", project); }
         QFuture<KimaiActivity> addActivity(const KimaiActivity &activity) override { return result("addActivity", activity); }
+        QFuture<void>          createTag(const QString &name) override
+        {
+            createdTags.append(name);
+            return result("createTag");
+        }
 
         QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &, KimaiTimeSheetConfig::TrackingMode) override { return result("startTimeSheet", timeSheetResult); }
         QFuture<KimaiTimeSheet> updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode) override
@@ -93,6 +98,7 @@ namespace kemai
         KimaiTimeSheet lastUpdatedTimeSheet;
         int            lastDeletedTimeSheetId = 0;
         QString        lastTagsQuery;
+        QStringList    createdTags;
 
     private:
         // Body-less variant (e.g. DELETE): resolves or fails like result()

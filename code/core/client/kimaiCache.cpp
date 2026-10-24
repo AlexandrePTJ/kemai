@@ -175,6 +175,7 @@ namespace kemai
                 {
                     KimaiActivity fanned = activity;
                     fanned.project       = project;
+                    fanned.global        = true;
                     consolidated.append(std::move(fanned));
                 }
             }

@@ -45,6 +45,7 @@ namespace kemai
         QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode) override;
         QFuture<KimaiTimeSheet> updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode) override;
         QFuture<void>           deleteTimeSheet(int timeSheetId) override;
+        QFuture<void>           createTag(const QString &name) override;
 
         QFuture<KimaiTasks> requestTasks() override;
         QFuture<KimaiTask>  startTask(int taskId) override;

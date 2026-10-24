@@ -234,7 +234,7 @@ namespace kemai
     }
 
     bool SessionController::updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
-                                            const QDateTime &beginAt, const QDateTime &endAt)
+                                            const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags)
     {
         const auto timeSheet = m_recentTimeSheets->findById(timesheetId);
         if (!timeSheet)
@@ -270,17 +270,56 @@ namespace kemai
             return false;
         }
 
-        m_client->updateTimeSheet(updated, m_cache->timesheetConfig().trackingMode)
-            .then(this,
-                  [this, timesheetId](const KimaiTimeSheet &)
-                  {
-                      refreshActiveTimeSheets();
-                      refreshRecentTimeSheets();
-                      emit timeSheetSaved(timesheetId);
-                  })
-            .onFailed(this, [this, timesheetId](const KimaiApiError &e)
-                      { handleOperationError(e, "Failed to update timesheet", timesheetId, &SessionController::timeSheetSaveFailed); });
+        // Only tags the entry keeps need creating
+        QStringList tagsToCreate;
+        for (const auto &tag : newTags)
+        {
+            if (tags.contains(tag))
+            {
+                tagsToCreate.append(tag);
+            }
+        }
+
+        createTagsThen(tagsToCreate, timesheetId,
+                       [this, updated, timesheetId]()
+                       {
+                           m_client->updateTimeSheet(updated, m_cache->timesheetConfig().trackingMode)
+                               .then(this,
+                                     [this, timesheetId](const KimaiTimeSheet &)
+                                     {
+                                         refreshActiveTimeSheets();
+                                         refreshRecentTimeSheets();
+                                         emit timeSheetSaved(timesheetId);
+                                     })
+                               .onFailed(this, [this, timesheetId](const KimaiApiError &e)
+                                         { handleOperationError(e, "Failed to update timesheet", timesheetId, &SessionController::timeSheetSaveFailed); });
+                       });
         return true;
+    }
+
+    void SessionController::createTagsThen(QStringList names, int timesheetId, std::function<void()> next)
+    {
+        if (names.isEmpty())
+        {
+            next();
+            return;
+        }
+
+        const auto name = names.takeFirst();
+        m_client->createTag(name)
+            .then(this, [this, names, timesheetId, next]() { createTagsThen(names, timesheetId, next); })
+            .onFailed(this,
+                      [this, names, timesheetId, next](const KimaiApiError &e)
+                      {
+                          // 400: the name is already taken (created meanwhile), the entry can use it as is
+                          if (e.httpStatus() == 400)
+                          {
+                              spdlog::warn("Tag creation refused, assuming it exists: {}", e.what());
+                              createTagsThen(names, timesheetId, next);
+                              return;
+                          }
+                          handleOperationError(e, "Failed to create tag", timesheetId, &SessionController::timeSheetSaveFailed);
+                      });
     }
 
     bool SessionController::deleteTimeSheet(int timesheetId)
