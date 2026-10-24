@@ -3,6 +3,7 @@
 #include <QCommandLineParser>
 #include <QFontDatabase>
 #include <QGuiApplication>
+#include <QLoggingCategory>
 #include <QQmlApplicationEngine>
 
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -39,6 +40,10 @@ int main(int argc, char *argv[])
     {
         // Catch Qt messages to spdlog
         qInstallMessageHandler(kemaiQtMessageOutputHandler);
+
+        // Qt's Wayland text input warns at every focus change out of a text field ("Trying to disable … but 0x0 is
+        // focused"): harmless and floods the log. QT_LOGGING_RULES still overrides this for debugging.
+        QLoggingCategory::setFilterRules(QStringLiteral("qt.qpa.wayland.textinput.warning=false"));
 
         // QtApp setup
         QGuiApplication app(argc, argv);
