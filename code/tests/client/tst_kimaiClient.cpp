@@ -4,7 +4,10 @@
 
 #include <QEventLoop>
 #include <QFutureWatcher>
+#include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QTcpServer>
+#include <QTcpSocket>
 #include <QTimer>
 
 #include <spdlog/sinks/ringbuffer_sink.h>
@@ -145,6 +148,51 @@ TEST_CASE("KimaiClient - token and URL credentials never reach the log", "[clien
         REQUIRE(line.find("secret-api-token-1234") == std::string::npos);
         REQUIRE(line.find("url-password") == std::string::npos);
     }
+}
+
+TEST_CASE("KimaiClient - a failed request may release the last client reference", "[client][unit]")
+{
+    // Answers 401 at once, like a Kimai given a wrong token
+    QTcpServer server;
+    REQUIRE(server.listen(QHostAddress::LocalHost));
+    QObject::connect(&server, &QTcpServer::newConnection, [&server]
+                     {
+                         auto *socket = server.nextPendingConnection();
+                         QObject::connect(socket, &QTcpSocket::readyRead, socket, [socket]
+                                          {
+                                              socket->readAll();
+                                              socket->write("HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
+                                              socket->disconnectFromHost();
+                                          });
+                     });
+
+    // Same ownership as KemaiContext::login(): only the continuation keeps the client alive
+    QObject context;
+    auto    failed = false;
+    {
+        auto client = std::make_shared<KimaiClient>();
+        client->setHost(QString("http://127.0.0.1:%1").arg(server.serverPort()));
+        client->setToken("wrong");
+
+        client->requestMeUserInfo()
+            .then(&context, [client](const KimaiUser &) {})
+            .onFailed(&context, [&failed](const KimaiApiError &) { failed = true; });
+    }
+
+    QElapsedTimer elapsed;
+    elapsed.start();
+    while (!failed && elapsed.elapsed() < 5000)
+    {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    }
+    // Let the deferred deletions run: a use-after-free crashes here
+    for (int i = 0; i < 10; ++i)
+    {
+        QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+        QCoreApplication::processEvents();
+    }
+
+    REQUIRE(failed);
 }
 
 TEST_CASE("KimaiClient - deleteTimeSheet removes a created timesheet", "[client][integration]")

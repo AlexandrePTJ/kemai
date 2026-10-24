@@ -119,6 +119,11 @@ namespace kemai
                 this,
                 [networkReply, promise = std::move(promise), method, parse = std::move(parse)]() mutable
                 {
+                    // finish() may run continuations that release the last KimaiClient reference, destroying the
+                    // network manager, this reply and this lambda: everything is done before it, nothing after.
+                    auto result = std::move(promise);
+                    networkReply->deleteLater();
+
                     if (networkReply->error() == QNetworkReply::NoError)
                     {
                         try
@@ -134,20 +139,19 @@ namespace kemai
                                     throw std::runtime_error(parseError.errorString().toStdString());
                                 }
 
-                                promise.addResult(parse(doc));
+                                result.addResult(parse(doc));
                             }
                         }
                         catch (const std::exception &e)
                         {
-                            promise.setException(std::make_exception_ptr(makeParseError(method, QString::fromUtf8(e.what()))));
+                            result.setException(std::make_exception_ptr(makeParseError(method, QString::fromUtf8(e.what()))));
                         }
                     }
                     else
                     {
-                        promise.setException(std::make_exception_ptr(makeReplyError(method, networkReply)));
+                        result.setException(std::make_exception_ptr(makeReplyError(method, networkReply)));
                     }
-                    promise.finish();
-                    networkReply->deleteLater();
+                    result.finish();
                 }
             );
             // clang-format on
