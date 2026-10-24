@@ -9,7 +9,11 @@ Page {
 
     required property SessionContext sessionContext
 
+    // At least one settings section exists: the account menu offers the settings
+    property bool settingsAvailable: false
+
     signal logoutRequested()
+    signal settingsRequested()
 
     // Back to the foreground: reload what may have changed on the server meanwhile
     readonly property bool windowActive: Window.active
@@ -72,7 +76,9 @@ Page {
             Layout.fillWidth: true
             Layout.fillHeight: true
             sessionContext: root.sessionContext
+            settingsAvailable: root.settingsAvailable
             onLogoutRequested: root.logoutRequested()
+            onSettingsRequested: root.settingsRequested()
         }
     }
 }

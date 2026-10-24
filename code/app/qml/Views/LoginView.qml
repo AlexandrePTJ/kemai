@@ -9,6 +9,11 @@ Page {
 
     required property KemaiContext kemaiContext
 
+    // At least one settings section exists: the settings button shows
+    property bool settingsAvailable: false
+
+    signal settingsRequested()
+
     property bool loginPending: false
     property string loginError: ""
 
@@ -60,6 +65,44 @@ Page {
                     text: "Kimai desktop client"
                     color: Theme.colorTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
+                }
+            }
+
+            Item { Layout.fillWidth: true }
+
+            AbstractButton {
+                id: settingsButton
+                objectName: "loginSettingsButton"
+
+                visible: root.settingsAvailable
+                Layout.alignment: Qt.AlignTop
+                Layout.preferredWidth: 28
+                Layout.preferredHeight: 28
+                focusPolicy: Qt.StrongFocus
+                onClicked: root.settingsRequested()
+
+                ToolTip.visible: settingsButton.hovered
+                ToolTip.delay: 500
+                ToolTip.text: "Settings"
+
+                HoverHandler {
+                    cursorShape: Qt.PointingHandCursor
+                }
+
+                background: Rectangle {
+                    radius: Theme.radiusMedium
+                    color: settingsButton.hovered || settingsButton.visualFocus ? Theme.colorSurface : "transparent"
+                    border.width: 1
+                    border.color: Theme.colorBorderSubtle
+                }
+
+                contentItem: Item {
+                    Icon {
+                        anchors.centerIn: parent
+                        name: "settings"
+                        size: 15
+                        color: settingsButton.hovered ? Theme.colorTextPrimary : Theme.colorTextSecondary
+                    }
                 }
             }
         }

@@ -13,8 +13,10 @@ AbstractButton {
     property string accountName: ""
     property string host: ""
     property bool timerRunning: false
+    property bool settingsAvailable: false
 
     signal logoutRequested()
+    signal settingsRequested()
 
     // Up to two initials from the account name ("KimaiDev" -> "KD", "susan_super" -> "SS")
     function initials(name) {
@@ -162,6 +164,63 @@ AbstractButton {
                 Layout.fillWidth: true
                 Layout.leftMargin: -4
                 Layout.rightMargin: -4
+                Layout.bottomMargin: 4
+                Layout.preferredHeight: 1
+                color: Theme.colorDivider
+            }
+
+            AbstractButton {
+                id: settingsItem
+                objectName: "settingsMenuItem"
+
+                visible: root.settingsAvailable
+                Layout.fillWidth: true
+                padding: 10
+                topPadding: 8
+                bottomPadding: 8
+                focusPolicy: Qt.StrongFocus
+
+                onClicked: {
+                    menu.close()
+                    root.settingsRequested()
+                }
+
+                Keys.onReturnPressed: settingsItem.clicked()
+                Keys.onEnterPressed: settingsItem.clicked()
+
+                HoverHandler {
+                    cursorShape: Qt.PointingHandCursor
+                }
+
+                background: Rectangle {
+                    radius: Theme.radiusSmall
+                    color: settingsItem.hovered || settingsItem.activeFocus ? Theme.colorSurface : "transparent"
+                }
+
+                contentItem: RowLayout {
+                    spacing: 10
+
+                    Icon {
+                        name: "settings"
+                        size: 15
+                        color: settingsItem.hovered || settingsItem.activeFocus ? Theme.colorTextPrimary : Theme.colorTextSecondary
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Settings…"
+                        color: Theme.colorTextPrimary
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+                }
+            }
+
+            Rectangle {
+                visible: root.settingsAvailable
+                Layout.fillWidth: true
+                Layout.leftMargin: -4
+                Layout.rightMargin: -4
+                Layout.topMargin: 4
                 Layout.bottomMargin: 4
                 Layout.preferredHeight: 1
                 color: Theme.colorDivider

@@ -13,7 +13,10 @@ Item {
     required property SessionContext sessionContext
 
     // The user chose to log out (and confirmed it if a timer runs)
+    property bool settingsAvailable: false
+
     signal logoutRequested()
+    signal settingsRequested()
 
     ColumnLayout {
         anchors.fill: parent
@@ -33,6 +36,8 @@ Item {
                 accountName: root.sessionContext.accountName
                 host: root.sessionContext.host
                 timerRunning: root.sessionContext.hasActiveTimesheet
+                settingsAvailable: root.settingsAvailable
+                onSettingsRequested: root.settingsRequested()
                 onLogoutRequested: root.sessionContext.hasActiveTimesheet ? logoutConfirm.open() : root.logoutRequested()
             }
         }

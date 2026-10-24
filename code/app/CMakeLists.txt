@@ -19,6 +19,9 @@ set(KEMAI_QML_FILES
         qml/Components/ProfileForm.qml
         qml/Components/ProjectActivityField.qml
         qml/Components/SecondaryButton.qml
+        qml/Components/SettingsRow.qml
+        qml/Components/SettingsSection.qml
+        qml/Components/SettingsToggle.qml
         qml/Components/Spinner.qml
         qml/Components/StartStopButton.qml
         qml/Components/TagsInput.qml
@@ -31,6 +34,7 @@ set(KEMAI_QML_FILES
         qml/Views/LogoutConfirmDialog.qml
         qml/Views/MainView.qml
         qml/Views/ProfileManagerDialog.qml
+        qml/Views/SettingsDialog.qml
         qml/Views/TimeEntryEditDialog.qml
         qml/Views/TimesheetHistoryView.qml
         qml/Main.qml

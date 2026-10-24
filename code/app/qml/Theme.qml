@@ -37,6 +37,10 @@ QtObject {
     readonly property color colorAccentRedSoft:       Qt.rgba(0.898, 0.224, 0.208, 0.12)
     readonly property color colorAccentRedLine:       Qt.rgba(0.898, 0.224, 0.208, 0.5)
     readonly property color colorBackdrop:            Qt.rgba(0.047, 0.047, 0.078, 0.62)
+    // Warnings (session-only notice, restart badge)
+    readonly property color colorWarning:             "#e0a83a"
+    readonly property color colorWarningSoft:         Qt.rgba(0.878, 0.659, 0.227, 0.12)
+    readonly property color colorWarningLine:         Qt.rgba(0.878, 0.659, 0.227, 0.45)
 
     readonly property color colorAccentRed:         "#E53935"
     readonly property color colorAccentRedTint:     "#66751919"

@@ -39,9 +39,19 @@ ApplicationWindow {
         onLoggedOut: stackView.replace(null, loginViewComponent)
     }
 
+    Views.SettingsDialog {
+        id: settingsDialog
+        kemaiContext: appContext
+    }
+
     Component {
         id: mainViewComponent
         Views.MainView {
+            settingsAvailable: settingsDialog.hasSections
+            onSettingsRequested: {
+                settingsDialog.signedIn = true
+                settingsDialog.open()
+            }
             // The session lives as long as its view: released once the view is gone (logout or expiry),
             // never while a transition still binds to it
             Component.onDestruction: appContext.closeSession(sessionContext)
@@ -51,7 +61,14 @@ ApplicationWindow {
 
     Component {
         id: loginViewComponent
-        Views.LoginView { kemaiContext: appContext }
+        Views.LoginView {
+            kemaiContext: appContext
+            settingsAvailable: settingsDialog.hasSections
+            onSettingsRequested: {
+                settingsDialog.signedIn = false
+                settingsDialog.open()
+            }
+        }
     }
 
     StackView {
