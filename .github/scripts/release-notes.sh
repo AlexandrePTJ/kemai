@@ -32,7 +32,7 @@ Kemai releases are source-only. To build this release:
 \`\`\`
 git clone --branch $version https://github.com/AlexandrePTJ/kemai.git
 cd kemai
-cmake --preset release -DKEMAI_VERSION=$version -DKEMAI_CHANNEL=$channel
+cmake --preset release -DCMAKE_PREFIX_PATH=<Qt install dir>/<Qt version>/<arch> -DKEMAI_VERSION=$version -DKEMAI_CHANNEL=$channel
 cmake --build --preset release
 \`\`\`
 

@@ -1,8 +1,8 @@
 # Kemai, a Kimai Desktop Client
 
 > 🔄 **Complete rewrite in progress**:
-A complete rewrite of the application has started on the `develop` branch.
-Development will be focused on this refactoring effort. Current open bugs and feature requests will be addressed as part of this rewrite rather than in the existing codebase.
+The `develop` branch holds a complete rewrite of the application (Qt 6 / QML), published as **alpha** releases, **source only**.
+The current stable version is **0.11.1** (`master` branch). Open bugs and feature requests are addressed as part of the rewrite rather than in the 0.11 codebase.
 
 ## Build Status
 
@@ -12,52 +12,69 @@ Development will be focused on this refactoring effort. Current open bugs and fe
 
 ## How to install
 
-Several methods to install _Kemai_ are available.
+### Kemai 0.11.1 (stable)
 
+Pre-built packages are available from [Releases](https://github.com/AlexandrePTJ/kemai/releases/latest). Just select the asset for your OS.
 
-### From GitHub releases
+Binaries with `-NoUpdate` suffix will not automatically check for new updates. Those binaries are intended to be used with OS specific package managers.
 
-Pre-build packages are available from [Releases](https://github.com/AlexandrePTJ/kemai/releases/latest). Just select the asset for your OS.
-
-Binaries with `-NoUpdate` suffix will not automaticaly check for new update. Thoses binaries are intent to be use with OS specifics packages manager.
-
-
-### From Homebrew (mac OS only)
-
-A [Tap](https://github.com/AlexandrePTJ/homebrew-cask) repository is available to simplify _Kemai_ install through `brew`
+On macOS, a [Tap](https://github.com/AlexandrePTJ/homebrew-cask) repository is available to install it through `brew`:
 
 ```shell script
 > brew tap alexandreptj/cask
 > brew install kemai
 ```
 
+### Rewrite (alpha)
 
-### From source
+Alpha releases of the rewrite are tagged `YEAR.MONTH.PATCH` (for example `2026.11.1`) and listed as pre-releases on the [Releases](https://github.com/AlexandrePTJ/kemai/releases) page. They are **source only**: no binary is provided, see [Build from source](#build-from-source). The release notes give the exact commands for each release.
 
-_Kemai_ is Qt6 based application. It uses CMake to build. So regular cmake process will work.
+The rewrite and Kemai 0.11.x can be installed side by side: the rewrite keeps its own settings and never modifies 0.11.x's. Profiles are not imported from 0.11.x.
+
+
+## Build from source
+
+Requirements, on every platform:
+- CMake 3.30 or later and Ninja
+- A C++20 compiler (GCC or Clang on Linux, Visual Studio 2022 on Windows, Xcode command line tools on macOS)
+- Qt 6.11 or later (desktop, base install). It can be installed with the [Qt online installer](https://www.qt.io/download-qt-installer-oss) or [aqtinstall](https://github.com/miurahr/aqtinstall), for example `aqt install-qt linux desktop 6.11.3 linux_gcc_64` (on Windows, Qt 6.11 needs an aqtinstall newer than 3.3.0, or the online installer)
+- On Linux, the Secret Service development files used to store API tokens in the system keychain (`libsecret-1-dev` on Debian/Ubuntu, `libsecret-devel` on Fedora, `libsecret` on Arch)
+
+Other dependencies (spdlog, fmt, magic_enum, qtkeychain, Catch2) are downloaded by CMake during configuration.
 
 ```shell script
-> cmake . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=<path to Qt installation>
-> cmake --build build --config Release
+> git clone https://github.com/AlexandrePTJ/kemai.git
+> cd kemai
+> cmake --preset release -DCMAKE_PREFIX_PATH=<Qt install dir>/6.11.3/<arch>
+> cmake --build --preset release
 ```
+
+`<arch>` is `gcc_64` on Linux, `msvc2022_64` on Windows and `macos` on macOS. On Windows, run these commands from a *x64 Native Tools Command Prompt for VS 2022*.
+
+The application is built as `build/release/bin/Kemai` (`Kemai.exe` on Windows, `Kemai.app` on macOS). To get a self-contained copy, with the Qt libraries it needs next to it, run `cmake --install build/release --prefix <target dir>`.
+
+To build a release rather than a development version, check out its tag and pass its version and channel, as given in its release notes:
+
+```shell script
+> git checkout 2026.11.1
+> cmake --preset release -DCMAKE_PREFIX_PATH=<...> -DKEMAI_VERSION=2026.11.1 -DKEMAI_CHANNEL=alpha
+```
+
+Without them, Kemai reports itself as a development build (`dev-<commit>`).
 
 
 ## How to use
 
-_Kemai_ connects to your _Kimai_ instance through its API. As credentials for API are not the same as login, here is how to create them:
+_Kemai_ connects to your _Kimai_ instance through its API, with an API token (Kimai 2.14 or later): create one in Kimai from your user profile, under *API access*.
 
-![API password](https://github.com/AlexandrePTJ/kemai/blob/master/docs/api_password.gif)
-
-Then, you can set this credentials to _Kemai_ settings :
-
-![Kemai settings](https://github.com/AlexandrePTJ/kemai/blob/master/docs/kemai_settings.gif)
+Then, on Kemai's login screen, enter the address of your Kimai instance and the token. Saved profiles keep several instances at hand, and the token is stored in the system keychain.
 
 
 ## How to help
 
 Ideas, pull requests and translation are welcome.
 
-For the later, [Weblate](https://hosted.weblate.org/engage/kemai/) is used. Here is the current status:
+For the latter (0.11.x for now; the rewrite is not translated yet), [Weblate](https://hosted.weblate.org/engage/kemai/) is used. Here is the current status:
 
 [![Translation status](https://hosted.weblate.org/widgets/kemai/-/kemai/multi-auto.svg)](https://hosted.weblate.org/engage/kemai/)
 

@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2026.11.1] - Unreleased
+
+First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is provided, build it as shown below. It can be installed next to Kemai 0.11.x: it keeps its own settings and never modifies 0.11.x's (profiles are not imported).
+
+### Added
+- New QML interface: timer bar, history of recent time entries with day labels, "Yesterday" and running entry first
+- Connection profiles with tokens stored in the system keychain, auto-login, logout from the account menu
+- Edit dialog for time entries: project and activity search, description, start and end, tags (new tags are created on Kimai), delete
+- Projects and activities cache refreshed on demand and when it gets old; clear messages when the network or the server fails
+- Calendar versions (`YEAR.MONTH.PATCH`), alpha releases from the `develop` branch
+
+### Not there yet (compared with 0.11.1)
+- Creating customers, projects and activities; Task Management plugin
+- System tray, idle detection
+- Update check, About dialog, log journal and log files
+- Translations
+- Trusting a self-signed certificate from the application
+- Login with username and API password (Kimai older than 2.14): an API token is required
+
+
 
 ## [0.11.1] - 2024-06-30
 
