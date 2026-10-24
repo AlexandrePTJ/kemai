@@ -77,6 +77,8 @@ namespace kemai
             InvalidValue,       // detail: Kimai's message
             AuthFailed,         // login only (in a session, 401 ends it): token refused
             HttpsRedirect,      // detail: the https address the http:// host redirects to
+            UntrustedCertificate, // login only: the server certificate can be trusted (KemaiContext::refusedCertificate)
+            CertificateRejected,  // login only: the server certificate cannot be trusted (expired, other name…)
             UnknownError,
             CacheLoadFailed,   // initial load: no usable cache
             CacheRefreshFailed, // refresh: previous cache kept

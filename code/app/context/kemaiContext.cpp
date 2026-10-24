@@ -68,6 +68,87 @@ namespace kemai
         return m_settingsPersistent;
     }
 
+    QVariantMap KemaiContext::refusedCertificate() const
+    {
+        if (!m_refusedCertificate)
+        {
+            return {};
+        }
+        const auto &c         = *m_refusedCertificate;
+        const auto  rejection = [&c]
+        {
+            switch (c.rejection)
+            {
+            case CertificateInfo::Rejection::None:
+                return "none";
+            case CertificateInfo::Rejection::Expired:
+                return "expired";
+            case CertificateInfo::Rejection::HostName:
+                return "hostname";
+            case CertificateInfo::Rejection::Revoked:
+                return "revoked";
+            case CertificateInfo::Rejection::Other:
+                break;
+            }
+            return "other";
+        }();
+        return {
+            {"host",            c.host                },
+            {"subject",         c.subject             },
+            {"issuer",          c.issuer              },
+            {"validFrom",       c.validFrom.toLocalTime()},
+            {"validUntil",      c.validUntil.toLocalTime()},
+            {"sha256",          c.sha256              },
+            {"replacesTrusted", c.replacesTrusted     },
+            {"rejection",       QString(rejection)    }
+        };
+    }
+
+    QVariantList KemaiContext::trustedCertificates() const
+    {
+        QVariantList list;
+        for (const auto &certificate : m_pendingSettings->trustedCertificates)
+        {
+            list.append(QVariantMap{
+                {"host",      certificate.host                                             },
+                {"sha256",    certificate.sha256                                           },
+                {"expiresAt", certificate.expiresAt.toLocalTime()                          },
+                {"expired",   certificate.expiresAt < QDateTime::currentDateTimeUtc()}
+            });
+        }
+        return list;
+    }
+
+    void KemaiContext::trustRefusedCertificate()
+    {
+        if (!m_refusedCertificate || m_refusedCertificate->rejection != CertificateInfo::Rejection::None)
+        {
+            spdlog::warn("No certificate to trust");
+            return;
+        }
+        const auto &refused = *m_refusedCertificate;
+        spdlog::info("Trusting certificate {} for {}", refused.sha256, refused.host);
+
+        // One certificate per host: a replaced one takes the place of the old one
+        auto &trusted = m_pendingSettings->trustedCertificates;
+        trusted.removeIf([&refused](const TrustedCertificate &t) { return t.host == refused.host; });
+        trusted.append(TrustedCertificate{.host = refused.host, .sha256 = refused.sha256, .pem = refused.pem, .expiresAt = refused.validUntil});
+        m_settingsStore->save(*m_pendingSettings);
+        emit trustedCertificatesChanged();
+
+        login(m_lastLogin.host, m_lastLogin.token, m_lastLogin.remember, m_lastLogin.profileName);
+    }
+
+    void KemaiContext::removeTrustedCertificate(const QString &host)
+    {
+        if (m_pendingSettings->trustedCertificates.removeIf([&host](const TrustedCertificate &t) { return t.host == host; }) > 0)
+        {
+            spdlog::info("Certificate for {} no longer trusted", host);
+            m_settingsStore->save(*m_pendingSettings);
+            emit trustedCertificatesChanged();
+        }
+    }
+
     QString KemaiContext::lastAccountName() const
     {
         return m_lastAccountName;
@@ -80,9 +161,17 @@ namespace kemai
 
     void KemaiContext::login(const QString &host, const QString &token, bool rememberLogin, const QString &profileName)
     {
+        m_lastLogin = {.host = host, .token = token, .remember = rememberLogin, .profileName = profileName};
+        if (m_refusedCertificate)
+        {
+            m_refusedCertificate.reset();
+            emit refusedCertificateChanged();
+        }
+
         auto client = std::make_shared<KimaiClient>();
         client->setHost(host);
         client->setToken(token);
+        client->setTrustedCertificates(m_pendingSettings->trustedCertificates);
 
         // clang-format off
         client->requestMeUserInfo()
@@ -100,6 +189,11 @@ namespace kemai
             .onFailed(this, [this, host](const KimaiApiError &e)
                 {
                     spdlog::error("Login to {} failed: {}", QUrl(host).toString(QUrl::RemoveUserInfo), e.what());
+                    if (e.certificate())
+                    {
+                        m_refusedCertificate = e.certificate();
+                        emit refusedCertificateChanged();
+                    }
                     emit loginFailed(SessionController::notificationKindOf(e.kind()), e.serverMessage());
                     updateAutoLoginSettings("", "", false);
                 })

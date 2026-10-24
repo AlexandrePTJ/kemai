@@ -23,10 +23,11 @@ namespace
      * 2026-10-24    1.0    File renamed from settings.json (Kemai 0.11.x's file) to appSettings.json
  * 2026-10-24    1.1    Add `window`: main window geometry (x, y, width, height of the normal state, maximized)
  * 2026-10-24    1.2    Add `preferences`: per-computer preferences by key (unknown keys are kept on save)
+ * 2026-10-24    1.3    Add `trustedCertificates`: [{host, sha256, pem, expiresAt}], certificates trusted per host
      *
      * Versioning policy: same as the profiles file (see profileStore.cpp).
      */
-    const auto gSettingsCurrentVersion     = QVersionNumber(1, 2);
+    const auto gSettingsCurrentVersion     = QVersionNumber(1, 3);
     const auto gSettingsSecretAutoLoginKey = QString("autologin/token");
 
 } // namespace

@@ -41,6 +41,10 @@ namespace
             return Kind::AuthFailed;
         case ApiErrorKind::HttpsRedirect:
             return Kind::HttpsRedirect;
+        case ApiErrorKind::UntrustedCertificate:
+            return Kind::UntrustedCertificate;
+        case ApiErrorKind::CertificateRejected:
+            return Kind::CertificateRejected;
         default:
             return Kind::UnknownError;
         }

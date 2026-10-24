@@ -7,6 +7,8 @@
 
 // Qt headers
 #include <QObject>
+#include <QVariantList>
+#include <QVariantMap>
 #include <QRect>
 #include <QWindow>
 #include <QtQmlIntegration/qqmlintegration.h>
@@ -32,6 +34,11 @@ namespace kemai
         // Settings dialog: the preferences, and false when the settings file could not be read (changes kept for this session only)
         Q_PROPERTY(kemai::AppPreferences *preferences READ preferences CONSTANT)
         Q_PROPERTY(bool settingsPersistent READ settingsPersistent CONSTANT)
+        // Certificate the last login refused ({host, subject, issuer, validFrom, validUntil, sha256, replacesTrusted,
+        // rejection: "none" | "expired" | "hostname" | "revoked" | "other"}), empty otherwise
+        Q_PROPERTY(QVariantMap refusedCertificate READ refusedCertificate NOTIFY refusedCertificateChanged)
+        // Certificates the user trusted: {host, sha256, expiresAt, expired}
+        Q_PROPERTY(QVariantList trustedCertificates READ trustedCertificates NOTIFY trustedCertificatesChanged)
 
     public:
         explicit KemaiContext(QObject *parent = nullptr);
@@ -43,6 +50,14 @@ namespace kemai
         QString windowTitle() const;
         AppPreferences *preferences() const;
         bool            settingsPersistent() const;
+        QVariantMap     refusedCertificate() const;
+        QVariantList    trustedCertificates() const;
+
+        // Trusts the certificate the last login refused (for its host only, never an expired or misnamed one),
+        // then logs in again with the same credentials
+        Q_INVOKABLE void trustRefusedCertificate();
+        // The next connection to `host` asks again
+        Q_INVOKABLE void removeTrustedCertificate(const QString &host);
 
         // `profileName`: saved profile the credentials come from, empty when typed by hand
         Q_INVOKABLE void login(const QString &host, const QString &token, bool rememberLogin, const QString &profileName = {});
@@ -62,6 +77,8 @@ namespace kemai
         void loginFailed(kemai::SessionController::NotificationKind kind, const QString &detail);
         void loggedOut();
         void lastSessionChanged();
+        void refusedCertificateChanged();
+        void trustedCertificatesChanged();
 
     private:
         void updateAutoLoginSettings(const QString &host, const QString &token, bool rememberLogin);
@@ -71,6 +88,16 @@ namespace kemai
         std::unique_ptr<AppSettings>      m_pendingSettings;
         std::unique_ptr<AppPreferences>   m_preferences;
         bool                              m_settingsPersistent = true;
+        std::optional<CertificateInfo>    m_refusedCertificate;
+        // Credentials of the last login, to retry it once a certificate is trusted
+        struct LoginRequest
+        {
+            QString host;
+            QString token;
+            bool    remember = false;
+            QString profileName;
+        };
+        LoginRequest m_lastLogin;
         QString                           m_lastAccountName;
         bool                              m_justLoggedOut = false;
     };

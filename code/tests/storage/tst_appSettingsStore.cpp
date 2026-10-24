@@ -6,6 +6,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QTemporaryDir>
+#include <QTimeZone>
 
 #include <misc/pathHelpers.h>
 #include <storage/appSettingsStore.h>
@@ -72,7 +73,7 @@ TEST_CASE("AppSettingsStore::save - round-trip", "[appSettingsStore][unit]")
     store.save(AppSettings{});
 
     const auto saved = QJsonDocument::fromJson(readFile(path)).object();
-    REQUIRE(saved.value("version").toString() == "1.2");
+    REQUIRE(saved.value("version").toString() == "1.3");
     REQUIRE_FALSE(AppSettingsStore::settingsFromJson(saved).autoLogin.has_value());
 }
 
@@ -204,4 +205,29 @@ TEST_CASE("AppSettingsStore::canSave - only a missing or readable file", "[appSe
 
     writeFile(path, QJsonDocument(makeSettingsJson("2.0")).toJson());
     REQUIRE_FALSE(store.canSave());
+}
+
+TEST_CASE("AppSettingsStore::save - trusted certificates round-trip", "[appSettingsStore][unit]")
+{
+    QTemporaryDir tempDir;
+    REQUIRE(tempDir.isValid());
+    const auto path = tempDir.filePath("appSettings.json");
+
+    const TrustedCertificate certificate{.host      = "kimai.example.lan:8443",
+                                         .sha256    = "AB:CD:EF",
+                                         .pem       = "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----\n",
+                                         .expiresAt = QDateTime(QDate(2027, 3, 12), QTime(10, 0), QTimeZone::UTC)};
+    AppSettings settings;
+    settings.trustedCertificates = {certificate};
+
+    AppSettingsStore store;
+    store.setStorePath(path);
+    store.save(settings);
+
+    const auto loaded = AppSettingsStore::settingsFromJson(QJsonDocument::fromJson(readFile(path)).object());
+    REQUIRE(loaded.trustedCertificates.size() == 1);
+    REQUIRE(loaded.trustedCertificates[0].host == certificate.host);
+    REQUIRE(loaded.trustedCertificates[0].sha256 == certificate.sha256);
+    REQUIRE(loaded.trustedCertificates[0].pem == certificate.pem);
+    REQUIRE(loaded.trustedCertificates[0].expiresAt == certificate.expiresAt);
 }

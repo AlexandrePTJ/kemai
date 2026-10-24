@@ -1,5 +1,8 @@
 #include "appSettings.h"
 
+// Qt headers
+#include <QJsonArray>
+
 namespace kemai
 {
 
@@ -26,6 +29,20 @@ namespace kemai
         {
             json["preferences"] = preferences;
         }
+        if (!trustedCertificates.isEmpty())
+        {
+            QJsonArray certificates;
+            for (const auto &certificate : trustedCertificates)
+            {
+                certificates.append(QJsonObject{
+                    {"host",      certificate.host                                 },
+                    {"sha256",    certificate.sha256                               },
+                    {"pem",       QString::fromLatin1(certificate.pem)             },
+                    {"expiresAt", certificate.expiresAt.toString(Qt::ISODate)      }
+                });
+            }
+            json["trustedCertificates"] = certificates;
+        }
         return json;
     }
 
@@ -49,6 +66,16 @@ namespace kemai
             }
         }
         settings.preferences = json["preferences"].toObject();
+        for (const auto &value : json["trustedCertificates"].toArray())
+        {
+            const auto certificate = value.toObject();
+            settings.trustedCertificates.append(TrustedCertificate{
+                .host      = certificate["host"].toString(),
+                .sha256    = certificate["sha256"].toString(),
+                .pem       = certificate["pem"].toString().toLatin1(),
+                .expiresAt = QDateTime::fromString(certificate["expiresAt"].toString(), Qt::ISODate),
+            });
+        }
         return settings;
     }
 
