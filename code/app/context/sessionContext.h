@@ -44,4 +44,12 @@ namespace kemai
         QML_NAMED_ELEMENT(TimesheetModel)
         QML_UNCREATABLE("TimesheetModel is created by the application")
     };
+
+    struct TaskModelForeign
+    {
+        Q_GADGET
+        QML_FOREIGN(TaskModel)
+        QML_NAMED_ELEMENT(TaskModel)
+        QML_UNCREATABLE("TaskModel is created by the application")
+    };
 } // namespace kemai

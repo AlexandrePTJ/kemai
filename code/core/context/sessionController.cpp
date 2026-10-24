@@ -153,6 +153,11 @@ namespace kemai
         return QStringLiteral("#888888");
     }
 
+    QDateTime SessionController::activeTimesheetBegin() const
+    {
+        return m_activeTimeSheet ? m_activeTimeSheet->beginAt.toLocalTime() : QDateTime();
+    }
+
     ActivityListModel *SessionController::activityModel() const
     {
         return m_activityModel.get();

@@ -32,10 +32,13 @@ set(KEMAI_QML_FILES
         qml/Components/Spinner.qml
         qml/Components/StartStopButton.qml
         qml/Components/TagsInput.qml
+        qml/Components/TaskFilterField.qml
+        qml/Components/TasksPane.qml
         qml/Components/WheelScroller.qml
         qml/Components/TimeEntryDelegate.qml
         qml/Components/TimeWheel.qml
         qml/Components/TimerBar.qml
+        qml/Components/ViewSwitch.qml
         qml/Views/DateTimeEditDialog.qml
         qml/Views/LoginView.qml
         qml/Views/LogoutConfirmDialog.qml

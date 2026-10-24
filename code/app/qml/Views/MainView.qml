@@ -83,6 +83,8 @@ Page {
             Layout.fillWidth: true
             isActive: root.sessionContext.hasActiveTimesheet
             entryName: root.sessionContext.activeTimesheetLabel
+            taskTitle: root.sessionContext.hasTaskManagement ? root.sessionContext.tasks.runningTaskTitle : ""
+            since: root.sessionContext.activeTimesheetBegin
         }
 
         Rectangle {

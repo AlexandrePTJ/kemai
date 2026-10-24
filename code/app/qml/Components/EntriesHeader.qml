@@ -13,6 +13,13 @@ Item {
 
     // Extra controls at the far right, after a divider (e.g. the account menu)
     default property alias trailing: trailingRow.data
+    // Replaces the title when set (e.g. the History | Tasks switch)
+    property alias leading: leadingRow.data
+    // Right of the spacer, in place of the stats and refresh when those are hidden (e.g. the tasks filter)
+    property alias middle: middleRow.data
+    property bool statsVisible: true
+    // False when `leading` takes the title's place
+    property bool titleVisible: true
 
     signal refreshClicked()
 
@@ -22,8 +29,15 @@ Item {
         anchors.fill: parent
         spacing: 8
 
+        RowLayout {
+            id: leadingRow
+            visible: !root.titleVisible
+            spacing: 8
+        }
+
         // Title
         RowLayout {
+            visible: root.titleVisible
             spacing: 8
 
             Text {
@@ -41,8 +55,14 @@ Item {
 
         Item { Layout.fillWidth: true }
 
+        RowLayout {
+            id: middleRow
+            spacing: 8
+        }
+
         // Stats
         RowLayout {
+            visible: root.statsVisible
             spacing: 4
 
             Text {
@@ -99,6 +119,7 @@ Item {
         // Refresh (projects/activities cache + timesheets)
         Text {
             id: refreshIcon
+            visible: root.statsVisible
             text: "\u21BB"
             color: root.refreshing ? Theme.colorTextSecondary : Theme.colorTextPrimary
             font.pixelSize: Theme.fontSizeMedium

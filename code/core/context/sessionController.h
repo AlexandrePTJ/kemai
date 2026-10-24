@@ -43,6 +43,8 @@ namespace kemai
         Q_PROPERTY(QString activeProjectName READ activeProjectName NOTIFY activeTimesheetChanged)
         Q_PROPERTY(QString activeActivityName READ activeActivityName NOTIFY activeTimesheetChanged)
         Q_PROPERTY(QString activeActivityColor READ activeActivityColor NOTIFY activeTimesheetChanged)
+        // Local start time of the running timer, invalid without one
+        Q_PROPERTY(QDateTime activeTimesheetBegin READ activeTimesheetBegin NOTIFY activeTimesheetChanged)
         Q_PROPERTY(kemai::ActivityListModel *activityModel READ activityModel CONSTANT)
         Q_PROPERTY(bool refreshing READ isRefreshing NOTIFY refreshingChanged)
         Q_PROPERTY(bool punchMode READ isPunchMode NOTIFY punchModeChanged)
@@ -121,6 +123,7 @@ namespace kemai
         QString            activeProjectName() const;
         QString            activeActivityName() const;
         QString            activeActivityColor() const;
+        QDateTime          activeTimesheetBegin() const;
         ActivityListModel *activityModel() const;
         bool               isRefreshing() const;
         // Kimai manages begin/end itself: they are never sent on update
