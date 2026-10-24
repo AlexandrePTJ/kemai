@@ -8,10 +8,12 @@
 // Qt headers
 #include <QGuiApplication>
 #include <QScreen>
+#include <QUrl>
 
 // Project headers
 #include "kemaiConfig.h"
 #include <client/kimaiSystem.h>
+#include <misc/customFmt.h>
 #include <misc/pathHelpers.h>
 #include <misc/windowPlacement.h>
 
@@ -66,6 +68,7 @@ namespace kemai
         client->requestMeUserInfo()
             .then(this, [this, client, host, token, rememberLogin, profileName](KimaiUser user)
                 {
+                    spdlog::info("Logged in to {} as {}", QUrl(host).toString(QUrl::RemoveUserInfo), user.username);
                     auto* session = new SessionContext(std::move(client), user, this);
                     session->setAccount(profileName, host);
                     m_lastAccountName = session->accountName();
@@ -74,8 +77,9 @@ namespace kemai
                     emit loginSucceeded(session);
                     updateAutoLoginSettings(host, token, rememberLogin);
                 })
-            .onFailed(this, [this](const std::exception &e)
+            .onFailed(this, [this, host](const std::exception &e)
                 {
+                    spdlog::error("Login to {} failed: {}", QUrl(host).toString(QUrl::RemoveUserInfo), e.what());
                     emit loginFailed(QString::fromStdString(e.what()));
                     updateAutoLoginSettings("", "", false);
                 });
