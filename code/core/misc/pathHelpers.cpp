@@ -39,7 +39,8 @@ namespace
             return "profiles.json";
 
         case kemai::PathHelpers::FilePathType::AppSettings:
-            return "settings.json";
+            // Not "settings.json": Kemai 0.11.x keeps its profiles in that file, same directory
+            return "appSettings.json";
 
         default:
             throw std::runtime_error("Unknown path type");

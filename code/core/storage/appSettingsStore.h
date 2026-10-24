@@ -24,6 +24,9 @@ namespace kemai
         void load();
         void save(const AppSettings &settings);
 
+        // Throws std::runtime_error on a missing/invalid version or one written by a newer major
+        static AppSettings settingsFromJson(const QJsonObject &json);
+
     signals:
         void settingsLoaded(const AppSettings &settings);
 

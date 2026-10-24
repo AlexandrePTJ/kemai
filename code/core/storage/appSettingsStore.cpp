@@ -6,7 +6,9 @@
 #include <spdlog/spdlog.h>
 
 // Qt headers
+#include <QFileInfo>
 #include <QJsonObject>
+#include <QVersionNumber>
 
 // Project helpers
 #include <misc/customFmt.h>
@@ -18,8 +20,11 @@ namespace
     /* Changelog
      * =========
      * 2026-03-21    1.0    Initial version
+     * 2026-10-24    1.0    File renamed from settings.json (Kemai 0.11.x's file) to appSettings.json
+     *
+     * Versioning policy: same as the profiles file (see profileStore.cpp).
      */
-    const auto gSettingsCurrentVersion     = QString("1.0");
+    const auto gSettingsCurrentVersion     = QVersionNumber(1, 0);
     const auto gSettingsSecretAutoLoginKey = QString("autologin/token");
 
 } // namespace
@@ -43,15 +48,7 @@ namespace kemai
     {
         try
         {
-            auto json = JsonHelpers::loadJsonObjectFromFile(m_storePath);
-
-            if (!json.contains("version"))
-            {
-                throw std::runtime_error("Missing version field");
-            }
-
-            auto settingsObject = json["settings"].toObject();
-            m_pendingSettings   = AppSettings::fromJson(settingsObject);
+            m_pendingSettings = settingsFromJson(JsonHelpers::loadJsonObjectFromFile(m_storePath));
 
             if (m_pendingSettings.autoLogin.has_value())
             {
@@ -68,12 +65,46 @@ namespace kemai
         }
     }
 
+    AppSettings AppSettingsStore::settingsFromJson(const QJsonObject &json)
+    {
+        const auto versionString = json.value("version").toString();
+        const auto version       = QVersionNumber::fromString(versionString);
+        if (version.isNull())
+        {
+            throw std::runtime_error(fmt::format("Missing or invalid settings version '{}'", versionString));
+        }
+
+        if (version.majorVersion() > gSettingsCurrentVersion.majorVersion())
+        {
+            throw std::runtime_error(fmt::format("Settings version {} was written by a newer Kemai (supports up to {}.x)", versionString,
+                                                 gSettingsCurrentVersion.majorVersion()));
+        }
+
+        return AppSettings::fromJson(json.value("settings").toObject());
+    }
+
     void AppSettingsStore::save(const AppSettings &settings)
     {
-        PathHelpers::ensureDirectoryExists(m_storePath);
+        if (QFileInfo::exists(m_storePath))
+        {
+            try
+            {
+                settingsFromJson(JsonHelpers::loadJsonObjectFromFile(m_storePath));
+            }
+            catch (const std::runtime_error &e)
+            {
+                // Corrupt or newer-format file: keep it, the settings only live for this session.
+                spdlog::error("Settings not saved, {} left untouched: {}", m_storePath, e.what());
+                return;
+            }
+        }
+        else
+        {
+            PathHelpers::ensureDirectoryExists(m_storePath);
+        }
 
         QJsonObject json;
-        json.insert("version", gSettingsCurrentVersion);
+        json.insert("version", gSettingsCurrentVersion.toString());
         json.insert("settings", settings.toJson());
 
         JsonHelpers::saveJsonToFile(json, m_storePath);
