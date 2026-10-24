@@ -21,6 +21,8 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.11.3'
+          # aqtinstall 3.3.0 (latest release) misses the Qt 6.11 Windows repo layout (miurahr/aqtinstall#1000); drop once released
+          aqtsource: 'git+https://github.com/miurahr/aqtinstall.git@076e1659807d0b362a3ed684d54c2e9c775eb9c7'
 
       - name: Install linux packages
         if: runner.os == 'Linux'
