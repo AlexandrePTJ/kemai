@@ -19,11 +19,14 @@ First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is prov
 
 ### Not there yet (compared with 0.11.1)
 - Creating customers, projects and activities; Task Management plugin
-- System tray, idle detection
+- System tray, stopping the timer when idle or when the session is locked
+- Automatic refresh of the running timer (started or stopped from the web interface or another client)
+- Settings dialog; window size and position are not remembered
 - Update check, About dialog, log journal and log files
 - Translations
 - Trusting a self-signed certificate from the application
-- Login with username and API password (Kimai older than 2.14): an API token is required
+
+Login requires an API token (Kimai 2.14 or later): login with username and API password is no longer supported.
 
 
 
