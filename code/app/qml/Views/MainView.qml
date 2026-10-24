@@ -13,7 +13,12 @@ Page {
 
     // Back to the foreground: reload what may have changed on the server meanwhile
     readonly property bool windowActive: Window.active
-    onWindowActiveChanged: if (windowActive) sessionContext.refreshIfStale()
+    onWindowActiveChanged: {
+        if (windowActive) {
+            root.sessionContext.refreshIfStale()
+            root.sessionContext.syncActiveTimeSheet()
+        }
+    }
 
     background: Rectangle {
         color: Theme.colorBackground
