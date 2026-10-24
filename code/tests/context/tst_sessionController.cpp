@@ -546,6 +546,20 @@ TEST_CASE("SessionController::updateTimeSheet - creates new tags before updating
     }
 }
 
+TEST_CASE("SessionController::accountName - profile name, else the Kimai user name", "[session][unit]")
+{
+    auto      fake = std::make_shared<FakeKimaiClient>();
+    KimaiUser user;
+    user.username = "susan";
+
+    SessionController controller(fake, user);
+    REQUIRE(controller.accountName() == "susan");
+
+    controller.setAccount("KimaiDev", "https://demo.kimai.org");
+    REQUIRE(controller.accountName() == "KimaiDev");
+    REQUIRE(controller.host() == "https://demo.kimai.org");
+}
+
 TEST_CASE("SessionController - punch mode follows the timesheet config", "[session][unit]")
 {
     auto fake                          = std::make_shared<FakeKimaiClient>();

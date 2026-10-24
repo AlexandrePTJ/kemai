@@ -66,6 +66,23 @@ namespace kemai
         return m_user.username;
     }
 
+    QString SessionController::accountName() const
+    {
+        return m_profileName.isEmpty() ? m_user.username : m_profileName;
+    }
+
+    QString SessionController::host() const
+    {
+        return m_host;
+    }
+
+    void SessionController::setAccount(const QString &profileName, const QString &host)
+    {
+        m_profileName = profileName;
+        m_host        = host;
+        emit accountChanged();
+    }
+
     TimesheetModel *SessionController::recentTimeSheets() const
     {
         return m_recentTimeSheets.get();
@@ -92,6 +109,33 @@ namespace kemai
             return QStringLiteral("00:00:00");
         }
         return FormatHelpers::formatDuration(m_activeTimeSheet->beginAt.secsTo(QDateTime::currentDateTimeUtc()));
+    }
+
+    QString SessionController::activeProjectName() const
+    {
+        return m_activeTimeSheet ? m_activeTimeSheet->project.name : QString{};
+    }
+
+    QString SessionController::activeActivityName() const
+    {
+        return m_activeTimeSheet ? m_activeTimeSheet->activity.name : QString{};
+    }
+
+    QString SessionController::activeActivityColor() const
+    {
+        if (!m_activeTimeSheet)
+        {
+            return {};
+        }
+        if (!m_activeTimeSheet->activity.color.isEmpty())
+        {
+            return m_activeTimeSheet->activity.color;
+        }
+        if (!m_activeTimeSheet->project.color.isEmpty())
+        {
+            return m_activeTimeSheet->project.color;
+        }
+        return QStringLiteral("#888888");
     }
 
     ActivityListModel *SessionController::activityModel() const

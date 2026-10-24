@@ -33,10 +33,15 @@ namespace kemai
         Q_OBJECT
 
         Q_PROPERTY(QString username READ username CONSTANT)
+        Q_PROPERTY(QString accountName READ accountName NOTIFY accountChanged)
+        Q_PROPERTY(QString host READ host NOTIFY accountChanged)
         Q_PROPERTY(kemai::TimesheetModel *recentTimeSheets READ recentTimeSheets CONSTANT)
         Q_PROPERTY(bool hasActiveTimesheet READ hasActiveTimesheet NOTIFY activeTimesheetChanged)
         Q_PROPERTY(QString activeTimesheetLabel READ activeTimesheetLabel NOTIFY activeTimesheetChanged)
         Q_PROPERTY(QString activeTimesheetDuration READ activeTimesheetDuration NOTIFY activeTimesheetChanged)
+        Q_PROPERTY(QString activeProjectName READ activeProjectName NOTIFY activeTimesheetChanged)
+        Q_PROPERTY(QString activeActivityName READ activeActivityName NOTIFY activeTimesheetChanged)
+        Q_PROPERTY(QString activeActivityColor READ activeActivityColor NOTIFY activeTimesheetChanged)
         Q_PROPERTY(kemai::ActivityListModel *activityModel READ activityModel CONSTANT)
         Q_PROPERTY(bool refreshing READ isRefreshing NOTIFY refreshingChanged)
         Q_PROPERTY(bool punchMode READ isPunchMode NOTIFY punchModeChanged)
@@ -67,14 +72,23 @@ namespace kemai
         ~SessionController() override;
 
         QString            username() const;
+        // Saved profile name the session was opened from, else the Kimai user name
+        QString            accountName() const;
+        QString            host() const;
         TimesheetModel    *recentTimeSheets() const;
         bool               hasActiveTimesheet() const;
         QString            activeTimesheetLabel() const;
         QString            activeTimesheetDuration() const;
+        QString            activeProjectName() const;
+        QString            activeActivityName() const;
+        QString            activeActivityColor() const;
         ActivityListModel *activityModel() const;
         bool               isRefreshing() const;
         // Kimai manages begin/end itself: they are never sent on update
         bool               isPunchMode() const;
+
+        // Where the session comes from, for display: `profileName` may be empty (credentials typed by hand)
+        void setAccount(const QString &profileName, const QString &host);
 
         // Cache age beyond which refreshIfStale() reloads it.
         void setStaleAfter(std::chrono::seconds staleAfter);
@@ -100,6 +114,7 @@ namespace kemai
 
     signals:
         void activeTimesheetChanged();
+        void accountChanged();
         void refreshingChanged();
         void punchModeChanged();
         // Update/delete outcomes, for the edit dialog that shows its own failures (never 401: sessionExpired instead)
@@ -130,6 +145,8 @@ namespace kemai
 
         std::shared_ptr<IKimaiClient>      m_client;
         KimaiUser                          m_user;
+        QString                            m_profileName;
+        QString                            m_host;
         std::unique_ptr<TimesheetModel>    m_recentTimeSheets;
         std::unique_ptr<ActivityListModel> m_activityModel;
         std::unique_ptr<KimaiCache>        m_cache;

@@ -28,7 +28,17 @@ namespace kemai
         m_settingsStore->load();
     }
 
-    void KemaiContext::login(const QString &host, const QString &token, bool rememberLogin)
+    QString KemaiContext::lastAccountName() const
+    {
+        return m_lastAccountName;
+    }
+
+    bool KemaiContext::justLoggedOut() const
+    {
+        return m_justLoggedOut;
+    }
+
+    void KemaiContext::login(const QString &host, const QString &token, bool rememberLogin, const QString &profileName)
     {
         auto client = std::make_shared<KimaiClient>();
         client->setHost(host);
@@ -36,9 +46,13 @@ namespace kemai
 
         // clang-format off
         client->requestMeUserInfo()
-            .then(this, [this, client, host, token, rememberLogin](KimaiUser user)
+            .then(this, [this, client, host, token, rememberLogin, profileName](KimaiUser user)
                 {
                     auto* session = new SessionContext(std::move(client), user, this);
+                    session->setAccount(profileName, host);
+                    m_lastAccountName = session->accountName();
+                    m_justLoggedOut   = false;
+                    emit lastSessionChanged();
                     emit loginSucceeded(session);
                     updateAutoLoginSettings(host, token, rememberLogin);
                 })
@@ -54,6 +68,8 @@ namespace kemai
     {
         spdlog::info("Logging out");
         updateAutoLoginSettings("", "", false);
+        m_justLoggedOut = true;
+        emit lastSessionChanged();
         emit loggedOut();
     }
 
