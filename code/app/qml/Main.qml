@@ -11,10 +11,23 @@ ApplicationWindow {
 
     id: main
 
+    // Default size; shown by appContext with the saved geometry once completed
     width: 800
     height: 600
-    visible: true
     title: appContext.windowTitle
+
+    // Geometry of the window when not maximized, saved on close
+    property rect _normalGeometry: Qt.rect(0, 0, 0, 0)
+    function _trackNormalGeometry() {
+        if (main.visibility === Window.Windowed)
+            main._normalGeometry = Qt.rect(main.x, main.y, main.width, main.height)
+    }
+    onXChanged: main._trackNormalGeometry()
+    onYChanged: main._trackNormalGeometry()
+    onWidthChanged: main._trackNormalGeometry()
+    onHeightChanged: main._trackNormalGeometry()
+    onVisibilityChanged: main._trackNormalGeometry()
+    onClosing: appContext.saveWindowGeometry(main._normalGeometry, main.visibility === Window.Maximized)
 
     KemaiContext {
         id: appContext
@@ -48,5 +61,8 @@ ApplicationWindow {
         initialItem: loginViewComponent
     }
 
-    Component.onCompleted: appContext.initialize()
+    Component.onCompleted: {
+        appContext.showWindowWithSavedGeometry(main)
+        appContext.initialize()
+    }
 }

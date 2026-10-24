@@ -5,10 +5,24 @@
 // spdlog headers
 #include <spdlog/spdlog.h>
 
+// Qt headers
+#include <QGuiApplication>
+#include <QScreen>
+
 // Project headers
 #include "kemaiConfig.h"
 #include <client/kimaiSystem.h>
 #include <misc/pathHelpers.h>
+#include <misc/windowPlacement.h>
+
+namespace
+{
+    // Wayland compositors place windows themselves: an application cannot set nor read its window position
+    bool platformPlacesWindows()
+    {
+        return QGuiApplication::platformName().startsWith("wayland");
+    }
+} // namespace
 
 namespace kemai
 {
@@ -20,6 +34,9 @@ namespace kemai
         m_settingsStore->setStorePath(settingsPath);
 
         connect(m_settingsStore.get(), &AppSettingsStore::settingsLoaded, this, &KemaiContext::onSettingsLoaded);
+
+        // Read now: the window geometry is needed before the window shows, the keychain read comes later
+        m_pendingSettings = std::make_unique<AppSettings>(m_settingsStore->readFile());
     }
 
     KemaiContext::~KemaiContext() = default;
@@ -82,6 +99,65 @@ namespace kemai
         }
     }
 
+    void KemaiContext::showWindowWithSavedGeometry(QWindow *window)
+    {
+        if (window == nullptr)
+        {
+            return;
+        }
+
+        if (const auto &saved = m_pendingSettings->window; saved.has_value())
+        {
+            QList<QRect> screens;
+            if (const auto *primary = QGuiApplication::primaryScreen(); primary != nullptr)
+            {
+                screens.append(primary->availableGeometry());
+            }
+            for (const auto *screen : QGuiApplication::screens())
+            {
+                if (screen != QGuiApplication::primaryScreen())
+                {
+                    screens.append(screen->availableGeometry());
+                }
+            }
+
+            const auto placement = WindowPlacement::fit(saved->normal, screens);
+            if (placement.positionKept && !platformPlacesWindows())
+            {
+                window->setGeometry(placement.rect);
+            }
+            else
+            {
+                window->resize(placement.rect.size());
+            }
+
+            if (saved->maximized)
+            {
+                window->showMaximized();
+                return;
+            }
+        }
+        window->show();
+    }
+
+    void KemaiContext::saveWindowGeometry(const QRect &normalGeometry, bool maximized)
+    {
+        if (!normalGeometry.isValid())
+        {
+            return;
+        }
+
+        auto normal = normalGeometry;
+        // The position read on Wayland is meaningless: keep the one saved by an X11, Windows or macOS session
+        if (platformPlacesWindows())
+        {
+            normal.moveTopLeft(m_pendingSettings->window ? m_pendingSettings->window->normal.topLeft() : QPoint());
+        }
+
+        m_pendingSettings->window = WindowGeometry{.normal = normal, .maximized = maximized};
+        m_settingsStore->save(*m_pendingSettings);
+    }
+
     QString KemaiContext::windowTitle() const
     {
         const auto channel = QStringLiteral(KEMAI_CHANNEL);
@@ -115,6 +191,7 @@ namespace kemai
 
     void KemaiContext::onSettingsLoaded(const AppSettings &settings)
     {
+        // Same file as read at construction, now with the token
         m_pendingSettings = std::make_unique<AppSettings>(settings);
 
         if (m_pendingSettings->autoLogin.has_value())

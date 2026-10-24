@@ -66,6 +66,19 @@ namespace kemai
         }
     }
 
+    AppSettings AppSettingsStore::readFile() const
+    {
+        try
+        {
+            return settingsFromJson(JsonHelpers::loadJsonObjectFromFile(m_storePath));
+        }
+        catch (const std::runtime_error &e)
+        {
+            spdlog::debug("Could not read app settings from {}: {}", m_storePath, e.what());
+            return {};
+        }
+    }
+
     AppSettings AppSettingsStore::settingsFromJson(const QJsonObject &json)
     {
         const auto versionString = json.value("version").toString();
@@ -110,7 +123,7 @@ namespace kemai
 
         JsonHelpers::saveJsonToFile(json, m_storePath);
 
-        if (settings.autoLogin.has_value())
+        if (settings.autoLogin.has_value() && !settings.autoLogin->token.isEmpty())
         {
             m_secretStorage.writeSecret(gSettingsSecretAutoLoginKey, settings.autoLogin->token);
         }

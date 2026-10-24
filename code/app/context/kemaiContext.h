@@ -7,6 +7,8 @@
 
 // Qt headers
 #include <QObject>
+#include <QRect>
+#include <QWindow>
 #include <QtQmlIntegration/qqmlintegration.h>
 
 // Project headers
@@ -42,6 +44,11 @@ namespace kemai
         Q_INVOKABLE void logout();
         // Releases a session the UI no longer shows (logout or expiry); call once its view is gone
         Q_INVOKABLE void closeSession(kemai::SessionContext *session);
+
+        // Applies the saved geometry (fitted to the connected screens; size only where the platform places windows) and shows `window`
+        Q_INVOKABLE void showWindowWithSavedGeometry(QWindow *window);
+        // `normalGeometry`: geometry of the window when not maximized
+        Q_INVOKABLE void saveWindowGeometry(const QRect &normalGeometry, bool maximized);
 
     signals:
         void loginSucceeded(kemai::SessionContext *session);
