@@ -5,6 +5,7 @@ list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
 qt_add_executable(${PROJECT_NAME}
     main.cpp
     mocks/fakeKimaiClient.h
+    client/tst_certificateTrust.cpp
     client/tst_kimaiCache.cpp
     client/tst_kimaiClient.cpp
     client/tst_kimaiTasks.cpp

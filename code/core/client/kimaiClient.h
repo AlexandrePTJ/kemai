@@ -13,6 +13,7 @@
 
 // Project headers
 #include <client/iKimaiClient.h>
+#include <client/kimaiCertificate.h>
 
 namespace kemai
 {
@@ -30,6 +31,8 @@ namespace kemai
         // A request that transfers nothing for this long fails as NoNetwork: a dead connection never errors on its own
         static constexpr std::chrono::milliseconds DefaultTransferTimeout{15000};
         void setTransferTimeout(std::chrono::milliseconds timeout);
+        // Certificates the user trusted, each for its own host: their "unknown issuer" errors are ignored
+        void setTrustedCertificates(const TrustedCertificates &certificates);
 
         QFuture<KimaiVersion>         requestKimaiVersion() override;
         QFuture<KimaiUser>            requestMeUserInfo() override;
@@ -68,8 +71,6 @@ namespace kemai
         // message, or the form-level error with an empty field; empty pair when the body holds none
         static std::pair<QString, QString> validationErrorFromJson(const QJsonDocument &doc);
 
-    signals:
-        void sslError(const QString &msg, const QByteArray &certSN, const QByteArray &certPem);
 
     private:
         class KimaiClientPrivate;

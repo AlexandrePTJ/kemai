@@ -170,6 +170,7 @@ namespace kemai
         void onNamSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 
         QString                                m_username, m_host, m_token, m_apiToken;
+        TrustedCertificates                    m_trustedCertificates;
         std::unique_ptr<QNetworkAccessManager> m_networkAccessManager;
 
     private:

@@ -155,6 +155,14 @@ QNetworkReply *KimaiClient::KimaiClientPrivate::sendDeleteRequest(const QNetwork
     return m_networkAccessManager->deleteResource(networkRequest);
 }
 
+namespace
+{
+    // Reply properties carrying the certificate problem to makeReplyError()
+    constexpr auto PropertyCertificatePem = "kemaiCertificatePem";
+    constexpr auto PropertyRejection      = "kemaiCertificateRejection";
+    constexpr auto PropertyReplaces       = "kemaiCertificateReplacesTrusted";
+} // namespace
+
 KimaiApiError KimaiClient::KimaiClientPrivate::makeReplyError(ApiMethod method, QNetworkReply *networkReply)
 {
     const auto httpStatus = networkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
@@ -199,6 +207,19 @@ KimaiApiError KimaiClient::KimaiClientPrivate::makeReplyError(ApiMethod method, 
         }
     }
 
+    // TLS refused before any HTTP exchange: say which certificate and why
+    if (const auto pem = networkReply->property(PropertyCertificatePem).toByteArray(); !pem.isEmpty())
+    {
+        auto info            = CertificateInfo::fromCertificate(QSslCertificate(pem), hostKey(networkReply->url()));
+        info.rejection       = static_cast<CertificateInfo::Rejection>(networkReply->property(PropertyRejection).toInt());
+        info.replacesTrusted = networkReply->property(PropertyReplaces).toBool();
+
+        KimaiApiError error(info.rejection == CertificateInfo::Rejection::None ? ApiErrorKind::UntrustedCertificate : ApiErrorKind::CertificateRejected, 0,
+                            apiMethodToString(method), networkReply->errorString());
+        error.setCertificate(info);
+        return error;
+    }
+
     return {kind, httpStatus, apiMethodToString(method), serverMessage, field};
 }
 
@@ -223,20 +244,78 @@ KimaiApiError KimaiClient::KimaiClientPrivate::makeParseError(ApiMethod method, 
     return {ApiErrorKind::InvalidResponse, 0, apiMethodToString(method), reason};
 }
 
-void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply * /*reply*/, const QList<QSslError> &errors)
+namespace
+{
+    // Errors that only say the issuer is unknown: a certificate the user trusted for this host may override them
+    bool isUnknownIssuer(QSslError::SslError error)
+    {
+        switch (error)
+        {
+        case QSslError::SelfSignedCertificate:
+        case QSslError::SelfSignedCertificateInChain:
+        case QSslError::UnableToGetLocalIssuerCertificate:
+        case QSslError::UnableToGetIssuerCertificate:
+        case QSslError::UnableToVerifyFirstCertificate:
+        case QSslError::CertificateUntrusted:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    kemai::CertificateInfo::Rejection rejectionOf(QSslError::SslError error)
+    {
+        using Rejection = kemai::CertificateInfo::Rejection;
+        switch (error)
+        {
+        case QSslError::CertificateExpired:
+        case QSslError::CertificateNotYetValid:
+            return Rejection::Expired;
+        case QSslError::HostNameMismatch:
+            return Rejection::HostName;
+        case QSslError::CertificateRevoked:
+            return Rejection::Revoked;
+        default:
+            return Rejection::Other;
+        }
+    }
+
+} // namespace
+
+void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
 {
     if (errors.isEmpty())
     {
         return;
     }
 
-    for (const auto &error : errors)
+    auto leaf = reply->sslConfiguration().peerCertificate();
+    if (leaf.isNull())
     {
-        spdlog::error("SSL Error: {}", error.errorString());
+        const auto withCertificate = std::ranges::find_if(errors, [](const QSslError &e) { return !e.certificate().isNull(); });
+        leaf                       = withCertificate != errors.cend() ? withCertificate->certificate() : QSslCertificate();
+    }
+    const auto host = hostKey(reply->url());
+    const auto sha  = sha256Of(leaf);
+
+    const auto blocking = std::ranges::find_if(errors, [](const QSslError &e) { return !isUnknownIssuer(e.error()); });
+    const auto trusted  = std::ranges::find_if(m_trustedCertificates, [&host](const TrustedCertificate &t) { return t.host == host; });
+
+    // Only an unknown issuer, and the user trusted exactly this certificate for this host
+    if (blocking == errors.cend() && trusted != m_trustedCertificates.cend() && trusted->sha256 == sha)
+    {
+        reply->ignoreSslErrors(errors);
+        return;
     }
 
-    const auto &crtError = errors.first();
-    emit        m_q->sslError(crtError.errorString(), crtError.certificate().serialNumber(), crtError.certificate().toPem());
+    for (const auto &error : errors)
+    {
+        spdlog::error("SSL error on {}: {}", host, error.errorString());
+    }
+
+    reply->setProperty(PropertyCertificatePem, leaf.toPem());
+    reply->setProperty(PropertyRejection, blocking != errors.cend() ? static_cast<int>(rejectionOf(blocking->error())) : 0);
+    reply->setProperty(PropertyReplaces, trusted != m_trustedCertificates.cend());
 }
 
 /*
@@ -267,6 +346,11 @@ QString KimaiClient::normalizedHost(const QString &host)
         normalized.chop(1);
     }
     return normalized;
+}
+
+void KimaiClient::setTrustedCertificates(const TrustedCertificates &certificates)
+{
+    m_d->m_trustedCertificates = certificates;
 }
 
 void KimaiClient::setTransferTimeout(std::chrono::milliseconds timeout)

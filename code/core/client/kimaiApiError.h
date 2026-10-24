@@ -4,10 +4,14 @@
 
 // STL headers
 #include <exception>
+#include <optional>
 #include <string>
 
 // Qt headers
 #include <QString>
+
+// Project headers
+#include <client/kimaiCertificate.h>
 
 namespace kemai
 {
@@ -21,6 +25,8 @@ namespace kemai
         InvalidResponse, // invalid JSON or unexpected schema
         InvalidValue,    // 400 — Kimai rejected a value; serverMessage holds its message, field() the field when known
         HttpsRedirect,   // the http:// host redirects to https (writes would turn into GETs); serverMessage holds the https base URL
+        UntrustedCertificate, // TLS: certificate of an unknown issuer, not trusted for this host; certificate() details it
+        CertificateRejected,  // TLS: expired, other host name, revoked…: cannot be trusted; certificate()->rejection says why
         Unknown
     };
 
@@ -39,6 +45,9 @@ namespace kemai
         const QString &serverMessage() const noexcept;
         // Kimai field the message is about (InvalidValue), empty when not tied to a field
         const QString &field() const noexcept;
+        // The server certificate (UntrustedCertificate, CertificateRejected)
+        const std::optional<CertificateInfo> &certificate() const noexcept;
+        void                                  setCertificate(const CertificateInfo &certificate);
 
         const char *what() const noexcept override;
 
@@ -48,6 +57,7 @@ namespace kemai
         QString      m_endpoint;
         QString      m_serverMessage;
         QString      m_field;
+        std::optional<CertificateInfo> m_certificate;
         std::string  m_what;
     };
 } // namespace kemai

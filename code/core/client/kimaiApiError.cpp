@@ -45,6 +45,16 @@ namespace kemai
         return m_field;
     }
 
+    const std::optional<CertificateInfo> &KimaiApiError::certificate() const noexcept
+    {
+        return m_certificate;
+    }
+
+    void KimaiApiError::setCertificate(const CertificateInfo &certificate)
+    {
+        m_certificate = certificate;
+    }
+
     const char *KimaiApiError::what() const noexcept
     {
         return m_what.c_str();
