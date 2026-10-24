@@ -1,5 +1,5 @@
 AccessModifierOffset: -4
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: true
 AlignArrayOfStructures: Left
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
@@ -15,11 +15,13 @@ AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
-AlwaysBreakAfterReturnType: None
+BreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
-AlwaysBreakTemplateDeclarations: Yes
-BinPackArguments: false
-BinPackParameters: false
+BreakTemplateDeclarations: Yes
+PackArguments:
+  BinPack: OnePerLine
+PackParameters:
+  BinPack: OnePerLine
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Allman
 BreakBeforeTernaryOperators: false
@@ -29,14 +31,30 @@ ColumnLimit: 0
 CompactNamespaces: false
 ConstructorInitializerIndentWidth: 0
 ContinuationIndentWidth: 4
-DeriveLineEnding: true
+LineEnding: DeriveLF
 Cpp11BracedListStyle: true
 FixNamespaceComments: true
-IncludeBlocks: Preserve
+IncludeBlocks: Regroup
+IncludeCategories:
+  # Keep the C++ standard library first.
+  - Regex: '^<(algorithm|any|array|atomic|barrier|bit|bitset|cassert|cctype|cerrno|cfenv|cfloat|charconv|chrono|cinttypes|climits|cmath|compare|complex|concepts|condition_variable|coroutine|cstddef|cstdint|cstdio|cstdlib|cstring|ctime|cuchar|cwchar|cwctype|deque|exception|execution|expected|filesystem|format|forward_list|fstream|functional|future|initializer_list|iomanip|ios|iosfwd|iostream|istream|iterator|latch|limits|list|locale|map|memory|memory_resource|mutex|new|numbers|numeric|optional|ostream|queue|random|ranges|ratio|regex|scoped_allocator|semaphore|set|shared_mutex|source_location|span|sstream|stack|stdexcept|streambuf|string|string_view|syncstream|system_error|thread|tuple|typeindex|typeinfo|type_traits|unordered_map|unordered_set|utility|valarray|variant|vector|version)>$'
+    Priority: 1
+  # External libraries and platform SDK headers come next.
+  - Regex: '^<(catch2|fmt|gmock|gtest|magic_enum|qtkeychain|spdlog)/'
+    Priority: 2
+  - Regex: '^<(windows|wtsapi32)\.h>$'
+    Priority: 2
+  # Qt headers are recognizable by their Q* names and module paths.
+  - Regex: '^<(Q[A-Za-z0-9_]+|Qt[^/]+/[^>]+)>$'
+    Priority: 3
+  # Remaining angle-bracket and quoted headers belong to Kemai or generated code.
+  - Regex: '.*'
+    Priority: 4
 IndentCaseLabels: false
 IndentPPDirectives: BeforeHash
 IndentWidth: 4
-KeepEmptyLinesAtTheStartOfBlocks: true
+KeepEmptyLines:
+  AtStartOfBlock: true
 Language: Cpp
 LambdaBodyIndentation: Signature
 MaxEmptyLinesToKeep: 1
@@ -60,8 +78,7 @@ SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 1
 SpacesInAngles: false
 SpacesInContainerLiterals: false
-SpacesInCStyleCastParentheses: false
-SpacesInParentheses: false
+SpacesInParens: Never
 SpacesInSquareBrackets: false
 Standard: Auto
 TabWidth: 4
