@@ -33,6 +33,8 @@ set(KEMAI_LIB_SOURCES
         misc/jsonHelpers.cpp
         misc/pathHelpers.h
         misc/pathHelpers.cpp
+        misc/windowPlacement.h
+        misc/windowPlacement.cpp
         model/activityListModel.cpp
         model/activityListModel.h
         model/profile.cpp

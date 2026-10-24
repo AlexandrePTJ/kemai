@@ -72,7 +72,7 @@ TEST_CASE("AppSettingsStore::save - round-trip", "[appSettingsStore][unit]")
     store.save(AppSettings{});
 
     const auto saved = QJsonDocument::fromJson(readFile(path)).object();
-    REQUIRE(saved.value("version").toString() == "1.0");
+    REQUIRE(saved.value("version").toString() == "1.1");
     REQUIRE_FALSE(AppSettingsStore::settingsFromJson(saved).autoLogin.has_value());
 }
 
@@ -106,4 +106,45 @@ TEST_CASE("AppSettingsStore::save - never overwrites a corrupt file", "[appSetti
     store.save(AppSettings{});
 
     REQUIRE(readFile(path) == original);
+}
+
+TEST_CASE("AppSettingsStore::save - window geometry round-trip", "[appSettingsStore][unit]")
+{
+    QTemporaryDir tempDir;
+    REQUIRE(tempDir.isValid());
+    const auto path = tempDir.filePath("appSettings.json");
+
+    AppSettings settings;
+    settings.window = WindowGeometry{.normal = QRect(120, 80, 900, 700), .maximized = true};
+
+    AppSettingsStore store;
+    store.setStorePath(path);
+    store.save(settings);
+
+    const auto loaded = AppSettingsStore::settingsFromJson(QJsonDocument::fromJson(readFile(path)).object());
+    REQUIRE(loaded.window.has_value());
+    REQUIRE(loaded.window->normal == QRect(120, 80, 900, 700));
+    REQUIRE(loaded.window->maximized);
+}
+
+TEST_CASE("AppSettingsStore::settingsFromJson - window geometry across versions", "[appSettingsStore][unit]")
+{
+    // A 1.0 file has no geometry
+    REQUIRE_FALSE(AppSettingsStore::settingsFromJson(makeSettingsJson("1.0")).window.has_value());
+
+    // A later 1.x file is read by the same rules, its unknown fields ignored
+    auto json     = makeSettingsJson("1.7");
+    auto settings = json["settings"].toObject();
+    settings.insert("window", QJsonObject{{"x", 10}, {"y", 20}, {"width", 640}, {"height", 480}, {"maximized", false}});
+    settings.insert("someFutureField", true);
+    json.insert("settings", settings);
+
+    const auto loaded = AppSettingsStore::settingsFromJson(json);
+    REQUIRE(loaded.window->normal == QRect(10, 20, 640, 480));
+    REQUIRE(loaded.autoLogin->host == "https://kimai.example");
+
+    // A degenerate size is no geometry
+    settings.insert("window", QJsonObject{{"x", 10}, {"y", 20}, {"width", 0}, {"height", 480}});
+    json.insert("settings", settings);
+    REQUIRE_FALSE(AppSettingsStore::settingsFromJson(json).window.has_value());
 }

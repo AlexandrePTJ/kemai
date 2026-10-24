@@ -12,6 +12,16 @@ namespace kemai
                 {"host", autoLogin->host}
             };
         }
+        if (window.has_value())
+        {
+            json["window"] = QJsonObject{
+                {"x",         window->normal.x()     },
+                {"y",         window->normal.y()     },
+                {"width",     window->normal.width() },
+                {"height",    window->normal.height()},
+                {"maximized", window->maximized      }
+            };
+        }
         return json;
     }
 
@@ -24,6 +34,15 @@ namespace kemai
             settings.autoLogin = Credentials{
                 .host = json["autoLogin"].toObject()["host"].toString(),
             };
+        }
+        if (json.contains("window"))
+        {
+            const auto window = json["window"].toObject();
+            const QRect normal(window["x"].toInt(), window["y"].toInt(), window["width"].toInt(), window["height"].toInt());
+            if (normal.isValid())
+            {
+                settings.window = WindowGeometry{.normal = normal, .maximized = window["maximized"].toBool()};
+            }
         }
         return settings;
     }

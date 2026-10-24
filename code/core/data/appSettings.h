@@ -5,6 +5,9 @@
 // STL headers
 #include <optional>
 
+// Qt headers
+#include <QRect>
+
 // Project headers
 #include <data/profile.h>
 
@@ -16,9 +19,16 @@ namespace kemai
         QString token;
     };
 
+    struct WindowGeometry
+    {
+        QRect normal;            // position and size when not maximized
+        bool  maximized = false;
+    };
+
     struct AppSettings
     {
-        std::optional<Credentials> autoLogin;
+        std::optional<Credentials>    autoLogin;
+        std::optional<WindowGeometry> window;
 
         QJsonObject        toJson() const;
         static AppSettings fromJson(const QJsonObject &json);
