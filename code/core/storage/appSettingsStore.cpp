@@ -22,10 +22,11 @@ namespace
      * 2026-03-21    1.0    Initial version
      * 2026-10-24    1.0    File renamed from settings.json (Kemai 0.11.x's file) to appSettings.json
  * 2026-10-24    1.1    Add `window`: main window geometry (x, y, width, height of the normal state, maximized)
+ * 2026-10-24    1.2    Add `preferences`: per-computer preferences by key (unknown keys are kept on save)
      *
      * Versioning policy: same as the profiles file (see profileStore.cpp).
      */
-    const auto gSettingsCurrentVersion     = QVersionNumber(1, 1);
+    const auto gSettingsCurrentVersion     = QVersionNumber(1, 2);
     const auto gSettingsSecretAutoLoginKey = QString("autologin/token");
 
 } // namespace
@@ -95,6 +96,23 @@ namespace kemai
         }
 
         return AppSettings::fromJson(json.value("settings").toObject());
+    }
+
+    bool AppSettingsStore::canSave() const
+    {
+        if (!QFileInfo::exists(m_storePath))
+        {
+            return true;
+        }
+        try
+        {
+            settingsFromJson(JsonHelpers::loadJsonObjectFromFile(m_storePath));
+            return true;
+        }
+        catch (const std::runtime_error &)
+        {
+            return false;
+        }
     }
 
     void AppSettingsStore::save(const AppSettings &settings)

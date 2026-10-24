@@ -6,6 +6,7 @@
 #include <optional>
 
 // Qt headers
+#include <QJsonObject>
 #include <QRect>
 
 // Project headers
@@ -29,6 +30,9 @@ namespace kemai
     {
         std::optional<Credentials>    autoLogin;
         std::optional<WindowGeometry> window;
+        // Per-computer preferences, read and written by key in the app layer. Kept as a whole so keys written
+        // by a newer Kemai (unknown here) survive a save by this one.
+        QJsonObject                   preferences;
 
         QJsonObject        toJson() const;
         static AppSettings fromJson(const QJsonObject &json);

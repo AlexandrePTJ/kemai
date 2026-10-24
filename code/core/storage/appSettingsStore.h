@@ -25,6 +25,9 @@ namespace kemai
         void load();
         // Synchronous file read, without the token: defaults when the file is missing or unreadable
         AppSettings readFile() const;
+        // False when an existing settings file cannot be read (corrupt, newer major): save() then leaves it untouched,
+        // settings only live for this session
+        bool canSave() const;
         // The token is written to the keychain only when present: settings read by readFile() carry none
         void save(const AppSettings &settings);
 

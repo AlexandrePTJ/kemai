@@ -30,7 +30,8 @@ namespace kemai
 {
     KemaiContext::KemaiContext(QObject *parent):
     QObject(parent),
-    m_settingsStore(std::make_unique<AppSettingsStore>(this))
+    m_settingsStore(std::make_unique<AppSettingsStore>(this)),
+    m_preferences(std::make_unique<AppPreferences>(this))
     {
         auto settingsPath = PathHelpers::getFilePath(PathHelpers::FilePathType::AppSettings);
         m_settingsStore->setStorePath(settingsPath);
@@ -38,7 +39,16 @@ namespace kemai
         connect(m_settingsStore.get(), &AppSettingsStore::settingsLoaded, this, &KemaiContext::onSettingsLoaded);
 
         // Read now: the window geometry is needed before the window shows, the keychain read comes later
-        m_pendingSettings = std::make_unique<AppSettings>(m_settingsStore->readFile());
+        m_pendingSettings    = std::make_unique<AppSettings>(m_settingsStore->readFile());
+        m_settingsPersistent = m_settingsStore->canSave();
+        m_preferences->setJson(m_pendingSettings->preferences);
+
+        connect(m_preferences.get(), &AppPreferences::changed, this,
+                [this]
+                {
+                    m_pendingSettings->preferences = m_preferences->json();
+                    m_settingsStore->save(*m_pendingSettings);
+                });
     }
 
     KemaiContext::~KemaiContext() = default;
@@ -46,6 +56,16 @@ namespace kemai
     void KemaiContext::initialize()
     {
         m_settingsStore->load();
+    }
+
+    AppPreferences *KemaiContext::preferences() const
+    {
+        return m_preferences.get();
+    }
+
+    bool KemaiContext::settingsPersistent() const
+    {
+        return m_settingsPersistent;
     }
 
     QString KemaiContext::lastAccountName() const
@@ -195,8 +215,9 @@ namespace kemai
 
     void KemaiContext::onSettingsLoaded(const AppSettings &settings)
     {
-        // Same file as read at construction, now with the token
-        m_pendingSettings = std::make_unique<AppSettings>(settings);
+        // Same file as read at construction, now with the token; preferences changed meanwhile are kept
+        m_pendingSettings              = std::make_unique<AppSettings>(settings);
+        m_pendingSettings->preferences = m_preferences->json();
 
         if (m_pendingSettings->autoLogin.has_value())
         {

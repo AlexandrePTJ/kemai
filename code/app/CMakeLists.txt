@@ -38,6 +38,8 @@ set(KEMAI_QML_FILES
 )
 
 set(KEMAI_QML_SOURCES
+        context/appPreferences.cpp
+        context/appPreferences.h
         context/kemaiContext.cpp
         context/kemaiContext.h
         context/sessionContext.cpp

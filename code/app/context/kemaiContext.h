@@ -13,6 +13,7 @@
 
 // Project headers
 #include <client/kimaiClient.h>
+#include <context/appPreferences.h>
 #include <context/sessionContext.h>
 #include <storage/appSettingsStore.h>
 
@@ -28,6 +29,9 @@ namespace kemai
         Q_PROPERTY(bool justLoggedOut READ justLoggedOut NOTIFY lastSessionChanged)
         // "Kemai <version>", plus " alpha" for an alpha release
         Q_PROPERTY(QString windowTitle READ windowTitle CONSTANT)
+        // Settings dialog: the preferences, and false when the settings file could not be read (changes kept for this session only)
+        Q_PROPERTY(kemai::AppPreferences *preferences READ preferences CONSTANT)
+        Q_PROPERTY(bool settingsPersistent READ settingsPersistent CONSTANT)
 
     public:
         explicit KemaiContext(QObject *parent = nullptr);
@@ -37,6 +41,8 @@ namespace kemai
         QString lastAccountName() const;
         bool    justLoggedOut() const;
         QString windowTitle() const;
+        AppPreferences *preferences() const;
+        bool            settingsPersistent() const;
 
         // `profileName`: saved profile the credentials come from, empty when typed by hand
         Q_INVOKABLE void login(const QString &host, const QString &token, bool rememberLogin, const QString &profileName = {});
@@ -62,6 +68,8 @@ namespace kemai
 
         std::unique_ptr<AppSettingsStore> m_settingsStore;
         std::unique_ptr<AppSettings>      m_pendingSettings;
+        std::unique_ptr<AppPreferences>   m_preferences;
+        bool                              m_settingsPersistent = true;
         QString                           m_lastAccountName;
         bool                              m_justLoggedOut = false;
     };

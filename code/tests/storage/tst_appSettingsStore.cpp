@@ -72,7 +72,7 @@ TEST_CASE("AppSettingsStore::save - round-trip", "[appSettingsStore][unit]")
     store.save(AppSettings{});
 
     const auto saved = QJsonDocument::fromJson(readFile(path)).object();
-    REQUIRE(saved.value("version").toString() == "1.1");
+    REQUIRE(saved.value("version").toString() == "1.2");
     REQUIRE_FALSE(AppSettingsStore::settingsFromJson(saved).autoLogin.has_value());
 }
 
@@ -147,4 +147,61 @@ TEST_CASE("AppSettingsStore::settingsFromJson - window geometry across versions"
     settings.insert("window", QJsonObject{{"x", 10}, {"y", 20}, {"width", 0}, {"height", 480}});
     json.insert("settings", settings);
     REQUIRE_FALSE(AppSettingsStore::settingsFromJson(json).window.has_value());
+}
+
+TEST_CASE("AppSettingsStore::save - preferences unknown to this build are kept", "[appSettingsStore][unit]")
+{
+    QTemporaryDir tempDir;
+    REQUIRE(tempDir.isValid());
+    const auto path = tempDir.filePath("appSettings.json");
+
+    // Written by a newer 1.x Kemai
+    auto json     = makeSettingsJson("1.9");
+    auto settings = json["settings"].toObject();
+    settings.insert("preferences", QJsonObject{{"someFuturePreference", 42}, {"anotherOne", "x"}});
+    json.insert("settings", settings);
+    writeFile(path, QJsonDocument(json).toJson());
+
+    AppSettingsStore store;
+    store.setStorePath(path);
+    REQUIRE(store.canSave());
+
+    // This build changes something else and saves what it read
+    auto read = store.readFile();
+    read.window = WindowGeometry{.normal = QRect(0, 0, 800, 600)};
+    read.autoLogin.reset(); // no keychain write in tests
+    store.save(read);
+
+    const auto saved = AppSettingsStore::settingsFromJson(QJsonDocument::fromJson(readFile(path)).object());
+    REQUIRE(saved.preferences.value("someFuturePreference").toInt() == 42);
+    REQUIRE(saved.preferences.value("anotherOne").toString() == "x");
+}
+
+TEST_CASE("AppSettingsStore::readFile - file without preferences", "[appSettingsStore][unit]")
+{
+    REQUIRE(AppSettingsStore::settingsFromJson(makeSettingsJson("1.1")).preferences.isEmpty());
+}
+
+TEST_CASE("AppSettingsStore::canSave - only a missing or readable file", "[appSettingsStore][unit]")
+{
+    QTemporaryDir tempDir;
+    REQUIRE(tempDir.isValid());
+    const auto path = tempDir.filePath("appSettings.json");
+
+    AppSettingsStore store;
+    store.setStorePath(path);
+    REQUIRE(store.canSave()); // missing
+
+    writeFile(path, QJsonDocument(makeSettingsJson("1.0")).toJson());
+    REQUIRE(store.canSave());
+
+    const QByteArray corrupt = R"({"version": "1.0", "settings": {)";
+    writeFile(path, corrupt);
+    REQUIRE_FALSE(store.canSave());
+    REQUIRE(store.readFile().preferences.isEmpty()); // defaults
+    store.save(AppSettings{});
+    REQUIRE(readFile(path) == corrupt);
+
+    writeFile(path, QJsonDocument(makeSettingsJson("2.0")).toJson());
+    REQUIRE_FALSE(store.canSave());
 }

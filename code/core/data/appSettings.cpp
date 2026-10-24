@@ -22,6 +22,10 @@ namespace kemai
                 {"maximized", window->maximized      }
             };
         }
+        if (!preferences.isEmpty())
+        {
+            json["preferences"] = preferences;
+        }
         return json;
     }
 
@@ -44,6 +48,7 @@ namespace kemai
                 settings.window = WindowGeometry{.normal = normal, .maximized = window["maximized"].toBool()};
             }
         }
+        settings.preferences = json["preferences"].toObject();
         return settings;
     }
 
