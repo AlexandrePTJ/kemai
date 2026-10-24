@@ -17,8 +17,6 @@ Popup {
 
     required property KemaiContext kemaiContext
     required property PresenceMonitor presence
-    // Header context: before login the dialog says so
-    property bool signedIn: false
     property list<SettingsSection> sections: [inactivitySection]
 
     SettingsSection {
@@ -153,18 +151,11 @@ Popup {
             }
 
             Text {
+                Layout.fillWidth: true
                 text: "Settings"
                 color: Theme.colorTextPrimary
                 font.pixelSize: Theme.fontSizeNormal
                 font.weight: Font.DemiBold
-            }
-
-            Text {
-                Layout.fillWidth: true
-                text: root.signedIn ? "This computer" : "This computer · not signed in"
-                color: Theme.colorTextSecondary
-                font.pixelSize: Theme.fontSizeSmall
-                elide: Text.ElideRight
             }
 
             Icon {
