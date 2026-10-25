@@ -6,6 +6,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import Kemai
+
 // Account chip opening a menu that holds "Log out" (future settings go above it, Log out stays last)
 AbstractButton {
     id: root

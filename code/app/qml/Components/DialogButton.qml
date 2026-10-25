@@ -4,6 +4,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import Kemai
+
 // Dialog footer button: "subtle", "primary", "danger" or "ghost" (transparent, outlined; `tone: "warning"` turns
 // its text and border amber), with an optional leading icon.
 // While busy it keeps full opacity and a wait cursor (the caller ignores clicks);

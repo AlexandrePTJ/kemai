@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Layouts
 
+import Kemai
+
 // One setting: title and description on the left, its control on the right. A disabled row
 // greys out and gives the reason under it. Extra content (e.g. a stepper) goes under the description.
 ColumnLayout {

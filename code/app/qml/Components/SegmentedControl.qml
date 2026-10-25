@@ -6,6 +6,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import Kemai
+
 // One choice among a few, side by side; Left/Right move it when focused
 FocusScope {
     id: root

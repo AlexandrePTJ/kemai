@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Layouts
 
+import Kemai
+
 // Labelled form control: caps label (+ optional note), the control, and an error line under it.
 // The error may carry a link (e.g. "Use it"): `linkText` and `linkActivated`.
 ColumnLayout {

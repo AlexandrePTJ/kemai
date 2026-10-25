@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Shapes
 
+import Kemai
+
 import "LucideIcons.js" as LucideIcons
 
 // Lucide line icon by name, drawn as a Shape so it takes any color at any size

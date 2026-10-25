@@ -5,6 +5,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 
+import Kemai
+
 // Shown by the project — activity pickers when the search finds nothing: offers to create an activity
 // (highlighted first, the common case) or a project named after the typed text. The picker forwards
 // Up/Down/Enter through moveHighlight() and activate().

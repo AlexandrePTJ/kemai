@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Controls
 
+import Kemai
+
 // 36 px text field of the creation forms: accent ring on focus, red border on error
 TextField {
     id: root

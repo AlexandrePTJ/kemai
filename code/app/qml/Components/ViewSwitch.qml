@@ -6,6 +6,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import Kemai
+
 // History | Tasks switch of the entries header (only with the Task Management plugin)
 Rectangle {
     id: root

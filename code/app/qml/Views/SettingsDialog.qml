@@ -8,7 +8,6 @@ import QtQuick.Layouts
 
 import Kemai
 
-import "../Components"
 
 // Per-computer settings, opened from the account menu and the login view. Every change applies and is saved
 // at once: no Save/Cancel. Sections come with their features (SettingsSection), none is built in.

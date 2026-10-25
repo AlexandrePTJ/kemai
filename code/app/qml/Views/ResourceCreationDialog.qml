@@ -8,7 +8,6 @@ import QtQuick.Layouts
 
 import Kemai
 
-import "../Components"
 
 // Creates the activity or project the user searched for (and its customer when needed), then hands the new
 // project — activity pair back to the picker the search came from. Steps run one after the other with the id

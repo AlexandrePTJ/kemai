@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Controls
 
+import Kemai
+
 // On/off switch of the settings dialog; Space toggles it when focused
 AbstractButton {
     id: root

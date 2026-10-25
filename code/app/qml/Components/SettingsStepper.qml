@@ -4,6 +4,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import Kemai
+
 // Number field with −/+ buttons, typeable, clamped to from..to; `edited` carries the new value
 Rectangle {
     id: root

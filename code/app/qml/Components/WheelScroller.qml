@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 import QtQuick
 
+import Kemai
+
 // Mouse wheel scrolling for a Flickable (declare it inside the view: `WheelScroller { flickable: myList }`).
 // Qt's own wheel handling restarts its animation on every event and barely moves with high-resolution wheels
 // (1/8-notch events): scroll a fixed distance per notch instead, easing toward a target that each event moves.

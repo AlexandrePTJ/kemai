@@ -6,6 +6,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import Kemai
+
 // Select over a list of {key, label, meta?, color?, code?}: closed it shows the current item, open it
 // filters as you type (label, code, meta; client side, fast for a few hundred items). An optional row
 // under a divider offers to create something from the typed text.

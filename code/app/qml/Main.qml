@@ -5,7 +5,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 
-import "Views" as Views
+import Kemai
 
 ApplicationWindow {
 
@@ -44,7 +44,7 @@ ApplicationWindow {
         id: presenceMonitor
     }
 
-    Views.SettingsDialog {
+    SettingsDialog {
         id: settingsDialog
         kemaiContext: appContext
         presence: presenceMonitor
@@ -52,7 +52,7 @@ ApplicationWindow {
 
     Component {
         id: mainViewComponent
-        Views.MainView {
+        MainView {
             preferences: appContext.preferences
             presence: presenceMonitor
             settingsAvailable: settingsDialog.hasSections
@@ -66,7 +66,7 @@ ApplicationWindow {
 
     Component {
         id: loginViewComponent
-        Views.LoginView {
+        LoginView {
             kemaiContext: appContext
             settingsAvailable: settingsDialog.hasSections
             onSettingsRequested: settingsDialog.open()

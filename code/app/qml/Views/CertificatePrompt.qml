@@ -8,7 +8,6 @@ import QtQuick.Layouts
 
 import Kemai
 
-import "../Components"
 
 // Shown when a login meets a server certificate the system does not trust: trust it for this server
 // (first time, or a changed certificate), or learn why it can never be trusted. Cancel is the default:

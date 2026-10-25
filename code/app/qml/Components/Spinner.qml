@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Shapes
 
+import Kemai
+
 // Small busy ring: a quarter arc spinning over a faint track
 Item {
     id: root

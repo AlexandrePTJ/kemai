@@ -6,6 +6,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import Kemai
+
 // SHA-256 fingerprint of a certificate: caps label, Copy (copies "AB:CD:…"), and the 32 bytes on two
 // selectable lines of four groups
 Rectangle {

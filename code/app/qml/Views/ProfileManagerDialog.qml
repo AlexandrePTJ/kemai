@@ -6,7 +6,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import "../Components"
+import Kemai
 
 Popup {
     id: root

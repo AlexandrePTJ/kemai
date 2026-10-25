@@ -6,7 +6,6 @@ import QtQuick.Layouts
 
 import Kemai
 
-import "../Components"
 
 // Asked only when a timer runs: logging out leaves it running on the server
 Popup {

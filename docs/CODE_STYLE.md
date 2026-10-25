@@ -176,9 +176,11 @@ of the `Kemai` QML module (`qt_add_qml_module`, URI `Kemai`).
 - One component per file, `PascalCase.qml`, starting with the SPDX header as a
   `//` comment.
 - Import Qt modules first (`QtQuick`, `QtQuick.Controls`, `QtQuick.Layouts`),
-  then `import Kemai`. Never import a folder by relative path
-  (`import "../Components"`): components and C++ types all come from the
-  `Kemai` module.
+  then `import Kemai` (every file, even when the implicit directory import
+  would do), then JavaScript resources (`import "LucideIcons.js" as …`), one
+  blank line between groups. Never import a folder by relative path
+  (`import "../Components"`, `import "Views" as Views`): components, views and
+  C++ types all come from the `Kemai` module.
 - Add `pragma ComponentBehavior: Bound` to every file with delegates or
   nested `Component`s.
 - Register each new file in `code/app/CMakeLists.txt` (`KEMAI_QML_FILES`).

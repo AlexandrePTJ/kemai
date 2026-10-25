@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Layouts
 
+import Kemai
+
 Rectangle {
     id: root
 

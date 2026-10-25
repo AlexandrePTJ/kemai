@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Shapes
 
+import Kemai
+
 // Dashed rounded outline filling its parent (Rectangle borders are solid only)
 Shape {
     id: root

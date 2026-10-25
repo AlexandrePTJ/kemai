@@ -8,7 +8,6 @@ import QtQuick.Layouts
 
 import Kemai
 
-import "../Components"
 
 // Edits one time entry (project — activity, description, start/end, tags) or deletes it.
 // Edits stay local until Save; save and delete failures are shown here, with the edits kept.

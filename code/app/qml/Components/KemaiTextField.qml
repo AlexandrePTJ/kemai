@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Controls
 
+import Kemai
+
 TextField {
     
     color: Theme.colorTextPrimary

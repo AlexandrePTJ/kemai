@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Layouts
 
+import Kemai
+
 // "Filter tasks" field of the tasks header: search icon, clear × once there is text
 Rectangle {
     id: root
