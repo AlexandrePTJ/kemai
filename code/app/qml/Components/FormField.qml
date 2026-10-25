@@ -36,7 +36,7 @@ ColumnLayout {
             visible: root.note !== ""
             text: root.note
             color: Theme.colorTextDim
-            font.pixelSize: 10
+            font.pixelSize: Theme.fontSizeTiny
         }
     }
 

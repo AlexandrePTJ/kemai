@@ -313,12 +313,13 @@ Page {
                         height: 24
                         checkable: true
 
-                        contentItem: Text {
-                            text: "👁"
-                            color: showToken.checked ? Theme.colorTextTertiary : Theme.colorTextSecondary
-                            font.pixelSize: 16
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
+                        contentItem: Item {
+                            Icon {
+                                anchors.centerIn: parent
+                                name: showToken.checked ? "eye-off" : "eye"
+                                size: 16
+                                color: showToken.checked ? Theme.colorTextTertiary : Theme.colorTextSecondary
+                            }
                         }
 
                         background: Item {}
@@ -344,7 +345,7 @@ Page {
             visible: root.loginError.length > 0
             text: root.loginError
             textFormat: Text.StyledText
-            color: "red"
+            color: Theme.colorAccentRed
             font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.WordWrap
             // "Use https://…": fix the host, the user connects again

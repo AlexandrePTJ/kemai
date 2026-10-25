@@ -21,6 +21,9 @@ QtObject {
     readonly property color colorTextTertiary:      "#BCBCBC"
     readonly property color colorTextDim:           "#6b6a82"
     readonly property color colorTextLabel:         "#9d9bb3"
+    // Text and marks on filled accent / danger backgrounds (buttons, badges, toggle knob)
+    readonly property color colorTextOnAccent:      "#ffffff"
+    readonly property color colorTextOnAccentTrack: Qt.rgba(1, 1, 1, 0.3)
 
     // -- Accent
     readonly property color colorAccentGreen:         "#4CAF50"
@@ -37,6 +40,9 @@ QtObject {
     readonly property color colorAccentRedSoft:       Qt.rgba(0.898, 0.224, 0.208, 0.12)
     readonly property color colorAccentRedLine:       Qt.rgba(0.898, 0.224, 0.208, 0.5)
     readonly property color colorBackdrop:            Qt.rgba(0.047, 0.047, 0.078, 0.62)
+    // List rows: hovered, and the running entry or task
+    readonly property color colorRowHover:            Qt.rgba(1, 1, 1, 0.025)
+    readonly property color colorRowRunning:          Qt.rgba(0.298, 0.686, 0.314, 0.06)
     // Warnings (session-only notice, restart badge)
     readonly property color colorWarning:             "#e0a83a"
     readonly property color colorWarningSoft:         Qt.rgba(0.878, 0.659, 0.227, 0.12)
@@ -59,14 +65,17 @@ QtObject {
     readonly property color colorInputBackground:   "#23242f"
 
     // -- Font 
+    readonly property int fontSizeTiny:    10 // badges, caps labels
     readonly property int fontSizeXSmall:  11
     readonly property int fontSizeSmall:   12
     readonly property int fontSizeMedium:  13
     readonly property int fontSizeNormal:  14
     readonly property int fontSizeLarge:   15
+    readonly property int fontSizeTitle:   16 // section titles, highlighted values
     readonly property int fontSizeXLarge:  18
-    readonly property int fontSizeTimer:   28
+    readonly property int fontSizeTimer:   26
 
+    // Hexadecimal values only (certificate fingerprints): numbers use fontFeaturesTabular
     readonly property string fontFamilyMono: "monospace"
     // Times and durations in the UI font: tabular figures keep digits aligned (font.features)
     readonly property var fontFeaturesTabular: ({ "tnum": 1 })

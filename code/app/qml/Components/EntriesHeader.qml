@@ -42,9 +42,10 @@ Item {
             visible: root.titleVisible
             spacing: 8
 
-            Text {
-                text: "\uD83D\uDCC5"
-                font.pixelSize: 16
+            Icon {
+                name: "calendar"
+                size: 15
+                color: Theme.colorAccentGreen
             }
 
             Text {
@@ -77,11 +78,11 @@ Item {
                 color: Theme.colorAccentGreen
                 font.pixelSize: Theme.fontSizeSmall
                 font.bold: true
-                font.family: Theme.fontFamilyMono
+                font.features: Theme.fontFeaturesTabular
             }
 
             Text {
-                text: "\u00B7"
+                text: "·"
                 color: Theme.colorBorderHighlight
                 font.pixelSize: Theme.fontSizeSmall
                 Layout.leftMargin: 8
@@ -98,11 +99,11 @@ Item {
                 color: Theme.colorAccentGreen
                 font.pixelSize: Theme.fontSizeSmall
                 font.bold: true
-                font.family: Theme.fontFamilyMono
+                font.features: Theme.fontFeaturesTabular
             }
 
             Text {
-                text: "\u00B7"
+                text: "·"
                 color: Theme.colorBorderHighlight
                 font.pixelSize: Theme.fontSizeSmall
                 visible: root.dateLabel.length > 0
@@ -119,12 +120,12 @@ Item {
         }
 
         // Refresh (projects/activities cache + timesheets)
-        Text {
+        Icon {
             id: refreshIcon
             visible: root.statsVisible
-            text: "\u21BB"
+            name: "refresh-cw"
+            size: 14
             color: root.refreshing ? Theme.colorTextSecondary : Theme.colorTextPrimary
-            font.pixelSize: Theme.fontSizeMedium
             Layout.leftMargin: 8
 
             RotationAnimator on rotation {

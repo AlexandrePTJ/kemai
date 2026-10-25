@@ -10,8 +10,8 @@ Item {
     id: root
 
     property real size: 12
-    property color color: "white"
-    property color trackColor: Qt.rgba(1, 1, 1, 0.3)
+    property color color: Theme.colorTextOnAccent
+    property color trackColor: Theme.colorTextOnAccentTrack
 
     implicitWidth: root.size
     implicitHeight: root.size

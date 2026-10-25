@@ -620,7 +620,7 @@ Popup {
                         Layout.fillWidth: true
                         text: root._current ? root._current.title : ""
                         color: Theme.colorTextPrimary
-                        font.pixelSize: 16
+                        font.pixelSize: Theme.fontSizeTitle
                         font.weight: Font.DemiBold
                     }
 

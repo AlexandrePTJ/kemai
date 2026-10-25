@@ -36,8 +36,8 @@ Rectangle {
         Text {
             text: root.timerText
             color: root.isRunning ? Theme.colorAccentGreen : Theme.colorTextSecondary
-            font.family: Theme.fontFamilyMono
-            font.pixelSize: 26
+            font.features: Theme.fontFeaturesTabular
+            font.pixelSize: Theme.fontSizeTimer
             font.bold: true
             Layout.minimumWidth: 110
         }

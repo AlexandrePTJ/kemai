@@ -145,7 +145,7 @@ ColumnLayout {
                         anchors.centerIn: parent
                         text: offer.modelData.kind.toUpperCase()
                         color: Theme.colorTextSecondary
-                        font.pixelSize: 10
+                        font.pixelSize: Theme.fontSizeTiny
                         font.weight: Font.DemiBold
                         font.letterSpacing: 0.8
                     }

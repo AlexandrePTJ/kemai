@@ -334,7 +334,7 @@ Popup {
             Text {
                 text: "modified"
                 color: Theme.colorAccentGreen
-                font.pixelSize: 10
+                font.pixelSize: Theme.fontSizeTiny
                 font.weight: Font.Medium
             }
         }
@@ -412,7 +412,7 @@ Popup {
                         color: chip.mode === "error" ? Theme.colorAccentRed
                                : chip.mode === "now" ? Theme.colorAccentGreen
                                : chip.mode === "locked" ? Theme.colorTextSecondary : Theme.colorTextPrimary
-                        font.pixelSize: 16
+                        font.pixelSize: Theme.fontSizeTitle
                         font.weight: Font.DemiBold
                         font.features: Theme.fontFeaturesTabular
                     }
@@ -474,13 +474,13 @@ Popup {
                                 Layout.preferredWidth: 5
                                 Layout.preferredHeight: 5
                                 radius: 2.5
-                                color: "white"
+                                color: Theme.colorTextOnAccent
                             }
 
                             Text {
                                 text: "RUNNING"
-                                color: "white"
-                                font.pixelSize: 10
+                                color: Theme.colorTextOnAccent
+                                font.pixelSize: Theme.fontSizeTiny
                                 font.weight: Font.DemiBold
                                 font.letterSpacing: 0.6
                             }
@@ -726,7 +726,7 @@ Popup {
                                       : root._formatDuration(root._begin, root.running ? root._now : root._end)
                                 color: !root._rangeValid ? Theme.colorAccentRed
                                        : root.running ? Theme.colorAccentGreen : Theme.colorTextPrimary
-                                font.pixelSize: 16
+                                font.pixelSize: Theme.fontSizeTitle
                                 font.weight: Font.DemiBold
                                 font.features: Theme.fontFeaturesTabular
                             }

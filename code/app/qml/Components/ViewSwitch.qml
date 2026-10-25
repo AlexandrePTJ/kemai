@@ -89,7 +89,7 @@ Rectangle {
                             anchors.centerIn: parent
                             text: root.taskCount
                             color: segment.active ? Theme.colorAccentGreen : Theme.colorTextSecondary
-                            font.pixelSize: 10
+                            font.pixelSize: Theme.fontSizeTiny
                             font.weight: Font.DemiBold
                             font.features: Theme.fontFeaturesTabular
                         }

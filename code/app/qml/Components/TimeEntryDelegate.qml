@@ -34,7 +34,7 @@ Rectangle {
         if (isRunning)
             return Theme.colorAccentGreenTint
         if (hoverArea.containsMouse)
-            return Qt.rgba(1, 1, 1, 0.025)
+            return Theme.colorRowHover
         return "transparent"
     }
 
@@ -92,7 +92,7 @@ Rectangle {
                 }
 
                 Text {
-                    text: "\u2014"
+                    text: "—"
                     color: Theme.colorTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
                 }
@@ -121,7 +121,7 @@ Rectangle {
             Text {
                 text: root.duration
                 color: Theme.colorAccentGreen
-                font.family: Theme.fontFamilyMono
+                font.features: Theme.fontFeaturesTabular
                 font.pixelSize: Theme.fontSizeMedium
                 font.bold: true
                 Layout.alignment: Qt.AlignRight
@@ -137,7 +137,7 @@ Rectangle {
             Text {
                 text: root.timeRange
                 color: Theme.colorTextSecondary
-                font.family: Theme.fontFamilyMono
+                font.features: Theme.fontFeaturesTabular
                 font.pixelSize: Theme.fontSizeXSmall
                 Layout.alignment: Qt.AlignRight
             }
@@ -151,7 +151,8 @@ Rectangle {
 
             // Edit button (always visible)
             SecondaryButton {
-                text: "\u270E Edit"
+                text: "Edit"
+                iconName: "pencil"
                 implicitHeight: 40
                 implicitWidth: 50
                 // Same visual height as the neighbouring StartStopButton (Material insets)

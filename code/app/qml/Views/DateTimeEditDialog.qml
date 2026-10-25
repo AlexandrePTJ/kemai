@@ -128,7 +128,7 @@ Popup {
                 id: dateField
                 Layout.fillWidth: true
                 inputMask: "9999-99-99"
-                font.family: Theme.fontFamilyMono
+                font.features: Theme.fontFeaturesTabular
                 horizontalAlignment: TextInput.AlignHCenter
 
                 Binding on text {
@@ -156,7 +156,7 @@ Popup {
                 id: timeField
                 Layout.fillWidth: true
                 inputMask: "99:99"
-                font.family: Theme.fontFamilyMono
+                font.features: Theme.fontFeaturesTabular
                 horizontalAlignment: TextInput.AlignHCenter
 
                 Binding on text {
@@ -240,7 +240,7 @@ Popup {
                           + " — " + root._formatTime(root._hour, root._minute)
                     color: Theme.colorAccentGreen
                     font.pixelSize: Theme.fontSizeSmall
-                    font.family: Theme.fontFamilyMono
+                    font.features: Theme.fontFeaturesTabular
                 }
 
                 Item { Layout.fillWidth: true }

@@ -115,7 +115,7 @@ Popup {
                           : root._kind === "changed" ? "The certificate of " + root._host + " has changed"
                           : "Do you trust " + root._host + "?"
                     color: Theme.colorTextPrimary
-                    font.pixelSize: 15
+                    font.pixelSize: Theme.fontSizeLarge
                     font.weight: Font.DemiBold
                     wrapMode: Text.Wrap
                 }

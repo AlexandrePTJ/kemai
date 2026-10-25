@@ -150,7 +150,7 @@ Item {
                 Text {
                     text: ({ progress: "In progress", overdue: "Overdue", upcoming: "Upcoming", none: "No due date", matches: "Matches" })[groupHeader.section].toUpperCase()
                     color: groupHeader.section === "overdue" ? Theme.colorAccentRed : Theme.colorTextLabel
-                    font.pixelSize: 10
+                    font.pixelSize: Theme.fontSizeTiny
                     font.weight: Font.DemiBold
                     font.letterSpacing: 1.3
                 }
@@ -159,7 +159,7 @@ Item {
                     // Re-evaluated when the shown rows change (count)
                     text: root._tasks.count >= 0 ? root._tasks.groupCount(groupHeader.section) : 0
                     color: Theme.colorTextDim
-                    font.pixelSize: 10
+                    font.pixelSize: Theme.fontSizeTiny
                     font.features: Theme.fontFeaturesTabular
                 }
             }
@@ -207,7 +207,7 @@ Item {
                 visible: !row.confirming
                 Layout.fillWidth: true
                 Layout.preferredHeight: taskLine.implicitHeight + 20
-                color: row.running ? Qt.rgba(0.298, 0.686, 0.314, 0.06) : "transparent"
+                color: row.running ? Theme.colorRowRunning : "transparent"
 
                 Rectangle {
                     x: 0
@@ -291,13 +291,13 @@ Item {
                                         Layout.preferredWidth: 5
                                         Layout.preferredHeight: 5
                                         radius: 2.5
-                                        color: "white"
+                                        color: Theme.colorTextOnAccent
                                     }
 
                                     Text {
                                         text: row.running ? "RUNNING" : "IN PROGRESS"
-                                        color: row.running ? "white" : Theme.colorAccentGreen
-                                        font.pixelSize: 10
+                                        color: row.running ? Theme.colorTextOnAccent : Theme.colorAccentGreen
+                                        font.pixelSize: Theme.fontSizeTiny
                                         font.weight: Font.DemiBold
                                         font.letterSpacing: 0.6
                                     }

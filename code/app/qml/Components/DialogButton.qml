@@ -20,7 +20,7 @@ AbstractButton {
     property bool spinning: false
 
     readonly property bool _filled: root.variant === "primary" || root.variant === "danger"
-    readonly property color _textColor: root._filled ? "white" : root.tone === "warning" ? Theme.colorWarning : Theme.colorTextPrimary
+    readonly property color _textColor: root._filled ? Theme.colorTextOnAccent : root.tone === "warning" ? Theme.colorWarning : Theme.colorTextPrimary
 
     implicitHeight: 34
     implicitWidth: Math.max(contentRow.implicitWidth + 28, 64)
@@ -39,7 +39,7 @@ AbstractButton {
 
             Spinner {
                 visible: root.busy && root.spinning
-                color: "white"
+                color: Theme.colorTextOnAccent
             }
 
             Icon {

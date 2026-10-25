@@ -67,7 +67,7 @@ ColumnLayout {
                             anchors.centerIn: parent
                             text: root.badge
                             color: Theme.colorWarning
-                            font.pixelSize: 10
+                            font.pixelSize: Theme.fontSizeTiny
                             font.weight: Font.DemiBold
                             font.letterSpacing: 0.4
                         }

@@ -940,7 +940,7 @@ Popup {
                                 anchors.centerIn: parent
                                 text: "global"
                                 color: Theme.colorTextSecondary
-                                font.pixelSize: 10
+                                font.pixelSize: Theme.fontSizeTiny
                             }
                         }
 

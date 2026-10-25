@@ -48,12 +48,13 @@ Item {
                 id: prevBtn
                 implicitWidth: 28
                 implicitHeight: 28
-                contentItem: Text {
-                    text: "‹"
-                    color: Theme.colorTextPrimary
-                    font.pixelSize: Theme.fontSizeXLarge
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                contentItem: Item {
+                    Icon {
+                        anchors.centerIn: parent
+                        name: "chevron-left"
+                        size: 16
+                        color: Theme.colorTextPrimary
+                    }
                 }
                 background: Rectangle {
                     color: prevBtn.hovered ? Theme.colorSurface : "transparent"
@@ -77,12 +78,13 @@ Item {
                 id: nextBtn
                 implicitWidth: 28
                 implicitHeight: 28
-                contentItem: Text {
-                    text: "›"
-                    color: Theme.colorTextPrimary
-                    font.pixelSize: Theme.fontSizeXLarge
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                contentItem: Item {
+                    Icon {
+                        anchors.centerIn: parent
+                        name: "chevron-right"
+                        size: 16
+                        color: Theme.colorTextPrimary
+                    }
                 }
                 background: Rectangle {
                     color: nextBtn.hovered ? Theme.colorSurface : "transparent"

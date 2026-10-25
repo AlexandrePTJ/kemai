@@ -147,7 +147,7 @@ Item {
                             color: timeRow.isSelected ? Theme.colorTextDarkPrimary : Theme.colorTextSecondary
                             font.pixelSize: Theme.fontSizeNormal
                             font.bold: timeRow.isSelected
-                            font.family: Theme.fontFamilyMono
+                            font.features: Theme.fontFeaturesTabular
                         }
                     }
 

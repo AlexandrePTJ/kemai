@@ -43,7 +43,7 @@ AbstractButton {
             width: 14
             height: 14
             radius: 7
-            color: root.checked ? "white" : Theme.colorTextSecondary
+            color: root.checked ? Theme.colorTextOnAccent : Theme.colorTextSecondary
         }
     }
 

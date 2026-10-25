@@ -89,11 +89,13 @@ Item {
             implicitWidth: 28
             implicitHeight: 28
 
-            contentItem: Text {
-                text: "🗑"
-                font.pixelSize: Theme.fontSizeMedium
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+            contentItem: Item {
+                Icon {
+                    anchors.centerIn: parent
+                    name: "trash-2"
+                    size: 14
+                    color: trashButton.hovered ? Theme.colorAccentRed : Theme.colorTextSecondary
+                }
             }
 
             onClicked: root.isConfirming = true
