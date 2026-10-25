@@ -11,6 +11,7 @@
 // Qt headers
 #include <QObject>
 #include <QTimer>
+#include <QUrl>
 
 // Project headers
 #include <client/iKimaiClient.h>
@@ -36,6 +37,8 @@ namespace kemai
         Q_PROPERTY(QString username READ username CONSTANT)
         Q_PROPERTY(QString accountName READ accountName NOTIFY accountChanged)
         Q_PROPERTY(QString host READ host NOTIFY accountChanged)
+        // The instance's web interface: the host as typed, with https:// when no scheme was given
+        Q_PROPERTY(QUrl webUrl READ webUrl NOTIFY accountChanged)
         Q_PROPERTY(kemai::TimesheetModel *recentTimeSheets READ recentTimeSheets CONSTANT)
         Q_PROPERTY(bool hasActiveTimesheet READ hasActiveTimesheet NOTIFY activeTimesheetChanged)
         Q_PROPERTY(QString activeTimesheetLabel READ activeTimesheetLabel NOTIFY activeTimesheetChanged)
@@ -123,6 +126,7 @@ namespace kemai
         // Saved profile name the session was opened from, else the Kimai user name
         QString            accountName() const;
         QString            host() const;
+        QUrl               webUrl() const;
         TimesheetModel    *recentTimeSheets() const;
         bool               hasActiveTimesheet() const;
         QString            activeTimesheetLabel() const;

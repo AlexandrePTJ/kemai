@@ -13,6 +13,7 @@
 #include <spdlog/spdlog.h>
 
 // Project headers
+#include <client/kimaiClient.h>
 #include <misc/customFmt.h>
 #include <misc/formatHelpers.h>
 
@@ -102,6 +103,11 @@ namespace kemai
     QString SessionController::host() const
     {
         return m_host;
+    }
+
+    QUrl SessionController::webUrl() const
+    {
+        return QUrl(KimaiClient::normalizedHost(m_host));
     }
 
     void SessionController::setAccount(const QString &profileName, const QString &host)

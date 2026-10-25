@@ -42,6 +42,7 @@ set(KEMAI_QML_FILES
         qml/Components/TimerBar.qml
         qml/Components/UpdateStrip.qml
         qml/Components/ViewSwitch.qml
+        qml/Views/AboutDialog.qml
         qml/Views/CertificatePrompt.qml
         qml/Views/DateTimeEditDialog.qml
         qml/Views/LogJournalDialog.qml
@@ -52,6 +53,7 @@ set(KEMAI_QML_FILES
         qml/Views/ResourceCreationDialog.qml
         qml/Views/SettingsDialog.qml
         qml/Views/TimeEntryEditDialog.qml
+        qml/Views/ThirdParty.js
         qml/Views/TimesheetHistoryView.qml
         qml/Main.qml
         qml/Theme.qml
@@ -60,6 +62,8 @@ set(KEMAI_QML_FILES
 set(KEMAI_QML_SOURCES
         context/appPreferences.cpp
         context/appPreferences.h
+        context/buildInfo.cpp
+        context/buildInfo.h
         context/kemaiContext.cpp
         context/kemaiContext.h
         context/logJournal.cpp
@@ -115,6 +119,7 @@ qt_add_resources(
         ${PROJECT_NAME} "assets"
         FILES
         assets/fonts/RaveoVF.ttf
+        assets/fonts/RaveoVF-OFL.txt
         assets/images/kimai_logo.svg
         assets/data/countries.json
         assets/data/currencies.json

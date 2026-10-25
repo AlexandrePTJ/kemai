@@ -8,12 +8,15 @@ import QtQuick.Layouts
 
 import Kemai
 
-// Account chip opening a menu: Settings…, Log journal…, Check for updates, then Log out (always last)
+// Account chip opening a menu: Open Kimai in the browser, Settings…, Log journal…, Check for updates, About Kemai,
+// then Log out (always last)
 AbstractButton {
     id: root
 
     property string accountName: ""
     property string host: ""
+    // The instance's web interface (host with its scheme)
+    property url webUrl
     property bool timerRunning: false
     property bool settingsAvailable: false
     // Null: no update entry
@@ -22,6 +25,7 @@ AbstractButton {
     signal logoutRequested
     signal settingsRequested
     signal logJournalRequested
+    signal aboutRequested
 
     // Up to two initials from the account name ("KimaiDev" -> "KD", "susan_super" -> "SS")
     function initials(name) {
@@ -191,6 +195,27 @@ AbstractButton {
             }
 
             MenuEntry {
+                objectName: "openKimaiMenuItem"
+                iconName: "globe"
+                text: "Open Kimai in the browser"
+                trailingIcon: "external-link"
+                onClicked: {
+                    menu.close()
+                    Qt.openUrlExternally(root.webUrl)
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.leftMargin: -4
+                Layout.rightMargin: -4
+                Layout.topMargin: 4
+                Layout.bottomMargin: 4
+                Layout.preferredHeight: 1
+                color: Theme.colorDivider
+            }
+
+            MenuEntry {
                 id: settingsItem
                 objectName: "settingsMenuItem"
                 visible: root.settingsAvailable
@@ -221,6 +246,16 @@ AbstractButton {
                 onClicked: {
                     menu.close()
                     root.updates.checkNow(UpdateNotifier.Menu)
+                }
+            }
+
+            MenuEntry {
+                objectName: "aboutMenuItem"
+                iconName: "info"
+                text: "About Kemai"
+                onClicked: {
+                    menu.close()
+                    root.aboutRequested()
                 }
             }
 

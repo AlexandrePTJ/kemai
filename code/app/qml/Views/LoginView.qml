@@ -17,6 +17,7 @@ Page {
 
     signal settingsRequested
     signal logJournalRequested
+    signal aboutRequested
 
     property bool loginPending: false
     property string loginError: ""
@@ -218,6 +219,16 @@ Page {
                             onClicked: {
                                 loginMenu.close()
                                 root.updates.checkNow(UpdateNotifier.Menu)
+                            }
+                        }
+
+                        MenuEntry {
+                            objectName: "loginAboutEntry"
+                            iconName: "info"
+                            text: "About Kemai"
+                            onClicked: {
+                                loginMenu.close()
+                                root.aboutRequested()
                             }
                         }
                     }

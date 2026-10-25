@@ -63,6 +63,10 @@ ApplicationWindow {
         onClosed: updateNotifier.showInStrip()
     }
 
+    AboutDialog {
+        id: aboutDialog
+    }
+
     LogJournalDialog {
         id: logJournalDialog
         journal: main.logJournal
@@ -77,6 +81,7 @@ ApplicationWindow {
             settingsAvailable: settingsDialog.hasSections
             onSettingsRequested: settingsDialog.open()
             onLogJournalRequested: logJournalDialog.open()
+            onAboutRequested: aboutDialog.open()
             // The session lives as long as its view: released once the view is gone (logout or expiry),
             // never while a transition still binds to it
             Component.onDestruction: appContext.closeSession(sessionContext)
@@ -92,6 +97,7 @@ ApplicationWindow {
             settingsAvailable: settingsDialog.hasSections
             onSettingsRequested: settingsDialog.open()
             onLogJournalRequested: logJournalDialog.open()
+            onAboutRequested: aboutDialog.open()
         }
     }
 

@@ -569,6 +569,17 @@ TEST_CASE("SessionController::accountName - profile name, else the Kimai user na
     REQUIRE(controller.host() == "https://demo.kimai.org");
 }
 
+TEST_CASE("SessionController::webUrl - the instance's web interface, https when typed without scheme", "[session][unit]")
+{
+    SessionController controller(std::make_shared<FakeKimaiClient>(), KimaiUser{});
+
+    controller.setAccount("", "demo.kimai.org");
+    REQUIRE(controller.webUrl() == QUrl("https://demo.kimai.org"));
+
+    controller.setAccount("", "http://kimai.lan:8001/");
+    REQUIRE(controller.webUrl() == QUrl("http://kimai.lan:8001"));
+}
+
 TEST_CASE("SessionController - punch mode follows the timesheet config", "[session][unit]")
 {
     auto fake                          = std::make_shared<FakeKimaiClient>();

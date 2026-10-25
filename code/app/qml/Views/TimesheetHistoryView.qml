@@ -23,6 +23,7 @@ Item {
     signal logoutRequested
     signal settingsRequested
     signal logJournalRequested
+    signal aboutRequested
     // A resource was created from the edit dialog: NotificationKind.ResourceCreated detail
     signal resourceCreated(string detail)
 
@@ -91,11 +92,13 @@ Item {
             AccountMenu {
                 accountName: root.sessionContext.accountName
                 host: root.sessionContext.host
+                webUrl: root.sessionContext.webUrl
                 timerRunning: root.sessionContext.hasActiveTimesheet
                 settingsAvailable: root.settingsAvailable
                 updates: root.updates
                 onSettingsRequested: root.settingsRequested()
                 onLogJournalRequested: root.logJournalRequested()
+                onAboutRequested: root.aboutRequested()
                 onLogoutRequested: root.sessionContext.hasActiveTimesheet ? logoutConfirm.open() : root.logoutRequested()
             }
         }
