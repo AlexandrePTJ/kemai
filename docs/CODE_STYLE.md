@@ -185,6 +185,16 @@ of the `Kemai` QML module (`qt_add_qml_module`, URI `Kemai`).
   nested `Component`s.
 - Register each new file in `code/app/CMakeLists.txt` (`KEMAI_QML_FILES`).
 
+### Formatting
+
+QML files are formatted with `qmlformat` (Qt 6.11 or newer) and the root
+`.qmlformat.ini`: semicolons only where JavaScript needs them, Unix line
+endings, the rest at qmlformat's defaults. It writes object and array literals
+one key per line and does not reorder declarations, so the order below stays a
+manual rule. The tree was formatted once in its own commit, listed in
+`.git-blame-ignore-revs`. Run `qmlformat -i <files>` on the QML files you
+change.
+
 ### Lint-clean bindings
 
 `cmake --build --preset <preset> --target Kemai_qmllint` must report no
@@ -244,8 +254,9 @@ operations started from a dialog by that dialog.
 
 ## Applying the rules
 
-Format changed C++ files with clang-format 23 or newer, using the root
-configuration, and keep QML lint-clean (see the QML section). Review the
+Format changed C++ files with clang-format 23 or newer and changed QML files
+with qmlformat, both using their root configuration, and keep QML lint-clean
+(see the QML section). Review the
 resulting diff; do not add `clang-format off/on` regions. Formatting is a contributor responsibility;
 the project does not currently enforce it in CI. Do not use a
 formatting-only whole-tree change to conceal functional edits in the same
