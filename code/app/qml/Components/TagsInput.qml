@@ -129,6 +129,8 @@ FocusScope {
         }
 
         TapHandler {
+
+            gesturePolicy: TapHandler.ReleaseWithinBounds
             onTapped: tagInput.forceActiveFocus()
         }
 
@@ -186,6 +188,8 @@ FocusScope {
                             color: Theme.colorAccentGreen
 
                             TapHandler {
+
+                                gesturePolicy: TapHandler.ReleaseWithinBounds
                                 cursorShape: Qt.PointingHandCursor
                                 onTapped: root._remove(chip.modelData)
                             }
@@ -313,6 +317,8 @@ FocusScope {
                 color: Theme.colorSurface
 
                 TapHandler {
+
+                    gesturePolicy: TapHandler.ReleaseWithinBounds
                     cursorShape: Qt.PointingHandCursor
                     onTapped: root._add(tagInput.text, true)
                 }
@@ -382,6 +388,8 @@ FocusScope {
                     }
 
                     TapHandler {
+
+                        gesturePolicy: TapHandler.ReleaseWithinBounds
                         enabled: !suggestion.added
                         onTapped: root._add(suggestion.modelData, false)
                     }

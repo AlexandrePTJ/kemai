@@ -374,6 +374,8 @@ Popup {
             }
 
             TapHandler {
+
+                gesturePolicy: TapHandler.ReleaseWithinBounds
                 enabled: !chip.locked
                 onTapped: chip.pickRequested()
             }
@@ -495,6 +497,8 @@ Popup {
                         opacity: root._busy ? 0.45 : 1
 
                         TapHandler {
+
+                            gesturePolicy: TapHandler.ReleaseWithinBounds
                             enabled: !root._busy
                             onTapped: root._cancel()
                         }

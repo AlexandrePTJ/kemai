@@ -113,11 +113,16 @@ FocusScope {
             border.color: root.hasError ? Theme.colorAccentRedSoft : Theme.colorAccentGreenSoft
         }
 
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
+        TapHandler {
+
+            gesturePolicy: TapHandler.ReleaseWithinBounds
             enabled: !root.searching
-            onClicked: root.openSearch()
+            onTapped: root.openSearch()
+        }
+
+        HoverHandler {
+            enabled: !root.searching
+            cursorShape: Qt.PointingHandCursor
         }
 
         // Closed: current item
@@ -279,6 +284,8 @@ FocusScope {
                     }
 
                     TapHandler {
+
+                        gesturePolicy: TapHandler.ReleaseWithinBounds
                         onTapped: root._activate(row.index)
                     }
 
@@ -374,6 +381,8 @@ FocusScope {
                 }
 
                 TapHandler {
+
+                    gesturePolicy: TapHandler.ReleaseWithinBounds
                     onTapped: root._activate(root._filtered.length)
                 }
 

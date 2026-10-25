@@ -490,6 +490,8 @@ Popup {
                 opacity: root._busy ? 0.45 : 1
 
                 TapHandler {
+
+                    gesturePolicy: TapHandler.ReleaseWithinBounds
                     enabled: !root._busy
                     onTapped: root.close()
                 }
@@ -748,6 +750,8 @@ Popup {
                                     font.pixelSize: Theme.fontSizeSmall
 
                                     TapHandler {
+
+                                        gesturePolicy: TapHandler.ReleaseWithinBounds
                                         onTapped: {
                                             root._newCustomer = false
                                             root._customerNameError = ""

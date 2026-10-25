@@ -437,6 +437,8 @@ Popup {
                 color: Theme.colorTextSecondary
 
                 TapHandler {
+
+                    gesturePolicy: TapHandler.ReleaseWithinBounds
                     onTapped: root.close()
                 }
 

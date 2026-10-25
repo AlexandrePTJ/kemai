@@ -79,6 +79,8 @@ ColumnLayout {
             }
 
             TapHandler {
+
+                gesturePolicy: TapHandler.ReleaseWithinBounds
                 onTapped: {
                     root.highlight = offer.index
                     root.activate()

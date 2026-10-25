@@ -210,10 +210,14 @@ Page {
                     color: Theme.colorAccentGreen
                     font.pixelSize: Theme.fontSizeSmall
 
-                    MouseArea {
-                        anchors.fill: parent
+                    TapHandler {
+
+                        gesturePolicy: TapHandler.ReleaseWithinBounds
+                        onTapped: profileManagerDialog.open()
+                    }
+
+                    HoverHandler {
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: profileManagerDialog.open()
                     }
                 }
             }

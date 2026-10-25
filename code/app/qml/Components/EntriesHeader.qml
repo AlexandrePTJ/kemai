@@ -137,12 +137,18 @@ Item {
                 onStopped: refreshIcon.rotation = 0
             }
 
-            MouseArea {
-                anchors.fill: parent
-                anchors.margins: -6
+            TapHandler {
+
+                gesturePolicy: TapHandler.ReleaseWithinBounds
+                margin: 6
+                enabled: !root.refreshing
+                onTapped: root.refreshClicked()
+            }
+
+            HoverHandler {
+                margin: 6
                 enabled: !root.refreshing
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.refreshClicked()
             }
         }
 

@@ -114,11 +114,16 @@ Rectangle {
         color: Theme.colorTextSecondary
         font.pixelSize: Theme.fontSizeSmall
 
-        MouseArea {
-            anchors.fill: parent
-            anchors.margins: -8
+        TapHandler {
+
+            gesturePolicy: TapHandler.ReleaseWithinBounds
+            margin: 8
+            onTapped: root.visible = false
+        }
+
+        HoverHandler {
+            margin: 8
             cursorShape: Qt.PointingHandCursor
-            onClicked: root.visible = false
         }
     }
 }

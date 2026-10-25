@@ -49,10 +49,13 @@ Item {
     }
 
     // Click to select / deselect (behind the action buttons)
-    MouseArea {
-        anchors.fill: parent
+    TapHandler {
+        gesturePolicy: TapHandler.ReleaseWithinBounds
+        onTapped: root.selectionRequested(root.isSelected ? -1 : root.index)
+    }
+
+    HoverHandler {
         cursorShape: Qt.PointingHandCursor
-        onClicked: root.selectionRequested(root.isSelected ? -1 : root.index)
     }
 
     RowLayout {

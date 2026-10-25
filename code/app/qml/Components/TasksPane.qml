@@ -240,6 +240,8 @@ Item {
                             color: Theme.colorTextSecondary
 
                             TapHandler {
+
+                                gesturePolicy: TapHandler.ReleaseWithinBounds
                                 onTapped: root._expanded = root._set(root._expanded, row.taskId, row.expanded ? undefined : true)
                             }
 
@@ -653,6 +655,8 @@ Item {
                             color: Theme.colorTextSecondary
 
                             TapHandler {
+
+                                gesturePolicy: TapHandler.ReleaseWithinBounds
                                 onTapped: root._rowErrors = root._set(root._rowErrors, row.taskId, undefined)
                             }
 

@@ -227,7 +227,10 @@ pending spinner…).
   `primary`, `danger`, `ghost`); a request in progress sets `busy` at once and
   `spinning` after about 150 ms.
 - Input uses pointer handlers (`TapHandler`, `HoverHandler`, `DragHandler`)
-  rather than `MouseArea`.
+  rather than `MouseArea`. A clickable `TapHandler` sets
+  `gesturePolicy: TapHandler.ReleaseWithinBounds`: with the default policy it
+  only grabs the press passively, so the press also reaches what lies beneath,
+  even under a popup (a pick in a dropdown would also click the field below).
 - Every scrollable list declares a `WheelScroller { flickable: <its id> }`.
 - A `Text` whose layout width follows its `implicitWidth` uses
   `Math.ceil(implicitWidth)`: a width a fraction of a pixel smaller elides it.

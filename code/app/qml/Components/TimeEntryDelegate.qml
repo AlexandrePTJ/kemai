@@ -33,7 +33,7 @@ Rectangle {
     color: {
         if (isRunning)
             return Theme.colorAccentGreenTint
-        if (hoverArea.containsMouse)
+        if (rowHover.hovered)
             return Theme.colorRowHover
         return "transparent"
     }
@@ -56,11 +56,8 @@ Rectangle {
         color: root.activityColor
     }
 
-    MouseArea {
-        id: hoverArea
-        anchors.fill: parent
-        hoverEnabled: true
-        acceptedButtons: Qt.NoButton
+    HoverHandler {
+        id: rowHover
     }
 
     RowLayout {

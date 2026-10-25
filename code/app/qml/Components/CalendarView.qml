@@ -158,7 +158,7 @@ Item {
                         height: 30
                         radius: 15
                         color: dayCell.isSelected ? Theme.colorAccentGreen
-                            : (cellMouse.containsMouse && dayCell.inCurrentMonth ? Theme.colorSurface : "transparent")
+                            : (cellHover.hovered && dayCell.inCurrentMonth ? Theme.colorSurface : "transparent")
 
                         Text {
                             anchors.centerIn: parent
@@ -170,12 +170,15 @@ Item {
                         }
                     }
 
-                    MouseArea {
-                        id: cellMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
+                    HoverHandler {
+                        id: cellHover
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
+                    }
+
+                    TapHandler {
+
+                        gesturePolicy: TapHandler.ReleaseWithinBounds
+                        onTapped: {
                             if (dayCell.inCurrentMonth) {
                                 root.dateClicked(root._viewYear, root._viewMonth, dayCell.displayDay)
                             } else if (dayCell.dayNumber < 1) {

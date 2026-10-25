@@ -138,7 +138,7 @@ Item {
                         anchors.leftMargin: 6
                         anchors.rightMargin: 6
                         color: timeRow.isSelected ? Theme.colorAccentGreen
-                            : (timeMouse.containsMouse ? Theme.colorSurface : "transparent")
+                            : (timeHover.hovered ? Theme.colorSurface : "transparent")
                         radius: Theme.radiusSmall
 
                         Text {
@@ -151,12 +151,15 @@ Item {
                         }
                     }
 
-                    MouseArea {
-                        id: timeMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
+                    HoverHandler {
+                        id: timeHover
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: root.timeClicked(timeRow.rowHour, timeRow.rowMinute)
+                    }
+
+                    TapHandler {
+
+                        gesturePolicy: TapHandler.ReleaseWithinBounds
+                        onTapped: root.timeClicked(timeRow.rowHour, timeRow.rowMinute)
                     }
                 }
             }

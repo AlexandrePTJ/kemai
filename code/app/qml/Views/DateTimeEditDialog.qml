@@ -101,18 +101,24 @@ Popup {
                 font.bold: true
             }
 
-            MouseArea {
-                anchors.fill: parent
+            // Drag the title bar to move the picker
+            DragHandler {
+                id: moveHandler
+                property point startPosition
+                target: null
                 cursorShape: Qt.SizeAllCursor
-                property real pressX: 0
-                property real pressY: 0
-                onPressed: (mouse) => { pressX = mouse.x; pressY = mouse.y }
-                onPositionChanged: (mouse) => {
-                    if (pressed) {
-                        root.x += mouse.x - pressX
-                        root.y += mouse.y - pressY
+                onActiveChanged: if (moveHandler.active) moveHandler.startPosition = Qt.point(root.x, root.y)
+                // Scene coordinates: they do not move with the popup being dragged
+                onCentroidChanged: {
+                    if (moveHandler.active) {
+                        root.x = moveHandler.startPosition.x + moveHandler.centroid.scenePosition.x - moveHandler.centroid.scenePressPosition.x
+                        root.y = moveHandler.startPosition.y + moveHandler.centroid.scenePosition.y - moveHandler.centroid.scenePressPosition.y
                     }
                 }
+            }
+
+            HoverHandler {
+                cursorShape: Qt.SizeAllCursor
             }
         }
 
