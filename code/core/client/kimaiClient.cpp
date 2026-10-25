@@ -281,6 +281,26 @@ namespace
         }
     }
 
+    // Expired or not yet valid by its own dates, whatever the TLS backend reported
+    kemai::CertificateInfo::Rejection dateRejectionOf(const QSslCertificate &certificate)
+    {
+        using Rejection = kemai::CertificateInfo::Rejection;
+        if (certificate.isNull())
+        {
+            return Rejection::None;
+        }
+        const auto now = QDateTime::currentDateTimeUtc();
+        if (certificate.expiryDate() < now)
+        {
+            return Rejection::Expired;
+        }
+        if (certificate.effectiveDate() > now)
+        {
+            return Rejection::NotYetValid;
+        }
+        return Rejection::None;
+    }
+
 } // namespace
 
 void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
@@ -300,13 +320,12 @@ void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply *reply, const
     const auto host = hostKey(reply->url());
     const auto sha  = sha256Of(leaf);
 
-    const auto blocking = std::ranges::find_if(errors, [](const QSslError &e)
-                                               { return !isUnknownIssuer(e.error()); });
-    const auto trusted  = std::ranges::find_if(m_trustedCertificates, [&host](const TrustedCertificate &t)
-                                               { return t.host == host; });
+    const auto rejection = certificateRejection(errors, leaf);
+    const auto trusted   = std::ranges::find_if(m_trustedCertificates, [&host](const TrustedCertificate &t)
+                                                { return t.host == host; });
 
     // Only an unknown issuer, and the user trusted exactly this certificate for this host
-    if (blocking == errors.cend() && trusted != m_trustedCertificates.cend() && trusted->sha256 == sha)
+    if (rejection == CertificateInfo::Rejection::None && trusted != m_trustedCertificates.cend() && trusted->sha256 == sha)
     {
         reply->ignoreSslErrors(errors);
         return;
@@ -318,13 +337,24 @@ void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply *reply, const
     }
 
     reply->setProperty(PropertyCertificatePem, leaf.toPem());
-    reply->setProperty(PropertyRejection, blocking != errors.cend() ? static_cast<int>(rejectionOf(blocking->error())) : 0);
+    reply->setProperty(PropertyRejection, static_cast<int>(rejection));
     reply->setProperty(PropertyReplaces, trusted != m_trustedCertificates.cend());
 }
 
 /*
  * Public impl
  */
+CertificateInfo::Rejection KimaiClient::certificateRejection(const QList<QSslError> &errors, const QSslCertificate &leaf)
+{
+    if (const auto byDate = dateRejectionOf(leaf); byDate != CertificateInfo::Rejection::None)
+    {
+        return byDate;
+    }
+    const auto blocking = std::ranges::find_if(errors, [](const QSslError &e)
+                                               { return !isUnknownIssuer(e.error()); });
+    return blocking != errors.cend() ? rejectionOf(blocking->error()) : CertificateInfo::Rejection::None;
+}
+
 KimaiClient::KimaiClient(QObject *parent):
 QObject(parent),
 m_d(std::make_unique<KimaiClientPrivate>(this))

@@ -10,6 +10,8 @@
 #include <QFuture>
 #include <QJsonDocument>
 #include <QObject>
+#include <QSslCertificate>
+#include <QSslError>
 
 // Project headers
 #include <client/iKimaiClient.h>
@@ -70,6 +72,11 @@ namespace kemai
         // Kimai's 400 body ({"errors": {"children": {field: {"errors": [...]}}}}): the first field with an error and its
         // message, or the form-level error with an empty field; empty pair when the body holds none
         static std::pair<QString, QString> validationErrorFromJson(const QJsonDocument &doc);
+        // Why the TLS errors of a connection make its certificate untrustable, whatever the user trusted; None when
+        // they only say its issuer is unknown (a certificate trusted for its host may then override them). The
+        // certificate's own dates count too: SecureTransport (macOS) reports an expired self-signed one as merely
+        // untrusted.
+        static CertificateInfo::Rejection certificateRejection(const QList<QSslError> &errors, const QSslCertificate &leaf);
 
     private:
         class KimaiClientPrivate;

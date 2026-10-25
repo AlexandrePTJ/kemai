@@ -188,3 +188,21 @@ TEST_CASE("Certificate trust - expired or for another name cannot be trusted", "
         REQUIRE(error->certificate()->rejection == CertificateInfo::Rejection::HostName);
     }
 }
+
+TEST_CASE("Certificate trust - the certificate's dates count whatever the TLS backend reports", "[certificate][unit]")
+{
+    const QSslCertificate expired(readTlsFile("expired.pem"));
+    const QSslCertificate valid(readTlsFile("selfsigned.pem"));
+
+    // SecureTransport (macOS) reports an expired self-signed certificate as merely untrusted
+    const QList<QSslError> untrustedOnly{QSslError(QSslError::CertificateUntrusted, expired)};
+    REQUIRE(KimaiClient::certificateRejection(untrustedOnly, expired) == CertificateInfo::Rejection::Expired);
+
+    // OpenSSL lists the expiry itself
+    const QList<QSslError> openSsl{QSslError(QSslError::SelfSignedCertificate, expired), QSslError(QSslError::CertificateExpired, expired)};
+    REQUIRE(KimaiClient::certificateRejection(openSsl, expired) == CertificateInfo::Rejection::Expired);
+
+    // A valid self-signed certificate only has an unknown issuer: a pin may override it
+    REQUIRE(KimaiClient::certificateRejection({QSslError(QSslError::CertificateUntrusted, valid)}, valid) == CertificateInfo::Rejection::None);
+    REQUIRE(KimaiClient::certificateRejection({QSslError(QSslError::HostNameMismatch, valid)}, valid) == CertificateInfo::Rejection::HostName);
+}
