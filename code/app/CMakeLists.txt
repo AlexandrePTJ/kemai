@@ -140,7 +140,7 @@ target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE KemaiCore Qt6::Gui Qt6::Quick spdlog::spdlog magic_enum::magic_enum)
+        PRIVATE KemaiCore Qt6::Gui Qt6::Quick Qt6::LabsPlatform spdlog::spdlog magic_enum::magic_enum)
 
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE wtsapi32)

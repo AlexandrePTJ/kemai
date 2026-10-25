@@ -59,7 +59,8 @@ option(KEMAI_BUILD_LOCAL_DEPENDENCIES "Download and build dependencies (except Q
 
 # Qt first: qtkeychain finds it too, and Qt's deploy support (used by cmake --install) must be set up
 # from this scope, otherwise its QML deployment commands are missing at install time
-find_package(Qt6 REQUIRED COMPONENTS Gui Network LinguistTools Quick)
+# LabsPlatform: the tray icon (Qt.labs.platform SystemTrayIcon), native on every platform without Qt Widgets
+find_package(Qt6 REQUIRED COMPONENTS Gui Network LinguistTools Quick LabsPlatform)
 if (UNIX AND NOT APPLE)
     # Presence (idle time, session lock) over D-Bus
     find_package(Qt6 REQUIRED COMPONENTS DBus)
