@@ -3,6 +3,7 @@
 #pragma once
 
 // Qt headers
+#include <QDateTime>
 #include <QJsonObject>
 #include <QObject>
 #include <QtQmlIntegration/qqmlintegration.h>
@@ -24,6 +25,11 @@ namespace kemai
         Q_PROPERTY(bool stopOnIdle READ stopOnIdle WRITE setStopOnIdle NOTIFY stopOnIdleChanged)
         Q_PROPERTY(int idleMinutes READ idleMinutes WRITE setIdleMinutes NOTIFY idleMinutesChanged)
         Q_PROPERTY(bool stopOnLock READ stopOnLock WRITE setStopOnLock NOTIFY stopOnLockChanged)
+        // Updates (about-and-updates): check at start (on by default), the version not to announce at start (empty:
+        // none), and when the last check succeeded (invalid: never)
+        Q_PROPERTY(bool checkUpdatesAtStart READ checkUpdatesAtStart WRITE setCheckUpdatesAtStart NOTIFY checkUpdatesAtStartChanged)
+        Q_PROPERTY(QString ignoredVersion READ ignoredVersion WRITE setIgnoredVersion NOTIFY ignoredVersionChanged)
+        Q_PROPERTY(QDateTime lastUpdateCheck READ lastUpdateCheck WRITE setLastUpdateCheck NOTIFY lastUpdateCheckChanged)
 
     public:
         explicit AppPreferences(QObject *parent = nullptr);
@@ -43,10 +49,16 @@ namespace kemai
         bool stopOnIdle() const;
         void setStopOnIdle(bool stop);
         // Clamped to MinIdleMinutes..MaxIdleMinutes
-        int  idleMinutes() const;
-        void setIdleMinutes(int minutes);
-        bool stopOnLock() const;
-        void setStopOnLock(bool stop);
+        int       idleMinutes() const;
+        void      setIdleMinutes(int minutes);
+        bool      stopOnLock() const;
+        void      setStopOnLock(bool stop);
+        bool      checkUpdatesAtStart() const;
+        void      setCheckUpdatesAtStart(bool check);
+        QString   ignoredVersion() const;
+        void      setIgnoredVersion(const QString &version);
+        QDateTime lastUpdateCheck() const;
+        void      setLastUpdateCheck(const QDateTime &when);
 
     signals:
         // A preference was written: the owner saves the settings
@@ -54,6 +66,9 @@ namespace kemai
         void stopOnIdleChanged();
         void idleMinutesChanged();
         void stopOnLockChanged();
+        void checkUpdatesAtStartChanged();
+        void ignoredVersionChanged();
+        void lastUpdateCheckChanged();
 
     protected:
         QJsonValue value(const QString &key, const QJsonValue &defaultValue) const;

@@ -61,6 +61,45 @@ namespace kemai
         }
     }
 
+    bool AppPreferences::checkUpdatesAtStart() const
+    {
+        return value("checkUpdatesAtStart", true).toBool();
+    }
+
+    void AppPreferences::setCheckUpdatesAtStart(bool check)
+    {
+        if (setValue("checkUpdatesAtStart", check))
+        {
+            emit checkUpdatesAtStartChanged();
+        }
+    }
+
+    QString AppPreferences::ignoredVersion() const
+    {
+        return value("ignoredVersion", QString()).toString();
+    }
+
+    void AppPreferences::setIgnoredVersion(const QString &version)
+    {
+        if (setValue("ignoredVersion", version))
+        {
+            emit ignoredVersionChanged();
+        }
+    }
+
+    QDateTime AppPreferences::lastUpdateCheck() const
+    {
+        return QDateTime::fromString(value("lastUpdateCheck", QString()).toString(), Qt::ISODate);
+    }
+
+    void AppPreferences::setLastUpdateCheck(const QDateTime &when)
+    {
+        if (setValue("lastUpdateCheck", when.toUTC().toString(Qt::ISODate)))
+        {
+            emit lastUpdateCheckChanged();
+        }
+    }
+
     QJsonValue AppPreferences::value(const QString &key, const QJsonValue &defaultValue) const
     {
         return m_json.contains(key) ? m_json.value(key) : defaultValue;

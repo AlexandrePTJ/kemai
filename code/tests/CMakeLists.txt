@@ -6,10 +6,15 @@ qt_add_executable(${PROJECT_NAME}
     main.cpp
     mocks/fakeKimaiClient.h
     client/tst_certificateTrust.cpp
+    client/tst_kemaiUpdateChecker.cpp
     client/tst_kimaiCache.cpp
     client/tst_kimaiClient.cpp
     client/tst_kimaiTasks.cpp
+    context/tst_appPreferences.cpp
     context/tst_profileManager.cpp
+    # The preferences are a plain QObject of the app (QML macros only): tested here with their source
+    ../app/context/appPreferences.cpp
+    ../app/context/appPreferences.h
     context/tst_sessionController.cpp
     misc/tst_formatHelpers.cpp
     misc/tst_fuzzyMatch.cpp
@@ -22,8 +27,11 @@ qt_add_executable(${PROJECT_NAME}
     storage/tst_profileStore.cpp
 )
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../app/context)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
     KemaiCore
+    Qt6::QmlIntegration
     Catch2::Catch2
     spdlog::spdlog # tests capture or write logs themselves (core links it privately)
 )

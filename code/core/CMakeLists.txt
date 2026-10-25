@@ -23,6 +23,8 @@ set(KEMAI_LIB_SOURCES
         client/kimaiClient.h
         client/kimaiClient_p.h
         client/kimaiClient.cpp
+        client/kemaiUpdateChecker.h
+        client/kemaiUpdateChecker.cpp
         data/appSettings.cpp
         data/appSettings.h
         data/profile.cpp

@@ -4,4 +4,6 @@
 #define KEMAI_VERSION "@KEMAI_DISPLAY_VERSION@"
 // alpha, stable or dev
 #define KEMAI_CHANNEL "@KEMAI_BUILD_CHANNEL@"
+// GitHub repository whose releases the update check reads, and the About links point to
+#define KEMAI_REPOSITORY "AlexandrePTJ/kemai"
 #cmakedefine KEMAI_ENABLE_UPDATE_CHECK
