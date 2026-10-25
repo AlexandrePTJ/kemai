@@ -40,6 +40,21 @@ TEST_CASE("AppPreferences - update preferences and their defaults", "[preference
     REQUIRE_FALSE(saved);
 }
 
+TEST_CASE("AppPreferences - tray preferences are off by default and kept", "[preferences][unit]")
+{
+    AppPreferences preferences;
+    REQUIRE_FALSE(preferences.closeToTray());
+    REQUIRE_FALSE(preferences.minimizeToTray());
+
+    preferences.setCloseToTray(true);
+    preferences.setMinimizeToTray(true);
+
+    AppPreferences reread;
+    reread.setJson(preferences.json());
+    REQUIRE(reread.closeToTray());
+    REQUIRE(reread.minimizeToTray());
+}
+
 TEST_CASE("AppPreferences - keys of a newer Kemai survive", "[preferences][unit]")
 {
     AppPreferences preferences;

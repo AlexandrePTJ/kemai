@@ -61,6 +61,32 @@ namespace kemai
         }
     }
 
+    bool AppPreferences::closeToTray() const
+    {
+        return value("closeToTray", false).toBool();
+    }
+
+    void AppPreferences::setCloseToTray(bool enabled)
+    {
+        if (setValue("closeToTray", enabled))
+        {
+            emit closeToTrayChanged();
+        }
+    }
+
+    bool AppPreferences::minimizeToTray() const
+    {
+        return value("minimizeToTray", false).toBool();
+    }
+
+    void AppPreferences::setMinimizeToTray(bool enabled)
+    {
+        if (setValue("minimizeToTray", enabled))
+        {
+            emit minimizeToTrayChanged();
+        }
+    }
+
     bool AppPreferences::checkUpdatesAtStart() const
     {
         return value("checkUpdatesAtStart", true).toBool();

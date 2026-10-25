@@ -16,7 +16,18 @@ Popup {
     required property KemaiContext kemaiContext
     required property PresenceMonitor presence
     required property UpdateNotifier updates
-    property list<SettingsSection> sections: root.updates.enabled ? [inactivitySection, updatesSection, certificatesSection] : [inactivitySection, certificatesSection]
+    // The tray icon (system-tray), null until Kemai has one: its `available` drives the Window section
+    property var tray: null
+    property list<SettingsSection> sections: {
+        const list = []
+        if (root.tray !== null)
+            list.push(windowSection)
+        list.push(inactivitySection)
+        if (root.updates.enabled)
+            list.push(updatesSection)
+        list.push(certificatesSection)
+        return list
+    }
 
     // Trusted certificate asking for removal confirmation ("" if none)
     property string _confirmRemoveHost: ""
@@ -285,6 +296,49 @@ Popup {
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    SettingsSection {
+        id: windowSection
+        key: "window"
+        title: "Window"
+        description: "What happens when you close or minimize Kemai."
+        icon: "app-window"
+        content: Component {
+            ColumnLayout {
+                id: windowRows
+
+                readonly property AppPreferences preferences: root.kemaiContext.preferences
+                readonly property string noTray: root.tray !== null && root.tray.available ? "" : "Your desktop provides no tray area."
+
+                spacing: 0
+
+                SettingsRow {
+                    Layout.fillWidth: true
+                    title: "Close to tray"
+                    description: "Closing the window keeps Kemai running in the tray. Quit from the tray menu."
+                    unavailableReason: windowRows.noTray
+                    control: SettingsToggle {
+                        objectName: "closeToTrayToggle"
+                        checked: windowRows.preferences.closeToTray && windowRows.noTray === ""
+                        onToggled: windowRows.preferences.closeToTray = checked
+                    }
+                }
+
+                SettingsRow {
+                    Layout.fillWidth: true
+                    last: true
+                    title: "Minimize to tray"
+                    description: "Minimizing hides the window from the taskbar. Click the tray icon to bring it back."
+                    unavailableReason: windowRows.noTray
+                    control: SettingsToggle {
+                        objectName: "minimizeToTrayToggle"
+                        checked: windowRows.preferences.minimizeToTray && windowRows.noTray === ""
+                        onToggled: windowRows.preferences.minimizeToTray = checked
                     }
                 }
             }

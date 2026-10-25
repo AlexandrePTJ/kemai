@@ -25,6 +25,9 @@ namespace kemai
         Q_PROPERTY(bool stopOnIdle READ stopOnIdle WRITE setStopOnIdle NOTIFY stopOnIdleChanged)
         Q_PROPERTY(int idleMinutes READ idleMinutes WRITE setIdleMinutes NOTIFY idleMinutesChanged)
         Q_PROPERTY(bool stopOnLock READ stopOnLock WRITE setStopOnLock NOTIFY stopOnLockChanged)
+        // Window (system-tray): keep running in the tray when the window is closed / minimized (off by default)
+        Q_PROPERTY(bool closeToTray READ closeToTray WRITE setCloseToTray NOTIFY closeToTrayChanged)
+        Q_PROPERTY(bool minimizeToTray READ minimizeToTray WRITE setMinimizeToTray NOTIFY minimizeToTrayChanged)
         // Updates (about-and-updates): check at start (on by default), the version not to announce at start (empty:
         // none), and when the last check succeeded (invalid: never)
         Q_PROPERTY(bool checkUpdatesAtStart READ checkUpdatesAtStart WRITE setCheckUpdatesAtStart NOTIFY checkUpdatesAtStartChanged)
@@ -53,6 +56,10 @@ namespace kemai
         void      setIdleMinutes(int minutes);
         bool      stopOnLock() const;
         void      setStopOnLock(bool stop);
+        bool      closeToTray() const;
+        void      setCloseToTray(bool enabled);
+        bool      minimizeToTray() const;
+        void      setMinimizeToTray(bool enabled);
         bool      checkUpdatesAtStart() const;
         void      setCheckUpdatesAtStart(bool check);
         QString   ignoredVersion() const;
@@ -66,6 +73,8 @@ namespace kemai
         void stopOnIdleChanged();
         void idleMinutesChanged();
         void stopOnLockChanged();
+        void closeToTrayChanged();
+        void minimizeToTrayChanged();
         void checkUpdatesAtStartChanged();
         void ignoredVersionChanged();
         void lastUpdateCheckChanged();
