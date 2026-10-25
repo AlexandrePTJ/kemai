@@ -7,8 +7,8 @@
 
 // Qt headers
 #include <QJsonObject>
-#include <QList>
 #include <QJsonValue>
+#include <QList>
 #include <QString>
 
 namespace kemai

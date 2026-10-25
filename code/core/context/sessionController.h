@@ -74,17 +74,17 @@ namespace kemai
             NotFound,
             ServerError,
             InvalidResponse,
-            InvalidValue,       // detail: Kimai's message
-            AuthFailed,         // login only (in a session, 401 ends it): token refused
-            HttpsRedirect,      // detail: the https address the http:// host redirects to
+            InvalidValue,         // detail: Kimai's message
+            AuthFailed,           // login only (in a session, 401 ends it): token refused
+            HttpsRedirect,        // detail: the https address the http:// host redirects to
             UntrustedCertificate, // login only: the server certificate can be trusted (KemaiContext::refusedCertificate)
             CertificateRejected,  // login only: the server certificate cannot be trusted (expired, other name…)
             UnknownError,
-            CacheLoadFailed,   // initial load: no usable cache
+            CacheLoadFailed,    // initial load: no usable cache
             CacheRefreshFailed, // refresh: previous cache kept
             TimerStoppedIdle,   // detail: end time, reported when the user is back
             TimerStoppedLocked,
-            ResourceCreated     // detail: "activity|name|project" (project empty for a global one) or "project|name|"
+            ResourceCreated // detail: "activity|name|project" (project empty for a global one) or "project|name|"
         };
         Q_ENUM(NotificationKind)
 
@@ -119,7 +119,7 @@ namespace kemai
         static NotificationKind notificationKindOf(ApiErrorKind kind);
         ~SessionController() override;
 
-        QString            username() const;
+        QString username() const;
         // Saved profile name the session was opened from, else the Kimai user name
         QString            accountName() const;
         QString            host() const;
@@ -134,14 +134,14 @@ namespace kemai
         ActivityListModel *activityModel() const;
         bool               isRefreshing() const;
         // Kimai manages begin/end itself: they are never sent on update
-        bool               isPunchMode() const;
-        QString            userTimezone() const;
-        bool               hasTaskManagement() const;
-        TaskModel         *tasks() const;
-        TasksLoad          tasksLoad() const;
-        NotificationKind   tasksError() const;
+        bool             isPunchMode() const;
+        QString          userTimezone() const;
+        bool             hasTaskManagement() const;
+        TaskModel       *tasks() const;
+        TasksLoad        tasksLoad() const;
+        NotificationKind tasksError() const;
         // Project of the most recent entry (prefill of new activities), 0 without entries
-        Q_INVOKABLE int    lastUsedProjectId() const;
+        Q_INVOKABLE int lastUsedProjectId() const;
 
         // Where the session comes from, for display: `profileName` may be empty (credentials typed by hand)
         void setAccount(const QString &profileName, const QString &host);
@@ -159,8 +159,7 @@ namespace kemai
         // and a running entry keeps no end. Returns false (nothing sent) when end <= begin or project/activity
         // are invalid; otherwise answered by timeSheetSaved or timeSheetSaveFailed.
         // `newTags` (among `tags`) do not exist on the server yet: they are created before the update.
-        Q_INVOKABLE bool updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
-                                         const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags = {});
+        Q_INVOKABLE bool updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags, const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags = {});
         // Deletes the timesheet on the server, then refreshes active + recent (stops tracking if it was active).
         // Returns false (nothing sent) for an invalid id; otherwise answered by timeSheetDeleted or timeSheetDeleteFailed.
         Q_INVOKABLE bool deleteTimeSheet(int timesheetId);
@@ -228,8 +227,7 @@ namespace kemai
         void taskActionFailed(int taskId, const QString &action, kemai::SessionController::NotificationKind error, const QString &detail);
         void resourceCreated(kemai::SessionController::ResourceKind kind, int id);
         // `field`: the Kimai field a refused value belongs to, when known
-        void resourceCreateFailed(kemai::SessionController::ResourceKind kind, kemai::SessionController::NotificationKind error, const QString &detail,
-                                  const QString &field);
+        void resourceCreateFailed(kemai::SessionController::ResourceKind kind, kemai::SessionController::NotificationKind error, const QString &detail, const QString &field);
         // `query` is the text the suggestions answer, so the UI can drop stale replies
         void tagSuggestionsReady(const QString &query, const QStringList &tags);
         // The running timesheet was stopped by stopActiveTimeSheetAt; `end` is the end it got
@@ -271,10 +269,10 @@ namespace kemai
         QTimer                             m_recentRefreshTimer;
         QTimer                             m_activeDurationTimer;
         QTimer                             m_syncTimer;
-        bool                               m_syncInFlight   = false;
-        bool                               m_syncFailing    = false;
-        int                                m_syncGeneration = 0;
-        std::chrono::seconds               m_staleAfter = std::chrono::minutes(10);
+        bool                               m_syncInFlight      = false;
+        bool                               m_syncFailing       = false;
+        int                                m_syncGeneration    = 0;
+        std::chrono::seconds               m_staleAfter        = std::chrono::minutes(10);
         int                                m_lastUsedProjectId = 0;
         std::unique_ptr<TaskModel>         m_tasks;
         bool                               m_hasTaskManagement = false;

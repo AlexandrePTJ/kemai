@@ -38,9 +38,7 @@ namespace kemai
         switch (static_cast<Role>(role))
         {
         case Role::Label:
-            return activity.project.has_value()
-                ? QStringLiteral("%1 - %2").arg(activity.project->name, activity.name)
-                : activity.name;
+            return activity.project.has_value() ? QStringLiteral("%1 - %2").arg(activity.project->name, activity.name) : activity.name;
 
         case Role::ActivityName:
             return activity.name;

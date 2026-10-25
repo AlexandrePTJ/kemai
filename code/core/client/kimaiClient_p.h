@@ -74,13 +74,15 @@ namespace kemai
         template<class ResultType>
         QFuture<ResultType> processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply *networkReply)
         {
-            return processApiNetworkReply<ResultType>(method, networkReply, [](const QJsonDocument &doc) { return ResultType::fromJson(doc.object()); });
+            return processApiNetworkReply<ResultType>(method, networkReply, [](const QJsonDocument &doc)
+                                                      { return ResultType::fromJson(doc.object()); });
         }
 
         template<class ResultType>
         QFuture<QList<ResultType>> processApiNetworkReplyArray(ApiMethod method, QNetworkReply *networkReply)
         {
-            return processApiNetworkReply<QList<ResultType>>(method, networkReply,
+            return processApiNetworkReply<QList<ResultType>>(method,
+                                                             networkReply,
                                                              [](const QJsonDocument &doc)
                                                              {
                                                                  if (!doc.isArray())
@@ -115,7 +117,6 @@ namespace kemai
             promise.start();
             auto future = promise.future();
 
-            // clang-format off
             connect(
                 networkReply,
                 &QNetworkReply::finished,
@@ -160,9 +161,7 @@ namespace kemai
                         result.setException(std::make_exception_ptr(makeReplyError(method, networkReply)));
                     }
                     result.finish();
-                }
-            );
-            // clang-format on
+                });
 
             return future;
         }

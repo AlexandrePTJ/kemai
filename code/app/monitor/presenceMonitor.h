@@ -23,12 +23,13 @@ namespace kemai
     public:
         virtual ~PresenceBackend() = default;
 
-        virtual bool               idleSupported() const = 0;
+        virtual bool idleSupported() const = 0;
         // Seconds since the last input; nullopt when it cannot be read right now
         virtual std::optional<int> idleSeconds() const   = 0;
         virtual bool               lockSupported() const = 0;
         // Session already locked when the backend was created
-        virtual bool               lockedAtStart() const { return false; }
+        virtual bool lockedAtStart() const
+        { return false; }
 
         // Called on the main thread when the session gets locked (true) or unlocked (false)
         std::function<void(bool)> lockChanged;

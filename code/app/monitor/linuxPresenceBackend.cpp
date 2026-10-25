@@ -16,8 +16,8 @@
 #include <misc/customFmt.h>
 
 #ifdef KEMAI_HAS_XCB_SCREENSAVER
-#    include <xcb/screensaver.h>
-#    include <xcb/xcb.h>
+    #include <xcb/screensaver.h>
+    #include <xcb/xcb.h>
 #endif
 
 namespace
@@ -60,8 +60,7 @@ namespace kemai
         {
             m_sessionPath   = session.value().path();
             m_lockedAtStart = readLockedHint().value_or(false);
-            QDBusConnection::systemBus().connect(Login1Service, m_sessionPath, "org.freedesktop.DBus.Properties", "PropertiesChanged", this,
-                                                 SLOT(onSessionPropertiesChanged(QString, QVariantMap, QStringList)));
+            QDBusConnection::systemBus().connect(Login1Service, m_sessionPath, "org.freedesktop.DBus.Properties", "PropertiesChanged", this, SLOT(onSessionPropertiesChanged(QString, QVariantMap, QStringList)));
         }
         else
         {
@@ -98,20 +97,23 @@ namespace kemai
     {
         switch (source)
         {
-        case IdleSource::Gnome: {
+        case IdleSource::Gnome:
+        {
             QDBusInterface monitor("org.gnome.Mutter.IdleMonitor", "/org/gnome/Mutter/IdleMonitor/Core", "org.gnome.Mutter.IdleMonitor");
             monitor.setTimeout(DBusTimeoutMs);
             const QDBusReply<qulonglong> ms = monitor.call("GetIdletime");
             return ms.isValid() ? std::optional<int>(static_cast<int>(ms.value() / 1000)) : std::nullopt;
         }
-        case IdleSource::Kde: {
+        case IdleSource::Kde:
+        {
             // GNOME also owns this name but answers NotSupported: it is tried after Mutter
             QDBusInterface screenSaver("org.freedesktop.ScreenSaver", "/ScreenSaver", "org.freedesktop.ScreenSaver");
             screenSaver.setTimeout(DBusTimeoutMs);
             const QDBusReply<uint> seconds = screenSaver.call("GetSessionIdleTime");
             return seconds.isValid() ? std::optional<int>(static_cast<int>(seconds.value())) : std::nullopt;
         }
-        case IdleSource::X11: {
+        case IdleSource::X11:
+        {
 #ifdef KEMAI_HAS_XCB_SCREENSAVER
             auto *connection = static_cast<xcb_connection_t *>(m_xcbConnection);
             if (connection == nullptr || xcb_connection_has_error(connection) != 0)

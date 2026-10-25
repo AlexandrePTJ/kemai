@@ -1,19 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
 #include <catch2/catch_test_macros.hpp>
+#include <spdlog/sinks/ringbuffer_sink.h>
+#include <spdlog/spdlog.h>
 
-#include <QEventLoop>
-#include <QFutureWatcher>
 #include <QCoreApplication>
 #include <QElapsedTimer>
+#include <QEventLoop>
+#include <QFutureWatcher>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
-
-#include <spdlog/sinks/ringbuffer_sink.h>
-#include <spdlog/spdlog.h>
 
 #include "client/kimaiApiError.h"
 #include "client/kimaiClient.h"
@@ -157,10 +156,15 @@ TEST_CASE("KimaiClient - a failed request may release the last client reference"
     // Answers 401 at once, like a Kimai given a wrong token
     QTcpServer server;
     REQUIRE(server.listen(QHostAddress::LocalHost));
-    QObject::connect(&server, &QTcpServer::newConnection, [&server]
+    QObject::connect(&server,
+                     &QTcpServer::newConnection,
+                     [&server]
                      {
                          auto *socket = server.nextPendingConnection();
-                         QObject::connect(socket, &QTcpSocket::readyRead, socket, [socket]
+                         QObject::connect(socket,
+                                          &QTcpSocket::readyRead,
+                                          socket,
+                                          [socket]
                                           {
                                               socket->readAll();
                                               socket->write("HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
@@ -178,7 +182,8 @@ TEST_CASE("KimaiClient - a failed request may release the last client reference"
 
         client->requestMeUserInfo()
             .then(&context, [client](const KimaiUser &) {})
-            .onFailed(&context, [&failed](const KimaiApiError &) { failed = true; });
+            .onFailed(&context, [&failed](const KimaiApiError &)
+                      { failed = true; });
     }
 
     QElapsedTimer elapsed;
@@ -216,7 +221,8 @@ TEST_CASE("KimaiClient - deleteTimeSheet removes a created timesheet", "[client]
 
     // Any activity bound to a project of the instance
     const auto activities = waitForFuture(client.requestActivities());
-    const auto it         = std::ranges::find_if(activities, [](const KimaiActivity &a) { return a.project.has_value(); });
+    const auto it         = std::ranges::find_if(activities, [](const KimaiActivity &a)
+                                                 { return a.project.has_value(); });
     REQUIRE(it != activities.cend());
 
     KimaiTimeSheet ts;
@@ -267,7 +273,8 @@ TEST_CASE("KimaiClient - a running timesheet stops at a given end or now", "[cli
     }
 
     const auto activities = waitForFuture(client.requestActivities());
-    const auto it         = std::ranges::find_if(activities, [](const KimaiActivity &a) { return a.project.has_value(); });
+    const auto it         = std::ranges::find_if(activities, [](const KimaiActivity &a)
+                                                 { return a.project.has_value(); });
     REQUIRE(it != activities.cend());
 
     KimaiTimeSheet ts;
@@ -336,25 +343,25 @@ TEST_CASE("KimaiClient - creates a customer, project and activity", "[client][in
     };
 
     KimaiCustomer customer;
-    customer.name        = QStringLiteral("kemai integration test customer");
-    customer.countryKey  = "FR";
-    customer.currencyKey = "EUR";
-    customer.timezone    = "Europe/Paris";
-    customer.language    = "fr";
+    customer.name              = QStringLiteral("kemai integration test customer");
+    customer.countryKey        = "FR";
+    customer.currencyKey       = "EUR";
+    customer.timezone          = "Europe/Paris";
+    customer.language          = "fr";
     const auto createdCustomer = waitForFuture(client.addCustomer(customer));
     REQUIRE(createdCustomer.id > 0);
     REQUIRE(createdCustomer.name == customer.name);
     REQUIRE(createdCustomer.language == "fr");
 
     KimaiProject project;
-    project.name        = QStringLiteral("kemai integration test project");
-    project.customer.id = createdCustomer.id;
+    project.name              = QStringLiteral("kemai integration test project");
+    project.customer.id       = createdCustomer.id;
     const auto createdProject = waitForFuture(client.addProject(project));
     REQUIRE(createdProject.id > 0);
 
     KimaiActivity activity;
-    activity.name    = QStringLiteral("kemai integration test activity");
-    activity.project = createdProject;
+    activity.name              = QStringLiteral("kemai integration test activity");
+    activity.project           = createdProject;
     const auto createdActivity = waitForFuture(client.addActivity(activity));
     REQUIRE(createdActivity.id > 0);
     REQUIRE(createdActivity.project.has_value());
@@ -399,10 +406,15 @@ TEST_CASE("KimaiClient - an http host redirecting to https fails as HttpsRedirec
 
     QTcpServer httpSide;
     REQUIRE(httpSide.listen(QHostAddress::LocalHost));
-    QObject::connect(&httpSide, &QTcpServer::newConnection, [&]
+    QObject::connect(&httpSide,
+                     &QTcpServer::newConnection,
+                     [&]
                      {
                          auto *socket = httpSide.nextPendingConnection();
-                         QObject::connect(socket, &QTcpSocket::readyRead, socket, [socket, httpsBase]
+                         QObject::connect(socket,
+                                          &QTcpSocket::readyRead,
+                                          socket,
+                                          [socket, httpsBase]
                                           {
                                               socket->readAll();
                                               socket->write(QString("HTTP/1.1 301 Moved Permanently\r\nLocation: %1/api/users/me\r\nContent-Length: 0\r\n"

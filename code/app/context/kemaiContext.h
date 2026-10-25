@@ -7,9 +7,9 @@
 
 // Qt headers
 #include <QObject>
+#include <QRect>
 #include <QVariantList>
 #include <QVariantMap>
-#include <QRect>
 #include <QWindow>
 #include <QtQmlIntegration/qqmlintegration.h>
 
@@ -45,13 +45,13 @@ namespace kemai
         ~KemaiContext() override;
 
         Q_INVOKABLE void initialize();
-        QString lastAccountName() const;
-        bool    justLoggedOut() const;
-        QString windowTitle() const;
-        AppPreferences *preferences() const;
-        bool            settingsPersistent() const;
-        QVariantMap     refusedCertificate() const;
-        QVariantList    trustedCertificates() const;
+        QString          lastAccountName() const;
+        bool             justLoggedOut() const;
+        QString          windowTitle() const;
+        AppPreferences  *preferences() const;
+        bool             settingsPersistent() const;
+        QVariantMap      refusedCertificate() const;
+        QVariantList     trustedCertificates() const;
 
         // Trusts the certificate the last login refused (for its host only, never an expired or misnamed one),
         // then logs in again with the same credentials
@@ -98,7 +98,7 @@ namespace kemai
             QString profileName;
         };
         LoginRequest m_lastLogin;
-        QString                           m_lastAccountName;
-        bool                              m_justLoggedOut = false;
+        QString      m_lastAccountName;
+        bool         m_justLoggedOut = false;
     };
 } // namespace kemai

@@ -35,10 +35,10 @@ namespace kemai
             for (const auto &certificate : trustedCertificates)
             {
                 certificates.append(QJsonObject{
-                    {"host",      certificate.host                                 },
-                    {"sha256",    certificate.sha256                               },
-                    {"pem",       QString::fromLatin1(certificate.pem)             },
-                    {"expiresAt", certificate.expiresAt.toString(Qt::ISODate)      }
+                    {"host",      certificate.host                           },
+                    {"sha256",    certificate.sha256                         },
+                    {"pem",       QString::fromLatin1(certificate.pem)       },
+                    {"expiresAt", certificate.expiresAt.toString(Qt::ISODate)}
                 });
             }
             json["trustedCertificates"] = certificates;
@@ -58,7 +58,7 @@ namespace kemai
         }
         if (json.contains("window"))
         {
-            const auto window = json["window"].toObject();
+            const auto  window = json["window"].toObject();
             const QRect normal(window["x"].toInt(), window["y"].toInt(), window["width"].toInt(), window["height"].toInt());
             if (normal.isValid())
             {

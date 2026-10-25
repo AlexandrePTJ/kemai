@@ -19,10 +19,14 @@ static bool waitForModelReset(ProfileModel *model, int timeoutMs = 5000)
 {
     QEventLoop loop;
     bool       signalReceived = false;
-    QObject::connect(model, &QAbstractItemModel::modelReset, &loop, [&loop, &signalReceived]()
+    QObject::connect(model,
+                     &QAbstractItemModel::modelReset,
+                     &loop,
+                     [&loop, &signalReceived]()
                      {
                          signalReceived = true;
-                         loop.quit(); });
+                         loop.quit();
+                     });
     QTimer::singleShot(timeoutMs, &loop, &QEventLoop::quit);
     loop.exec();
     return signalReceived;

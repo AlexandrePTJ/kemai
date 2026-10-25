@@ -24,7 +24,7 @@ namespace kemai
         // A new generation supersedes any load in flight: its responses are dropped.
         const int generation = ++m_generation;
 
-        m_staging          = {};
+        m_staging = {};
         m_stagingError.reset();
         m_pendingResources = {Resource::Customers, Resource::Projects, Resource::Activities, Resource::TimesheetConfig};
 

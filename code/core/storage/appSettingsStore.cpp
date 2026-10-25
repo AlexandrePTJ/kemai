@@ -21,9 +21,9 @@ namespace
      * =========
      * 2026-03-21    1.0    Initial version
      * 2026-10-24    1.0    File renamed from settings.json (Kemai 0.11.x's file) to appSettings.json
- * 2026-10-24    1.1    Add `window`: main window geometry (x, y, width, height of the normal state, maximized)
- * 2026-10-24    1.2    Add `preferences`: per-computer preferences by key (unknown keys are kept on save)
- * 2026-10-24    1.3    Add `trustedCertificates`: [{host, sha256, pem, expiresAt}], certificates trusted per host
+     * 2026-10-24    1.1    Add `window`: main window geometry (x, y, width, height of the normal state, maximized)
+     * 2026-10-24    1.2    Add `preferences`: per-computer preferences by key (unknown keys are kept on save)
+     * 2026-10-24    1.3    Add `trustedCertificates`: [{host, sha256, pem, expiresAt}], certificates trusted per host
      *
      * Versioning policy: same as the profiles file (see profileStore.cpp).
      */
@@ -92,8 +92,7 @@ namespace kemai
 
         if (version.majorVersion() > gSettingsCurrentVersion.majorVersion())
         {
-            throw std::runtime_error(fmt::format("Settings version {} was written by a newer Kemai (supports up to {}.x)", versionString,
-                                                 gSettingsCurrentVersion.majorVersion()));
+            throw std::runtime_error(fmt::format("Settings version {} was written by a newer Kemai (supports up to {}.x)", versionString, gSettingsCurrentVersion.majorVersion()));
         }
 
         return AppSettings::fromJson(json.value("settings").toObject());

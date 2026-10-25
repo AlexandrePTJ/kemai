@@ -31,7 +31,10 @@ namespace
             const auto name = it.value().toString();
             if (keep(name))
             {
-                list.append(QVariantMap{{"code", it.key()}, {"name", name}});
+                list.append(QVariantMap{
+                    {"code", it.key()},
+                    {"name", name    }
+                });
             }
         }
         std::ranges::sort(list, [](const QVariant &a, const QVariant &b)
@@ -41,24 +44,30 @@ namespace
 
     bool containsCode(const QVariantList &list, const QString &code)
     {
-        return std::ranges::any_of(list, [&code](const QVariant &item) { return item.toMap().value("code").toString() == code; });
+        return std::ranges::any_of(list, [&code](const QVariant &item)
+                                   { return item.toMap().value("code").toString() == code; });
     }
 } // namespace
 
 namespace kemai
 {
-    ReferenceData::ReferenceData(QObject *parent): QObject(parent) {}
+    ReferenceData::ReferenceData(QObject *parent):
+    QObject(parent)
+    {
+    }
 
     QVariantList ReferenceData::countries() const
     {
-        static const auto list = readCodeNames(":/assets/data/countries.json", [](const QString &) { return true; });
+        static const auto list = readCodeNames(":/assets/data/countries.json", [](const QString &)
+                                               { return true; });
         return list;
     }
 
     QVariantList ReferenceData::currencies() const
     {
         // Historic currencies carry their years, e.g. "Afghan Afghani (1927–2002)": Kimai offers only current ones
-        static const auto list = readCodeNames(":/assets/data/currencies.json", [](const QString &name) { return !name.contains('('); });
+        static const auto list = readCodeNames(":/assets/data/currencies.json", [](const QString &name)
+                                               { return !name.contains('('); });
         return list;
     }
 

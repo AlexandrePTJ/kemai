@@ -19,7 +19,10 @@ namespace
 
 namespace kemai
 {
-    TaskModel::TaskModel(QObject *parent): QAbstractListModel(parent) {}
+    TaskModel::TaskModel(QObject *parent):
+    QAbstractListModel(parent)
+    {
+    }
 
     void TaskModel::setTasks(const KimaiTasks &tasks, int activeTimeSheetId)
     {
@@ -43,13 +46,15 @@ namespace kemai
     void TaskModel::removeTask(int taskId)
     {
         KimaiTasks remaining;
-        std::ranges::copy_if(m_tasks, std::back_inserter(remaining), [taskId](const KimaiTask &t) { return t.id != taskId; });
+        std::ranges::copy_if(m_tasks, std::back_inserter(remaining), [taskId](const KimaiTask &t)
+                             { return t.id != taskId; });
         setTasks(remaining, m_activeTimeSheetId);
     }
 
     const KimaiTask *TaskModel::findById(int taskId) const
     {
-        const auto it = std::ranges::find_if(m_tasks, [taskId](const KimaiTask &t) { return t.id == taskId; });
+        const auto it = std::ranges::find_if(m_tasks, [taskId](const KimaiTask &t)
+                                             { return t.id == taskId; });
         return it == m_tasks.cend() ? nullptr : &*it;
     }
 
@@ -79,7 +84,8 @@ namespace kemai
 
     QString TaskModel::runningTaskTitle() const
     {
-        const auto it = std::ranges::find_if(m_tasks, [this](const KimaiTask &t) { return isRunning(t); });
+        const auto it = std::ranges::find_if(m_tasks, [this](const KimaiTask &t)
+                                             { return isRunning(t); });
         return it == m_tasks.cend() ? QString() : it->title;
     }
 
@@ -97,7 +103,8 @@ namespace kemai
 
     bool TaskModel::isRunning(const KimaiTask &task) const
     {
-        return m_activeTimeSheetId > 0 && std::ranges::any_of(task.activeTimeSheets, [this](const KimaiTimeSheet &ts) { return ts.id == m_activeTimeSheetId; });
+        return m_activeTimeSheetId > 0 && std::ranges::any_of(task.activeTimeSheets, [this](const KimaiTimeSheet &ts)
+                                                              { return ts.id == m_activeTimeSheetId; });
     }
 
     QString TaskModel::dueStateOf(const KimaiTask &task) const
@@ -108,7 +115,8 @@ namespace kemai
         }
         const auto today = m_today.value_or(QDate::currentDate());
         const auto due   = task.endAt.toLocalTime().date();
-        return due < today ? "overdue" : due == today ? "today" : "upcoming";
+        return due < today ? "overdue" : due == today ? "today" :
+                                                        "upcoming";
     }
 
     QString TaskModel::groupOf(const KimaiTask &task) const
@@ -129,8 +137,7 @@ namespace kemai
         for (int i = 0; i < m_tasks.size(); ++i)
         {
             const auto &t = m_tasks[i];
-            if (query.isEmpty() || t.title.contains(query, Qt::CaseInsensitive) || t.project.name.contains(query, Qt::CaseInsensitive)
-                || t.activity.name.contains(query, Qt::CaseInsensitive) || t.todo.contains(query, Qt::CaseInsensitive))
+            if (query.isEmpty() || t.title.contains(query, Qt::CaseInsensitive) || t.project.name.contains(query, Qt::CaseInsensitive) || t.activity.name.contains(query, Qt::CaseInsensitive) || t.todo.contains(query, Qt::CaseInsensitive))
             {
                 m_shown.append(i);
             }

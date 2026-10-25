@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+
 #include <QCommandLineParser>
 #include <QFontDatabase>
 #include <QGuiApplication>
 #include <QLoggingCategory>
 #include <QQmlApplicationEngine>
-
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
 
 #include "kemaiConfig.h"
 #include "misc/customFmt.h"

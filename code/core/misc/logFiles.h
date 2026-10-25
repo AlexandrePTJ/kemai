@@ -20,7 +20,6 @@ namespace kemai
 
         // Rotating sink writing `path`, keeping at most `maxFiles` files of `maxFileBytes` (the oldest dropped first).
         // Null when the log directory cannot be created: Kemai then logs to the console only.
-        static spdlog::sink_ptr makeRotatingSink(const QString &path, std::size_t maxFileBytes = DefaultMaxFileBytes,
-                                                 std::size_t maxFiles = DefaultMaxFiles);
+        static spdlog::sink_ptr makeRotatingSink(const QString &path, std::size_t maxFileBytes = DefaultMaxFileBytes, std::size_t maxFiles = DefaultMaxFiles);
     };
 } // namespace kemai

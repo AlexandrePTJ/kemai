@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
 #include "kimaiClient.h"
+
 #include "kimaiClient_p.h"
 
 // 3rd party headers
@@ -214,8 +215,7 @@ KimaiApiError KimaiClient::KimaiClientPrivate::makeReplyError(ApiMethod method, 
         info.rejection       = static_cast<CertificateInfo::Rejection>(networkReply->property(PropertyRejection).toInt());
         info.replacesTrusted = networkReply->property(PropertyReplaces).toBool();
 
-        KimaiApiError error(info.rejection == CertificateInfo::Rejection::None ? ApiErrorKind::UntrustedCertificate : ApiErrorKind::CertificateRejected, 0,
-                            apiMethodToString(method), networkReply->errorString());
+        KimaiApiError error(info.rejection == CertificateInfo::Rejection::None ? ApiErrorKind::UntrustedCertificate : ApiErrorKind::CertificateRejected, 0, apiMethodToString(method), networkReply->errorString());
         error.setCertificate(info);
         return error;
     }
@@ -293,14 +293,17 @@ void KimaiClient::KimaiClientPrivate::onNamSslErrors(QNetworkReply *reply, const
     auto leaf = reply->sslConfiguration().peerCertificate();
     if (leaf.isNull())
     {
-        const auto withCertificate = std::ranges::find_if(errors, [](const QSslError &e) { return !e.certificate().isNull(); });
+        const auto withCertificate = std::ranges::find_if(errors, [](const QSslError &e)
+                                                          { return !e.certificate().isNull(); });
         leaf                       = withCertificate != errors.cend() ? withCertificate->certificate() : QSslCertificate();
     }
     const auto host = hostKey(reply->url());
     const auto sha  = sha256Of(leaf);
 
-    const auto blocking = std::ranges::find_if(errors, [](const QSslError &e) { return !isUnknownIssuer(e.error()); });
-    const auto trusted  = std::ranges::find_if(m_trustedCertificates, [&host](const TrustedCertificate &t) { return t.host == host; });
+    const auto blocking = std::ranges::find_if(errors, [](const QSslError &e)
+                                               { return !isUnknownIssuer(e.error()); });
+    const auto trusted  = std::ranges::find_if(m_trustedCertificates, [&host](const TrustedCertificate &t)
+                                               { return t.host == host; });
 
     // Only an unknown issuer, and the user trusted exactly this certificate for this host
     if (blocking == errors.cend() && trusted != m_trustedCertificates.cend() && trusted->sha256 == sha)
@@ -387,7 +390,9 @@ QFuture<KimaiTimeSheetConfig> KimaiClient::requestTimeSheetConfig()
 
 QFuture<QStringList> KimaiClient::requestTags(const QString &name)
 {
-    auto request = m_d->prepareRequest(ApiMethod::TagsFind, {{"name", name}});
+    auto request = m_d->prepareRequest(ApiMethod::TagsFind, {
+                                                                {"name", name}
+    });
     auto reply   = m_d->sendGetRequest(request);
     return m_d->processApiNetworkReply<QStringList>(ApiMethod::TagsFind, reply, &KimaiClient::tagNamesFromJson);
 }
@@ -528,7 +533,10 @@ QFuture<KimaiActivity> KimaiClient::addActivity(const KimaiActivity &activity)
 QFuture<void> KimaiClient::createTag(const QString &name)
 {
     // Visible, or Kimai hides it from its own tag lists
-    auto data    = JsonHelpers::toByteArray(QJsonObject{{"name", name}, {"visible", true}});
+    auto data    = JsonHelpers::toByteArray(QJsonObject{
+        {"name",    name},
+        {"visible", true}
+    });
     auto request = m_d->prepareRequest(ApiMethod::Tags, {}, data);
     auto reply   = m_d->sendPostRequest(request, data);
     return m_d->processApiNetworkReplyNoContent(ApiMethod::Tags, reply);

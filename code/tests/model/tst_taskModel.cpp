@@ -13,10 +13,10 @@ namespace
     KimaiTask makeTask(int id, const QString &title, KimaiTask::Status status, const QDateTime &due = {}, int activeTimeSheetId = 0)
     {
         KimaiTask task;
-        task.id     = id;
-        task.title  = title;
-        task.status = status;
-        task.endAt  = due;
+        task.id            = id;
+        task.title         = title;
+        task.status        = status;
+        task.endAt         = due;
         task.project.name  = "Website";
         task.activity.name = "Design";
         if (activeTimeSheetId > 0)
@@ -60,10 +60,8 @@ TEST_CASE("TaskModel - groups and order", "[tasks][model][unit]")
                    },
                    900);
 
-    REQUIRE(column(model, TaskModel::Role::Title)
-            == QStringList{"Running", "In progress", "Overdue old", "Overdue recent", "Due today", "Upcoming far", "No due A", "No due B"});
-    REQUIRE(column(model, TaskModel::Role::Group)
-            == QStringList{"progress", "progress", "overdue", "overdue", "upcoming", "upcoming", "none", "none"});
+    REQUIRE(column(model, TaskModel::Role::Title) == QStringList{"Running", "In progress", "Overdue old", "Overdue recent", "Due today", "Upcoming far", "No due A", "No due B"});
+    REQUIRE(column(model, TaskModel::Role::Group) == QStringList{"progress", "progress", "overdue", "overdue", "upcoming", "upcoming", "none", "none"});
     REQUIRE(model.data(model.index(4), static_cast<int>(TaskModel::Role::DueState)) == "today");
     REQUIRE(model.data(model.index(2), static_cast<int>(TaskModel::Role::OverdueDays)) == 9);
     REQUIRE(model.data(model.index(0), static_cast<int>(TaskModel::Role::Running)).toBool());

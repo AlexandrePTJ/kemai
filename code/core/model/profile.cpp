@@ -3,8 +3,9 @@
 #include "profile.h"
 
 // magic_enum headers
-#include <magic_enum/magic_enum.hpp>
 #include <utility>
+
+#include <magic_enum/magic_enum.hpp>
 
 namespace
 {

@@ -5,7 +5,7 @@
 
 #include <QCoreApplication>
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
     return Catch::Session().run(argc, argv);

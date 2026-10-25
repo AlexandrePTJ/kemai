@@ -1,16 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
-#include <catch2/catch_test_macros.hpp>
-
 #include <optional>
+
+#include <catch2/catch_test_macros.hpp>
 
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QElapsedTimer>
 
-#include <context/sessionController.h>
-
 #include "../mocks/fakeKimaiClient.h"
+#include <context/sessionController.h>
 
 using namespace kemai;
 
@@ -47,8 +46,10 @@ namespace
 
         void attach(SessionController &controller)
         {
-            QObject::connect(&controller, &SessionController::sessionExpired, [this] { ++sessionExpiredCount; });
-            QObject::connect(&controller, &SessionController::notificationRequested,
+            QObject::connect(&controller, &SessionController::sessionExpired, [this]
+                             { ++sessionExpiredCount; });
+            QObject::connect(&controller,
+                             &SessionController::notificationRequested,
                              [this](SessionController::NotificationLevel level, SessionController::NotificationKind kind, const QString &)
                              {
                                  ++notificationCount;
@@ -195,8 +196,8 @@ TEST_CASE("SessionController::updateTimeSheet - applies project, activity, descr
     const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
     const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
 
-    auto fake = std::make_shared<FakeKimaiClient>();
-    auto ts   = makeTimeSheet(42, begin, end);
+    auto fake      = std::make_shared<FakeKimaiClient>();
+    auto ts        = makeTimeSheet(42, begin, end);
     ts.description = "Old";
     ts.tags        = {"Legacy"};
     fake->timeSheets.append(ts);
@@ -409,7 +410,8 @@ TEST_CASE("SessionController::deleteTimeSheet - 403 is reported to the caller, n
 
     int  failedId   = 0;
     auto failedKind = SessionController::NotificationKind::UnknownError;
-    QObject::connect(&controller, &SessionController::timeSheetDeleteFailed,
+    QObject::connect(&controller,
+                     &SessionController::timeSheetDeleteFailed,
                      [&](int id, SessionController::NotificationKind kind, const QString &)
                      {
                          failedId   = id;
@@ -434,7 +436,8 @@ TEST_CASE("SessionController::deleteTimeSheet - success emits timeSheetDeleted",
     processEvents();
 
     int deletedId = 0;
-    QObject::connect(&controller, &SessionController::timeSheetDeleted, [&](int id) { deletedId = id; });
+    QObject::connect(&controller, &SessionController::timeSheetDeleted, [&](int id)
+                     { deletedId = id; });
 
     REQUIRE(controller.deleteTimeSheet(42));
     REQUIRE_FALSE(controller.deleteTimeSheet(0));
@@ -461,8 +464,10 @@ TEST_CASE("SessionController::updateTimeSheet - reports success or failure to th
     int     failedId = 0;
     auto    kind     = SessionController::NotificationKind::UnknownError;
     QString detail;
-    QObject::connect(&controller, &SessionController::timeSheetSaved, [&](int id) { savedId = id; });
-    QObject::connect(&controller, &SessionController::timeSheetSaveFailed,
+    QObject::connect(&controller, &SessionController::timeSheetSaved, [&](int id)
+                     { savedId = id; });
+    QObject::connect(&controller,
+                     &SessionController::timeSheetSaveFailed,
                      [&](int id, SessionController::NotificationKind k, const QString &d)
                      {
                          failedId = id;
@@ -509,9 +514,10 @@ TEST_CASE("SessionController::updateTimeSheet - creates new tags before updating
     SessionController controller(fake, KimaiUser{});
     processEvents();
 
-    int     failedId = 0;
-    auto    kind     = SessionController::NotificationKind::UnknownError;
-    QObject::connect(&controller, &SessionController::timeSheetSaveFailed,
+    int  failedId = 0;
+    auto kind     = SessionController::NotificationKind::UnknownError;
+    QObject::connect(&controller,
+                     &SessionController::timeSheetSaveFailed,
                      [&](int id, SessionController::NotificationKind k, const QString &)
                      {
                          failedId = id;
@@ -603,7 +609,8 @@ TEST_CASE("SessionController::requestTagSuggestions - server tags reach the sign
 
     QString     receivedQuery;
     QStringList receivedTags;
-    QObject::connect(&controller, &SessionController::tagSuggestionsReady,
+    QObject::connect(&controller,
+                     &SessionController::tagSuggestionsReady,
                      [&](const QString &query, const QStringList &tags)
                      {
                          receivedQuery = query;
@@ -673,7 +680,8 @@ TEST_CASE("SessionController::syncActiveTimeSheet - unchanged timer reloads noth
     processEvents();
 
     int refreshingChanges = 0;
-    QObject::connect(&controller, &SessionController::refreshingChanged, [&] { ++refreshingChanges; });
+    QObject::connect(&controller, &SessionController::refreshingChanged, [&]
+                     { ++refreshingChanges; });
 
     fake->calls.clear();
     controller.syncActiveTimeSheet();
@@ -835,8 +843,9 @@ TEST_CASE("SessionController::stopActiveTimeSheetAt - ends the entry when the us
     processEvents();
 
     std::optional<SessionController::AwayReason> reason;
-    QDateTime                                     reportedEnd;
-    QObject::connect(&controller, &SessionController::timeSheetStoppedAway,
+    QDateTime                                    reportedEnd;
+    QObject::connect(&controller,
+                     &SessionController::timeSheetStoppedAway,
                      [&](SessionController::AwayReason r, const QDateTime &end)
                      {
                          reason      = r;
@@ -869,7 +878,8 @@ TEST_CASE("SessionController::stopActiveTimeSheetAt - plain stop in punch mode",
     REQUIRE(controller.isPunchMode());
 
     int stopped = 0;
-    QObject::connect(&controller, &SessionController::timeSheetStoppedAway, [&] { ++stopped; });
+    QObject::connect(&controller, &SessionController::timeSheetStoppedAway, [&]
+                     { ++stopped; });
 
     controller.stopActiveTimeSheetAt(begin.addSecs(600), SessionController::AwayReason::Locked);
     processEvents();
@@ -911,7 +921,8 @@ TEST_CASE("SessionController::stopActiveTimeSheetAt - failure keeps the timer an
     SignalProbe probe;
     probe.attach(controller);
     int stopped = 0;
-    QObject::connect(&controller, &SessionController::timeSheetStoppedAway, [&] { ++stopped; });
+    QObject::connect(&controller, &SessionController::timeSheetStoppedAway, [&]
+                     { ++stopped; });
 
     controller.stopActiveTimeSheetAt(begin.addSecs(600), SessionController::AwayReason::Idle);
     processEvents();
@@ -932,8 +943,8 @@ TEST_CASE("SessionController::create* - creates and reports the new id, without 
     processEvents();
 
     QList<std::pair<SessionController::ResourceKind, int>> created;
-    QObject::connect(&controller, &SessionController::resourceCreated,
-                     [&](SessionController::ResourceKind kind, int id) { created.append({kind, id}); });
+    QObject::connect(&controller, &SessionController::resourceCreated, [&](SessionController::ResourceKind kind, int id)
+                     { created.append({kind, id}); });
 
     fake->calls.clear();
     controller.createCustomer("  Acme  ", "FR", "EUR", "Europe/Paris");
@@ -973,7 +984,8 @@ TEST_CASE("SessionController::create* - refusals go to the form, 401 expires the
     std::optional<SessionController::NotificationKind> failure;
     QString                                            detail;
     QString                                            field;
-    QObject::connect(&controller, &SessionController::resourceCreateFailed,
+    QObject::connect(&controller,
+                     &SessionController::resourceCreateFailed,
                      [&](SessionController::ResourceKind, SessionController::NotificationKind kind, const QString &d, const QString &f)
                      {
                          failure = kind;
@@ -1008,8 +1020,8 @@ TEST_CASE("SessionController - choices and duplicate lookup for the creation for
     acme.id   = 1;
     acme.name = "Acme";
     KimaiCustomer beta;
-    beta.id   = 2;
-    beta.name = "beta corp";
+    beta.id         = 2;
+    beta.name       = "beta corp";
     fake->customers = {acme, beta};
 
     KimaiProject website;
@@ -1020,16 +1032,16 @@ TEST_CASE("SessionController - choices and duplicate lookup for the creation for
     internal.id          = 11;
     internal.name        = "Internal";
     internal.customer.id = 1;
-    fake->projects = {website, internal};
+    fake->projects       = {website, internal};
 
     KimaiActivity design;
     design.id      = 100;
     design.name    = "Design";
     design.project = website;
     KimaiActivity meeting; // global
-    meeting.id    = 200;
-    meeting.name  = "Meeting";
-    meeting.color = "#8b5cf6";
+    meeting.id       = 200;
+    meeting.name     = "Meeting";
+    meeting.color    = "#8b5cf6";
     fake->activities = {design, meeting};
 
     SessionController controller(fake, KimaiUser{});
@@ -1121,7 +1133,8 @@ TEST_CASE("SessionController - loads, starts and closes tasks", "[session][tasks
 
     // Start: the task's timer, titled after it
     int started = 0;
-    QObject::connect(&controller, &SessionController::taskStarted, [&] { ++started; });
+    QObject::connect(&controller, &SessionController::taskStarted, [&]
+                     { ++started; });
     fake->timeSheetResult = makeTimeSheet(500, QDateTime::currentDateTimeUtc());
     fake->calls.clear();
     controller.startTask(1);
@@ -1133,7 +1146,8 @@ TEST_CASE("SessionController - loads, starts and closes tasks", "[session][tasks
 
     // Close: leaves the list
     int closed = 0;
-    QObject::connect(&controller, &SessionController::taskClosed, [&] { ++closed; });
+    QObject::connect(&controller, &SessionController::taskClosed, [&]
+                     { ++closed; });
     controller.closeTask(2);
     processEvents();
     REQUIRE(closed == 1);
@@ -1174,7 +1188,8 @@ TEST_CASE("SessionController - task failures go to the row, 401 expires the sess
     probe.attach(controller);
     QString                                            action;
     std::optional<SessionController::NotificationKind> failure;
-    QObject::connect(&controller, &SessionController::taskActionFailed,
+    QObject::connect(&controller,
+                     &SessionController::taskActionFailed,
                      [&](int, const QString &a, SessionController::NotificationKind kind, const QString &)
                      {
                          action  = a;

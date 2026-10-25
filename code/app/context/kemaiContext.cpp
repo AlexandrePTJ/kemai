@@ -46,7 +46,9 @@ namespace kemai
         m_settingsPersistent = m_settingsStore->canSave();
         m_preferences->setJson(m_pendingSettings->preferences);
 
-        connect(m_preferences.get(), &AppPreferences::changed, this,
+        connect(m_preferences.get(),
+                &AppPreferences::changed,
+                this,
                 [this]
                 {
                     m_pendingSettings->preferences = m_preferences->json();
@@ -99,18 +101,19 @@ namespace kemai
         }();
         // Changed certificate: the fingerprint trusted before for this host
         const auto &trusted  = m_pendingSettings->trustedCertificates;
-        const auto  previous = std::ranges::find_if(trusted, [&c](const TrustedCertificate &t) { return t.host == c.host; });
+        const auto  previous = std::ranges::find_if(trusted, [&c](const TrustedCertificate &t)
+                                                    { return t.host == c.host; });
         return {
             {"previousSha256",  previous != trusted.cend() ? previous->sha256 : QString()},
-            {"selfSigned",      c.subject == c.issuer },
-            {"host",            c.host                },
-            {"subject",         c.subject             },
-            {"issuer",          c.issuer              },
-            {"validFrom",       c.validFrom.toLocalTime()},
-            {"validUntil",      c.validUntil.toLocalTime()},
-            {"sha256",          c.sha256              },
-            {"replacesTrusted", c.replacesTrusted     },
-            {"rejection",       QString(rejection)    }
+            {"selfSigned",      c.subject == c.issuer                                    },
+            {"host",            c.host                                                   },
+            {"subject",         c.subject                                                },
+            {"issuer",          c.issuer                                                 },
+            {"validFrom",       c.validFrom.toLocalTime()                                },
+            {"validUntil",      c.validUntil.toLocalTime()                               },
+            {"sha256",          c.sha256                                                 },
+            {"replacesTrusted", c.replacesTrusted                                        },
+            {"rejection",       QString(rejection)                                       }
         };
     }
 
@@ -120,9 +123,9 @@ namespace kemai
         for (const auto &certificate : m_pendingSettings->trustedCertificates)
         {
             list.append(QVariantMap{
-                {"host",      certificate.host                                             },
-                {"sha256",    certificate.sha256                                           },
-                {"expiresAt", certificate.expiresAt.toLocalTime()                          },
+                {"host",      certificate.host                                       },
+                {"sha256",    certificate.sha256                                     },
+                {"expiresAt", certificate.expiresAt.toLocalTime()                    },
                 {"expired",   certificate.expiresAt < QDateTime::currentDateTimeUtc()}
             });
         }
@@ -141,7 +144,8 @@ namespace kemai
 
         // One certificate per host: a replaced one takes the place of the old one
         auto &trusted = m_pendingSettings->trustedCertificates;
-        trusted.removeIf([&refused](const TrustedCertificate &t) { return t.host == refused.host; });
+        trusted.removeIf([&refused](const TrustedCertificate &t)
+                         { return t.host == refused.host; });
         trusted.append(TrustedCertificate{.host = refused.host, .sha256 = refused.sha256, .pem = refused.pem, .expiresAt = refused.validUntil});
         m_settingsStore->save(*m_pendingSettings);
         emit trustedCertificatesChanged();
@@ -151,7 +155,8 @@ namespace kemai
 
     void KemaiContext::removeTrustedCertificate(const QString &host)
     {
-        if (m_pendingSettings->trustedCertificates.removeIf([&host](const TrustedCertificate &t) { return t.host == host; }) > 0)
+        if (m_pendingSettings->trustedCertificates.removeIf([&host](const TrustedCertificate &t)
+                                                            { return t.host == host; }) > 0)
         {
             spdlog::info("Certificate for {} no longer trusted", host);
             m_settingsStore->save(*m_pendingSettings);
@@ -183,37 +188,38 @@ namespace kemai
         client->setToken(token);
         client->setTrustedCertificates(m_pendingSettings->trustedCertificates);
 
-        // clang-format off
         client->requestMeUserInfo()
-            .then(this, [this, client, host, token, rememberLogin, profileName](KimaiUser user)
-                {
-                    spdlog::info("Logged in to {} as {}", QUrl(host).toString(QUrl::RemoveUserInfo), user.username);
-                    auto* session = new SessionContext(std::move(client), user, this);
-                    session->setAccount(profileName, host);
-                    m_lastAccountName = session->accountName();
-                    m_justLoggedOut   = false;
-                    emit lastSessionChanged();
-                    emit loginSucceeded(session);
-                    updateAutoLoginSettings(host, token, rememberLogin);
-                })
-            .onFailed(this, [this, host](const KimaiApiError &e)
-                {
-                    spdlog::error("Login to {} failed: {}", QUrl(host).toString(QUrl::RemoveUserInfo), e.what());
-                    if (e.certificate())
-                    {
-                        m_refusedCertificate = e.certificate();
-                        emit refusedCertificateChanged();
-                    }
-                    emit loginFailed(SessionController::notificationKindOf(e.kind()), e.serverMessage());
-                    updateAutoLoginSettings("", "", false);
-                })
-            .onFailed(this, [this, host](const std::exception &e)
-                {
-                    spdlog::error("Login to {} failed: {}", QUrl(host).toString(QUrl::RemoveUserInfo), e.what());
-                    emit loginFailed(SessionController::NotificationKind::UnknownError, {});
-                    updateAutoLoginSettings("", "", false);
-                });
-        // clang-format on
+            .then(this,
+                  [this, client, host, token, rememberLogin, profileName](KimaiUser user)
+                  {
+                      spdlog::info("Logged in to {} as {}", QUrl(host).toString(QUrl::RemoveUserInfo), user.username);
+                      auto *session = new SessionContext(std::move(client), user, this);
+                      session->setAccount(profileName, host);
+                      m_lastAccountName = session->accountName();
+                      m_justLoggedOut   = false;
+                      emit lastSessionChanged();
+                      emit loginSucceeded(session);
+                      updateAutoLoginSettings(host, token, rememberLogin);
+                  })
+            .onFailed(this,
+                      [this, host](const KimaiApiError &e)
+                      {
+                          spdlog::error("Login to {} failed: {}", QUrl(host).toString(QUrl::RemoveUserInfo), e.what());
+                          if (e.certificate())
+                          {
+                              m_refusedCertificate = e.certificate();
+                              emit refusedCertificateChanged();
+                          }
+                          emit loginFailed(SessionController::notificationKindOf(e.kind()), e.serverMessage());
+                          updateAutoLoginSettings("", "", false);
+                      })
+            .onFailed(this,
+                      [this, host](const std::exception &e)
+                      {
+                          spdlog::error("Login to {} failed: {}", QUrl(host).toString(QUrl::RemoveUserInfo), e.what());
+                          emit loginFailed(SessionController::NotificationKind::UnknownError, {});
+                          updateAutoLoginSettings("", "", false);
+                      });
     }
 
     void KemaiContext::logout()

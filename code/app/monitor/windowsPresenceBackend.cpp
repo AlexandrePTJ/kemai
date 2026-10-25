@@ -51,7 +51,8 @@ namespace kemai
             }
         }
 
-        bool idleSupported() const override { return true; }
+        bool idleSupported() const override
+        { return true; }
 
         std::optional<int> idleSeconds() const override
         {
@@ -65,7 +66,8 @@ namespace kemai
             return static_cast<int>((GetTickCount() - info.dwTime) / 1000);
         }
 
-        bool lockSupported() const override { return m_lockSupported; }
+        bool lockSupported() const override
+        { return m_lockSupported; }
 
     private:
         static LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)

@@ -75,5 +75,6 @@ TEST_CASE("KimaiPlugin - the plugin list names TaskManagement", "[tasks][unit]")
         }
         return list;
     }();
-    REQUIRE(std::ranges::any_of(plugins, [](const KimaiPlugin &p) { return p.apiPlugin == ApiPlugin::TaskManagement; }));
+    REQUIRE(std::ranges::any_of(plugins, [](const KimaiPlugin &p)
+                                { return p.apiPlugin == ApiPlugin::TaskManagement; }));
 }

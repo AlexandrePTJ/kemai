@@ -58,7 +58,7 @@ namespace kemai
     protected:
         QJsonValue value(const QString &key, const QJsonValue &defaultValue) const;
         // Returns false when the value is unchanged (nothing saved)
-        bool       setValue(const QString &key, const QJsonValue &value);
+        bool setValue(const QString &key, const QJsonValue &value);
 
     private:
         QJsonObject m_json;

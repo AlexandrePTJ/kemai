@@ -30,7 +30,7 @@ namespace kemai
 
         // A request that transfers nothing for this long fails as NoNetwork: a dead connection never errors on its own
         static constexpr std::chrono::milliseconds DefaultTransferTimeout{15000};
-        void setTransferTimeout(std::chrono::milliseconds timeout);
+        void                                       setTransferTimeout(std::chrono::milliseconds timeout);
         // Certificates the user trusted, each for its own host: their "unknown issuer" errors are ignored
         void setTrustedCertificates(const TrustedCertificates &certificates);
 
@@ -56,9 +56,9 @@ namespace kemai
         QFuture<KimaiTimeSheet> stopTimeSheet(int timeSheetId) override;
         QFuture<void>           createTag(const QString &name) override;
 
-        QFuture<KimaiTasks> requestTasks(int userId) override;
+        QFuture<KimaiTasks>     requestTasks(int userId) override;
         QFuture<KimaiTimeSheet> startTask(int taskId) override;
-        QFuture<KimaiTask>  closeTask(int taskId) override;
+        QFuture<KimaiTask>      closeTask(int taskId) override;
 
         static void addTrustedCertificates(const QStringList &trustedCertificates);
 
@@ -70,7 +70,6 @@ namespace kemai
         // Kimai's 400 body ({"errors": {"children": {field: {"errors": [...]}}}}): the first field with an error and its
         // message, or the form-level error with an empty field; empty pair when the body holds none
         static std::pair<QString, QString> validationErrorFromJson(const QJsonDocument &doc);
-
 
     private:
         class KimaiClientPrivate;

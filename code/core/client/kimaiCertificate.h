@@ -27,7 +27,7 @@ namespace kemai
     {
         enum class Rejection
         {
-            None,     // only its issuer is unknown: it can be trusted
+            None, // only its issuer is unknown: it can be trusted
             Expired,
             NotYetValid,
             HostName, // issued for another name
@@ -43,8 +43,8 @@ namespace kemai
         QString    sha256;
         QByteArray pem;
         // Another certificate is trusted for this host: the server's one changed
-        bool       replacesTrusted = false;
-        Rejection  rejection       = Rejection::None;
+        bool      replacesTrusted = false;
+        Rejection rejection       = Rejection::None;
 
         static CertificateInfo fromCertificate(const QSslCertificate &certificate, const QString &host);
     };

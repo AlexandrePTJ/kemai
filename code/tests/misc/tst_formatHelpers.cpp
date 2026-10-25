@@ -21,8 +21,10 @@ namespace
     struct CLocaleScope
     {
         QLocale previous;
-        CLocaleScope() { QLocale::setDefault(QLocale::c()); }
-        ~CLocaleScope() { QLocale::setDefault(previous); }
+        CLocaleScope()
+        { QLocale::setDefault(QLocale::c()); }
+        ~CLocaleScope()
+        { QLocale::setDefault(previous); }
     };
 } // namespace
 

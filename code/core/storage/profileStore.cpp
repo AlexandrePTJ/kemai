@@ -86,8 +86,7 @@ namespace kemai
 
         if (version.majorVersion() > gProfilesCurrentVersion.majorVersion())
         {
-            throw std::runtime_error(fmt::format("Profiles version {} was written by a newer Kemai (supports up to {}.x)", versionString,
-                                                 gProfilesCurrentVersion.majorVersion()));
+            throw std::runtime_error(fmt::format("Profiles version {} was written by a newer Kemai (supports up to {}.x)", versionString, gProfilesCurrentVersion.majorVersion()));
         }
 
         // Migrations from older majors go here, oldest first (none yet: 1.0 is the first format).
@@ -195,7 +194,7 @@ namespace kemai
     {
         auto profileId = getProfileIdFromSecretKey(key);
         auto it        = std::ranges::find_if(m_pendingProfiles, [&profileId](const Profile &p)
-                                       { return p.id == profileId; });
+                                              { return p.id == profileId; });
         if (it != m_pendingProfiles.end())
         {
             it->token = token;

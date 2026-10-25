@@ -54,17 +54,27 @@ namespace kemai
             errors.insert(method, KimaiApiError{kind, httpStatus, method, QStringLiteral("fake error")});
         }
 
-        QFuture<KimaiVersion>         requestKimaiVersion() override { return result("requestKimaiVersion", version); }
-        QFuture<KimaiUser>            requestMeUserInfo() override { return result("requestMeUserInfo", user); }
-        QFuture<KimaiTimeSheetConfig> requestTimeSheetConfig() override { return result("requestTimeSheetConfig", timesheetConfig); }
-        QFuture<KimaiPlugins>         requestPlugins() override { return result("requestPlugins", plugins); }
-        QFuture<KimaiCustomers>       requestCustomers() override { return result("requestCustomers", customers); }
-        QFuture<KimaiTimeSheets>      requestTimeSheets() override { return result("requestTimeSheets", timeSheets); }
-        QFuture<KimaiTimeSheets>      requestActiveTimeSheets() override { return result("requestActiveTimeSheets", activeTimeSheets); }
-        QFuture<KimaiTimeSheets>      requestRecentTimeSheets() override { return result("requestRecentTimeSheets", timeSheets); }
-        QFuture<KimaiProjects>        requestProjects(std::optional<int> = std::nullopt) override { return result("requestProjects", projects); }
-        QFuture<KimaiActivities>      requestActivities(std::optional<int> = std::nullopt) override { return result("requestActivities", activities); }
-        QFuture<QStringList>          requestTags(const QString &name) override
+        QFuture<KimaiVersion> requestKimaiVersion() override
+        { return result("requestKimaiVersion", version); }
+        QFuture<KimaiUser> requestMeUserInfo() override
+        { return result("requestMeUserInfo", user); }
+        QFuture<KimaiTimeSheetConfig> requestTimeSheetConfig() override
+        { return result("requestTimeSheetConfig", timesheetConfig); }
+        QFuture<KimaiPlugins> requestPlugins() override
+        { return result("requestPlugins", plugins); }
+        QFuture<KimaiCustomers> requestCustomers() override
+        { return result("requestCustomers", customers); }
+        QFuture<KimaiTimeSheets> requestTimeSheets() override
+        { return result("requestTimeSheets", timeSheets); }
+        QFuture<KimaiTimeSheets> requestActiveTimeSheets() override
+        { return result("requestActiveTimeSheets", activeTimeSheets); }
+        QFuture<KimaiTimeSheets> requestRecentTimeSheets() override
+        { return result("requestRecentTimeSheets", timeSheets); }
+        QFuture<KimaiProjects> requestProjects(std::optional<int> = std::nullopt) override
+        { return result("requestProjects", projects); }
+        QFuture<KimaiActivities> requestActivities(std::optional<int> = std::nullopt) override
+        { return result("requestActivities", activities); }
+        QFuture<QStringList> requestTags(const QString &name) override
         {
             lastTagsQuery = name;
             return result("requestTags", tags);
@@ -89,13 +99,14 @@ namespace kemai
             lastAddedActivity.id = nextCreatedId++;
             return result("addActivity", lastAddedActivity);
         }
-        QFuture<void>          createTag(const QString &name) override
+        QFuture<void> createTag(const QString &name) override
         {
             createdTags.append(name);
             return result("createTag");
         }
 
-        QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &, KimaiTimeSheetConfig::TrackingMode) override { return result("startTimeSheet", timeSheetResult); }
+        QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &, KimaiTimeSheetConfig::TrackingMode) override
+        { return result("startTimeSheet", timeSheetResult); }
         QFuture<KimaiTimeSheet> updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode) override
         {
             lastUpdatedTimeSheet = timeSheet;
@@ -113,13 +124,15 @@ namespace kemai
             return result("stopTimeSheet", timeSheetResult);
         }
 
-        QFuture<KimaiTasks> requestTasks(int) override { return result("requestTasks", tasks); }
+        QFuture<KimaiTasks> requestTasks(int) override
+        { return result("requestTasks", tasks); }
         QFuture<KimaiTimeSheet> startTask(int taskId) override
         {
             lastStartedTaskId = taskId;
             return result("startTask", timeSheetResult);
         }
-        QFuture<KimaiTask>  closeTask(int) override { return result("closeTask", taskResult); }
+        QFuture<KimaiTask> closeTask(int) override
+        { return result("closeTask", taskResult); }
 
         KimaiTimeSheet lastUpdatedTimeSheet;
         int            lastDeletedTimeSheetId = 0;
@@ -148,7 +161,8 @@ namespace kemai
             auto promise = std::make_shared<QPromise<void>>();
             promise->start();
 
-            QTimer::singleShot(0, QCoreApplication::instance(),
+            QTimer::singleShot(0,
+                               QCoreApplication::instance(),
                                [promise, error]()
                                {
                                    if (error)
@@ -178,7 +192,8 @@ namespace kemai
             auto promise = std::make_shared<QPromise<T>>();
             promise->start();
 
-            QTimer::singleShot(0, QCoreApplication::instance(),
+            QTimer::singleShot(0,
+                               QCoreApplication::instance(),
                                [promise, value, error]()
                                {
                                    if (error)

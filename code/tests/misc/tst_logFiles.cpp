@@ -1,12 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
 #include <catch2/catch_test_macros.hpp>
+#include <spdlog/spdlog.h>
 
 #include <QDir>
 #include <QFileInfo>
 #include <QTemporaryDir>
-
-#include <spdlog/spdlog.h>
 
 #include <misc/logFiles.h>
 #include <misc/pathHelpers.h>

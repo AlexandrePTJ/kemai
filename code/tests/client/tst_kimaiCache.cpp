@@ -4,9 +4,8 @@
 
 #include <QCoreApplication>
 
-#include <client/kimaiCache.h>
-
 #include "../mocks/fakeKimaiClient.h"
+#include <client/kimaiCache.h>
 
 using namespace kemai;
 
@@ -36,9 +35,9 @@ namespace
         fake.projects.append(project);
 
         KimaiActivity boundActivity;
-        boundActivity.id      = 11;
-        boundActivity.name    = "Design";
-        boundActivity.project = KimaiProject{};
+        boundActivity.id          = 11;
+        boundActivity.name        = "Design";
+        boundActivity.project     = KimaiProject{};
         boundActivity.project->id = 7;
         fake.activities.append(boundActivity);
 
@@ -60,8 +59,10 @@ TEST_CASE("KimaiCache - nominal load consolidates and emits loaded", "[cache][un
 
     int loadedCount = 0;
     int failedCount = 0;
-    QObject::connect(&cache, &KimaiCache::loaded, [&loadedCount] { ++loadedCount; });
-    QObject::connect(&cache, &KimaiCache::loadFailed, [&failedCount] { ++failedCount; });
+    QObject::connect(&cache, &KimaiCache::loaded, [&loadedCount]
+                     { ++loadedCount; });
+    QObject::connect(&cache, &KimaiCache::loadFailed, [&failedCount]
+                     { ++failedCount; });
 
     cache.load(&fake);
     processEvents();
@@ -95,8 +96,10 @@ TEST_CASE("KimaiCache - any resource failure fails the whole load", "[cache][uni
 
     int loadedCount = 0;
     int failedCount = 0;
-    QObject::connect(&cache, &KimaiCache::loaded, [&loadedCount] { ++loadedCount; });
-    QObject::connect(&cache, &KimaiCache::loadFailed, [&failedCount] { ++failedCount; });
+    QObject::connect(&cache, &KimaiCache::loaded, [&loadedCount]
+                     { ++loadedCount; });
+    QObject::connect(&cache, &KimaiCache::loadFailed, [&failedCount]
+                     { ++failedCount; });
 
     cache.load(&fake);
     processEvents();
@@ -119,7 +122,8 @@ TEST_CASE("KimaiCache - failed refresh keeps the previous complete snapshot", "[
     const auto firstLoadedAt = cache.lastLoadedAt();
 
     int failedCount = 0;
-    QObject::connect(&cache, &KimaiCache::loadFailed, [&failedCount] { ++failedCount; });
+    QObject::connect(&cache, &KimaiCache::loadFailed, [&failedCount]
+                     { ++failedCount; });
 
     // New data on the server, but one resource fails: nothing of it must leak in
     fake.customers.first().name = "Changed";
@@ -165,8 +169,10 @@ TEST_CASE("KimaiCache - a new load supersedes the one in flight", "[cache][unit]
 
     int loadedCount = 0;
     int failedCount = 0;
-    QObject::connect(&cache, &KimaiCache::loaded, [&loadedCount] { ++loadedCount; });
-    QObject::connect(&cache, &KimaiCache::loadFailed, [&failedCount] { ++failedCount; });
+    QObject::connect(&cache, &KimaiCache::loaded, [&loadedCount]
+                     { ++loadedCount; });
+    QObject::connect(&cache, &KimaiCache::loadFailed, [&failedCount]
+                     { ++failedCount; });
 
     // First load would fail; it is superseded before any response arrives
     fake.failWith("requestProjects", ApiErrorKind::ServerError, 500);

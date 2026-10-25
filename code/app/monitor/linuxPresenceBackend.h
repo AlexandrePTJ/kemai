@@ -41,7 +41,7 @@ namespace kemai
             X11
         };
 
-        std::optional<int> readIdleSeconds(IdleSource source) const;
+        std::optional<int>  readIdleSeconds(IdleSource source) const;
         std::optional<bool> readLockedHint() const;
 
         IdleSource m_idleSource = IdleSource::None;

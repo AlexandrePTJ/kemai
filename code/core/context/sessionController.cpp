@@ -207,8 +207,10 @@ namespace kemai
         customer.language = m_user.language.isEmpty() ? QStringLiteral("en") : m_user.language;
 
         m_client->addCustomer(customer)
-            .then(this, [this](const KimaiCustomer &created) { emit resourceCreated(ResourceKind::Customer, created.id); })
-            .onFailed(this, [this](const KimaiApiError &e) { handleCreateError(e, ResourceKind::Customer); });
+            .then(this, [this](const KimaiCustomer &created)
+                  { emit resourceCreated(ResourceKind::Customer, created.id); })
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { handleCreateError(e, ResourceKind::Customer); });
     }
 
     void SessionController::createProject(const QString &name, int customerId)
@@ -218,8 +220,10 @@ namespace kemai
         project.customer.id = customerId;
 
         m_client->addProject(project)
-            .then(this, [this](const KimaiProject &created) { emit resourceCreated(ResourceKind::Project, created.id); })
-            .onFailed(this, [this](const KimaiApiError &e) { handleCreateError(e, ResourceKind::Project); });
+            .then(this, [this](const KimaiProject &created)
+                  { emit resourceCreated(ResourceKind::Project, created.id); })
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { handleCreateError(e, ResourceKind::Project); });
     }
 
     void SessionController::createActivity(const QString &name, int projectId)
@@ -234,8 +238,10 @@ namespace kemai
         }
 
         m_client->addActivity(activity)
-            .then(this, [this](const KimaiActivity &created) { emit resourceCreated(ResourceKind::Activity, created.id); })
-            .onFailed(this, [this](const KimaiApiError &e) { handleCreateError(e, ResourceKind::Activity); });
+            .then(this, [this](const KimaiActivity &created)
+                  { emit resourceCreated(ResourceKind::Activity, created.id); })
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { handleCreateError(e, ResourceKind::Activity); });
     }
 
     void SessionController::reloadResources()
@@ -279,10 +285,11 @@ namespace kemai
         QVariantList list;
         for (const auto &customer : m_cache->customers())
         {
-            const auto projectCount = std::ranges::count_if(m_cache->projects(), [&customer](const KimaiProject &p) { return p.customer.id == customer.id; });
+            const auto projectCount = std::ranges::count_if(m_cache->projects(), [&customer](const KimaiProject &p)
+                                                            { return p.customer.id == customer.id; });
             list.append(QVariantMap{
-                {"id",           customer.id                    },
-                {"name",         customer.name                  },
+                {"id",           customer.id                   },
+                {"name",         customer.name                 },
                 {"projectCount", static_cast<int>(projectCount)}
             });
         }
@@ -296,10 +303,10 @@ namespace kemai
         for (const auto &project : m_cache->projects())
         {
             list.append(QVariantMap{
-                {"id",           project.id           },
-                {"name",         project.name         },
-                {"customerId",   project.customer.id  },
-                {"customerName", project.customer.name},
+                {"id",           project.id                                                         },
+                {"name",         project.name                                                       },
+                {"customerId",   project.customer.id                                                },
+                {"customerName", project.customer.name                                              },
                 {"color",        project.color.isEmpty() ? QStringLiteral("#888888") : project.color}
             });
         }
@@ -331,15 +338,21 @@ namespace kemai
     QVariantMap SessionController::findCustomer(const QString &name) const
     {
         const auto &customers = m_cache->customers();
-        const auto  it        = std::ranges::find_if(customers, [&name](const KimaiCustomer &c) { return sameName(c.name, name); });
-        return it == customers.cend() ? QVariantMap{} : QVariantMap{{"id", it->id}, {"name", it->name}};
+        const auto  it        = std::ranges::find_if(customers, [&name](const KimaiCustomer &c)
+                                                     { return sameName(c.name, name); });
+        return it == customers.cend() ? QVariantMap{
+        } :
+                                        QVariantMap{{"id", it->id}, {"name", it->name}};
     }
 
     QVariantMap SessionController::findProject(const QString &name, int customerId) const
     {
         const auto &projects = m_cache->projects();
-        const auto  it       = std::ranges::find_if(projects, [&](const KimaiProject &p) { return p.customer.id == customerId && sameName(p.name, name); });
-        return it == projects.cend() ? QVariantMap{} : QVariantMap{{"id", it->id}, {"name", it->name}, {"customerName", it->customer.name}};
+        const auto  it       = std::ranges::find_if(projects, [&](const KimaiProject &p)
+                                                    { return p.customer.id == customerId && sameName(p.name, name); });
+        return it == projects.cend() ? QVariantMap{
+        } :
+                                       QVariantMap{{"id", it->id}, {"name", it->name}, {"customerName", it->customer.name}};
     }
 
     QVariantMap SessionController::findActivity(const QString &name, int projectId) const
@@ -348,28 +361,31 @@ namespace kemai
         const auto  it         = std::ranges::find_if(activities,
                                                       [&](const KimaiActivity &a)
                                                       {
-                                                          const auto inScope = projectId > 0 ? (!a.global && a.project && a.project->id == projectId) : a.global;
-                                                          return inScope && sameName(a.name, name);
+                                                 const auto inScope = projectId > 0 ? (!a.global && a.project && a.project->id == projectId) : a.global;
+                                                 return inScope && sameName(a.name, name);
                                                       });
-        return it == activities.cend() ? QVariantMap{} : QVariantMap{{"id", it->id}, {"name", it->name}};
+        return it == activities.cend() ? QVariantMap{
+        } :
+                                         QVariantMap{{"id", it->id}, {"name", it->name}};
     }
 
     QVariantMap SessionController::pair(int projectId, int activityId) const
     {
         const auto &activities = m_cache->activities();
-        const auto  it         = std::ranges::find_if(activities, [&](const KimaiActivity &a) { return a.id == activityId && a.project && a.project->id == projectId; });
+        const auto  it         = std::ranges::find_if(activities, [&](const KimaiActivity &a)
+                                                      { return a.id == activityId && a.project && a.project->id == projectId; });
         if (it == activities.cend())
         {
             return {};
         }
         return {
-            {"projectId",     projectId                                                     },
-            {"activityId",    activityId                                                    },
-            {"projectName",   it->project->name                                             },
-            {"activityName",  it->name                                                      },
-            {"activityColor", colorOf(*it)                                                  },
-            {"label",         QStringLiteral("%1 - %2").arg(it->project->name, it->name)},
-            {"isGlobal",      it->global                                                    }
+            {"projectId", projectId},
+            {"activityId", activityId},
+            {"projectName", it->project->name},
+            {"activityName", it->name},
+            {"activityColor", colorOf(*it)},
+            {"label", QStringLiteral("%1 - %2").arg(it->project->name, it->name)},
+            {"isGlobal", it->global}
         };
     }
 
@@ -399,7 +415,8 @@ namespace kemai
             .then(this,
                   [this](const KimaiPlugins &plugins)
                   {
-                      m_hasTaskManagement = std::ranges::any_of(plugins, [](const KimaiPlugin &p) { return p.apiPlugin == ApiPlugin::TaskManagement; });
+                      m_hasTaskManagement = std::ranges::any_of(plugins, [](const KimaiPlugin &p)
+                                                                { return p.apiPlugin == ApiPlugin::TaskManagement; });
                       emit pluginsChanged();
                   })
             .onFailed(this,
@@ -490,13 +507,16 @@ namespace kemai
                           auto described        = started;
                           described.description = title;
                           m_client->updateTimeSheet(described, m_cache->timesheetConfig().trackingMode)
-                              .then(this, [this](const KimaiTimeSheet &) { refreshRecentTimeSheets(); })
-                              .onFailed(this, [this](const KimaiApiError &e) { handleApiError(e, "Failed to describe the task's timesheet"); });
+                              .then(this, [this](const KimaiTimeSheet &)
+                                    { refreshRecentTimeSheets(); })
+                              .onFailed(this, [this](const KimaiApiError &e)
+                                        { handleApiError(e, "Failed to describe the task's timesheet"); });
                       }
                       refreshActiveTimeSheets();
                       refreshRecentTimeSheets();
                   })
-            .onFailed(this, [this, taskId](const KimaiApiError &e) { handleTaskError(e, taskId, "start"); });
+            .onFailed(this, [this, taskId](const KimaiApiError &e)
+                      { handleTaskError(e, taskId, "start"); });
     }
 
     void SessionController::closeTask(int taskId)
@@ -512,7 +532,8 @@ namespace kemai
                       refreshActiveTimeSheets();
                       refreshRecentTimeSheets();
                   })
-            .onFailed(this, [this, taskId](const KimaiApiError &e) { handleTaskError(e, taskId, "close"); });
+            .onFailed(this, [this, taskId](const KimaiApiError &e)
+                      { handleTaskError(e, taskId, "close"); });
     }
 
     void SessionController::handleTaskError(const KimaiApiError &error, int taskId, const QString &action)
@@ -579,7 +600,7 @@ namespace kemai
             .then(this,
                   [this](const KimaiTimeSheets &sheets)
                   {
-                      const auto latest = std::ranges::max_element(sheets, {}, &KimaiTimeSheet::beginAt);
+                      const auto latest   = std::ranges::max_element(sheets, {}, &KimaiTimeSheet::beginAt);
                       m_lastUsedProjectId = latest != sheets.cend() ? latest->project.id : 0;
                       m_recentTimeSheets->setTimeSheets(sheets);
                       m_recentRefreshTimer.start();
@@ -591,7 +612,8 @@ namespace kemai
     void SessionController::refreshActiveTimeSheets()
     {
         m_client->requestActiveTimeSheets()
-            .then(this, [this](const KimaiTimeSheets &sheets) { applyActiveTimeSheets(sheets); })
+            .then(this, [this](const KimaiTimeSheets &sheets)
+                  { applyActiveTimeSheets(sheets); })
             .onFailed(this, [this](const KimaiApiError &e)
                       { handleApiError(e, "Failed to fetch active timesheets"); });
     }
@@ -776,8 +798,7 @@ namespace kemai
                       { handleApiError(e, "Failed to stop timesheet at the time the user left"); });
     }
 
-    bool SessionController::updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags,
-                                            const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags)
+    bool SessionController::updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags, const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags)
     {
         const auto timeSheet = m_recentTimeSheets->findById(timesheetId);
         if (!timeSheet)
@@ -823,7 +844,8 @@ namespace kemai
             }
         }
 
-        createTagsThen(tagsToCreate, timesheetId,
+        createTagsThen(tagsToCreate,
+                       timesheetId,
                        [this, updated, timesheetId]()
                        {
                            invalidateSync();
@@ -836,8 +858,7 @@ namespace kemai
                                          emit timeSheetSaved(timesheetId);
                                      })
                                .onFailed(this, [this, timesheetId](const KimaiApiError &e)
-                                         { handleOperationError(e, "Failed to update timesheet", timesheetId, &SessionController::timeSheetSaveFailed); });
-                       });
+                                         { handleOperationError(e, "Failed to update timesheet", timesheetId, &SessionController::timeSheetSaveFailed); }); });
         return true;
     }
 
@@ -851,7 +872,8 @@ namespace kemai
 
         const auto name = names.takeFirst();
         m_client->createTag(name)
-            .then(this, [this, names, timesheetId, next]() { createTagsThen(names, timesheetId, next); })
+            .then(this, [this, names, timesheetId, next]()
+                  { createTagsThen(names, timesheetId, next); })
             .onFailed(this,
                       [this, names, timesheetId, next](const KimaiApiError &e)
                       {
@@ -891,7 +913,8 @@ namespace kemai
     void SessionController::requestTagSuggestions(const QString &text)
     {
         m_client->requestTags(text)
-            .then(this, [this, text](const QStringList &tags) { emit tagSuggestionsReady(text, tags); })
+            .then(this, [this, text](const QStringList &tags)
+                  { emit tagSuggestionsReady(text, tags); })
             .onFailed(this, [this](const KimaiApiError &e)
                       { handleApiError(e, "Failed to fetch tag suggestions"); });
     }

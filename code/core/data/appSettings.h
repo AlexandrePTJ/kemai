@@ -23,7 +23,7 @@ namespace kemai
 
     struct WindowGeometry
     {
-        QRect normal;            // position and size when not maximized
+        QRect normal; // position and size when not maximized
         bool  maximized = false;
     };
 
@@ -33,9 +33,9 @@ namespace kemai
         std::optional<WindowGeometry> window;
         // Per-computer preferences, read and written by key in the app layer. Kept as a whole so keys written
         // by a newer Kemai (unknown here) survive a save by this one.
-        QJsonObject                   preferences;
+        QJsonObject preferences;
         // Server certificates the user chose to trust, each for its host (public data: plain JSON)
-        TrustedCertificates           trustedCertificates;
+        TrustedCertificates trustedCertificates;
 
         QJsonObject        toJson() const;
         static AppSettings fromJson(const QJsonObject &json);

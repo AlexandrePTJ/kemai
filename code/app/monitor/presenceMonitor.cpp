@@ -7,10 +7,11 @@
 
 namespace kemai
 {
-    PresenceMonitor::PresenceMonitor(QObject *parent): QObject(parent), m_backend(PresenceBackend::create())
+    PresenceMonitor::PresenceMonitor(QObject *parent):
+    QObject(parent),
+    m_backend(PresenceBackend::create())
     {
-        spdlog::info("Presence: idle time {}, session lock {}", m_backend->idleSupported() ? "available" : "unavailable",
-                     m_backend->lockSupported() ? "available" : "unavailable");
+        spdlog::info("Presence: idle time {}, session lock {}", m_backend->idleSupported() ? "available" : "unavailable", m_backend->lockSupported() ? "available" : "unavailable");
 
         m_locked = m_backend->lockedAtStart();
 

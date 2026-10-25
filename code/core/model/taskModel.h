@@ -84,10 +84,10 @@ namespace kemai
         bool    isRunning(const KimaiTask &task) const;
         void    rebuild();
 
-        KimaiTasks        m_tasks;
-        QList<int>        m_shown; // indexes into m_tasks, in display order
-        QString           m_filterText;
-        int               m_activeTimeSheetId = 0;
+        KimaiTasks           m_tasks;
+        QList<int>           m_shown; // indexes into m_tasks, in display order
+        QString              m_filterText;
+        int                  m_activeTimeSheetId = 0;
         std::optional<QDate> m_today;
     };
 } // namespace kemai

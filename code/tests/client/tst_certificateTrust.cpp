@@ -36,23 +36,29 @@ namespace
             configuration.setPeerVerifyMode(QSslSocket::VerifyNone);
             m_server.setSslConfiguration(configuration);
 
-            QObject::connect(&m_server, &QSslServer::pendingConnectionAvailable, [this]
+            QObject::connect(&m_server,
+                             &QSslServer::pendingConnectionAvailable,
+                             [this]
                              {
                                  auto *socket = m_server.nextPendingConnection();
-                                 QObject::connect(socket, &QIODevice::readyRead, socket, [socket]
+                                 QObject::connect(socket,
+                                                  &QIODevice::readyRead,
+                                                  socket,
+                                                  [socket]
                                                   {
                                                       socket->readAll();
                                                       const QByteArray body = R"({"id": 1, "username": "susan", "language": "en", "timezone": "UTC"})";
-                                                      socket->write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: "
-                                                                    + QByteArray::number(body.size()) + "\r\n\r\n" + body);
+                                                      socket->write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: " + QByteArray::number(body.size()) + "\r\n\r\n" + body);
                                                       socket->disconnectFromHost();
                                                   });
                              });
             REQUIRE(m_server.listen(QHostAddress::LocalHost));
         }
 
-        QString url(const QString &hostName = "127.0.0.1") const { return QString("https://%1:%2").arg(hostName).arg(m_server.serverPort()); }
-        QString hostKey(const QString &hostName = "127.0.0.1") const { return QString("%1:%2").arg(hostName).arg(m_server.serverPort()); }
+        QString url(const QString &hostName = "127.0.0.1") const
+        { return QString("https://%1:%2").arg(hostName).arg(m_server.serverPort()); }
+        QString hostKey(const QString &hostName = "127.0.0.1") const
+        { return QString("%1:%2").arg(hostName).arg(m_server.serverPort()); }
 
     private:
         QSslServer m_server;
@@ -67,9 +73,9 @@ namespace
     // The error a login request ends with, or nullopt when it succeeds
     std::optional<KimaiApiError> loginError(KimaiClient &client)
     {
-        auto              future = client.requestMeUserInfo();
+        auto                      future = client.requestMeUserInfo();
         QFutureWatcher<KimaiUser> watcher;
-        QEventLoop        loop;
+        QEventLoop                loop;
         QObject::connect(&watcher, &QFutureWatcherBase::finished, &loop, &QEventLoop::quit);
         QTimer::singleShot(10000, &loop, &QEventLoop::quit);
         watcher.setFuture(future);

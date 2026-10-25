@@ -4,6 +4,7 @@
 
 // magic_enum headers
 #include <algorithm>
+
 #include <magic_enum/magic_enum.hpp>
 
 // Qt headers

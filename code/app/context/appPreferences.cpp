@@ -7,7 +7,10 @@
 
 namespace kemai
 {
-    AppPreferences::AppPreferences(QObject *parent): QObject(parent) {}
+    AppPreferences::AppPreferences(QObject *parent):
+    QObject(parent)
+    {
+    }
 
     void AppPreferences::setJson(const QJsonObject &json)
     {

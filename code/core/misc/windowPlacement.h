@@ -12,7 +12,7 @@ namespace kemai
     {
         QRect rect;
         // false: the saved position was off every screen, only rect's size applies (the platform places the window)
-        bool  positionKept = false;
+        bool positionKept = false;
 
         // Fits a saved window geometry to the available geometries of the connected screens (primary first):
         // the position is kept when enough of the window is on a screen, then the window is moved and shrunk

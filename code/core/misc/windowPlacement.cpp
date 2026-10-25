@@ -22,7 +22,7 @@ namespace kemai
         }
 
         // Screen holding most of the window
-        const QRect *best   = nullptr;
+        const QRect *best     = nullptr;
         qint64       bestArea = 0;
         for (const auto &screen : availableScreens)
         {

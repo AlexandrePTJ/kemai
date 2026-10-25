@@ -24,8 +24,10 @@ namespace kemai
         job->setKey(key);
         job->setAutoDelete(true);
 
-        // clang-format off
-        connect(job, &QKeychain::ReadPasswordJob::finished, this, [this, key](QKeychain::Job *j)
+        connect(job,
+                &QKeychain::ReadPasswordJob::finished,
+                this,
+                [this, key](QKeychain::Job *j)
                 {
                     auto* readJob = qobject_cast<QKeychain::ReadPasswordJob*>(j);
                     if (readJob->error() == QKeychain::NoError)
@@ -35,10 +37,7 @@ namespace kemai
                     else
                     {
                         emit readErrorOccurred(key, readJob->errorString());
-                    }
-                }
-        );
-        // clang-format on
+                    } });
 
         job->start();
     }
@@ -50,8 +49,10 @@ namespace kemai
         job->setTextData(value);
         job->setAutoDelete(true);
 
-        // clang-format off
-        connect(job, &QKeychain::WritePasswordJob::finished, this, [this, key](QKeychain::Job *j)
+        connect(job,
+                &QKeychain::WritePasswordJob::finished,
+                this,
+                [this, key](QKeychain::Job *j)
                 {
                     if (j->error() == QKeychain::NoError)
                     {
@@ -60,10 +61,7 @@ namespace kemai
                     else
                     {
                         emit writeErrorOccurred(key, j->errorString());
-                    }
-                }
-        );
-        // clang-format on
+                    } });
 
         job->start();
     }
@@ -74,8 +72,10 @@ namespace kemai
         job->setKey(key);
         job->setAutoDelete(true);
 
-        // clang-format off
-        connect(job, &QKeychain::DeletePasswordJob::finished, this, [this, key](QKeychain::Job *j)
+        connect(job,
+                &QKeychain::DeletePasswordJob::finished,
+                this,
+                [this, key](QKeychain::Job *j)
                 {
                     if (j->error() == QKeychain::NoError)
                     {
@@ -84,10 +84,7 @@ namespace kemai
                     else
                     {
                         emit deleteErrorOccurred(key, j->errorString());
-                    }
-                }
-        );
-        // clang-format on
+                    } });
 
         job->start();
     }

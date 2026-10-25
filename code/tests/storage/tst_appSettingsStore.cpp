@@ -136,7 +136,13 @@ TEST_CASE("AppSettingsStore::settingsFromJson - window geometry across versions"
     // A later 1.x file is read by the same rules, its unknown fields ignored
     auto json     = makeSettingsJson("1.7");
     auto settings = json["settings"].toObject();
-    settings.insert("window", QJsonObject{{"x", 10}, {"y", 20}, {"width", 640}, {"height", 480}, {"maximized", false}});
+    settings.insert("window", QJsonObject{
+                                  {"x",         10   },
+                                  {"y",         20   },
+                                  {"width",     640  },
+                                  {"height",    480  },
+                                  {"maximized", false}
+    });
     settings.insert("someFutureField", true);
     json.insert("settings", settings);
 
@@ -145,7 +151,12 @@ TEST_CASE("AppSettingsStore::settingsFromJson - window geometry across versions"
     REQUIRE(loaded.autoLogin->host == "https://kimai.example");
 
     // A degenerate size is no geometry
-    settings.insert("window", QJsonObject{{"x", 10}, {"y", 20}, {"width", 0}, {"height", 480}});
+    settings.insert("window", QJsonObject{
+                                  {"x",      10 },
+                                  {"y",      20 },
+                                  {"width",  0  },
+                                  {"height", 480}
+    });
     json.insert("settings", settings);
     REQUIRE_FALSE(AppSettingsStore::settingsFromJson(json).window.has_value());
 }
@@ -159,7 +170,10 @@ TEST_CASE("AppSettingsStore::save - preferences unknown to this build are kept",
     // Written by a newer 1.x Kemai
     auto json     = makeSettingsJson("1.9");
     auto settings = json["settings"].toObject();
-    settings.insert("preferences", QJsonObject{{"someFuturePreference", 42}, {"anotherOne", "x"}});
+    settings.insert("preferences", QJsonObject{
+                                       {"someFuturePreference", 42 },
+                                       {"anotherOne",           "x"}
+    });
     json.insert("settings", settings);
     writeFile(path, QJsonDocument(json).toJson());
 
@@ -168,7 +182,7 @@ TEST_CASE("AppSettingsStore::save - preferences unknown to this build are kept",
     REQUIRE(store.canSave());
 
     // This build changes something else and saves what it read
-    auto read = store.readFile();
+    auto read   = store.readFile();
     read.window = WindowGeometry{.normal = QRect(0, 0, 800, 600)};
     read.autoLogin.reset(); // no keychain write in tests
     store.save(read);
@@ -217,7 +231,7 @@ TEST_CASE("AppSettingsStore::save - trusted certificates round-trip", "[appSetti
                                          .sha256    = "AB:CD:EF",
                                          .pem       = "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----\n",
                                          .expiresAt = QDateTime(QDate(2027, 3, 12), QTime(10, 0), QTimeZone::UTC)};
-    AppSettings settings;
+    AppSettings              settings;
     settings.trustedCertificates = {certificate};
 
     AppSettingsStore store;
