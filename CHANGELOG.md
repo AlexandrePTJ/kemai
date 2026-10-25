@@ -14,17 +14,20 @@ First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is prov
 - New QML interface: timer bar, history of recent time entries with day labels, "Yesterday" and running entry first
 - Connection profiles with tokens stored in the system keychain, auto-login, logout from the account menu
 - Edit dialog for time entries: project and activity search, description, start and end, tags (new tags are created on Kimai), delete
+- Creating customers, projects and activities from the project and activity search
+- Task Management plugin: list, start and close your open tasks (shown only when the plugin is installed)
+- Running timer kept in sync with the web interface and other clients
+- Stopping the timer when idle or when the session is locked (optional, in the settings)
+- Settings dialog; window size and position remembered
+- Trusting a self-signed certificate for one server, after checking its fingerprint; trusted certificates listed in the settings
+- Log files and a log journal (filter, copy for a bug report, open the log folder), without any API token in them
 - Projects and activities cache refreshed on demand and when it gets old; clear messages when the network or the server fails
 - Calendar versions (`YEAR.MONTH.PATCH`), alpha releases from the `develop` branch
 
 ### Not there yet (compared with 0.11.1)
-- Creating customers, projects and activities; Task Management plugin
-- System tray, stopping the timer when idle or when the session is locked
-- Automatic refresh of the running timer (started or stopped from the web interface or another client)
-- Settings dialog; window size and position are not remembered
-- Update check, About dialog, log journal and log files
+- System tray
+- Update check, About dialog
 - Translations
-- Trusting a self-signed certificate from the application
 
 Login requires an API token (Kimai 2.14 or later): login with username and API password is no longer supported.
 
