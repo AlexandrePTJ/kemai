@@ -8,7 +8,7 @@
 #include <QVariantMap>
 
 // Project headers
-#include "presenceMonitor.h"
+#include <presenceMonitor.h>
 
 namespace kemai
 {

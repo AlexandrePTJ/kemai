@@ -19,8 +19,8 @@
 #include <misc/customFmt.h>
 
 // Local headers
-#include "kimaiApiError.h"
-#include "kimaiClient.h"
+#include <client/kimaiApiError.h>
+#include <client/kimaiClient.h>
 
 namespace kemai
 {
