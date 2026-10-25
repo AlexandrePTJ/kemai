@@ -8,7 +8,6 @@ import QtQuick.Layouts
 
 import Kemai
 
-
 // Per-computer settings, opened from the account menu and the login view. Every change applies and is saved
 // at once: no Save/Cancel. Sections come with their features (SettingsSection), none is built in.
 Popup {
@@ -173,8 +172,7 @@ Popup {
                                             }
 
                                             Text {
-                                                text: (certificateRow.modelData.expired ? "Expired " : "Expires ")
-                                                      + Qt.formatDate(certificateRow.modelData.expiresAt, "d MMM yyyy")
+                                                text: (certificateRow.modelData.expired ? "Expired " : "Expires ") + Qt.formatDate(certificateRow.modelData.expiresAt, "d MMM yyyy")
                                                 color: certificateRow.modelData.expired ? Theme.colorAccentRed : Theme.colorTextSecondary
                                                 font.pixelSize: Theme.fontSizeXSmall
                                                 font.features: Theme.fontFeaturesTabular
@@ -281,7 +279,8 @@ Popup {
                                     }
 
                                     // Keep has the focus: removal is a deliberate choice
-                                    onVisibleChanged: if (visible) keepButton.forceActiveFocus(Qt.TabFocusReason)
+                                    onVisibleChanged: if (visible)
+                                        keepButton.forceActiveFocus(Qt.TabFocusReason)
                                 }
                             }
                         }
@@ -332,7 +331,7 @@ Popup {
                             from: AppPreferences.MinIdleMinutes
                             to: AppPreferences.MaxIdleMinutes
                             value: inactivityRows.preferences.idleMinutes
-                            onEdited: (minutes) => inactivityRows.preferences.idleMinutes = minutes
+                            onEdited: minutes => inactivityRows.preferences.idleMinutes = minutes
                         }
 
                         Text {
@@ -482,8 +481,7 @@ Popup {
                 Text {
                     Layout.fillWidth: true
                     textFormat: Text.StyledText
-                    text: "<b>Changes are kept for this session only.</b> <font color=\"" + Theme.colorTextSecondary
-                          + "\">Kemai couldn't read its settings file, so it won't overwrite it.</font>"
+                    text: "<b>Changes are kept for this session only.</b> <font color=\"" + Theme.colorTextSecondary + "\">Kemai couldn't read its settings file, so it won't overwrite it.</font>"
                     color: Theme.colorTextPrimary
                     font.pixelSize: Theme.fontSizeSmall
                     // 12 px at 1.45

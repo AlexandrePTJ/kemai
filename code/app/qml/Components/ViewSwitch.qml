@@ -33,8 +33,16 @@ Rectangle {
 
         Repeater {
             model: [
-                { key: "history", label: "History", icon: "clock" },
-                { key: "tasks", label: "Tasks", icon: "list" }
+                {
+                    key: "history",
+                    label: "History",
+                    icon: "clock"
+                },
+                {
+                    key: "tasks",
+                    label: "Tasks",
+                    icon: "list"
+                }
             ]
 
             delegate: AbstractButton {

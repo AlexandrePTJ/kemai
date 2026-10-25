@@ -15,7 +15,7 @@ Item {
 
     required property SessionContext sessionContext
 
-    signal backToHistoryRequested()
+    signal backToHistoryRequested
 
     readonly property TaskModel _tasks: root.sessionContext.tasks
     readonly property int _load: root.sessionContext.tasksLoad
@@ -67,12 +67,23 @@ Item {
         const verb = error.action === "start" ? "Couldn't start —" : "Couldn't close —"
         let detail
         switch (error.kind) {
-        case SessionController.NoNetwork: detail = "no connection. Nothing changed."; break
-        case SessionController.Forbidden: detail = "permission refused by Kimai."; break
-        case SessionController.NotFound: detail = "the task no longer exists. Refresh the list."; break
-        case SessionController.ServerError: detail = error.action === "close" ? "server error. The task stays open." : "server error. Nothing changed."; break
-        case SessionController.InvalidResponse: detail = "unexpected response from Kimai."; break
-        default: detail = error.detail !== "" ? error.detail : "Kimai refused it."
+        case SessionController.NoNetwork:
+            detail = "no connection. Nothing changed."
+            break
+        case SessionController.Forbidden:
+            detail = "permission refused by Kimai."
+            break
+        case SessionController.NotFound:
+            detail = "the task no longer exists. Refresh the list."
+            break
+        case SessionController.ServerError:
+            detail = error.action === "close" ? "server error. The task stays open." : "server error. Nothing changed."
+            break
+        case SessionController.InvalidResponse:
+            detail = "unexpected response from Kimai."
+            break
+        default:
+            detail = error.detail !== "" ? error.detail : "Kimai refused it."
         }
         return "<b>" + verb + "</b> <font color=\"" + Theme.colorTextSecondary + "\">" + detail + "</font>"
     }
@@ -86,16 +97,17 @@ Item {
     }
 
     function _highlight(text, query) {
-        const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
         const i = query === "" ? -1 : text.toLowerCase().indexOf(query.toLowerCase())
         if (i < 0)
             return esc(text)
-        return esc(text.slice(0, i)) + "<font color='" + Theme.colorAccentGreen + "'>"
-               + esc(text.slice(i, i + query.length)) + "</font>" + esc(text.slice(i + query.length))
+        return esc(text.slice(0, i)) + "<font color='" + Theme.colorAccentGreen + "'>" + esc(text.slice(i, i + query.length)) + "</font>" + esc(text.slice(i + query.length))
     }
 
-    onVisibleChanged: if (root.visible) root.sessionContext.loadTasks()
-    Component.onCompleted: if (root.visible) root.sessionContext.loadTasks()
+    onVisibleChanged: if (root.visible)
+        root.sessionContext.loadTasks()
+    Component.onCompleted: if (root.visible)
+        root.sessionContext.loadTasks()
 
     Connections {
         target: root.sessionContext
@@ -111,7 +123,11 @@ Item {
             root._pending = root._set(root._pending, taskId, undefined)
             if (root._confirmClose === taskId)
                 root._confirmClose = 0
-            root._rowErrors = root._set(root._rowErrors, taskId, { action: action, kind: error, detail: detail })
+            root._rowErrors = root._set(root._rowErrors, taskId, {
+                action: action,
+                kind: error,
+                detail: detail
+            })
         }
     }
 
@@ -148,7 +164,13 @@ Item {
                 spacing: 6
 
                 Text {
-                    text: ({ progress: "In progress", overdue: "Overdue", upcoming: "Upcoming", none: "No due date", matches: "Matches" })[groupHeader.section].toUpperCase()
+                    text: ({
+                            progress: "In progress",
+                            overdue: "Overdue",
+                            upcoming: "Upcoming",
+                            none: "No due date",
+                            matches: "Matches"
+                        })[groupHeader.section].toUpperCase()
                     color: groupHeader.section === "overdue" ? Theme.colorAccentRed : Theme.colorTextLabel
                     font.pixelSize: Theme.fontSizeTiny
                     font.weight: Font.DemiBold
@@ -355,22 +377,15 @@ Item {
                             Icon {
                                 name: row.dueState === "overdue" ? "circle-alert" : "calendar"
                                 size: 11
-                                color: row.dueState === "overdue" ? Theme.colorAccentRed
-                                       : row.dueState === "today" ? Theme.colorWarning
-                                       : row.dueState === "none" ? Theme.colorTextDim : Theme.colorTextSecondary
+                                color: row.dueState === "overdue" ? Theme.colorAccentRed : row.dueState === "today" ? Theme.colorWarning : row.dueState === "none" ? Theme.colorTextDim : Theme.colorTextSecondary
                             }
 
                             Text {
                                 Layout.fillWidth: true
                                 Layout.preferredWidth: 0
                                 Layout.minimumWidth: implicitWidth
-                                text: row.dueState === "none" ? "No due date"
-                                      : row.dueState === "today" ? "Due today"
-                                      : row.dueState === "overdue" ? "Overdue · " + row.overdueDays + " d"
-                                      : Qt.formatDate(row.dueAt, "ddd d MMM")
-                                color: row.dueState === "overdue" ? Theme.colorAccentRed
-                                       : row.dueState === "today" ? Theme.colorWarning
-                                       : row.dueState === "none" ? Theme.colorTextDim : Theme.colorTextSecondary
+                                text: row.dueState === "none" ? "No due date" : row.dueState === "today" ? "Due today" : row.dueState === "overdue" ? "Overdue · " + row.overdueDays + " d" : Qt.formatDate(row.dueAt, "ddd d MMM")
+                                color: row.dueState === "overdue" ? Theme.colorAccentRed : row.dueState === "today" ? Theme.colorWarning : row.dueState === "none" ? Theme.colorTextDim : Theme.colorTextSecondary
                                 font.pixelSize: Theme.fontSizeXSmall
                                 font.weight: row.dueState === "overdue" || row.dueState === "today" ? Font.DemiBold : Font.Normal
                                 font.features: Theme.fontFeaturesTabular
@@ -543,8 +558,7 @@ Item {
                         Text {
                             Layout.fillWidth: true
                             // Checked on Kimai 2.70: closing a task also stops its running timer
-                            text: row.running ? "It's marked done in Kimai, which also stops its timer."
-                                              : "It's marked done in Kimai and leaves this list."
+                            text: row.running ? "It's marked done in Kimai, which also stops its timer." : "It's marked done in Kimai and leaves this list."
                             color: Theme.colorTextSecondary
                             font.pixelSize: Theme.fontSizeSmall
                             elide: Text.ElideRight
@@ -556,7 +570,8 @@ Item {
                         text: "Keep open"
                         enabled: row.pending === ""
                         onClicked: root._confirmClose = 0
-                        Component.onCompleted: if (row.confirming) keepButton.forceActiveFocus()
+                        Component.onCompleted: if (row.confirming)
+                            keepButton.forceActiveFocus()
                         Keys.onEscapePressed: root._confirmClose = 0
                     }
 
@@ -570,7 +585,8 @@ Item {
                     }
                 }
 
-                onVisibleChanged: if (visible) keepButton.forceActiveFocus()
+                onVisibleChanged: if (visible)
+                    keepButton.forceActiveFocus()
             }
 
             // ---- Todo text
@@ -766,10 +782,7 @@ Item {
     ColumnLayout {
         id: stateColumn
 
-        readonly property string kind: root._load === SessionController.Failed ? "failed"
-                                       : root._load !== SessionController.Ready ? ""
-                                       : root._tasks.totalCount === 0 ? "empty"
-                                       : taskList.count === 0 ? "nomatch" : ""
+        readonly property string kind: root._load === SessionController.Failed ? "failed" : root._load !== SessionController.Ready ? "" : root._tasks.totalCount === 0 ? "empty" : taskList.count === 0 ? "nomatch" : ""
 
         visible: stateColumn.kind !== ""
         anchors.centerIn: parent
@@ -787,8 +800,7 @@ Item {
 
             Icon {
                 anchors.centerIn: parent
-                name: stateColumn.kind === "failed" ? (root.sessionContext.tasksError === SessionController.NoNetwork ? "wifi-off" : "circle-alert")
-                      : stateColumn.kind === "nomatch" ? "search" : "check"
+                name: stateColumn.kind === "failed" ? (root.sessionContext.tasksError === SessionController.NoNetwork ? "wifi-off" : "circle-alert") : stateColumn.kind === "nomatch" ? "search" : "check"
                 size: 20
                 color: stateColumn.kind === "failed" ? Theme.colorAccentRed : Theme.colorTextSecondary
             }
@@ -797,8 +809,7 @@ Item {
         Text {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 14
-            text: stateColumn.kind === "failed" ? "Couldn't load tasks"
-                  : stateColumn.kind === "nomatch" ? "No task matches “" + root._filter + "”" : "No open tasks"
+            text: stateColumn.kind === "failed" ? "Couldn't load tasks" : stateColumn.kind === "nomatch" ? "No task matches “" + root._filter + "”" : "No open tasks"
             color: Theme.colorTextPrimary
             font.pixelSize: Theme.fontSizeNormal
             font.weight: Font.DemiBold
@@ -811,12 +822,7 @@ Item {
             Layout.topMargin: 6
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
-            text: stateColumn.kind === "failed"
-                  ? (root.sessionContext.tasksError === SessionController.NoNetwork
-                     ? "No connection to " + root.sessionContext.host + ". Your history and the timer still work."
-                     : "Kimai answered with an error. Your history and the timer still work.")
-                  : stateColumn.kind === "nomatch" ? "The filter looks in titles, projects, activities and todo text."
-                  : "Tasks assigned to you in Kimai appear here. Nothing to do right now."
+            text: stateColumn.kind === "failed" ? (root.sessionContext.tasksError === SessionController.NoNetwork ? "No connection to " + root.sessionContext.host + ". Your history and the timer still work." : "Kimai answered with an error. Your history and the timer still work.") : stateColumn.kind === "nomatch" ? "The filter looks in titles, projects, activities and todo text." : "Tasks assigned to you in Kimai appear here. Nothing to do right now."
             color: Theme.colorTextSecondary
             font.pixelSize: Theme.fontSizeSmall
         }

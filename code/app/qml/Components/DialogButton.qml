@@ -70,9 +70,7 @@ AbstractButton {
             return root.hovered && root.enabled ? Theme.colorSurface : Theme.colorSurfaceDark
         }
         border.width: 1
-        border.color: root.visualFocus ? Theme.colorAccentGreenDim
-                      : root._filled ? "transparent"
-                      : root.tone === "warning" ? Theme.colorWarningLine : Theme.colorBorderSubtle
+        border.color: root.visualFocus ? Theme.colorAccentGreenDim : root._filled ? "transparent" : root.tone === "warning" ? Theme.colorWarningLine : Theme.colorBorderSubtle
 
         // Focus glow outside the border
         Rectangle {

@@ -23,17 +23,28 @@ Item {
     onSelectedYearChanged: _viewYear = selectedYear
     onSelectedMonthChanged: _viewMonth = selectedMonth
 
-    function _daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate() }
+    function _daysInMonth(y, m) {
+        return new Date(y, m + 1, 0).getDate()
+    }
     function _monthLabel(y, m) {
-        const names = ["January", "February", "March", "April", "May", "June",
-                       "July", "August", "September", "October", "November", "December"]
+        const names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         return names[m] + " " + y
     }
     function _prevMonth() {
-        if (_viewMonth === 0) { _viewMonth = 11; _viewYear-- } else { _viewMonth-- }
+        if (_viewMonth === 0) {
+            _viewMonth = 11
+            _viewYear--
+        } else {
+            _viewMonth--
+        }
     }
     function _nextMonth() {
-        if (_viewMonth === 11) { _viewMonth = 0; _viewYear++ } else { _viewMonth++ }
+        if (_viewMonth === 11) {
+            _viewMonth = 0
+            _viewYear++
+        } else {
+            _viewMonth++
+        }
     }
 
     ColumnLayout {
@@ -63,7 +74,9 @@ Item {
                 onClicked: root._prevMonth()
             }
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             Text {
                 text: root._monthLabel(root._viewYear, root._viewMonth)
@@ -72,7 +85,9 @@ Item {
                 font.bold: true
             }
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             AbstractButton {
                 id: nextBtn
@@ -127,9 +142,7 @@ Item {
 
             readonly property int firstDayWeekday: new Date(root._viewYear, root._viewMonth, 1).getDay()
             readonly property int daysInThisMonth: root._daysInMonth(root._viewYear, root._viewMonth)
-            readonly property int daysInPrevMonth: root._daysInMonth(
-                root._viewMonth === 0 ? root._viewYear - 1 : root._viewYear,
-                root._viewMonth === 0 ? 11 : root._viewMonth - 1)
+            readonly property int daysInPrevMonth: root._daysInMonth(root._viewMonth === 0 ? root._viewYear - 1 : root._viewYear, root._viewMonth === 0 ? 11 : root._viewMonth - 1)
             readonly property int cellWidth: Math.floor(width / 7)
             readonly property int cellHeight: Math.floor(height / 6)
 
@@ -144,27 +157,20 @@ Item {
 
                     readonly property int dayNumber: dayCell.index - dayGrid.firstDayWeekday + 1
                     readonly property bool inCurrentMonth: dayCell.dayNumber >= 1 && dayCell.dayNumber <= dayGrid.daysInThisMonth
-                    readonly property int displayDay: dayCell.inCurrentMonth ? dayCell.dayNumber
-                        : (dayCell.dayNumber < 1 ? dayGrid.daysInPrevMonth + dayCell.dayNumber
-                                                 : dayCell.dayNumber - dayGrid.daysInThisMonth)
-                    readonly property bool isSelected: dayCell.inCurrentMonth
-                        && dayCell.displayDay === root.selectedDay
-                        && root._viewYear === root.selectedYear
-                        && root._viewMonth === root.selectedMonth
+                    readonly property int displayDay: dayCell.inCurrentMonth ? dayCell.dayNumber : (dayCell.dayNumber < 1 ? dayGrid.daysInPrevMonth + dayCell.dayNumber : dayCell.dayNumber - dayGrid.daysInThisMonth)
+                    readonly property bool isSelected: dayCell.inCurrentMonth && dayCell.displayDay === root.selectedDay && root._viewYear === root.selectedYear && root._viewMonth === root.selectedMonth
 
                     Rectangle {
                         anchors.centerIn: parent
                         width: 30
                         height: 30
                         radius: 15
-                        color: dayCell.isSelected ? Theme.colorAccentGreen
-                            : (cellHover.hovered && dayCell.inCurrentMonth ? Theme.colorSurface : "transparent")
+                        color: dayCell.isSelected ? Theme.colorAccentGreen : (cellHover.hovered && dayCell.inCurrentMonth ? Theme.colorSurface : "transparent")
 
                         Text {
                             anchors.centerIn: parent
                             text: dayCell.displayDay
-                            color: dayCell.isSelected ? Theme.colorTextDarkPrimary
-                                : (dayCell.inCurrentMonth ? Theme.colorTextPrimary : Theme.colorTextSecondary)
+                            color: dayCell.isSelected ? Theme.colorTextDarkPrimary : (dayCell.inCurrentMonth ? Theme.colorTextPrimary : Theme.colorTextSecondary)
                             font.pixelSize: Theme.fontSizeNormal
                             font.bold: dayCell.isSelected
                         }

@@ -8,7 +8,6 @@ import QtQuick.Layouts
 
 import Kemai
 
-
 // Shown when a login meets a server certificate the system does not trust: trust it for this server
 // (first time, or a changed certificate), or learn why it can never be trusted. Cancel is the default:
 // it has the focus, and Enter / Esc cancel. Nothing is stored unless the user trusts.
@@ -18,10 +17,9 @@ Popup {
     // KemaiContext::refusedCertificate
     property var certificate: ({})
 
-    signal trustRequested()
+    signal trustRequested
 
-    readonly property string _kind: root.certificate.rejection !== undefined && root.certificate.rejection !== "none" ? "refused"
-                                    : root.certificate.previousSha256 !== undefined && root.certificate.previousSha256 !== "" ? "changed" : "first"
+    readonly property string _kind: root.certificate.rejection !== undefined && root.certificate.rejection !== "none" ? "refused" : root.certificate.previousSha256 !== undefined && root.certificate.previousSha256 !== "" ? "changed" : "first"
     readonly property string _host: root.certificate.host !== undefined ? root.certificate.host : ""
     property bool _detailsOpen: false
 
@@ -37,7 +35,7 @@ Popup {
 
     // Plain-language reason of a refused certificate, key part in bold
     readonly property string _reason: {
-        const bold = (text) => "<font color=\"" + Theme.colorTextPrimary + "\"><b>" + text + "</b></font>"
+        const bold = text => "<font color=\"" + Theme.colorTextPrimary + "\"><b>" + text + "</b></font>"
         switch (root.certificate.rejection) {
         case "expired":
             return "Its certificate " + bold("expired on " + root._date(root.certificate.validUntil)) + ". The server's administrator needs to renew it."
@@ -111,9 +109,7 @@ Popup {
 
                 Text {
                     Layout.fillWidth: true
-                    text: root._kind === "refused" ? "Can't connect securely to " + root._host
-                          : root._kind === "changed" ? "The certificate of " + root._host + " has changed"
-                          : "Do you trust " + root._host + "?"
+                    text: root._kind === "refused" ? "Can't connect securely to " + root._host : root._kind === "changed" ? "The certificate of " + root._host + " has changed" : "Do you trust " + root._host + "?"
                     color: Theme.colorTextPrimary
                     font.pixelSize: Theme.fontSizeLarge
                     font.weight: Font.DemiBold
@@ -123,9 +119,7 @@ Popup {
                 Text {
                     Layout.fillWidth: true
                     textFormat: Text.StyledText
-                    text: root._kind === "refused" ? root._reason
-                          : root._kind === "changed" ? "You trusted a different certificate for this server before. This happens when the certificate is renewed — but it can also mean someone is intercepting the connection."
-                          : "Its certificate isn't issued by an authority your system trusts. That's common for servers run at home or in a small company."
+                    text: root._kind === "refused" ? root._reason : root._kind === "changed" ? "You trusted a different certificate for this server before. This happens when the certificate is renewed — but it can also mean someone is intercepting the connection." : "Its certificate isn't issued by an authority your system trusts. That's common for servers run at home or in a small company."
                     color: Theme.colorTextSecondary
                     font.pixelSize: Theme.fontSizeMedium
                     lineHeightMode: Text.FixedHeight
@@ -192,10 +186,7 @@ Popup {
                     Text {
                         Layout.fillWidth: true
                         textFormat: Text.StyledText
-                        text: (root._kind === "changed"
-                               ? "Only continue if the administrator confirms the new fingerprint, or the browser shows the same one. "
-                               : "Compare it with the fingerprint given by the server's administrator, or shown by your browser for this site. ")
-                              + "If you trust it, Kemai accepts <font color=\"" + Theme.colorTextPrimary + "\">this exact certificate, for this server only</font>, and asks again if it changes."
+                        text: (root._kind === "changed" ? "Only continue if the administrator confirms the new fingerprint, or the browser shows the same one. " : "Compare it with the fingerprint given by the server's administrator, or shown by your browser for this site. ") + "If you trust it, Kemai accepts <font color=\"" + Theme.colorTextPrimary + "\">this exact certificate, for this server only</font>, and asks again if it changes."
                         color: Theme.colorTextSecondary
                         font.pixelSize: Theme.fontSizeSmall
                         lineHeightMode: Text.FixedHeight
@@ -270,43 +261,39 @@ Popup {
                             columnSpacing: 10
                             rowSpacing: 6
 
-                            component DetailLabel: Text {
-                                Layout.preferredWidth: 100
-                                color: Theme.colorTextSecondary
-                                font.pixelSize: Theme.fontSizeSmall
+                            DetailLabel {
+                                text: "Server"
+                            }
+                            DetailValue {
+                                text: root._host
                             }
 
-                            component DetailValue: Text {
-                                property bool faulty: false
-                                Layout.fillWidth: true
-                                color: faulty ? Theme.colorAccentRed : Theme.colorTextPrimary
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: faulty ? Font.DemiBold : Font.Normal
-                                font.features: Theme.fontFeaturesTabular
-                                wrapMode: Text.WrapAnywhere
+                            DetailLabel {
+                                text: "Issued to"
                             }
-
-                            DetailLabel { text: "Server" }
-                            DetailValue { text: root._host }
-
-                            DetailLabel { text: "Issued to" }
                             DetailValue {
                                 faulty: root.certificate.rejection === "hostname"
                                 text: (root.certificate.subject !== undefined ? root.certificate.subject : "") + (faulty ? " · not this server" : "")
                             }
 
-                            DetailLabel { text: "Issued by" }
+                            DetailLabel {
+                                text: "Issued by"
+                            }
                             DetailValue {
                                 text: (root.certificate.issuer !== undefined ? root.certificate.issuer : "") + (root.certificate.selfSigned ? " (self-signed)" : "")
                             }
 
-                            DetailLabel { text: "Valid from" }
+                            DetailLabel {
+                                text: "Valid from"
+                            }
                             DetailValue {
                                 faulty: root.certificate.rejection === "notyetvalid"
                                 text: root._date(root.certificate.validFrom) + (faulty ? " · not yet valid" : "")
                             }
 
-                            DetailLabel { text: "Valid until" }
+                            DetailLabel {
+                                text: "Valid until"
+                            }
                             DetailValue {
                                 faulty: root.certificate.rejection === "expired"
                                 text: root._date(root.certificate.validUntil) + (faulty ? " · expired" : "")
@@ -368,5 +355,21 @@ Popup {
                 }
             }
         }
+    }
+
+    component DetailLabel: Text {
+        Layout.preferredWidth: 100
+        color: Theme.colorTextSecondary
+        font.pixelSize: Theme.fontSizeSmall
+    }
+
+    component DetailValue: Text {
+        property bool faulty: false
+        Layout.fillWidth: true
+        color: faulty ? Theme.colorAccentRed : Theme.colorTextPrimary
+        font.pixelSize: Theme.fontSizeSmall
+        font.weight: faulty ? Font.DemiBold : Font.Normal
+        font.features: Theme.fontFeaturesTabular
+        wrapMode: Text.WrapAnywhere
     }
 }

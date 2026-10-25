@@ -14,7 +14,7 @@ Page {
     // At least one settings section exists: the settings button shows
     property bool settingsAvailable: false
 
-    signal settingsRequested()
+    signal settingsRequested
 
     property bool loginPending: false
     property string loginError: ""
@@ -30,8 +30,7 @@ Page {
         case SessionController.NotFound:
             return "No Kimai API at this address. Check the host, e.g. https://kimai.example.com."
         case SessionController.HttpsRedirect:
-            return "This server only answers over https: with http, Kemai could read but not save anything. "
-                   + "<a href=\"https\"><font color=\"" + Theme.colorAccentGreen + "\"><b>Use " + detail + "</b></font></a>"
+            return "This server only answers over https: with http, Kemai could read but not save anything. " + "<a href=\"https\"><font color=\"" + Theme.colorAccentGreen + "\"><b>Use " + detail + "</b></font></a>"
         case SessionController.Forbidden:
             return "This Kimai account isn't allowed to use the API."
         case SessionController.ServerError:
@@ -45,7 +44,9 @@ Page {
 
     Connections {
         target: root.kemaiContext
-        function onLoginSucceeded() { root.loginPending = false }
+        function onLoginSucceeded() {
+            root.loginPending = false
+        }
         function onLoginFailed(kind, detail) {
             root.loginPending = false
             // A certificate problem is explained by the prompt, not by an error line
@@ -81,7 +82,7 @@ Page {
     }
 
     ColumnLayout {
-        anchors.fill: parent 
+        anchors.fill: parent
         anchors.margins: Theme.marginsMain
         spacing: Theme.spacingLarge
 
@@ -112,7 +113,9 @@ Page {
                 }
             }
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             AbstractButton {
                 id: settingsButton
@@ -178,9 +181,7 @@ Page {
                 Text {
                     id: logoutNotice
                     Layout.fillWidth: true
-                    text: "<b><font color='" + Theme.colorTextPrimary + "'>Logged out of "
-                          + root.kemaiContext.lastAccountName.replace(/&/g, "&amp;").replace(/</g, "&lt;")
-                          + ".</font></b> Auto-login is off, so Kemai won't connect by itself next time."
+                    text: "<b><font color='" + Theme.colorTextPrimary + "'>Logged out of " + root.kemaiContext.lastAccountName.replace(/&/g, "&amp;").replace(/</g, "&lt;") + ".</font></b> Auto-login is off, so Kemai won't connect by itself next time."
                     textFormat: Text.StyledText
                     color: Theme.colorTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
@@ -203,7 +204,9 @@ Page {
                     font.pixelSize: Theme.fontSizeXSmall
                 }
 
-                Item { Layout.fillWidth: true }
+                Item {
+                    Layout.fillWidth: true
+                }
 
                 Text {
                     text: "Manage profiles..."
@@ -240,7 +243,7 @@ Page {
                 onCountChanged: profileCombo.selectLastProfile()
 
                 onCurrentValueChanged: {
-                    const profile = profileManager.model.getById(currentValue);
+                    const profile = profileManager.model.getById(currentValue)
                     hostField.text = profile.host
                     tokenField.text = profile.token
                 }
@@ -337,10 +340,11 @@ Page {
             }
         }
 
-        Item { Layout.fillHeight: true }
+        Item {
+            Layout.fillHeight: true
+        }
 
         // -- Save profile
-
 
         // -- Error message
         Text {
@@ -398,8 +402,7 @@ Page {
                 // Name the session after the selected profile only if its credentials are the ones used
                 const profile = profileCombo.currentIndex >= 0 ? profileManager.model.getById(profileCombo.currentValue) : null
                 const fromProfile = profile && profile.host === hostField.text && profile.token === tokenField.text
-                root.kemaiContext.login(hostField.text, tokenField.text, autoLoginCheckBox.checked,
-                                        fromProfile ? profileCombo.currentText : "")
+                root.kemaiContext.login(hostField.text, tokenField.text, autoLoginCheckBox.checked, fromProfile ? profileCombo.currentText : "")
             }
         }
 

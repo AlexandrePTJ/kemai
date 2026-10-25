@@ -26,7 +26,7 @@ Rectangle {
     property bool isRunning: status === "active"
 
     signal startRequested(int activityId, int projectId)
-    signal editRequested()
+    signal editRequested
 
     width: ListView.view ? ListView.view.width : 0
     implicitHeight: mainLayout.implicitHeight + 22
@@ -126,8 +126,16 @@ Rectangle {
                 SequentialAnimation on opacity {
                     running: root.isRunning
                     loops: Animation.Infinite
-                    NumberAnimation { to: 0.7; duration: 500; easing.type: Easing.InOutQuad }
-                    NumberAnimation { to: 1.0; duration: 500; easing.type: Easing.InOutQuad }
+                    NumberAnimation {
+                        to: 0.7
+                        duration: 500
+                        easing.type: Easing.InOutQuad
+                    }
+                    NumberAnimation {
+                        to: 1.0
+                        duration: 500
+                        easing.type: Easing.InOutQuad
+                    }
                 }
             }
 

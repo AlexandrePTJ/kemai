@@ -19,8 +19,8 @@ Item {
     property string _view: "history"
     readonly property bool _tasksShown: root.sessionContext.hasTaskManagement && root._view === "tasks"
 
-    signal logoutRequested()
-    signal settingsRequested()
+    signal logoutRequested
+    signal settingsRequested
     // A resource was created from the edit dialog: NotificationKind.ResourceCreated detail
     signal resourceCreated(string detail)
 
@@ -44,7 +44,7 @@ Item {
                 current: root._tasksShown ? "tasks" : "history"
                 taskCount: root.sessionContext.tasks.totalCount
                 taskCountVisible: root.sessionContext.tasksLoad === SessionController.Ready
-                onSelected: (view) => root._view = view
+                onSelected: view => root._view = view
             }
 
             middle: [
@@ -135,6 +135,6 @@ Item {
     TimeEntryEditDialog {
         id: editDialog
         sessionContext: root.sessionContext
-        onResourceCreated: (detail) => root.resourceCreated(detail)
+        onResourceCreated: detail => root.resourceCreated(detail)
     }
 }

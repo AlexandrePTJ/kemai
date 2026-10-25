@@ -23,7 +23,7 @@ Item {
     // False when `leading` takes the title's place
     property bool titleVisible: true
 
-    signal refreshClicked()
+    signal refreshClicked
 
     implicitHeight: 38
 
@@ -56,7 +56,9 @@ Item {
             }
         }
 
-        Item { Layout.fillWidth: true }
+        Item {
+            Layout.fillWidth: true
+        }
 
         RowLayout {
             id: middleRow

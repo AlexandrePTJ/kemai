@@ -63,9 +63,13 @@ Item {
         function onTimeSheetStoppedAway(reason, end) {
             root._stopping = false
             const time = Qt.formatTime(end, "HH:mm")
-            root._pending = reason === SessionController.Locked
-                    ? { kind: SessionController.TimerStoppedLocked, detail: time }
-                    : { kind: SessionController.TimerStoppedIdle, detail: time + "|" + root.preferences.idleMinutes }
+            root._pending = reason === SessionController.Locked ? {
+                kind: SessionController.TimerStoppedLocked,
+                detail: time
+            } : {
+                kind: SessionController.TimerStoppedIdle,
+                detail: time + "|" + root.preferences.idleMinutes
+            }
             root._lastIdleSeconds = root.presence.idleSupported ? root.presence.idleSeconds() : 0
             // A lock stop is told at unlock; an idle stop as soon as input resumes
             if (reason === SessionController.Locked && !root.presence.locked)

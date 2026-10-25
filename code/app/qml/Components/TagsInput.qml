@@ -35,7 +35,7 @@ FocusScope {
 
     function _has(name) {
         const lower = name.toLowerCase()
-        return root.tags.some((t) => t.toLowerCase() === lower)
+        return root.tags.some(t => t.toLowerCase() === lower)
     }
 
     function _add(name, isNew) {
@@ -49,8 +49,8 @@ FocusScope {
     }
 
     function _remove(name) {
-        root.tags = root.tags.filter((t) => t !== name)
-        root.newTags = root.newTags.filter((t) => t !== name)
+        root.tags = root.tags.filter(t => t !== name)
+        root.newTags = root.newTags.filter(t => t !== name)
     }
 
     function _selectable(index) {
@@ -115,8 +115,7 @@ FocusScope {
         radius: Theme.radiusMedium
         color: Theme.colorSurface
         border.width: 1
-        border.color: root._state === "comma" ? Theme.colorAccentRed
-                      : (tagInput.activeFocus ? Theme.colorAccentGreenDim : "transparent")
+        border.color: root._state === "comma" ? Theme.colorAccentRed : (tagInput.activeFocus ? Theme.colorAccentGreenDim : "transparent")
 
         Rectangle {
             visible: tagInput.activeFocus
@@ -222,7 +221,7 @@ FocusScope {
                 onTextChanged: debounce.restart()
                 onActiveFocusChanged: activeFocus ? suggestions.open() : suggestions.close()
 
-                Keys.onPressed: (event) => {
+                Keys.onPressed: event => {
                     if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                         root._validate()
                         event.accepted = true
@@ -289,9 +288,7 @@ FocusScope {
 
                 Text {
                     Layout.fillWidth: true
-                    text: root._state === "loading" ? "Searching tags…"
-                          : root._state === "comma" ? "Tags can't contain commas — add them one at a time."
-                          : "Type to search tags from the server"
+                    text: root._state === "loading" ? "Searching tags…" : root._state === "comma" ? "Tags can't contain commas — add them one at a time." : "Type to search tags from the server"
                     color: root._state === "comma" ? Theme.colorAccentRed : Theme.colorTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
                     wrapMode: Text.Wrap
@@ -378,8 +375,7 @@ FocusScope {
                     width: resultsList.width
                     height: 32
                     radius: Theme.radiusSmall
-                    color: !suggestion.added && (root._highlighted === suggestion.index || suggestionHover.hovered)
-                           ? Theme.colorSurface : "transparent"
+                    color: !suggestion.added && (root._highlighted === suggestion.index || suggestionHover.hovered) ? Theme.colorSurface : "transparent"
 
                     HoverHandler {
                         id: suggestionHover
@@ -411,12 +407,11 @@ FocusScope {
                             text: {
                                 const name = suggestion.modelData
                                 const query = tagInput.text.trim()
-                                const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+                                const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
                                 const i = name.toLowerCase().indexOf(query.toLowerCase())
                                 if (suggestion.added || query === "" || i < 0)
                                     return esc(name)
-                                return esc(name.slice(0, i)) + "<font color='" + Theme.colorAccentGreen + "'><b>"
-                                       + esc(name.slice(i, i + query.length)) + "</b></font>" + esc(name.slice(i + query.length))
+                                return esc(name.slice(0, i)) + "<font color='" + Theme.colorAccentGreen + "'><b>" + esc(name.slice(i, i + query.length)) + "</b></font>" + esc(name.slice(i + query.length))
                             }
                             textFormat: Text.StyledText
                             color: suggestion.added ? Theme.colorTextDim : Theme.colorTextPrimary

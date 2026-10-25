@@ -7,78 +7,80 @@ import QtQuick
 QtObject {
 
     // -- Backgrounds
-    readonly property color colorBackground:        "#2d2b3d"
-    readonly property color colorBackgroundDark:    "#1e1c2e"
-    readonly property color colorSurface:           "#3d3b4d"
-    readonly property color colorSurfaceLight:      "#282A35"
-    readonly property color colorSurfaceDark:       "#2a2c38"
-    readonly property color colorActiveEntry:       "#1a2a1a"
+    readonly property color colorBackground: "#2d2b3d"
+    readonly property color colorBackgroundDark: "#1e1c2e"
+    readonly property color colorSurface: "#3d3b4d"
+    readonly property color colorSurfaceLight: "#282A35"
+    readonly property color colorSurfaceDark: "#2a2c38"
+    readonly property color colorActiveEntry: "#1a2a1a"
 
     // -- Text
-    readonly property color colorTextPrimary:       "#ffffff"
-    readonly property color colorTextDarkPrimary:   "#0d1a09"
-    readonly property color colorTextSecondary:     "#9E9E9E"
-    readonly property color colorTextTertiary:      "#BCBCBC"
-    readonly property color colorTextDim:           "#6b6a82"
-    readonly property color colorTextLabel:         "#9d9bb3"
+    readonly property color colorTextPrimary: "#ffffff"
+    readonly property color colorTextDarkPrimary: "#0d1a09"
+    readonly property color colorTextSecondary: "#9E9E9E"
+    readonly property color colorTextTertiary: "#BCBCBC"
+    readonly property color colorTextDim: "#6b6a82"
+    readonly property color colorTextLabel: "#9d9bb3"
     // Text and marks on filled accent / danger backgrounds (buttons, badges, toggle knob)
-    readonly property color colorTextOnAccent:      "#ffffff"
+    readonly property color colorTextOnAccent: "#ffffff"
     readonly property color colorTextOnAccentTrack: Qt.rgba(1, 1, 1, 0.3)
 
     // -- Accent
-    readonly property color colorAccentGreen:         "#4CAF50"
-    readonly property color colorAccentGreenTint:     "#194CB04F"
-    readonly property color colorAccentGreenHover:    "#4CAF50"
+    readonly property color colorAccentGreen: "#4CAF50"
+    readonly property color colorAccentGreenTint: "#194CB04F"
+    readonly property color colorAccentGreenHover: "#4CAF50"
     readonly property color colorAccentGreenDisabled: "#255627"
-    readonly property color colorBorder:              "#3d3b4d"
-    readonly property color colorBorderHighlight:     "#5a5c70"
-    readonly property color colorDivider:             Qt.rgba(1, 1, 1, 0.06)
-    readonly property color colorBorderSubtle:        Qt.rgba(1, 1, 1, 0.08)
+    readonly property color colorBorder: "#3d3b4d"
+    readonly property color colorBorderHighlight: "#5a5c70"
+    readonly property color colorDivider: Qt.rgba(1, 1, 1, 0.06)
+    readonly property color colorBorderSubtle: Qt.rgba(1, 1, 1, 0.08)
     // Translucent accents (focus rings, chips, error boxes)
-    readonly property color colorAccentGreenSoft:     Qt.rgba(0.298, 0.686, 0.314, 0.18)
-    readonly property color colorAccentGreenDim:      Qt.rgba(0.298, 0.686, 0.314, 0.55)
-    readonly property color colorAccentRedSoft:       Qt.rgba(0.898, 0.224, 0.208, 0.12)
-    readonly property color colorAccentRedLine:       Qt.rgba(0.898, 0.224, 0.208, 0.5)
-    readonly property color colorBackdrop:            Qt.rgba(0.047, 0.047, 0.078, 0.62)
+    readonly property color colorAccentGreenSoft: Qt.rgba(0.298, 0.686, 0.314, 0.18)
+    readonly property color colorAccentGreenDim: Qt.rgba(0.298, 0.686, 0.314, 0.55)
+    readonly property color colorAccentRedSoft: Qt.rgba(0.898, 0.224, 0.208, 0.12)
+    readonly property color colorAccentRedLine: Qt.rgba(0.898, 0.224, 0.208, 0.5)
+    readonly property color colorBackdrop: Qt.rgba(0.047, 0.047, 0.078, 0.62)
     // List rows: hovered, and the running entry or task
-    readonly property color colorRowHover:            Qt.rgba(1, 1, 1, 0.025)
-    readonly property color colorRowRunning:          Qt.rgba(0.298, 0.686, 0.314, 0.06)
+    readonly property color colorRowHover: Qt.rgba(1, 1, 1, 0.025)
+    readonly property color colorRowRunning: Qt.rgba(0.298, 0.686, 0.314, 0.06)
     // Warnings (session-only notice, restart badge)
-    readonly property color colorWarning:             "#e0a83a"
-    readonly property color colorWarningSoft:         Qt.rgba(0.878, 0.659, 0.227, 0.12)
-    readonly property color colorWarningLine:         Qt.rgba(0.878, 0.659, 0.227, 0.45)
+    readonly property color colorWarning: "#e0a83a"
+    readonly property color colorWarningSoft: Qt.rgba(0.878, 0.659, 0.227, 0.12)
+    readonly property color colorWarningLine: Qt.rgba(0.878, 0.659, 0.227, 0.45)
 
-    readonly property color colorAccentRed:         "#E53935"
-    readonly property color colorAccentRedTint:     "#66751919"
-    readonly property color colorAccentRedHover:    "#E53935"
+    readonly property color colorAccentRed: "#E53935"
+    readonly property color colorAccentRedTint: "#66751919"
+    readonly property color colorAccentRedHover: "#E53935"
     readonly property color colorAccentRedDisabled: "#891412"
 
-    // -- Buttons 
-    readonly property color colorButtonStop:        "#B71C1C"
-    readonly property color colorButtonStopDown:    "#f4a8a6"
-    readonly property color colorButtonStart:       "#388E3C"
-    readonly property color colorButtonStartDown:   "#a3d7a5"
-    readonly property color colorButtonEdit:        "#37474F"
-    readonly property color colorButtonEditDown:    "#455A64"
-    readonly property color colorButtonPrimary:     "#1565C0"
+    // -- Buttons
+    readonly property color colorButtonStop: "#B71C1C"
+    readonly property color colorButtonStopDown: "#f4a8a6"
+    readonly property color colorButtonStart: "#388E3C"
+    readonly property color colorButtonStartDown: "#a3d7a5"
+    readonly property color colorButtonEdit: "#37474F"
+    readonly property color colorButtonEditDown: "#455A64"
+    readonly property color colorButtonPrimary: "#1565C0"
     readonly property color colorButtonPrimaryDown: "#2196F3"
-    readonly property color colorInputBackground:   "#23242f"
+    readonly property color colorInputBackground: "#23242f"
 
-    // -- Font 
-    readonly property int fontSizeTiny:    10 // badges, caps labels
-    readonly property int fontSizeXSmall:  11
-    readonly property int fontSizeSmall:   12
-    readonly property int fontSizeMedium:  13
-    readonly property int fontSizeNormal:  14
-    readonly property int fontSizeLarge:   15
-    readonly property int fontSizeTitle:   16 // section titles, highlighted values
-    readonly property int fontSizeXLarge:  18
-    readonly property int fontSizeTimer:   26
+    // -- Font
+    readonly property int fontSizeTiny: 10 // badges, caps labels
+    readonly property int fontSizeXSmall: 11
+    readonly property int fontSizeSmall: 12
+    readonly property int fontSizeMedium: 13
+    readonly property int fontSizeNormal: 14
+    readonly property int fontSizeLarge: 15
+    readonly property int fontSizeTitle: 16 // section titles, highlighted values
+    readonly property int fontSizeXLarge: 18
+    readonly property int fontSizeTimer: 26
 
     // Hexadecimal values only (certificate fingerprints): numbers use fontFeaturesTabular
     readonly property string fontFamilyMono: "monospace"
     // Times and durations in the UI font: tabular figures keep digits aligned (font.features)
-    readonly property var fontFeaturesTabular: ({ "tnum": 1 })
+    readonly property var fontFeaturesTabular: ({
+            "tnum": 1
+        })
 
     // -- Spacing & Radius
     readonly property int radiusSmall: 4

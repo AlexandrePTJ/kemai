@@ -39,13 +39,19 @@ Popup {
         radius: Theme.radiusLarge
     }
 
-    function _pad2(n) { return n < 10 ? "0" + n : "" + n }
-    function _formatDate(y, m, d) { return y + "-" + _pad2(m + 1) + "-" + _pad2(d) }
+    function _pad2(n) {
+        return n < 10 ? "0" + n : "" + n
+    }
+    function _formatDate(y, m, d) {
+        return y + "-" + _pad2(m + 1) + "-" + _pad2(d)
+    }
     function _formatTime(h, mi) {
-        if (_is24h) return _pad2(h) + ":" + _pad2(mi)
+        if (_is24h)
+            return _pad2(h) + ":" + _pad2(mi)
         const period = h >= 12 ? "PM" : "AM"
         let h12 = h % 12
-        if (h12 === 0) h12 = 12
+        if (h12 === 0)
+            h12 = 12
         return h12 + ":" + _pad2(mi) + " " + period
     }
     function _shortDateLabel(y, m, d) {
@@ -107,7 +113,8 @@ Popup {
                 property point startPosition
                 target: null
                 cursorShape: Qt.SizeAllCursor
-                onActiveChanged: if (moveHandler.active) moveHandler.startPosition = Qt.point(root.x, root.y)
+                onActiveChanged: if (moveHandler.active)
+                    moveHandler.startPosition = Qt.point(root.x, root.y)
                 // Scene coordinates: they do not move with the popup being dragged
                 onCentroidChanged: {
                     if (moveHandler.active) {
@@ -144,14 +151,18 @@ Popup {
 
                 onEditingFinished: {
                     const parts = text.split("-")
-                    if (parts.length !== 3) return
+                    if (parts.length !== 3)
+                        return
                     const y = parseInt(parts[0])
                     const m = parseInt(parts[1]) - 1
                     const d = parseInt(parts[2])
-                    if (isNaN(y) || isNaN(m) || isNaN(d)) return
-                    if (m < 0 || m > 11) return
+                    if (isNaN(y) || isNaN(m) || isNaN(d))
+                        return
+                    if (m < 0 || m > 11)
+                        return
                     const maxDay = new Date(y, m + 1, 0).getDate()
-                    if (d < 1 || d > maxDay) return
+                    if (d < 1 || d > maxDay)
+                        return
                     root._year = y
                     root._month = m
                     root._day = d
@@ -179,11 +190,14 @@ Popup {
 
                 onEditingFinished: {
                     const parts = text.split(":")
-                    if (parts.length !== 2) return
+                    if (parts.length !== 2)
+                        return
                     const h = parseInt(parts[0])
                     const mi = parseInt(parts[1])
-                    if (isNaN(h) || isNaN(mi)) return
-                    if (h < 0 || h > 23 || mi < 0 || mi > 59) return
+                    if (isNaN(h) || isNaN(mi))
+                        return
+                    if (h < 0 || h > 23 || mi < 0 || mi > 59)
+                        return
                     root._hour = h
                     root._minute = mi
                     timeWheel.scrollToCurrent()
@@ -224,7 +238,7 @@ Popup {
                     root._hour = hour
                     root._minute = minute
                 }
-                onModeChanged: (is24h) => root._is24h = is24h
+                onModeChanged: is24h => root._is24h = is24h
             }
         }
 
@@ -242,14 +256,15 @@ Popup {
                 spacing: Theme.spacingSmall
 
                 Text {
-                    text: root._shortDateLabel(root._year, root._month, root._day)
-                          + " — " + root._formatTime(root._hour, root._minute)
+                    text: root._shortDateLabel(root._year, root._month, root._day) + " — " + root._formatTime(root._hour, root._minute)
                     color: Theme.colorAccentGreen
                     font.pixelSize: Theme.fontSizeSmall
                     font.features: Theme.fontFeaturesTabular
                 }
 
-                Item { Layout.fillWidth: true }
+                Item {
+                    Layout.fillWidth: true
+                }
 
                 Repeater {
                     model: [0, 15, 30, 45]
@@ -278,7 +293,9 @@ Popup {
             Layout.margins: Theme.spacingMedium
             spacing: Theme.spacingSmall
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             SecondaryButton {
                 text: "Cancel"

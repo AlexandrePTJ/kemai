@@ -48,8 +48,7 @@ Button {
                     return Theme.colorButtonStopDown
                 }
                 return root.hovered ? Theme.colorAccentRedHover : Theme.colorButtonStop
-            }
-            else {
+            } else {
                 if (root.down) {
                     return Theme.colorButtonStartDown
                 }

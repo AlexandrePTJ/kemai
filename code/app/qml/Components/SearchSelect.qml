@@ -54,24 +54,19 @@ FocusScope {
         const q = searchInput.text.trim().toLowerCase()
         if (q === "")
             return root.items
-        return root.items.filter(item => item.label.toLowerCase().includes(q)
-                                 || (item.code !== undefined && item.code.toLowerCase().includes(q))
-                                 || (item.meta !== undefined && item.meta.toLowerCase().includes(q)))
+        return root.items.filter(item => item.label.toLowerCase().includes(q) || (item.code !== undefined && item.code.toLowerCase().includes(q)) || (item.meta !== undefined && item.meta.toLowerCase().includes(q)))
     }
-    readonly property bool _showCreate: root.createLabel !== ""
-                                        && (root.createAlways || (searchInput.text.trim() !== ""
-                                                                  && (!root.createOnlyWithoutMatch || root._filtered.length === 0)))
+    readonly property bool _showCreate: root.createLabel !== "" && (root.createAlways || (searchInput.text.trim() !== "" && (!root.createOnlyWithoutMatch || root._filtered.length === 0)))
     // Highlight over the filtered rows, then the create row
     property int _highlight: 0
     readonly property int _rowCount: root._filtered.length + (root._showCreate ? 1 : 0)
 
     function _highlightText(text, query) {
-        const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
         const i = query === "" ? -1 : text.toLowerCase().indexOf(query.toLowerCase())
         if (i < 0)
             return esc(text)
-        return esc(text.slice(0, i)) + "<font color='" + Theme.colorAccentGreen + "'><b>"
-               + esc(text.slice(i, i + query.length)) + "</b></font>" + esc(text.slice(i + query.length))
+        return esc(text.slice(0, i)) + "<font color='" + Theme.colorAccentGreen + "'><b>" + esc(text.slice(i, i + query.length)) + "</b></font>" + esc(text.slice(i + query.length))
     }
 
     function _activate(index) {
@@ -88,9 +83,8 @@ FocusScope {
     implicitHeight: 36
     activeFocusOnTab: true
 
-    Keys.onPressed: (event) => {
-        if (!root.searching && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter
-                                || event.key === Qt.Key_Space || event.key === Qt.Key_Down)) {
+    Keys.onPressed: event => {
+        if (!root.searching && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space || event.key === Qt.Key_Down)) {
             root.openSearch()
             event.accepted = true
         }
@@ -154,9 +148,7 @@ FocusScope {
             }
 
             // Meta, or the code (countries): "France FR"
-            readonly property string _closedMeta: root.currentItem === null ? ""
-                                                  : root.currentItem.meta !== undefined ? root.currentItem.meta
-                                                  : root.currentItem.code !== undefined ? root.currentItem.code : ""
+            readonly property string _closedMeta: root.currentItem === null ? "" : root.currentItem.meta !== undefined ? root.currentItem.meta : root.currentItem.code !== undefined ? root.currentItem.code : ""
 
             Text {
                 visible: closedRow._closedMeta !== ""
@@ -203,7 +195,7 @@ FocusScope {
 
                 onTextChanged: root._highlight = 0
 
-                Keys.onPressed: (event) => {
+                Keys.onPressed: event => {
                     if (event.key === Qt.Key_Down) {
                         root._highlight = Math.min(root._highlight + 1, root._rowCount - 1)
                         listView.positionViewAtIndex(Math.min(root._highlight, root._filtered.length - 1), ListView.Contain)

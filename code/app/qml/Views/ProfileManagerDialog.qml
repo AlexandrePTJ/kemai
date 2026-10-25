@@ -74,8 +74,8 @@ Popup {
                     isSelected: profileList.currentIndex === index
                     isLast: profileList.count - 1 === index
 
-                    onSelectionRequested: (index) => profileList.currentIndex = index
-                    onDeleteConfirmRequested: (profileId) => root.profileManager.remove(profileId)
+                    onSelectionRequested: index => profileList.currentIndex = index
+                    onDeleteConfirmRequested: profileId => root.profileManager.remove(profileId)
                 }
 
                 onCurrentIndexChanged: {

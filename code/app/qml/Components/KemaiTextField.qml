@@ -6,12 +6,12 @@ import QtQuick.Controls
 import Kemai
 
 TextField {
-    
+
     color: Theme.colorTextPrimary
-    
+
     font.pixelSize: Theme.fontSizeNormal
     placeholderTextColor: Theme.colorTextSecondary
-    
+
     leftPadding: 10
     rightPadding: 10
 

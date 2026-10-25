@@ -17,12 +17,12 @@ AbstractButton {
     property bool timerRunning: false
     property bool settingsAvailable: false
 
-    signal logoutRequested()
-    signal settingsRequested()
+    signal logoutRequested
+    signal settingsRequested
 
     // Up to two initials from the account name ("KimaiDev" -> "KD", "susan_super" -> "SS")
     function initials(name) {
-        const words = name.replace(/([a-z])([A-Z])/g, "$1 $2").split(/[\s._-]+/).filter((w) => w.length > 0)
+        const words = name.replace(/([a-z])([A-Z])/g, "$1 $2").split(/[\s._-]+/).filter(w => w.length > 0)
         if (words.length === 0)
             return "?"
         if (words.length === 1)
@@ -45,7 +45,7 @@ AbstractButton {
 
     onClicked: menu.opened ? menu.close() : menu.open()
 
-    Keys.onPressed: (event) => {
+    Keys.onPressed: event => {
         if (event.key === Qt.Key_Down || event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             menu.open()
             event.accepted = true

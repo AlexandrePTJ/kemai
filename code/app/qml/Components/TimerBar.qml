@@ -13,7 +13,7 @@ Rectangle {
     required property ActivityListModel activityModel
     readonly property bool hasValidActivity: descriptionField.selectedActivityId > 0
 
-    signal stopClicked()
+    signal stopClicked
     signal startClicked(int activityId, int projectId)
     signal createRequested(string kind, string name)
 
@@ -57,9 +57,7 @@ Rectangle {
 
             isStarted: root.isRunning
             enabled: root.isRunning || root.hasValidActivity
-            onClicked: root.isRunning
-                ? root.stopClicked()
-                : root.startClicked(descriptionField.selectedActivityId, descriptionField.selectedProjectId)
+            onClicked: root.isRunning ? root.stopClicked() : root.startClicked(descriptionField.selectedActivityId, descriptionField.selectedProjectId)
         }
     }
 }

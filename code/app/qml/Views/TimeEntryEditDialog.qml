@@ -8,7 +8,6 @@ import QtQuick.Layouts
 
 import Kemai
 
-
 // Edits one time entry (project — activity, description, start/end, tags) or deletes it.
 // Edits stay local until Save; save and delete failures are shown here, with the edits kept.
 Popup {
@@ -53,8 +52,7 @@ Popup {
 
     readonly property bool _projectChanged: root._projectId !== root._origProjectId || root._activityId !== root._origActivityId
     readonly property bool _descriptionChanged: descriptionEdit.text !== root._origDescription
-    readonly property bool _timeChanged: !root._punch && (root._begin.getTime() !== root._origBegin.getTime()
-                                                         || (!root.running && root._end.getTime() !== root._origEnd.getTime()))
+    readonly property bool _timeChanged: !root._punch && (root._begin.getTime() !== root._origBegin.getTime() || (!root.running && root._end.getTime() !== root._origEnd.getTime()))
     readonly property bool _tagsChanged: !root._sameSet(tagsInput.tags, root._origTags)
     readonly property bool _dirty: root._projectChanged || root._descriptionChanged || root._timeChanged || root._tagsChanged
 
@@ -94,18 +92,22 @@ Popup {
     function _sameSet(a, b) {
         if (a.length !== b.length)
             return false
-        const lower = (l) => l.map((t) => t.toLowerCase()).sort().join("\n")
+        const lower = l => l.map(t => t.toLowerCase()).sort().join("\n")
         return lower(a) === lower(b)
     }
 
-    function _pad2(n) { return n < 10 ? "0" + n : "" + n }
+    function _pad2(n) {
+        return n < 10 ? "0" + n : "" + n
+    }
 
     function _formatDuration(from, to) {
         const minutes = Math.max(0, Math.floor((to.getTime() - from.getTime()) / 60000))
         return Math.floor(minutes / 60) + "h " + root._pad2(minutes % 60) + "m"
     }
 
-    function _formatTime(d) { return root._pad2(d.getHours()) + ":" + root._pad2(d.getMinutes()) }
+    function _formatTime(d) {
+        return root._pad2(d.getHours()) + ":" + root._pad2(d.getMinutes())
+    }
 
     // "Today", "Yesterday", or "" for other days
     function _dayWord(d) {
@@ -138,11 +140,14 @@ Popup {
         // Invalid dates leave begin/end unchanged: never sent in punch mode, and a running entry has no end
         const begin = root._punch ? new Date(NaN) : root._begin
         const end = root._punch || root.running ? new Date(NaN) : root._end
-        if (root.sessionContext.updateTimeSheet(root.timesheetId, root._projectId, root._activityId, descriptionEdit.text,
-                                                tagsInput.tags, begin, end, tagsInput.newTags)) {
+        if (root.sessionContext.updateTimeSheet(root.timesheetId, root._projectId, root._activityId, descriptionEdit.text, tagsInput.tags, begin, end, tagsInput.newTags)) {
             root._startPhase("saving")
         } else {
-            root._error = { op: "save", kind: SessionController.UnknownError, detail: "" }
+            root._error = {
+                op: "save",
+                kind: SessionController.UnknownError,
+                detail: ""
+            }
         }
     }
 
@@ -180,24 +185,35 @@ Popup {
     function _errorTitle(error) {
         const prefix = error.op === "delete" ? "Couldn't delete" : "Couldn't save"
         switch (error.kind) {
-        case SessionController.NoNetwork: return prefix + " — no connection"
-        case SessionController.Forbidden: return prefix + " — permission refused"
-        case SessionController.NotFound: return prefix + " — entry no longer exists"
-        case SessionController.ServerError: return prefix + " — server error"
-        case SessionController.InvalidResponse: return prefix + " — unexpected response"
-        default: return prefix + " — Kimai refused the change"
+        case SessionController.NoNetwork:
+            return prefix + " — no connection"
+        case SessionController.Forbidden:
+            return prefix + " — permission refused"
+        case SessionController.NotFound:
+            return prefix + " — entry no longer exists"
+        case SessionController.ServerError:
+            return prefix + " — server error"
+        case SessionController.InvalidResponse:
+            return prefix + " — unexpected response"
+        default:
+            return prefix + " — Kimai refused the change"
         }
     }
 
     function _errorDetail(error) {
         switch (error.kind) {
-        case SessionController.NoNetwork: return "Your changes are kept. Check the network, then retry."
+        case SessionController.NoNetwork:
+            return "Your changes are kept. Check the network, then retry."
         case SessionController.Forbidden:
             return "Your Kimai account isn't allowed to " + (error.op === "delete" ? "delete" : "edit") + " this entry. Cancel to discard."
-        case SessionController.NotFound: return "It was deleted on the server. Cancel to refresh the list."
-        case SessionController.ServerError: return "Kimai returned an error. Your changes are kept; retry in a moment."
-        case SessionController.InvalidResponse: return "Kimai answered in a way Kemai doesn’t understand. Your changes are kept."
-        default: return error.detail !== "" ? error.detail : "Your changes are kept."
+        case SessionController.NotFound:
+            return "It was deleted on the server. Cancel to refresh the list."
+        case SessionController.ServerError:
+            return "Kimai returned an error. Your changes are kept; retry in a moment."
+        case SessionController.InvalidResponse:
+            return "Kimai answered in a way Kemai doesn’t understand. Your changes are kept."
+        default:
+            return error.detail !== "" ? error.detail : "Your changes are kept."
         }
     }
 
@@ -221,7 +237,6 @@ Popup {
         border.color: Theme.colorBorderSubtle
         border.width: 1
         radius: Theme.radiusDialog
-
     }
 
     Connections {
@@ -235,7 +250,11 @@ Popup {
             if (timesheetId !== root.timesheetId || root._phase !== "saving")
                 return
             root._phase = "idle"
-            root._error = { op: "save", kind: kind, detail: detail }
+            root._error = {
+                op: "save",
+                kind: kind,
+                detail: detail
+            }
         }
         function onTimeSheetDeleted(timesheetId: int) {
             if (timesheetId === root.timesheetId && root._phase === "deleting")
@@ -245,7 +264,11 @@ Popup {
             if (timesheetId !== root.timesheetId || root._phase !== "deleting")
                 return
             root._phase = "idle"
-            root._error = { op: "delete", kind: kind, detail: detail }
+            root._error = {
+                op: "delete",
+                kind: kind,
+                detail: detail
+            }
         }
         // The app goes back to login: don't stand in the way
         function onSessionExpired() {
@@ -258,7 +281,7 @@ Popup {
     ResourceCreationDialog {
         id: creationDialog
         sessionContext: root.sessionContext
-        onPairChosen: (pair) => {
+        onPairChosen: pair => {
             root._projectId = pair.projectId
             root._activityId = pair.activityId
             root._projectName = pair.projectName
@@ -266,7 +289,7 @@ Popup {
             root._activityColor = pair.activityColor
             descriptionEdit.forceActiveFocus()
         }
-        onCreated: (detail) => root.resourceCreated(detail)
+        onCreated: detail => root.resourceCreated(detail)
     }
 
     Timer {
@@ -295,7 +318,7 @@ Popup {
         property bool editEnd: false
 
         parent: Overlay.overlay
-        onConfirmed: (dateTime) => {
+        onConfirmed: dateTime => {
             if (editEnd)
                 root._end = dateTime
             else
@@ -349,13 +372,13 @@ Popup {
         property string mode: "normal"
         readonly property bool locked: chip.mode === "locked" || chip.mode === "now"
 
-        signal pickRequested()
+        signal pickRequested
 
         Layout.fillWidth: true
         Layout.preferredHeight: 46
         activeFocusOnTab: !chip.locked
 
-        Keys.onPressed: (event) => {
+        Keys.onPressed: event => {
             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
                 chip.pickRequested()
                 event.accepted = true
@@ -411,9 +434,7 @@ Popup {
 
                     Text {
                         text: chip.mode === "now" ? "now" : root._formatTime(chip.value)
-                        color: chip.mode === "error" ? Theme.colorAccentRed
-                               : chip.mode === "now" ? Theme.colorAccentGreen
-                               : chip.mode === "locked" ? Theme.colorTextSecondary : Theme.colorTextPrimary
+                        color: chip.mode === "error" ? Theme.colorAccentRed : chip.mode === "now" ? Theme.colorAccentGreen : chip.mode === "locked" ? Theme.colorTextSecondary : Theme.colorTextPrimary
                         font.pixelSize: Theme.fontSizeTitle
                         font.weight: Font.DemiBold
                         font.features: Theme.fontFeaturesTabular
@@ -489,7 +510,9 @@ Popup {
                         }
                     }
 
-                    Item { Layout.fillWidth: true }
+                    Item {
+                        Layout.fillWidth: true
+                    }
 
                     Icon {
                         name: "x"
@@ -726,10 +749,8 @@ Popup {
 
                             Text {
                                 Layout.alignment: Qt.AlignRight
-                                text: !root._rangeValid ? "—"
-                                      : root._formatDuration(root._begin, root.running ? root._now : root._end)
-                                color: !root._rangeValid ? Theme.colorAccentRed
-                                       : root.running ? Theme.colorAccentGreen : Theme.colorTextPrimary
+                                text: !root._rangeValid ? "—" : root._formatDuration(root._begin, root.running ? root._now : root._end)
+                                color: !root._rangeValid ? Theme.colorAccentRed : root.running ? Theme.colorAccentGreen : Theme.colorTextPrimary
                                 font.pixelSize: Theme.fontSizeTitle
                                 font.weight: Font.DemiBold
                                 font.features: Theme.fontFeaturesTabular
@@ -749,9 +770,7 @@ Popup {
                         }
 
                         Text {
-                            text: !root._rangeValid ? "End must be after start (" + root._shortPoint(root._begin) + ")."
-                                  : root._punch ? "Punch mode: start and end are managed by Kimai."
-                                  : "End is set when you stop the timer."
+                            text: !root._rangeValid ? "End must be after start (" + root._shortPoint(root._begin) + ")." : root._punch ? "Punch mode: start and end are managed by Kimai." : "End is set when you stop the timer."
                             color: root._rangeValid ? Theme.colorTextSecondary : Theme.colorAccentRed
                             font.pixelSize: Theme.fontSizeSmall
                         }
@@ -828,7 +847,9 @@ Popup {
                         background: Item {}
                     }
 
-                    Item { Layout.fillWidth: true }
+                    Item {
+                        Layout.fillWidth: true
+                    }
 
                     RowLayout {
                         visible: root._dirty
@@ -858,8 +879,7 @@ Popup {
                     DialogButton {
                         Layout.minimumWidth: 92
                         variant: "primary"
-                        text: root._phase === "saving" && root._spinnerShown ? "Saving…"
-                              : (root._error && root._error.op === "save") ? "Retry" : "Save"
+                        text: root._phase === "saving" && root._spinnerShown ? "Saving…" : (root._error && root._error.op === "save") ? "Retry" : "Save"
                         busy: root._phase === "saving"
                         spinning: root._spinnerShown
                         enabled: root._canSave || root._busy
@@ -910,8 +930,7 @@ Popup {
 
                         Text {
                             Layout.fillWidth: true
-                            text: (root.running ? "The timer will stop. " : root._origDuration + " on " + root._origProjectName + ". ")
-                                  + "This can't be undone."
+                            text: (root.running ? "The timer will stop. " : root._origDuration + " on " + root._origProjectName + ". ") + "This can't be undone."
                             color: Theme.colorTextSecondary
                             font.pixelSize: Theme.fontSizeSmall
                             elide: Text.ElideRight

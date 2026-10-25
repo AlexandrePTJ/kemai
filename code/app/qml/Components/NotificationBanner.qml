@@ -11,8 +11,7 @@ Rectangle {
 
     height: visible ? 36 : 0
     visible: false
-    color: _level === SessionController.Error ? Theme.colorAccentRedTint
-         : _level === SessionController.Success ? Theme.colorAccentGreenSoft : Theme.colorSurfaceDark
+    color: _level === SessionController.Error ? Theme.colorAccentRedTint : _level === SessionController.Success ? Theme.colorAccentGreenSoft : Theme.colorSurfaceDark
 
     property int _level: SessionController.Info
 
@@ -43,22 +42,21 @@ Rectangle {
             return qsTr("Failed to load projects and activities.")
         case SessionController.CacheRefreshFailed:
             return qsTr("Could not refresh projects and activities — showing the previous list.")
-        case SessionController.TimerStoppedIdle: {
-            // detail: "HH:mm|minutes"
-            const parts = detail.split("|")
-            return Number(parts[1]) === 1
-                    ? qsTr("Timer stopped at %1 after 1 minute of inactivity.").arg(parts[0])
-                    : qsTr("Timer stopped at %1 after %2 minutes of inactivity.").arg(parts[0]).arg(parts[1])
-        }
-        case SessionController.ResourceCreated: {
-            // detail: "activity|name|project" or "project|name|"
-            const parts = detail.split("|")
-            const name = "<b>" + parts[1].replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</b>"
-            if (parts[0] === "project")
-                return qsTr("Project %1 created").arg(name)
-            return parts[2] !== "" ? qsTr("Activity %1 created in %2").arg(name).arg(parts[2].replace(/&/g, "&amp;").replace(/</g, "&lt;"))
-                                   : qsTr("Global activity %1 created").arg(name)
-        }
+        case SessionController.TimerStoppedIdle:
+            {
+                // detail: "HH:mm|minutes"
+                const parts = detail.split("|")
+                return Number(parts[1]) === 1 ? qsTr("Timer stopped at %1 after 1 minute of inactivity.").arg(parts[0]) : qsTr("Timer stopped at %1 after %2 minutes of inactivity.").arg(parts[0]).arg(parts[1])
+            }
+        case SessionController.ResourceCreated:
+            {
+                // detail: "activity|name|project" or "project|name|"
+                const parts = detail.split("|")
+                const name = "<b>" + parts[1].replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</b>"
+                if (parts[0] === "project")
+                    return qsTr("Project %1 created").arg(name)
+                return parts[2] !== "" ? qsTr("Activity %1 created in %2").arg(name).arg(parts[2].replace(/&/g, "&amp;").replace(/</g, "&lt;")) : qsTr("Global activity %1 created").arg(name)
+            }
         case SessionController.TimerStoppedLocked:
             return qsTr("Timer stopped at %1, when the session was locked.").arg(detail)
         default:

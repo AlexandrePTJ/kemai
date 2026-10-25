@@ -17,7 +17,7 @@ ColumnLayout {
 
     default property alias content: controlColumn.data
 
-    signal linkActivated()
+    signal linkActivated
 
     spacing: 6
 
@@ -62,8 +62,7 @@ ColumnLayout {
         Text {
             Layout.fillWidth: true
             textFormat: Text.StyledText
-            text: root.error + (root.linkText !== ""
-                                ? " <a href=\"link\"><font color=\"" + Theme.colorAccentGreen + "\"><b>" + root.linkText + "</b></font></a>" : "")
+            text: root.error + (root.linkText !== "" ? " <a href=\"link\"><font color=\"" + Theme.colorAccentGreen + "\"><b>" + root.linkText + "</b></font></a>" : "")
             color: Theme.colorAccentRed
             font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.Wrap

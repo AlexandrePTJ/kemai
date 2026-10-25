@@ -6,14 +6,13 @@ import QtQuick.Layouts
 
 import Kemai
 
-
 // Asked only when a timer runs: logging out leaves it running on the server
 Popup {
     id: root
 
     required property SessionContext sessionContext
 
-    signal confirmed()
+    signal confirmed
 
     parent: Overlay.overlay
     modal: true
@@ -148,7 +147,9 @@ Popup {
             Layout.bottomMargin: 12
             spacing: 8
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             DialogButton {
                 id: cancelButton

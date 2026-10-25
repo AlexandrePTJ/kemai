@@ -16,8 +16,8 @@ Page {
     // At least one settings section exists: the account menu offers the settings
     property bool settingsAvailable: false
 
-    signal logoutRequested()
-    signal settingsRequested()
+    signal logoutRequested
+    signal settingsRequested
 
     // Back to the foreground: reload what may have changed on the server meanwhile
     readonly property bool windowActive: Window.active
@@ -43,8 +43,8 @@ Page {
         id: timerBarCreation
         objectName: "timerBarCreation"
         sessionContext: root.sessionContext
-        onPairChosen: (pair) => timerBar.selectPair(pair)
-        onCreated: (detail) => notificationBanner.show(SessionController.Success, SessionController.ResourceCreated, detail)
+        onPairChosen: pair => timerBar.selectPair(pair)
+        onCreated: detail => notificationBanner.show(SessionController.Success, SessionController.ResourceCreated, detail)
     }
 
     AwayStopper {
@@ -102,7 +102,7 @@ Page {
             settingsAvailable: root.settingsAvailable
             onLogoutRequested: root.logoutRequested()
             onSettingsRequested: root.settingsRequested()
-            onResourceCreated: (detail) => notificationBanner.show(SessionController.Success, SessionController.ResourceCreated, detail)
+            onResourceCreated: detail => notificationBanner.show(SessionController.Success, SessionController.ResourceCreated, detail)
         }
     }
 }

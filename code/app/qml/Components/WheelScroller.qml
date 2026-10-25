@@ -24,7 +24,7 @@ WheelHandler {
         return Math.max(root.flickable.originY, Math.min(maxY, y))
     }
 
-    onWheel: (event) => {
+    onWheel: event => {
         if (event.pixelDelta.y !== 0) {
             root._ease.stop()
             root.flickable.contentY = root._clamped(root.flickable.contentY - event.pixelDelta.y)
@@ -50,6 +50,8 @@ WheelHandler {
     // A drag or flick takes over from the wheel
     readonly property Connections _drag: Connections {
         target: root.flickable
-        function onMovementStarted() { root._ease.stop() }
+        function onMovementStarted() {
+            root._ease.stop()
+        }
     }
 }

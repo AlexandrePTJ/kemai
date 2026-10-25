@@ -8,7 +8,6 @@ import QtQuick.Controls
 import Kemai
 
 ApplicationWindow {
-
     id: main
 
     // Default size; shown by appContext with the saved geometry once completed
@@ -31,10 +30,12 @@ ApplicationWindow {
 
     KemaiContext {
         id: appContext
-        onLoginSucceeded: (session) => {
+        onLoginSucceeded: session => {
             // Central 401 handling: an expired session drops back to the login view
             session.sessionExpired.connect(() => stackView.replace(null, loginViewComponent))
-            stackView.replace(null, mainViewComponent, { sessionContext: session })
+            stackView.replace(null, mainViewComponent, {
+                sessionContext: session
+            })
         }
         onLoggedOut: stackView.replace(null, loginViewComponent)
     }

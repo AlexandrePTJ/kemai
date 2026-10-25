@@ -56,8 +56,16 @@ ColumnLayout {
 
     Repeater {
         model: [
-            { kind: "activity", title: "New activity", hint: "Inside a project you choose, or global" },
-            { kind: "project", title: "New project", hint: "Under a customer, with an activity to track" }
+            {
+                kind: "activity",
+                title: "New activity",
+                hint: "Inside a project you choose, or global"
+            },
+            {
+                kind: "project",
+                title: "New project",
+                hint: "Under a customer, with an activity to track"
+            }
         ]
 
         delegate: Rectangle {
@@ -75,7 +83,8 @@ ColumnLayout {
 
             HoverHandler {
                 cursorShape: Qt.PointingHandCursor
-                onHoveredChanged: if (hovered) root.highlight = offer.index
+                onHoveredChanged: if (hovered)
+                    root.highlight = offer.index
             }
 
             TapHandler {

@@ -30,8 +30,10 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: {
-            if (root.isConfirming) return Theme.colorAccentRedTint
-            if (root.isSelected) return Theme.colorAccentGreenTint
+            if (root.isConfirming)
+                return Theme.colorAccentRedTint
+            if (root.isSelected)
+                return Theme.colorAccentGreenTint
             return "transparent"
         }
     }
@@ -42,8 +44,10 @@ Item {
         width: 3
         height: parent.height
         color: {
-            if (root.isConfirming) return Theme.colorAccentRed
-            if (root.isSelected) return Theme.colorAccentGreen
+            if (root.isConfirming)
+                return Theme.colorAccentRed
+            if (root.isSelected)
+                return Theme.colorAccentGreen
             return "transparent"
         }
     }

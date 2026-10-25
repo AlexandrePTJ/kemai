@@ -41,12 +41,11 @@ FocusScope {
 
     // Query part of `text` in accent, when it appears as is (fuzzy matches stay plain)
     function _highlight(text, query) {
-        const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
         const i = query === "" ? -1 : text.toLowerCase().indexOf(query.toLowerCase())
         if (i < 0)
             return esc(text)
-        return esc(text.slice(0, i)) + "<font color='" + Theme.colorAccentGreen + "'><b>"
-               + esc(text.slice(i, i + query.length)) + "</b></font>" + esc(text.slice(i + query.length))
+        return esc(text.slice(0, i)) + "<font color='" + Theme.colorAccentGreen + "'><b>" + esc(text.slice(i, i + query.length)) + "</b></font>" + esc(text.slice(i + query.length))
     }
 
     function _pick(row) {
@@ -57,9 +56,8 @@ FocusScope {
     implicitHeight: 36
     activeFocusOnTab: true
 
-    Keys.onPressed: (event) => {
-        if (!root.searching && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter
-                                || event.key === Qt.Key_Space || event.key === Qt.Key_Down)) {
+    Keys.onPressed: event => {
+        if (!root.searching && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space || event.key === Qt.Key_Down)) {
             root.openSearch()
             event.accepted = true
         }
@@ -166,7 +164,7 @@ FocusScope {
 
                 onTextChanged: suggestionList.currentIndex = 0
 
-                Keys.onPressed: (event) => {
+                Keys.onPressed: event => {
                     if (event.key === Qt.Key_Down) {
                         if (root._offering)
                             createOffer.moveHighlight(1)
@@ -222,126 +220,127 @@ FocusScope {
             implicitHeight: root._offering ? createOffer.implicitHeight : suggestionList.implicitHeight
             implicitWidth: dropdown.width - 8
 
-        CreateOffer {
-            id: createOffer
-            visible: root._offering
-            anchors.left: parent.left
-            anchors.right: parent.right
-            query: searchInput.text
-            onCreateRequested: (kind, name) => {
-                root.closeSearch()
-                root.createRequested(kind, name)
-            }
-            onVisibleChanged: if (visible) createOffer.highlight = 0
-        }
-
-        ListView {
-            id: suggestionList
-            visible: !root._offering
-            anchors.fill: parent
-
-            WheelScroller {
-                flickable: suggestionList
-            }
-            clip: true
-            model: filterProxy
-            implicitHeight: Math.min(contentHeight, 7 * 32)
-            highlightMoveDuration: 0
-            boundsBehavior: Flickable.StopAtBounds
-
-            delegate: Rectangle {
-                id: row
-
-                required property int index
-                required property int activityId
-                required property int projectId
-                required property string projectName
-                required property string activityName
-                required property string activityColor
-                required property bool isGlobal
-
-                readonly property bool highlighted: suggestionList.currentIndex === row.index || rowHover.hovered
-                readonly property bool current: row.projectId === root.projectId && row.activityId === root.activityId
-
-                width: suggestionList.width
-                height: 32
-                radius: Theme.radiusSmall
-                color: row.highlighted ? Theme.colorSurface : "transparent"
-
-                HoverHandler {
-                    id: rowHover
-                    cursorShape: Qt.PointingHandCursor
+            CreateOffer {
+                id: createOffer
+                visible: root._offering
+                anchors.left: parent.left
+                anchors.right: parent.right
+                query: searchInput.text
+                onCreateRequested: (kind, name) => {
+                    root.closeSearch()
+                    root.createRequested(kind, name)
                 }
+                onVisibleChanged: if (visible)
+                    createOffer.highlight = 0
+            }
 
-                TapHandler {
+            ListView {
+                id: suggestionList
+                visible: !root._offering
+                anchors.fill: parent
 
-                    gesturePolicy: TapHandler.ReleaseWithinBounds
-                    onTapped: root._pick(row)
+                WheelScroller {
+                    flickable: suggestionList
                 }
+                clip: true
+                model: filterProxy
+                implicitHeight: Math.min(contentHeight, 7 * 32)
+                highlightMoveDuration: 0
+                boundsBehavior: Flickable.StopAtBounds
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-                    anchors.rightMargin: 10
-                    spacing: 8
+                delegate: Rectangle {
+                    id: row
 
-                    Rectangle {
-                        Layout.preferredWidth: 8
-                        Layout.preferredHeight: 8
-                        radius: 2
-                        color: row.activityColor
+                    required property int index
+                    required property int activityId
+                    required property int projectId
+                    required property string projectName
+                    required property string activityName
+                    required property string activityColor
+                    required property bool isGlobal
+
+                    readonly property bool highlighted: suggestionList.currentIndex === row.index || rowHover.hovered
+                    readonly property bool current: row.projectId === root.projectId && row.activityId === root.activityId
+
+                    width: suggestionList.width
+                    height: 32
+                    radius: Theme.radiusSmall
+                    color: row.highlighted ? Theme.colorSurface : "transparent"
+
+                    HoverHandler {
+                        id: rowHover
+                        cursorShape: Qt.PointingHandCursor
                     }
 
-                    Text {
-                        text: root._highlight(row.projectName, searchInput.text)
-                        textFormat: Text.StyledText
-                        color: Theme.colorTextPrimary
-                        font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                    TapHandler {
+
+                        gesturePolicy: TapHandler.ReleaseWithinBounds
+                        onTapped: root._pick(row)
                     }
 
-                    Text {
-                        text: "—"
-                        color: Theme.colorTextDim
-                        font.pixelSize: Theme.fontSizeMedium
-                    }
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 8
 
-                    Text {
-                        Layout.fillWidth: true
-                        text: root._highlight(row.activityName, searchInput.text)
-                        textFormat: Text.StyledText
-                        color: Theme.colorTextSecondary
-                        font.pixelSize: Theme.fontSizeMedium
-                        elide: Text.ElideRight
-                    }
-
-                    Rectangle {
-                        visible: row.isGlobal
-                        Layout.preferredWidth: globalText.implicitWidth + 10
-                        Layout.preferredHeight: globalText.implicitHeight + 2
-                        radius: 3
-                        color: "transparent"
-                        border.width: 1
-                        border.color: Theme.colorBorderSubtle
+                        Rectangle {
+                            Layout.preferredWidth: 8
+                            Layout.preferredHeight: 8
+                            radius: 2
+                            color: row.activityColor
+                        }
 
                         Text {
-                            id: globalText
-                            anchors.centerIn: parent
-                            text: "global"
-                            color: Theme.colorTextSecondary
-                            font.pixelSize: Theme.fontSizeTiny
+                            text: root._highlight(row.projectName, searchInput.text)
+                            textFormat: Text.StyledText
+                            color: Theme.colorTextPrimary
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: Font.Medium
                         }
-                    }
 
-                    Icon {
-                        visible: row.current
-                        name: "check"
-                        size: 13
-                        color: Theme.colorAccentGreen
+                        Text {
+                            text: "—"
+                            color: Theme.colorTextDim
+                            font.pixelSize: Theme.fontSizeMedium
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: root._highlight(row.activityName, searchInput.text)
+                            textFormat: Text.StyledText
+                            color: Theme.colorTextSecondary
+                            font.pixelSize: Theme.fontSizeMedium
+                            elide: Text.ElideRight
+                        }
+
+                        Rectangle {
+                            visible: row.isGlobal
+                            Layout.preferredWidth: globalText.implicitWidth + 10
+                            Layout.preferredHeight: globalText.implicitHeight + 2
+                            radius: 3
+                            color: "transparent"
+                            border.width: 1
+                            border.color: Theme.colorBorderSubtle
+
+                            Text {
+                                id: globalText
+                                anchors.centerIn: parent
+                                text: "global"
+                                color: Theme.colorTextSecondary
+                                font.pixelSize: Theme.fontSizeTiny
+                            }
+                        }
+
+                        Icon {
+                            visible: row.current
+                            name: "check"
+                            size: 13
+                            color: Theme.colorAccentGreen
+                        }
                     }
                 }
             }
-        }
         }
     }
 }

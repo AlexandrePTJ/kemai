@@ -22,12 +22,16 @@ Item {
         timeList.positionViewAtIndex(timeList.currentIndex, ListView.Center)
     }
 
-    function _pad2(n) { return n < 10 ? "0" + n : "" + n }
+    function _pad2(n) {
+        return n < 10 ? "0" + n : "" + n
+    }
     function _formatTime(h, mi) {
-        if (is24h) return _pad2(h) + ":" + _pad2(mi)
+        if (is24h)
+            return _pad2(h) + ":" + _pad2(mi)
         const period = h >= 12 ? "PM" : "AM"
         let h12 = h % 12
-        if (h12 === 0) h12 = 12
+        if (h12 === 0)
+            h12 = 12
         return h12 + ":" + _pad2(mi) + " " + period
     }
 
@@ -47,7 +51,9 @@ Item {
                 font.bold: true
             }
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             Rectangle {
                 implicitWidth: 80
@@ -130,15 +136,13 @@ Item {
 
                     readonly property int rowHour: Math.floor(timeRow.index / 60)
                     readonly property int rowMinute: timeRow.index % 60
-                    readonly property bool isSelected: timeRow.rowHour === root.selectedHour
-                                                    && timeRow.rowMinute === root.selectedMinute
+                    readonly property bool isSelected: timeRow.rowHour === root.selectedHour && timeRow.rowMinute === root.selectedMinute
 
                     Rectangle {
                         anchors.fill: parent
                         anchors.leftMargin: 6
                         anchors.rightMargin: 6
-                        color: timeRow.isSelected ? Theme.colorAccentGreen
-                            : (timeHover.hovered ? Theme.colorSurface : "transparent")
+                        color: timeRow.isSelected ? Theme.colorAccentGreen : (timeHover.hovered ? Theme.colorSurface : "transparent")
                         radius: Theme.radiusSmall
 
                         Text {

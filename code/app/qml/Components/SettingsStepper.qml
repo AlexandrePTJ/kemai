@@ -34,29 +34,6 @@ Rectangle {
         anchors.fill: parent
         spacing: 0
 
-        component StepButton: AbstractButton {
-            id: stepButton
-            required property string iconName
-            Layout.preferredWidth: 28
-            Layout.fillHeight: true
-            focusPolicy: Qt.NoFocus
-            autoRepeat: true
-
-            HoverHandler {
-                cursorShape: Qt.PointingHandCursor
-            }
-
-            contentItem: Item {
-                Icon {
-                    anchors.centerIn: parent
-                    name: stepButton.iconName
-                    size: 12
-                    color: stepButton.hovered ? Theme.colorTextPrimary : Theme.colorTextSecondary
-                }
-            }
-            background: Item {}
-        }
-
         StepButton {
             iconName: "minus"
             onClicked: root._set(root.value - 1)
@@ -92,5 +69,28 @@ Rectangle {
             iconName: "plus"
             onClicked: root._set(root.value + 1)
         }
+    }
+
+    component StepButton: AbstractButton {
+        id: stepButton
+        required property string iconName
+        Layout.preferredWidth: 28
+        Layout.fillHeight: true
+        focusPolicy: Qt.NoFocus
+        autoRepeat: true
+
+        HoverHandler {
+            cursorShape: Qt.PointingHandCursor
+        }
+
+        contentItem: Item {
+            Icon {
+                anchors.centerIn: parent
+                name: stepButton.iconName
+                size: 12
+                color: stepButton.hovered ? Theme.colorTextPrimary : Theme.colorTextSecondary
+            }
+        }
+        background: Item {}
     }
 }

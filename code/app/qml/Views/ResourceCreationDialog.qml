@@ -8,7 +8,6 @@ import QtQuick.Layouts
 
 import Kemai
 
-
 // Creates the activity or project the user searched for (and its customer when needed), then hands the new
 // project — activity pair back to the picker the search came from. Steps run one after the other with the id
 // of the previous one; after a partial failure, Retry runs only the remaining steps.
@@ -88,14 +87,38 @@ Popup {
     }
 
     function _loadChoices() {
-        root._projects = root.sessionContext.projectChoices().map(p => ({ key: p.id, label: p.name, meta: p.customerName, color: p.color }))
-        root._customers = root.sessionContext.customerChoices().map(c => ({ key: c.id, label: c.name,
-                                                                             meta: c.projectCount === 1 ? "1 project" : c.projectCount + " projects" }))
-        root._globals = root.sessionContext.globalActivityChoices().map(a => ({ key: a.id, label: a.name, color: a.color, meta: "global" }))
+        root._projects = root.sessionContext.projectChoices().map(p => ({
+                    key: p.id,
+                    label: p.name,
+                    meta: p.customerName,
+                    color: p.color
+                }))
+        root._customers = root.sessionContext.customerChoices().map(c => ({
+                    key: c.id,
+                    label: c.name,
+                    meta: c.projectCount === 1 ? "1 project" : c.projectCount + " projects"
+                }))
+        root._globals = root.sessionContext.globalActivityChoices().map(a => ({
+                    key: a.id,
+                    label: a.name,
+                    color: a.color,
+                    meta: "global"
+                }))
         if (root._countries.length === 0) {
-            root._countries = reference.countries().map(c => ({ key: c.code, label: c.name, code: c.code }))
-            root._currencies = reference.currencies().map(c => ({ key: c.code, label: c.name, meta: c.code }))
-            root._timezones = reference.timezones().map(t => ({ key: t, label: t }))
+            root._countries = reference.countries().map(c => ({
+                        key: c.code,
+                        label: c.name,
+                        code: c.code
+                    }))
+            root._currencies = reference.currencies().map(c => ({
+                        key: c.code,
+                        label: c.name,
+                        meta: c.code
+                    }))
+            root._timezones = reference.timezones().map(t => ({
+                        key: t,
+                        label: t
+                    }))
         }
     }
 
@@ -173,7 +196,12 @@ Popup {
     readonly property var _preview: {
         if (root._form === "activity") {
             const project = root._item(root._projects, root._activityProjectId)
-            return project ? { project: project.label, activity: activityNameField.text.trim(), color: project.color, global: root._activityGlobal } : null
+            return project ? {
+                project: project.label,
+                activity: activityNameField.text.trim(),
+                color: project.color,
+                global: root._activityGlobal
+            } : null
         }
         const globalActivity = root._item(root._globals, root._globalActivityId)
         return {
@@ -206,17 +234,38 @@ Popup {
         // First run: check names against what Kimai already has (it accepts duplicates)
         if (root._steps.length === 0 && !root._checkExisting())
             return
-
         if (root._steps.length === 0) {
             if (root._form === "activity") {
-                root._steps = [{ kind: "activity", label: "Activity", status: "todo", id: 0 }]
+                root._steps = [
+                    {
+                        kind: "activity",
+                        label: "Activity",
+                        status: "todo",
+                        id: 0
+                    }
+                ]
             } else {
                 const steps = []
                 if (root._newCustomer)
-                    steps.push({ kind: "customer", label: "Customer", status: "todo", id: 0 })
-                steps.push({ kind: "project", label: "Project", status: "todo", id: 0 })
+                    steps.push({
+                        kind: "customer",
+                        label: "Customer",
+                        status: "todo",
+                        id: 0
+                    })
+                steps.push({
+                    kind: "project",
+                    label: "Project",
+                    status: "todo",
+                    id: 0
+                })
                 if (root._activityMode === 1)
-                    steps.push({ kind: "activity", label: "Activity", status: "todo", id: 0 })
+                    steps.push({
+                        kind: "activity",
+                        label: "Activity",
+                        status: "todo",
+                        id: 0
+                    })
                 root._steps = steps
             }
         }
@@ -274,7 +323,12 @@ Popup {
     }
 
     function _setStep(kind, status, id) {
-        root._steps = root._steps.map(s => s.kind === kind ? { kind: s.kind, label: s.label, status: status, id: id !== undefined ? id : s.id } : s)
+        root._steps = root._steps.map(s => s.kind === kind ? {
+                kind: s.kind,
+                label: s.label,
+                status: status,
+                id: id !== undefined ? id : s.id
+            } : s)
     }
 
     function _runNextStep() {
@@ -314,8 +368,13 @@ Popup {
             activityName = root._activityMode === 1 ? newActivityField.text.trim() : globalActivity.label
             detail = "project|" + projectName + "|"
         }
-        root._pendingPair = { projectId: projectId, activityId: activityId, projectName: projectName, activityName: activityName,
-                              detail: detail }
+        root._pendingPair = {
+            projectId: projectId,
+            activityId: activityId,
+            projectName: projectName,
+            activityName: activityName,
+            detail: detail
+        }
         root._phase = "finishing"
         // Make the new items searchable, then hand the pair over (as the reloaded cache shows it)
         root.sessionContext.reloadResources()
@@ -332,8 +391,13 @@ Popup {
     function _choosePair(projectId, activityId, projectName, activityName) {
         const cached = root.sessionContext.pair(projectId, activityId)
         root.pairChosen(cached.projectId !== undefined ? cached : {
-            projectId: projectId, activityId: activityId, projectName: projectName, activityName: activityName,
-            activityColor: Theme.colorAccentGreen, label: projectName + " - " + activityName, isGlobal: false
+            projectId: projectId,
+            activityId: activityId,
+            projectName: projectName,
+            activityName: activityName,
+            activityColor: Theme.colorAccentGreen,
+            label: projectName + " - " + activityName,
+            isGlobal: false
         })
         root._phase = "idle"
         root.close()
@@ -342,7 +406,12 @@ Popup {
     function _onFailed(resourceKind, errorKind, detail, field) {
         const kind = resourceKind === SessionController.Customer ? "customer" : resourceKind === SessionController.Project ? "project" : "activity"
         root._setStep(kind, "fail")
-        root._error = { resource: kind, kind: errorKind, detail: detail, field: field }
+        root._error = {
+            resource: kind,
+            kind: errorKind,
+            detail: detail,
+            field: field
+        }
         root._phase = "error"
     }
 
@@ -351,32 +420,52 @@ Popup {
         if (root._error === null)
             return null
         const e = root._error
-        const plural = { customer: "customers", project: "projects", activity: "activities" }[e.resource]
+        const plural = {
+            customer: "customers",
+            project: "projects",
+            activity: "activities"
+        }[e.resource]
         const done = root._steps.filter(s => s.status === "done")
         if (done.length > 0) {
             const created = done.map(s => s.label).join(", ")
             const remaining = root._steps.filter(s => s.status !== "done").map(s => s.label.toLowerCase()).join(" and ")
-            return { icon: e.kind === SessionController.NoNetwork ? "wifi-off" : "circle-alert",
-                     title: created + " created, " + e.resource + " not created",
-                     detail: (e.kind === SessionController.InvalidValue && e.detail !== "" ? e.detail + " " : "")
-                             + "What was created stays in Kimai — Retry creates only the " + remaining + "." }
+            return {
+                icon: e.kind === SessionController.NoNetwork ? "wifi-off" : "circle-alert",
+                title: created + " created, " + e.resource + " not created",
+                detail: (e.kind === SessionController.InvalidValue && e.detail !== "" ? e.detail + " " : "") + "What was created stays in Kimai — Retry creates only the " + remaining + "."
+            }
         }
         switch (e.kind) {
         case SessionController.Forbidden:
-            return { icon: "lock", title: "Kimai refused — you can't create " + plural,
-                     detail: "Your account lacks this permission. Pick an existing " + e.resource + " or ask a Kimai admin." }
+            return {
+                icon: "lock",
+                title: "Kimai refused — you can't create " + plural,
+                detail: "Your account lacks this permission. Pick an existing " + e.resource + " or ask a Kimai admin."
+            }
         case SessionController.InvalidValue:
-            return { icon: "circle-alert", title: "Kimai refused — invalid value",
-                     detail: (e.field !== "" ? e.field.charAt(0).toUpperCase() + e.field.slice(1) + ": " : "") + e.detail }
+            return {
+                icon: "circle-alert",
+                title: "Kimai refused — invalid value",
+                detail: (e.field !== "" ? e.field.charAt(0).toUpperCase() + e.field.slice(1) + ": " : "") + e.detail
+            }
         case SessionController.NoNetwork:
-            return { icon: "wifi-off", title: "Couldn't create — no connection",
-                     detail: "Nothing was created. Your values are kept; check the network and retry." }
+            return {
+                icon: "wifi-off",
+                title: "Couldn't create — no connection",
+                detail: "Nothing was created. Your values are kept; check the network and retry."
+            }
         case SessionController.ServerError:
-            return { icon: "circle-alert", title: "Couldn't create — server error",
-                     detail: "Kimai returned an error. Your values are kept; retry in a moment." }
+            return {
+                icon: "circle-alert",
+                title: "Couldn't create — server error",
+                detail: "Kimai returned an error. Your values are kept; retry in a moment."
+            }
         default:
-            return { icon: "circle-alert", title: "Couldn't create — unexpected error",
-                     detail: e.detail !== "" ? e.detail : "Your values are kept; retry in a moment." }
+            return {
+                icon: "circle-alert",
+                title: "Couldn't create — unexpected error",
+                detail: e.detail !== "" ? e.detail : "Your values are kept; retry in a moment."
+            }
         }
     }
 
@@ -617,7 +706,7 @@ Popup {
                         Layout.fillWidth: true
                         options: ["One project", "Global — any project"]
                         currentIndex: root._activityGlobal ? 1 : 0
-                        onActivated: (index) => {
+                        onActivated: index => {
                             root._activityGlobal = index === 1
                             root._activityNameError = ""
                         }
@@ -637,11 +726,11 @@ Popup {
                         placeholder: "Choose a project"
                         createLabel: "New project… <font color=\"" + Theme.colorTextSecondary + "\">(opens project form)</font>"
                         createAlways: true
-                        onSelected: (item) => {
+                        onSelected: item => {
                             root._activityProjectId = item.key
                             root._activityNameError = ""
                         }
-                        onCreateRequested: (query) => {
+                        onCreateRequested: query => {
                             if (query !== "")
                                 projectNameField.text = query
                             root._switchToProjectForm()
@@ -681,11 +770,11 @@ Popup {
                         placeholder: "Choose a customer"
                         createLabel: "New customer {query}"
                         createOnlyWithoutMatch: true
-                        onSelected: (item) => {
+                        onSelected: item => {
                             root._customerId = item.key
                             root._projectNameError = ""
                         }
-                        onCreateRequested: (query) => {
+                        onCreateRequested: query => {
                             customerNameField.text = query
                             root._newCustomer = true
                             root._projectNameError = ""
@@ -797,7 +886,7 @@ Popup {
                                     currentKey: root._country
                                     placeholder: "Choose"
                                     hasError: root._error !== null && root._error.field === "country"
-                                    onSelected: (item) => root._country = item.key
+                                    onSelected: item => root._country = item.key
                                 }
                             }
 
@@ -813,7 +902,7 @@ Popup {
                                     currentKey: root._currency
                                     placeholder: "Choose"
                                     hasError: root._error !== null && root._error.field === "currency"
-                                    onSelected: (item) => root._currency = item.key
+                                    onSelected: item => root._currency = item.key
                                 }
                             }
 
@@ -829,7 +918,7 @@ Popup {
                                     currentKey: root._timezone
                                     placeholder: "Choose"
                                     hasError: root._error !== null && root._error.field === "timezone"
-                                    onSelected: (item) => root._timezone = item.key
+                                    onSelected: item => root._timezone = item.key
                                 }
                             }
                         }
@@ -850,7 +939,7 @@ Popup {
                             Layout.preferredWidth: 1
                             options: ["Global activity", "New activity"]
                             currentIndex: root._activityMode
-                            onActivated: (index) => root._activityMode = index
+                            onActivated: index => root._activityMode = index
                         }
 
                         SearchSelect {
@@ -860,7 +949,7 @@ Popup {
                             items: root._globals
                             currentKey: root._globalActivityId
                             placeholder: root._globals.length > 0 ? "Choose an activity" : "No global activity"
-                            onSelected: (item) => root._globalActivityId = item.key
+                            onSelected: item => root._globalActivityId = item.key
                         }
 
                         FormTextField {
@@ -1023,8 +1112,7 @@ Popup {
 
                         Text {
                             text: stepItem.modelData.label
-                            color: stepItem.modelData.status === "fail" ? Theme.colorAccentRed
-                                   : stepItem.modelData.status === "done" ? Theme.colorTextPrimary : Theme.colorTextSecondary
+                            color: stepItem.modelData.status === "fail" ? Theme.colorAccentRed : stepItem.modelData.status === "done" ? Theme.colorTextPrimary : Theme.colorTextSecondary
                             font.pixelSize: Theme.fontSizeSmall
                         }
                     }
@@ -1044,9 +1132,7 @@ Popup {
             DialogButton {
                 Layout.minimumWidth: 120
                 variant: "primary"
-                text: root._busy && root._spinnerShown ? "Creating…"
-                      : root._phase === "error" ? "Retry"
-                      : root._form === "activity" ? "Create activity" : "Create & select"
+                text: root._busy && root._spinnerShown ? "Creating…" : root._phase === "error" ? "Retry" : root._form === "activity" ? "Create activity" : "Create & select"
                 busy: root._busy
                 spinning: root._spinnerShown
                 enabled: root._valid || root._busy
