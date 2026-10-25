@@ -12,6 +12,7 @@ Item {
     id: root
 
     required property SessionContext sessionContext
+    required property UpdateNotifier updates
 
     // The user chose to log out (and confirmed it if a timer runs)
     property bool settingsAvailable: false
@@ -92,6 +93,7 @@ Item {
                 host: root.sessionContext.host
                 timerRunning: root.sessionContext.hasActiveTimesheet
                 settingsAvailable: root.settingsAvailable
+                updates: root.updates
                 onSettingsRequested: root.settingsRequested()
                 onLogJournalRequested: root.logJournalRequested()
                 onLogoutRequested: root.sessionContext.hasActiveTimesheet ? logoutConfirm.open() : root.logoutRequested()

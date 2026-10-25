@@ -8,7 +8,7 @@ import QtQuick.Layouts
 
 import Kemai
 
-// Account chip opening a menu: Settings…, Log journal…, then Log out (always last)
+// Account chip opening a menu: Settings…, Log journal…, Check for updates, then Log out (always last)
 AbstractButton {
     id: root
 
@@ -16,6 +16,8 @@ AbstractButton {
     property string host: ""
     property bool timerRunning: false
     property bool settingsAvailable: false
+    // Null: no update entry
+    property UpdateNotifier updates: null
 
     signal logoutRequested
     signal settingsRequested
@@ -29,6 +31,22 @@ AbstractButton {
         if (words.length === 1)
             return words[0].slice(0, 2).toUpperCase()
         return words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase()
+    }
+
+    // "Last checked today at 08:42"
+    function lastCheckedText(when) {
+        if (!when || isNaN(when.getTime()))
+            return "Never checked"
+        const day = new Date(when.getFullYear(), when.getMonth(), when.getDate())
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const days = Math.round((today - day) / 86400000)
+        const time = Qt.formatTime(when, "HH:mm")
+        if (days === 0)
+            return "Last checked today at " + time
+        if (days === 1)
+            return "Last checked yesterday at " + time
+        return "Last checked on " + Qt.formatDate(when, "d MMM")
     }
 
     function displayHost(url) {
@@ -172,94 +190,37 @@ AbstractButton {
                 color: Theme.colorDivider
             }
 
-            AbstractButton {
+            MenuEntry {
                 id: settingsItem
                 objectName: "settingsMenuItem"
-
                 visible: root.settingsAvailable
-                Layout.fillWidth: true
-                padding: 10
-                topPadding: 8
-                bottomPadding: 8
-                focusPolicy: Qt.StrongFocus
-
+                iconName: "settings"
+                text: "Settings…"
                 onClicked: {
                     menu.close()
                     root.settingsRequested()
                 }
-
-                Keys.onReturnPressed: settingsItem.clicked()
-                Keys.onEnterPressed: settingsItem.clicked()
-
-                HoverHandler {
-                    cursorShape: Qt.PointingHandCursor
-                }
-
-                background: Rectangle {
-                    radius: Theme.radiusSmall
-                    color: settingsItem.hovered || settingsItem.activeFocus ? Theme.colorSurface : "transparent"
-                }
-
-                contentItem: RowLayout {
-                    spacing: 10
-
-                    Icon {
-                        name: "settings"
-                        size: 15
-                        color: settingsItem.hovered || settingsItem.activeFocus ? Theme.colorTextPrimary : Theme.colorTextSecondary
-                    }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: "Settings…"
-                        color: Theme.colorTextPrimary
-                        font.pixelSize: Theme.fontSizeMedium
-                    }
-                }
             }
 
-            AbstractButton {
-                id: logJournalItem
+            MenuEntry {
                 objectName: "logJournalMenuItem"
-
-                Layout.fillWidth: true
-                padding: 10
-                topPadding: 8
-                bottomPadding: 8
-                focusPolicy: Qt.StrongFocus
-
+                iconName: "list"
+                text: "Log journal…"
                 onClicked: {
                     menu.close()
                     root.logJournalRequested()
                 }
+            }
 
-                Keys.onReturnPressed: logJournalItem.clicked()
-                Keys.onEnterPressed: logJournalItem.clicked()
-
-                HoverHandler {
-                    cursorShape: Qt.PointingHandCursor
-                }
-
-                background: Rectangle {
-                    radius: Theme.radiusSmall
-                    color: logJournalItem.hovered || logJournalItem.activeFocus ? Theme.colorSurface : "transparent"
-                }
-
-                contentItem: RowLayout {
-                    spacing: 10
-
-                    Icon {
-                        name: "list"
-                        size: 15
-                        color: logJournalItem.hovered || logJournalItem.activeFocus ? Theme.colorTextPrimary : Theme.colorTextSecondary
-                    }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: "Log journal…"
-                        color: Theme.colorTextPrimary
-                        font.pixelSize: Theme.fontSizeMedium
-                    }
+            MenuEntry {
+                objectName: "checkUpdatesMenuItem"
+                visible: root.updates !== null && root.updates.enabled && !root.updates.devBuild
+                iconName: "refresh-cw"
+                text: "Check for updates"
+                detail: root.updates !== null && root.updates.preferences ? root.lastCheckedText(root.updates.preferences.lastUpdateCheck) : ""
+                onClicked: {
+                    menu.close()
+                    root.updates.checkNow(UpdateNotifier.Menu)
                 }
             }
 
@@ -273,72 +234,17 @@ AbstractButton {
                 color: Theme.colorDivider
             }
 
-            AbstractButton {
+            MenuEntry {
                 id: logoutItem
                 objectName: "logoutMenuItem"
-
-                Layout.fillWidth: true
-                padding: 10
-                topPadding: 8
-                bottomPadding: 8
-                focusPolicy: Qt.StrongFocus
-
+                iconName: "log-out"
+                text: "Log out"
+                detail: root.timerRunning ? "Your timer keeps running on Kimai" : "Auto-login will be turned off"
+                detailColor: root.timerRunning ? Theme.colorAccentGreen : Theme.colorTextSecondary
+                detailDot: root.timerRunning
                 onClicked: {
                     menu.close()
                     root.logoutRequested()
-                }
-
-                Keys.onReturnPressed: logoutItem.clicked()
-                Keys.onEnterPressed: logoutItem.clicked()
-
-                HoverHandler {
-                    cursorShape: Qt.PointingHandCursor
-                }
-
-                background: Rectangle {
-                    radius: Theme.radiusSmall
-                    color: logoutItem.hovered || logoutItem.activeFocus ? Theme.colorSurface : "transparent"
-                }
-
-                contentItem: RowLayout {
-                    spacing: 10
-
-                    Icon {
-                        Layout.alignment: Qt.AlignTop
-                        Layout.topMargin: 1
-                        name: "log-out"
-                        size: 15
-                        color: logoutItem.hovered || logoutItem.activeFocus ? Theme.colorTextPrimary : Theme.colorTextSecondary
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 2
-
-                        Text {
-                            text: "Log out"
-                            color: Theme.colorTextPrimary
-                            font.pixelSize: Theme.fontSizeMedium
-                        }
-
-                        RowLayout {
-                            spacing: 5
-
-                            Rectangle {
-                                visible: root.timerRunning
-                                Layout.preferredWidth: 6
-                                Layout.preferredHeight: 6
-                                radius: 3
-                                color: Theme.colorAccentGreen
-                            }
-
-                            Text {
-                                text: root.timerRunning ? "Your timer keeps running on Kimai" : "Auto-login will be turned off"
-                                color: root.timerRunning ? Theme.colorAccentGreen : Theme.colorTextSecondary
-                                font.pixelSize: Theme.fontSizeXSmall
-                            }
-                        }
-                    }
                 }
             }
         }

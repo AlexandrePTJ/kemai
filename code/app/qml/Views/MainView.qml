@@ -12,6 +12,7 @@ Page {
     required property SessionContext sessionContext
     required property AppPreferences preferences
     required property PresenceMonitor presence
+    required property UpdateNotifier updates
 
     // At least one settings section exists: the account menu offers the settings
     property bool settingsAvailable: false
@@ -96,10 +97,17 @@ Page {
             color: Theme.colorBorder
         }
 
+        // A newer Kemai, or the result of a check started from the account menu
+        UpdateStrip {
+            Layout.fillWidth: true
+            notifier: root.updates
+        }
+
         TimesheetHistoryView {
             Layout.fillWidth: true
             Layout.fillHeight: true
             sessionContext: root.sessionContext
+            updates: root.updates
             settingsAvailable: root.settingsAvailable
             onLogoutRequested: root.logoutRequested()
             onSettingsRequested: root.settingsRequested()

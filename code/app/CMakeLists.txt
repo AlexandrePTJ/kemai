@@ -15,6 +15,7 @@ set(KEMAI_QML_FILES
         qml/Components/FormTextField.qml
         qml/Components/Icon.qml
         qml/Components/KemaiTextField.qml
+        qml/Components/MenuEntry.qml
         qml/Components/LucideIcons.js
         qml/Components/NotificationBanner.qml
         qml/Components/PrimaryEditButton.qml
@@ -39,6 +40,7 @@ set(KEMAI_QML_FILES
         qml/Components/TimeEntryDelegate.qml
         qml/Components/TimeWheel.qml
         qml/Components/TimerBar.qml
+        qml/Components/UpdateStrip.qml
         qml/Components/ViewSwitch.qml
         qml/Views/CertificatePrompt.qml
         qml/Views/DateTimeEditDialog.qml
@@ -66,6 +68,8 @@ set(KEMAI_QML_SOURCES
         context/referenceData.h
         context/sessionContext.cpp
         context/sessionContext.h
+        context/updateNotifier.cpp
+        context/updateNotifier.h
         context/profileManager.cpp
         context/profileManager.h
         helpers/qmlFormatHelpers.cpp

@@ -15,7 +15,8 @@ Popup {
 
     required property KemaiContext kemaiContext
     required property PresenceMonitor presence
-    property list<SettingsSection> sections: [inactivitySection, certificatesSection]
+    required property UpdateNotifier updates
+    property list<SettingsSection> sections: root.updates.enabled ? [inactivitySection, updatesSection, certificatesSection] : [inactivitySection, certificatesSection]
 
     // Trusted certificate asking for removal confirmation ("" if none)
     property string _confirmRemoveHost: ""
@@ -284,6 +285,252 @@ Popup {
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    SettingsSection {
+        id: updatesSection
+        key: "updates"
+        title: "Updates"
+        description: "Kemai " + root.updates.currentVersion + (root.updates.channel === "alpha" ? " alpha" : "")
+        icon: "download"
+        content: Component {
+            ColumnLayout {
+                id: updateRows
+
+                readonly property AppPreferences preferences: root.kemaiContext.preferences
+                // A result of "Check now" (results of the menus show in the update strip)
+                readonly property int result: root.updates.source === UpdateNotifier.Settings ? root.updates.status : UpdateNotifier.Idle
+                readonly property string reason: {
+                    switch (root.updates.failure) {
+                    case UpdateNotifier.NoNetwork:
+                        return "No connection to the update server. Try again later."
+                    case UpdateNotifier.ServerError:
+                        return "GitHub didn't answer (server error). Try again later."
+                    }
+                    return "GitHub sent an unexpected response. Try again later."
+                }
+
+                spacing: 0
+
+                SettingsRow {
+                    Layout.fillWidth: true
+                    title: "Check for a new version at start"
+                    description: "Kemai asks GitHub once when it starts. Nothing is installed without you."
+                    unavailableReason: root.updates.devBuild ? "Development build — update checks are off." : ""
+                    control: SettingsToggle {
+                        objectName: "checkUpdatesAtStartToggle"
+                        checked: updateRows.preferences.checkUpdatesAtStart && !root.updates.devBuild
+                        onToggled: updateRows.preferences.checkUpdatesAtStart = checked
+                    }
+                }
+
+                SettingsRow {
+                    Layout.fillWidth: true
+                    last: updateRows.preferences.ignoredVersion === ""
+                    title: "Check now"
+                    description: "Looks for a newer release of the " + (root.updates.channel === "stable" ? "stable" : "alpha") + " channel on GitHub."
+                    control: DialogButton {
+                        objectName: "checkNowButton"
+                        implicitHeight: 28
+                        iconName: "refresh-cw"
+                        text: "Check now"
+                        enabled: updateRows.result !== UpdateNotifier.Checking
+                        onClicked: root.updates.checkNow(UpdateNotifier.Settings)
+                    }
+
+                    // Checking
+                    RowLayout {
+                        visible: updateRows.result === UpdateNotifier.Checking
+                        Layout.topMargin: 10
+                        spacing: 8
+
+                        Spinner {
+                            id: checkSpinner
+                            visible: false
+                            size: 12
+                            color: Theme.colorAccentGreen
+                            trackColor: Theme.colorBorderSubtle
+
+                            // Only for checks that take a while
+                            Timer {
+                                running: updateRows.result === UpdateNotifier.Checking
+                                interval: 150
+                                onRunningChanged: if (!running)
+                                    checkSpinner.visible = false
+                                onTriggered: checkSpinner.visible = true
+                            }
+                        }
+
+                        Text {
+                            text: "Checking for updates…"
+                            color: Theme.colorTextSecondary
+                            font.pixelSize: Theme.fontSizeSmall
+                        }
+                    }
+
+                    // Up to date
+                    RowLayout {
+                        visible: updateRows.result === UpdateNotifier.UpToDate
+                        Layout.topMargin: 10
+                        spacing: 8
+
+                        Icon {
+                            name: "check"
+                            size: 14
+                            color: Theme.colorAccentGreen
+                        }
+
+                        Text {
+                            text: "<b>Kemai is up to date.</b> Checked just now."
+                            color: Theme.colorTextSecondary
+                            font.pixelSize: Theme.fontSizeSmall
+                        }
+                    }
+
+                    // New version
+                    Rectangle {
+                        visible: updateRows.result === UpdateNotifier.Available
+                        Layout.topMargin: 10
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: availableRow.implicitHeight + 20
+                        radius: Theme.radiusMedium
+                        color: Theme.colorAccentGreenSoft
+                        border.width: 1
+                        border.color: Theme.colorAccentGreenDim
+
+                        ColumnLayout {
+                            id: availableRow
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            anchors.leftMargin: 12
+                            anchors.rightMargin: 12
+                            spacing: 10
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 10
+
+                                Icon {
+                                    Layout.alignment: Qt.AlignTop
+                                    Layout.topMargin: 2
+                                    name: "download"
+                                    size: 15
+                                    color: Theme.colorAccentGreen
+                                }
+
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 2
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: "Version " + root.updates.latestVersion + (root.updates.latestPrerelease ? " alpha" : "") + " is available"
+                                        color: Theme.colorTextPrimary
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        font.weight: Font.DemiBold
+                                        font.features: Theme.fontFeaturesTabular
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        text: "You have " + root.updates.currentVersion + "."
+                                        color: Theme.colorTextSecondary
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        font.features: Theme.fontFeaturesTabular
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                Layout.alignment: Qt.AlignRight
+                                spacing: 8
+
+                                DialogButton {
+                                    implicitHeight: 28
+                                    variant: "ghost"
+                                    text: "Ignore this version"
+                                    onClicked: {
+                                        updateRows.preferences.ignoredVersion = root.updates.latestVersion
+                                        root.updates.reset()
+                                    }
+                                }
+
+                                DialogButton {
+                                    implicitHeight: 28
+                                    variant: "primary"
+                                    iconName: "external-link"
+                                    text: "See the release"
+                                    onClicked: Qt.openUrlExternally(root.updates.releaseUrl)
+                                }
+                            }
+                        }
+                    }
+
+                    // Failed
+                    Rectangle {
+                        visible: updateRows.result === UpdateNotifier.Failed
+                        Layout.topMargin: 10
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: failedRow.implicitHeight + 20
+                        radius: Theme.radiusMedium
+                        color: Theme.colorAccentRedSoft
+                        border.width: 1
+                        border.color: Theme.colorAccentRedLine
+
+                        RowLayout {
+                            id: failedRow
+                            anchors.fill: parent
+                            anchors.leftMargin: 12
+                            anchors.rightMargin: 12
+                            spacing: 10
+
+                            Icon {
+                                Layout.alignment: Qt.AlignTop
+                                Layout.topMargin: 2
+                                name: root.updates.failure === UpdateNotifier.NoNetwork ? "wifi-off" : "circle-alert"
+                                size: 15
+                                color: Theme.colorAccentRed
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 2
+
+                                Text {
+                                    text: "Couldn't check for updates"
+                                    color: Theme.colorTextPrimary
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Font.DemiBold
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: updateRows.reason
+                                    color: Theme.colorTextSecondary
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    wrapMode: Text.Wrap
+                                }
+                            }
+                        }
+                    }
+                }
+
+                SettingsRow {
+                    visible: updateRows.preferences.ignoredVersion !== ""
+                    Layout.fillWidth: true
+                    last: true
+                    title: "Ignored version"
+                    description: "You chose to skip <b>" + updateRows.preferences.ignoredVersion + "</b>. Kemai won't mention it again."
+                    control: DialogButton {
+                        objectName: "stopIgnoringButton"
+                        implicitHeight: 28
+                        variant: "ghost"
+                        text: "Stop ignoring"
+                        onClicked: updateRows.preferences.ignoredVersion = ""
                     }
                 }
             }

@@ -48,10 +48,19 @@ ApplicationWindow {
         id: presenceMonitor
     }
 
+    // GitHub releases: checked once at start, and on demand
+    UpdateNotifier {
+        id: updateNotifier
+        preferences: appContext.preferences
+    }
+
     SettingsDialog {
         id: settingsDialog
         kemaiContext: appContext
         presence: presenceMonitor
+        updates: updateNotifier
+        // A version found from Settings › Updates stays announced once the dialog is closed
+        onClosed: updateNotifier.showInStrip()
     }
 
     LogJournalDialog {
@@ -64,6 +73,7 @@ ApplicationWindow {
         MainView {
             preferences: appContext.preferences
             presence: presenceMonitor
+            updates: updateNotifier
             settingsAvailable: settingsDialog.hasSections
             onSettingsRequested: settingsDialog.open()
             onLogJournalRequested: logJournalDialog.open()
@@ -78,6 +88,7 @@ ApplicationWindow {
         id: loginViewComponent
         LoginView {
             kemaiContext: appContext
+            updates: updateNotifier
             settingsAvailable: settingsDialog.hasSections
             onSettingsRequested: settingsDialog.open()
             onLogJournalRequested: logJournalDialog.open()
@@ -94,5 +105,6 @@ ApplicationWindow {
     Component.onCompleted: {
         appContext.showWindowWithSavedGeometry(main)
         appContext.initialize()
+        updateNotifier.checkAtStart()
     }
 }

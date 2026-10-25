@@ -13,6 +13,7 @@ Page {
 
     // At least one settings section exists: the settings button shows
     property bool settingsAvailable: false
+    required property UpdateNotifier updates
 
     signal settingsRequested
     signal logJournalRequested
@@ -82,9 +83,19 @@ Page {
         profileManager: profileManager
     }
 
+    // A newer Kemai, or the result of a check started from the menu
+    UpdateStrip {
+        id: updateStrip
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        notifier: root.updates
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Theme.marginsMain
+        anchors.topMargin: Theme.marginsMain + (updateStrip.visible ? updateStrip.height : 0)
         spacing: Theme.spacingLarge
 
         // -- Logo & Title
@@ -118,19 +129,20 @@ Page {
                 Layout.fillWidth: true
             }
 
+            // Help menu: what can be done before any session
             AbstractButton {
-                id: logJournalButton
-                objectName: "loginLogJournalButton"
+                id: moreButton
+                objectName: "loginMoreButton"
 
                 Layout.alignment: Qt.AlignTop
                 Layout.preferredWidth: 28
                 Layout.preferredHeight: 28
                 focusPolicy: Qt.StrongFocus
-                onClicked: root.logJournalRequested()
+                onClicked: loginMenu.opened ? loginMenu.close() : loginMenu.open()
 
-                ToolTip.visible: logJournalButton.hovered
+                ToolTip.visible: moreButton.hovered && !loginMenu.opened
                 ToolTip.delay: 500
-                ToolTip.text: "Log journal"
+                ToolTip.text: "More"
 
                 HoverHandler {
                     cursorShape: Qt.PointingHandCursor
@@ -138,53 +150,76 @@ Page {
 
                 background: Rectangle {
                     radius: Theme.radiusMedium
-                    color: logJournalButton.hovered || logJournalButton.visualFocus ? Theme.colorSurface : "transparent"
+                    color: loginMenu.opened || moreButton.hovered || moreButton.visualFocus ? Theme.colorSurface : "transparent"
                     border.width: 1
-                    border.color: Theme.colorBorderSubtle
+                    border.color: loginMenu.opened ? Theme.colorAccentGreenDim : Theme.colorBorderSubtle
                 }
 
                 contentItem: Item {
                     Icon {
                         anchors.centerIn: parent
-                        name: "list"
+                        name: "ellipsis"
                         size: 15
-                        color: logJournalButton.hovered ? Theme.colorTextPrimary : Theme.colorTextSecondary
+                        color: moreButton.hovered || loginMenu.opened ? Theme.colorTextPrimary : Theme.colorTextSecondary
                     }
                 }
-            }
 
-            AbstractButton {
-                id: settingsButton
-                objectName: "loginSettingsButton"
+                Popup {
+                    id: loginMenu
 
-                visible: root.settingsAvailable
-                Layout.alignment: Qt.AlignTop
-                Layout.preferredWidth: 28
-                Layout.preferredHeight: 28
-                focusPolicy: Qt.StrongFocus
-                onClicked: root.settingsRequested()
+                    y: moreButton.height + 6
+                    x: moreButton.width - loginMenu.width
+                    width: 230
+                    padding: 4
+                    focus: true
+                    // Pressing the button itself toggles the menu
+                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
-                ToolTip.visible: settingsButton.hovered
-                ToolTip.delay: 500
-                ToolTip.text: "Settings"
+                    onOpened: (settingsEntry.visible ? settingsEntry : logJournalEntry).forceActiveFocus()
 
-                HoverHandler {
-                    cursorShape: Qt.PointingHandCursor
-                }
+                    background: Rectangle {
+                        color: Theme.colorBackground
+                        radius: Theme.radiusMedium
+                        border.width: 1
+                        border.color: Theme.colorBorderSubtle
+                    }
 
-                background: Rectangle {
-                    radius: Theme.radiusMedium
-                    color: settingsButton.hovered || settingsButton.visualFocus ? Theme.colorSurface : "transparent"
-                    border.width: 1
-                    border.color: Theme.colorBorderSubtle
-                }
+                    contentItem: ColumnLayout {
+                        spacing: 0
 
-                contentItem: Item {
-                    Icon {
-                        anchors.centerIn: parent
-                        name: "settings"
-                        size: 15
-                        color: settingsButton.hovered ? Theme.colorTextPrimary : Theme.colorTextSecondary
+                        MenuEntry {
+                            id: settingsEntry
+                            objectName: "loginSettingsEntry"
+                            visible: root.settingsAvailable
+                            iconName: "settings"
+                            text: "Settings…"
+                            onClicked: {
+                                loginMenu.close()
+                                root.settingsRequested()
+                            }
+                        }
+
+                        MenuEntry {
+                            id: logJournalEntry
+                            objectName: "loginLogJournalEntry"
+                            iconName: "list"
+                            text: "Log journal…"
+                            onClicked: {
+                                loginMenu.close()
+                                root.logJournalRequested()
+                            }
+                        }
+
+                        MenuEntry {
+                            objectName: "loginCheckUpdatesEntry"
+                            visible: root.updates.enabled && !root.updates.devBuild
+                            iconName: "refresh-cw"
+                            text: "Check for updates"
+                            onClicked: {
+                                loginMenu.close()
+                                root.updates.checkNow(UpdateNotifier.Menu)
+                            }
+                        }
                     }
                 }
             }
