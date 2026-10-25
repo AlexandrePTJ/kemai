@@ -21,12 +21,12 @@ First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is prov
 - Settings dialog; window size and position remembered
 - Trusting a self-signed certificate for one server, after checking its fingerprint; trusted certificates listed in the settings
 - Log files and a log journal (filter, copy for a bug report, open the log folder), without any API token in them
+- Update check at start and on demand: a notice links to the release page of a newer version of your channel (nothing is downloaded); About dialog; open Kimai in the browser
 - Projects and activities cache refreshed on demand and when it gets old; clear messages when the network or the server fails
 - Calendar versions (`YEAR.MONTH.PATCH`), alpha releases from the `develop` branch
 
 ### Not there yet (compared with 0.11.1)
 - System tray
-- Update check, About dialog
 - Translations
 
 Login requires an API token (Kimai 2.14 or later): login with username and API password is no longer supported.
