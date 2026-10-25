@@ -1,0 +1,3 @@
+# Formatting-only commits, skipped by git blame (git config blame.ignoreRevsFile .git-blame-ignore-revs)
+# Format C++ sources with clang-format, without exempted regions
+80b42f489b4c498c91916b2a2dcc7c28e07a52d5

@@ -1,6 +1,6 @@
-# C++ style and architecture
+# C++ and QML style and architecture
 
-This document records the agreed C++ conventions. The root `.clang-format` is
+This document records the agreed C++ and QML conventions. The root `.clang-format` is
 the authority for mechanical formatting. `CONTRIBUTING.md` asks contributors
 to run it before opening a pull request. This document records the project
 conventions for all contributors, rather than relying on local agent
@@ -45,8 +45,9 @@ The agreed style choices are:
   trailing comments.
 - Keep the configured compact forms for short blocks, loops, and lambdas.
 - Keep `Standard: Auto`.
-- Do not add a CI formatting check and do not reformat the whole tree as part
-  of this guide.
+- Do not add a CI formatting check for now. The whole tree was formatted once
+  (commit `80b42f4`, listed in `.git-blame-ignore-revs`); keep it clean by
+  formatting the files you change.
 
 ### Include order
 
@@ -88,40 +89,39 @@ run a formatting check in CI. Contributors should therefore use clang-format
 versions in a patch: newer releases can change formatting even when the
 configuration remains valid.
 
-## Audit findings
+## Formatting state and lambda arguments
 
-This is a working-tree audit, not a clean-branch baseline: there were already
-uncommitted source and QML changes while it was performed. With the current
-configuration and local clang-format 23.1.3, `clang-format --dry-run --Werror`
-reports formatting differences in 46 tracked C++ source/header files. This
-count was measured after enabling include regrouping and includes the locally
-modified tracked files; it is not a clean-branch baseline. The check was
-read-only.
+All tracked C++ sources and headers are formatted with the repository
+configuration and clang-format 23 (commit `80b42f4`). Run
+`git config blame.ignoreRevsFile .git-blame-ignore-revs` so `git blame` skips
+that commit. There are no `clang-format off/on` regions: when the formatter
+renders something badly, change the shape of the code instead.
 
-Representative differences include:
+The one shape that needs care is a call whose last argument is a multi-line
+lambda. With `ColumnLimit: 0`, clang-format keeps such a call on one line and
+glues the lambda's closing brace to its last statement (`…; });`). Put one
+argument per line instead; clang-format keeps that form and indents the body
+properly:
 
-- [appPreferences.cpp](../code/app/context/appPreferences.cpp): constructor
-  initializer spacing differs from the configured form.
-- [appPreferences.h](../code/app/context/appPreferences.h): manually aligned
-  return types differ from the formatter's alignment output.
-- [kemaiContext.cpp](../code/app/context/kemaiContext.cpp): callback chains
-  are exempted with `clang-format off/on`; other files also have local
-  exemptions, for example `secretStorage.cpp` and `kimaiClient_p.h`.
-- Include organization in existing source is inconsistent: some files group
-  STL, Qt, project, and third-party headers in different orders, while others
-  use unlabelled groups. `IncludeBlocks: Regroup` now makes clang-format
-  normalize the groups when a file is formatted.
-- Three headers use quote-style includes, contrary to the agreed header rule:
-  [linuxPresenceBackend.h](../code/app/monitor/linuxPresenceBackend.h),
-  [kimaiClient_p.h](../code/core/client/kimaiClient_p.h) (two includes).
-- Some project-specific guidance currently lives only in the ignored local
-  `CLAUDE.md`. It is not part of the public repository and cannot serve as a
-  contributor-facing source of truth.
+```cpp
+connect(job,
+        &QKeychain::ReadPasswordJob::finished,
+        this,
+        [this, key](QKeychain::Job *j)
+        {
+            ...
+        });
 
-These findings show that the formatter is not being applied consistently.
-They do not by themselves indicate that the conventions encoded in
-`.clang-format` are wrong. A whole-tree formatting pass would produce a large
-diff and should be considered separately from deciding the rules.
+m_client->requestTimeSheets()
+    .then(this,
+          [this](const KimaiTimeSheets &sheets)
+          {
+              ...
+          })
+    .onFailed(this, [this](const KimaiApiError &e) { handleApiError(e, "Failed to fetch recent timesheets"); });
+```
+
+Short lambdas stay on one line. Headers use angle-bracket includes only.
 
 ## Architecture guide
 
@@ -165,11 +165,83 @@ These boundaries describe the intended direction of new code. If an existing
 implementation crosses a boundary, avoid expanding that dependency and
 consider correcting it as a separate change.
 
+## QML style
+
+QML lives in `code/app/qml`: `Main.qml`, the `Theme` singleton, full screens
+and dialogs in `Views/`, reusable pieces in `Components/`. Every file is part
+of the `Kemai` QML module (`qt_add_qml_module`, URI `Kemai`).
+
+### Files and imports
+
+- One component per file, `PascalCase.qml`, starting with the SPDX header as a
+  `//` comment.
+- Import Qt modules first (`QtQuick`, `QtQuick.Controls`, `QtQuick.Layouts`),
+  then `import Kemai`. Never import a folder by relative path
+  (`import "../Components"`): components and C++ types all come from the
+  `Kemai` module.
+- Add `pragma ComponentBehavior: Bound` to every file with delegates or
+  nested `Component`s.
+- Register each new file in `code/app/CMakeLists.txt` (`KEMAI_QML_FILES`).
+
+### Lint-clean bindings
+
+`cmake --build --preset <preset> --target Kemai_qmllint` must report no
+warning; CI fails on any. In practice:
+
+- Qualify member access with an id (`root.isActive`, `menu.close()`), never a
+  bare name or `parent.x` inside `background` / `contentItem`.
+- Delegates declare a `required property` for each role, `index` or
+  `modelData` they use.
+- Inside layouts, size with `Layout.preferredWidth/Height` (and
+  `Layout.fillWidth`), never `width` / `height`.
+- Never give an `id` the name of a property it is assigned to
+  (`KemaiContext { id: kemaiContext }` passed as `kemaiContext: kemaiContext`
+  binds the property to itself).
+- C++ types used as QML property types are fully qualified in `Q_PROPERTY`
+  and signal signatures (`kemai::SessionContext *`) and registered through
+  `QML_FOREIGN` shims when they live in the core library.
+
+### Structure of a component
+
+Order the declarations as: `id`, `required` properties, public properties,
+private properties (prefixed `_`), signals, functions, then property
+assignments and child objects. Keep business rules in C++ controllers and
+models; QML holds presentation state only (open/closed, highlighted row,
+pending spinner…).
+
+### Look and feel
+
+- Colors, font sizes, radii and spacing come from `Theme`; no literal colors
+  in views. Add a token to `Theme.qml` when a design introduces a new one.
+- Icons are Lucide line icons through `Icon { name; size; color }`; add one
+  by appending its path data to `LucideIcons.js`. No emoji, Unicode glyphs or
+  bitmaps as icons.
+- Text uses the application font (Raveo). Times, durations and other
+  numbers use `font.features: Theme.fontFeaturesTabular`; the monospace font
+  is only for hexadecimal values such as certificate fingerprints.
+- Modal dialogs are `Popup`s with explicit size, manual centering,
+  `padding: 0`, a `background` rectangle and a `ColumnLayout` content; do not
+  use the Controls `Dialog` type. Footers use `DialogButton` (`subtle`,
+  `primary`, `danger`, `ghost`); a request in progress sets `busy` at once and
+  `spinning` after about 150 ms.
+- Input uses pointer handlers (`TapHandler`, `HoverHandler`, `DragHandler`)
+  rather than `MouseArea`.
+- Every scrollable list declares a `WheelScroller { flickable: <its id> }`.
+- A `Text` whose layout width follows its `implicitWidth` uses
+  `Math.ceil(implicitWidth)`: a width a fraction of a pixel smaller elides it.
+
+### Errors and user-facing text
+
+Views turn notification kinds and details into words (see "Async work and
+errors"); the core never builds user-facing text. Login failures are worded
+by the login view, background failures by the notification banner, and
+operations started from a dialog by that dialog.
+
 ## Applying the rules
 
 Format changed C++ files with clang-format 23 or newer, using the root
-configuration. Review the resulting diff, especially around existing
-`clang-format off/on` regions. Formatting is a contributor responsibility;
+configuration, and keep QML lint-clean (see the QML section). Review the
+resulting diff; do not add `clang-format off/on` regions. Formatting is a contributor responsibility;
 the project does not currently enforce it in CI. Do not use a
 formatting-only whole-tree change to conceal functional edits in the same
 review.
