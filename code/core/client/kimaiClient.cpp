@@ -269,8 +269,9 @@ namespace
         switch (error)
         {
         case QSslError::CertificateExpired:
-        case QSslError::CertificateNotYetValid:
             return Rejection::Expired;
+        case QSslError::CertificateNotYetValid:
+            return Rejection::NotYetValid;
         case QSslError::HostNameMismatch:
             return Rejection::HostName;
         case QSslError::CertificateRevoked:

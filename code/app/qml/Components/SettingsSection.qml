@@ -7,6 +7,8 @@ import QtQuick
 QtObject {
     required property string key
     required property string title
+    // Shorter label for the navigation column, when the title is too long for it
+    property string navLabel: ""
     property string description: ""
     // Lucide icon name
     required property string icon

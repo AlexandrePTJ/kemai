@@ -17,7 +17,280 @@ Popup {
 
     required property KemaiContext kemaiContext
     required property PresenceMonitor presence
-    property list<SettingsSection> sections: [inactivitySection]
+    property list<SettingsSection> sections: [inactivitySection, certificatesSection]
+
+    // Trusted certificate asking for removal confirmation ("" if none)
+    property string _confirmRemoveHost: ""
+
+    onClosed: root._confirmRemoveHost = ""
+
+    SettingsSection {
+        id: certificatesSection
+        key: "certificates"
+        title: "Trusted certificates"
+        navLabel: "Certificates"
+        description: "Server certificates you chose to trust although they couldn't be verified."
+        icon: "shield-check"
+        content: Component {
+            ColumnLayout {
+                spacing: 0
+
+                // Empty state
+                Item {
+                    visible: root.kemaiContext.trustedCertificates.length === 0
+                    Layout.fillWidth: true
+                    Layout.topMargin: 10
+                    Layout.preferredHeight: emptyColumn.implicitHeight + 56
+
+                    DashedBorder {
+                        anchors.fill: parent
+                        radius: Theme.radiusMedium
+                        color: Theme.colorBorderSubtle
+                    }
+
+                    ColumnLayout {
+                        id: emptyColumn
+                        anchors.centerIn: parent
+                        width: Math.min(parent.width - 40, 300)
+                        spacing: 6
+
+                        Icon {
+                            Layout.alignment: Qt.AlignHCenter
+                            name: "shield"
+                            size: 22
+                            color: Theme.colorTextDim
+                        }
+
+                        Text {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.topMargin: 4
+                            text: "No trusted certificates"
+                            color: Theme.colorTextPrimary
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: Font.Medium
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            horizontalAlignment: Text.AlignHCenter
+                            text: "When you connect to a server whose certificate can't be verified and choose to trust it, it appears here."
+                            color: Theme.colorTextSecondary
+                            font.pixelSize: Theme.fontSizeSmall
+                            wrapMode: Text.Wrap
+                        }
+                    }
+                }
+
+                // List
+                Rectangle {
+                    visible: root.kemaiContext.trustedCertificates.length > 0
+                    Layout.fillWidth: true
+                    Layout.topMargin: 10
+                    Layout.preferredHeight: certificateRows.implicitHeight + 2
+                    radius: Theme.radiusMedium
+                    color: Theme.colorSurfaceDark
+                    border.width: 1
+                    border.color: Theme.colorBorderSubtle
+                    clip: true
+
+                    ColumnLayout {
+                        id: certificateRows
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.margins: 1
+                        spacing: 0
+
+                        Repeater {
+                            model: root.kemaiContext.trustedCertificates
+
+                            delegate: ColumnLayout {
+                                id: certificateRow
+
+                                required property var modelData
+                                required property int index
+
+                                readonly property bool confirming: root._confirmRemoveHost === certificateRow.modelData.host
+                                // First and last 3 bytes
+                                readonly property string shortSha: {
+                                    const bytes = certificateRow.modelData.sha256.split(":")
+                                    return bytes.slice(0, 3).join(":") + ":…:" + bytes.slice(-3).join(":")
+                                }
+
+                                Layout.fillWidth: true
+                                spacing: 0
+
+                                Rectangle {
+                                    visible: certificateRow.index > 0
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 1
+                                    color: Theme.colorDivider
+                                }
+
+                                // Row
+                                RowLayout {
+                                    visible: !certificateRow.confirming
+                                    Layout.fillWidth: true
+                                    Layout.margins: 10
+                                    Layout.leftMargin: 12
+                                    Layout.rightMargin: 12
+                                    spacing: 10
+
+                                    Icon {
+                                        name: "shield"
+                                        size: 15
+                                        color: certificateRow.modelData.expired ? Theme.colorAccentRed : Theme.colorTextSecondary
+                                    }
+
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 2
+
+                                        Text {
+                                            Layout.fillWidth: true
+                                            text: certificateRow.modelData.host
+                                            color: Theme.colorTextPrimary
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            font.weight: Font.Medium
+                                            elide: Text.ElideRight
+                                        }
+
+                                        RowLayout {
+                                            spacing: 10
+
+                                            Text {
+                                                text: "SHA-256 " + certificateRow.shortSha
+                                                color: Theme.colorTextSecondary
+                                                font.family: Theme.fontFamilyMono
+                                                font.pixelSize: Theme.fontSizeXSmall
+
+                                                HoverHandler {
+                                                    id: shaHover
+                                                }
+
+                                                ToolTip.visible: shaHover.hovered
+                                                ToolTip.delay: 400
+                                                ToolTip.text: certificateRow.modelData.sha256
+                                            }
+
+                                            Text {
+                                                text: (certificateRow.modelData.expired ? "Expired " : "Expires ")
+                                                      + Qt.formatDate(certificateRow.modelData.expiresAt, "d MMM yyyy")
+                                                color: certificateRow.modelData.expired ? Theme.colorAccentRed : Theme.colorTextSecondary
+                                                font.pixelSize: Theme.fontSizeXSmall
+                                                font.features: Theme.fontFeaturesTabular
+                                            }
+                                        }
+                                    }
+
+                                    AbstractButton {
+                                        id: removeButton
+                                        Layout.preferredWidth: 28
+                                        Layout.preferredHeight: 28
+                                        focusPolicy: Qt.StrongFocus
+                                        onClicked: root._confirmRemoveHost = certificateRow.modelData.host
+
+                                        ToolTip.visible: removeButton.hovered
+                                        ToolTip.delay: 500
+                                        ToolTip.text: "Stop trusting"
+
+                                        HoverHandler {
+                                            cursorShape: Qt.PointingHandCursor
+                                        }
+
+                                        background: Rectangle {
+                                            radius: Theme.radiusMedium
+                                            color: removeButton.hovered ? Theme.colorSurface : "transparent"
+                                            border.width: removeButton.visualFocus ? 1 : 0
+                                            border.color: Theme.colorAccentGreenDim
+                                        }
+
+                                        contentItem: Item {
+                                            Icon {
+                                                anchors.centerIn: parent
+                                                name: "trash-2"
+                                                size: 14
+                                                color: Theme.colorTextSecondary
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Inline removal confirmation
+                                Rectangle {
+                                    visible: certificateRow.confirming
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: confirmRow.implicitHeight + 20
+                                    color: Theme.colorAccentRedSoft
+                                    border.width: 1
+                                    border.color: Theme.colorAccentRedLine
+
+                                    Keys.onEscapePressed: root._confirmRemoveHost = ""
+
+                                    RowLayout {
+                                        id: confirmRow
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.leftMargin: 12
+                                        anchors.rightMargin: 12
+                                        spacing: 10
+
+                                        Icon {
+                                            name: "trash-2"
+                                            size: 15
+                                            color: Theme.colorAccentRed
+                                        }
+
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 2
+
+                                            Text {
+                                                Layout.fillWidth: true
+                                                text: "Stop trusting " + certificateRow.modelData.host + "?"
+                                                color: Theme.colorTextPrimary
+                                                font.pixelSize: Theme.fontSizeMedium
+                                                font.weight: Font.DemiBold
+                                                elide: Text.ElideRight
+                                            }
+
+                                            Text {
+                                                Layout.fillWidth: true
+                                                text: "Kemai will ask again at the next connection."
+                                                color: Theme.colorTextSecondary
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                elide: Text.ElideRight
+                                            }
+                                        }
+
+                                        DialogButton {
+                                            id: keepButton
+                                            text: "Keep"
+                                            onClicked: root._confirmRemoveHost = ""
+                                            Keys.onEscapePressed: root._confirmRemoveHost = ""
+                                        }
+
+                                        DialogButton {
+                                            variant: "danger"
+                                            text: "Remove"
+                                            onClicked: {
+                                                root.kemaiContext.removeTrustedCertificate(certificateRow.modelData.host)
+                                                root._confirmRemoveHost = ""
+                                            }
+                                        }
+                                    }
+
+                                    // Keep has the focus: removal is a deliberate choice
+                                    onVisibleChanged: if (visible) keepButton.forceActiveFocus(Qt.TabFocusReason)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     SettingsSection {
         id: inactivitySection
@@ -303,7 +576,7 @@ Popup {
 
                             Text {
                                 Layout.fillWidth: true
-                                text: navItem.modelData.title
+                                text: navItem.modelData.navLabel !== "" ? navItem.modelData.navLabel : navItem.modelData.title
                                 color: navItem.active ? Theme.colorTextPrimary : Theme.colorTextSecondary
                                 font.pixelSize: Theme.fontSizeMedium
                                 font.weight: navItem.active ? Font.Medium : Font.Normal

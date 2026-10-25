@@ -34,8 +34,8 @@ namespace kemai
         // Settings dialog: the preferences, and false when the settings file could not be read (changes kept for this session only)
         Q_PROPERTY(kemai::AppPreferences *preferences READ preferences CONSTANT)
         Q_PROPERTY(bool settingsPersistent READ settingsPersistent CONSTANT)
-        // Certificate the last login refused ({host, subject, issuer, validFrom, validUntil, sha256, replacesTrusted,
-        // rejection: "none" | "expired" | "hostname" | "revoked" | "other"}), empty otherwise
+        // Certificate the last login refused ({host, subject, issuer, selfSigned, validFrom, validUntil, sha256, replacesTrusted,
+        // previousSha256, rejection: "none" | "expired" | "notyetvalid" | "hostname" | "revoked" | "other"}), empty otherwise
         Q_PROPERTY(QVariantMap refusedCertificate READ refusedCertificate NOTIFY refusedCertificateChanged)
         // Certificates the user trusted: {host, sha256, expiresAt, expired}
         Q_PROPERTY(QVariantList trustedCertificates READ trustedCertificates NOTIFY trustedCertificatesChanged)

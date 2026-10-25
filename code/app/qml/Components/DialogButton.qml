@@ -4,18 +4,21 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-// Dialog footer button: "subtle", "primary" or "danger", with an optional leading icon.
+// Dialog footer button: "subtle", "primary", "danger" or "ghost" (transparent, outlined; `tone: "warning"` turns
+// its text and border amber), with an optional leading icon.
 // While busy it keeps full opacity and a wait cursor (the caller ignores clicks);
 // `spinning` shows the spinner, which callers delay so fast requests don't flash it.
 AbstractButton {
     id: root
 
     property string variant: "subtle"
+    property string tone: ""
     property string iconName: ""
     property bool busy: false
     property bool spinning: false
 
-    readonly property bool _filled: root.variant !== "subtle"
+    readonly property bool _filled: root.variant === "primary" || root.variant === "danger"
+    readonly property color _textColor: root._filled ? "white" : root.tone === "warning" ? Theme.colorWarning : Theme.colorTextPrimary
 
     implicitHeight: 34
     implicitWidth: Math.max(contentRow.implicitWidth + 28, 64)
@@ -41,12 +44,12 @@ AbstractButton {
                 visible: !(root.busy && root.spinning) && root.iconName !== ""
                 name: root.iconName
                 size: 14
-                color: root._filled ? "white" : Theme.colorTextPrimary
+                color: root._textColor
             }
 
             Text {
                 text: root.text
-                color: root._filled ? "white" : Theme.colorTextPrimary
+                color: root._textColor
                 font.pixelSize: Theme.fontSizeMedium
                 font.weight: Font.Medium
             }
@@ -60,10 +63,14 @@ AbstractButton {
                 return root.hovered && root.enabled ? Qt.lighter(Theme.colorAccentGreen, 1.1) : Theme.colorAccentGreen
             if (root.variant === "danger")
                 return root.hovered && root.enabled ? Qt.lighter(Theme.colorAccentRed, 1.1) : Theme.colorAccentRed
+            if (root.variant === "ghost")
+                return root.hovered && root.enabled ? Theme.colorSurfaceDark : "transparent"
             return root.hovered && root.enabled ? Theme.colorSurface : Theme.colorSurfaceDark
         }
         border.width: 1
-        border.color: root.visualFocus ? Theme.colorAccentGreenDim : (root._filled ? "transparent" : Theme.colorBorderSubtle)
+        border.color: root.visualFocus ? Theme.colorAccentGreenDim
+                      : root._filled ? "transparent"
+                      : root.tone === "warning" ? Theme.colorWarningLine : Theme.colorBorderSubtle
 
         // Focus glow outside the border
         Rectangle {

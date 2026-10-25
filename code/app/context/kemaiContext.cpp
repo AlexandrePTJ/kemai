@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 #include "kemaiContext.h"
 
+// STL headers
+#include <algorithm>
+
 // spdlog headers
 #include <spdlog/spdlog.h>
 
@@ -83,6 +86,8 @@ namespace kemai
                 return "none";
             case CertificateInfo::Rejection::Expired:
                 return "expired";
+            case CertificateInfo::Rejection::NotYetValid:
+                return "notyetvalid";
             case CertificateInfo::Rejection::HostName:
                 return "hostname";
             case CertificateInfo::Rejection::Revoked:
@@ -92,7 +97,12 @@ namespace kemai
             }
             return "other";
         }();
+        // Changed certificate: the fingerprint trusted before for this host
+        const auto &trusted  = m_pendingSettings->trustedCertificates;
+        const auto  previous = std::ranges::find_if(trusted, [&c](const TrustedCertificate &t) { return t.host == c.host; });
         return {
+            {"previousSha256",  previous != trusted.cend() ? previous->sha256 : QString()},
+            {"selfSigned",      c.subject == c.issuer },
             {"host",            c.host                },
             {"subject",         c.subject             },
             {"issuer",          c.issuer              },

@@ -10,6 +10,7 @@ set(KEMAI_QML_FILES
         qml/Components/DashedBorder.qml
         qml/Components/DialogButton.qml
         qml/Components/EntriesHeader.qml
+        qml/Components/FingerprintBlock.qml
         qml/Components/FormField.qml
         qml/Components/FormTextField.qml
         qml/Components/Icon.qml
@@ -39,6 +40,7 @@ set(KEMAI_QML_FILES
         qml/Components/TimeWheel.qml
         qml/Components/TimerBar.qml
         qml/Components/ViewSwitch.qml
+        qml/Views/CertificatePrompt.qml
         qml/Views/DateTimeEditDialog.qml
         qml/Views/LoginView.qml
         qml/Views/LogoutConfirmDialog.qml

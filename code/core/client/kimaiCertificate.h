@@ -28,7 +28,8 @@ namespace kemai
         enum class Rejection
         {
             None,     // only its issuer is unknown: it can be trusted
-            Expired,  // expired or not yet valid
+            Expired,
+            NotYetValid,
             HostName, // issued for another name
             Revoked,
             Other

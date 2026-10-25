@@ -71,6 +71,8 @@ Then, on Kemai's login screen, enter the address of your Kimai instance and the 
 
 In the settings (gear button), Kemai can stop the running timer when you step away: after a chosen time without keyboard or mouse activity, or when the session is locked. The entry then ends when you left, not when Kemai noticed it. Idle time is read on Windows, macOS, and on Linux under GNOME, KDE Plasma or any X11 session (the latter needs `libxcb-screensaver` at build time); other Wayland desktops do not report it. Session locking is read on Windows, macOS, and on Linux through logind.
 
+Self-hosted instances with a self-signed certificate, or one from a private authority, work too: at the first connection Kemai shows the certificate's fingerprint and lets you trust **this certificate, for this server only**. Compare the fingerprint with the one your administrator gives or your browser shows. Trusted certificates are listed, and can be removed, in the settings. An expired certificate, or one issued for another name, is always refused.
+
 
 ## How to help
 

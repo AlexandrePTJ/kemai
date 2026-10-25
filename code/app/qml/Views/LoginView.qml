@@ -32,11 +32,6 @@ Page {
         case SessionController.HttpsRedirect:
             return "This server only answers over https: with http, Kemai could read but not save anything. "
                    + "<a href=\"https\"><font color=\"" + Theme.colorAccentGreen + "\"><b>Use " + detail + "</b></font></a>"
-        case SessionController.UntrustedCertificate:
-            return "The certificate of this server is not issued by an authority your system trusts."
-        case SessionController.CertificateRejected:
-            return "The certificate of this server is not valid (" + ({ expired: "expired or not yet valid", hostname: "issued for another name",
-                                                                        revoked: "revoked" }[root.kemaiContext.refusedCertificate.rejection] || "refused") + ")."
         case SessionController.Forbidden:
             return "This Kimai account isn't allowed to use the API."
         case SessionController.ServerError:
@@ -53,6 +48,12 @@ Page {
         function onLoginSucceeded() { root.loginPending = false }
         function onLoginFailed(kind, detail) {
             root.loginPending = false
+            // A certificate problem is explained by the prompt, not by an error line
+            if (kind === SessionController.UntrustedCertificate || kind === SessionController.CertificateRejected) {
+                root.loginError = ""
+                certificatePrompt.openFor(root.kemaiContext.refusedCertificate)
+                return
+            }
             root._httpsHost = kind === SessionController.HttpsRedirect ? detail : ""
             root.loginError = root._loginMessage(kind, detail)
         }
@@ -64,6 +65,14 @@ Page {
 
     ProfileManager {
         id: profileManager
+    }
+
+    CertificatePrompt {
+        id: certificatePrompt
+        onTrustRequested: {
+            root.loginPending = true
+            root.kemaiContext.trustRefusedCertificate()
+        }
     }
 
     ProfileManagerDialog {
