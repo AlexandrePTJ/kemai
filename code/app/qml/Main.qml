@@ -10,6 +10,9 @@ import Kemai
 ApplicationWindow {
     id: main
 
+    // Set by main(): the log of this run, for the log journal
+    required property LogJournal logJournal
+
     // Default size; shown by appContext with the saved geometry once completed
     width: 800
     height: 600
@@ -51,6 +54,11 @@ ApplicationWindow {
         presence: presenceMonitor
     }
 
+    LogJournalDialog {
+        id: logJournalDialog
+        journal: main.logJournal
+    }
+
     Component {
         id: mainViewComponent
         MainView {
@@ -58,6 +66,7 @@ ApplicationWindow {
             presence: presenceMonitor
             settingsAvailable: settingsDialog.hasSections
             onSettingsRequested: settingsDialog.open()
+            onLogJournalRequested: logJournalDialog.open()
             // The session lives as long as its view: released once the view is gone (logout or expiry),
             // never while a transition still binds to it
             Component.onDestruction: appContext.closeSession(sessionContext)
@@ -71,6 +80,7 @@ ApplicationWindow {
             kemaiContext: appContext
             settingsAvailable: settingsDialog.hasSections
             onSettingsRequested: settingsDialog.open()
+            onLogJournalRequested: logJournalDialog.open()
         }
     }
 

@@ -230,7 +230,8 @@ pending spinner…).
   bitmaps as icons.
 - Text uses the application font (Raveo). Times, durations and other
   numbers use `font.features: Theme.fontFeaturesTabular`; the monospace font
-  is only for hexadecimal values such as certificate fingerprints.
+  is only for hexadecimal values such as certificate fingerprints, and for raw
+  log text (log journal entries and paths).
 - Modal dialogs are `Popup`s with explicit size, manual centering,
   `padding: 0`, a `background` rectangle and a `ColumnLayout` content; do not
   use the Controls `Dialog` type. Footers use `DialogButton` (`subtle`,

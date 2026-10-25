@@ -8,10 +8,13 @@
 #include <QGuiApplication>
 #include <QLoggingCategory>
 #include <QQmlApplicationEngine>
+#include <QScopeGuard>
 
+#include "context/logJournal.h"
 #include "kemaiConfig.h"
 #include "misc/customFmt.h"
 #include "misc/logFiles.h"
+#include "misc/logJournalSink.h"
 #include "misc/pathHelpers.h"
 
 void kemaiQtMessageOutputHandler(QtMsgType type, const QMessageLogContext & /*context*/, const QString &msg)
@@ -68,15 +71,25 @@ int main(int argc, char *argv[])
             kemai::PathHelpers::overrideDefaultRootPath(parser.value("root"));
         }
 
-        // Logger setup
+        // Logger setup: console, files and the in-app journal
+        kemai::LogJournal logJournal;
+        auto              journalSink = std::make_shared<kemai::LogJournalSink>(logJournal.model());
+        // The logger outlives the journal
+        const auto detachJournal = qScopeGuard([&journalSink]
+                                               { journalSink->detach(); });
+
         std::vector<spdlog::sink_ptr> sinks;
         sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+        sinks.emplace_back(journalSink);
 
         const auto logFilePath = kemai::PathHelpers::getFilePath(kemai::PathHelpers::FilePathType::LogFile);
-        if (auto fileSink = kemai::LogFiles::makeRotatingSink(logFilePath); fileSink != nullptr)
+        QString    logFileError;
+        if (auto fileSink = kemai::LogFiles::makeRotatingSink(logFilePath, kemai::LogFiles::DefaultMaxFileBytes, kemai::LogFiles::DefaultMaxFiles, &logFileError);
+            fileSink != nullptr)
         {
             sinks.emplace_back(std::move(fileSink));
         }
+        logJournal.setLogFile(logFilePath, logFileError);
 
         auto logger = std::make_shared<spdlog::logger>("kemai", sinks.begin(), sinks.end());
         spdlog::register_logger(logger);
@@ -84,9 +97,9 @@ int main(int argc, char *argv[])
         spdlog::set_default_logger(logger);
 
         spdlog::info("===== Starting Kemai {} ({}) =====", KEMAI_VERSION, KEMAI_CHANNEL);
-        if (sinks.size() < 2)
+        if (!logFileError.isEmpty())
         {
-            spdlog::error("Cannot write log file {}: logging to the console only", logFilePath);
+            spdlog::error("Cannot write log file {} ({}): logging to the console only", logFilePath, logFileError);
         }
 
         if (parser.isSet("root"))
@@ -107,6 +120,9 @@ int main(int argc, char *argv[])
 
         // Setup QML and run
         QQmlApplicationEngine engine;
+        engine.setInitialProperties({
+            {"logJournal", QVariant::fromValue(&logJournal)}
+        });
         engine.loadFromModule("Kemai", "Main");
 
         return QGuiApplication::exec();

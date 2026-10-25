@@ -13,6 +13,8 @@ FocusScope {
     id: root
 
     property list<string> options
+    // Optional color square before each option's label (a transparent color: none)
+    property list<color> swatches
     property int currentIndex: 0
 
     signal activated(int index)
@@ -55,6 +57,8 @@ FocusScope {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    leftPadding: 10
+                    rightPadding: 10
                     focusPolicy: Qt.NoFocus
                     onClicked: root._choose(option.index)
 
@@ -67,14 +71,35 @@ FocusScope {
                         color: option.selected ? Theme.colorSurface : "transparent"
                     }
 
-                    contentItem: Text {
-                        text: option.modelData
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        color: option.selected ? Theme.colorTextPrimary : Theme.colorTextSecondary
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
-                        elide: Text.ElideRight
+                    contentItem: Item {
+                        implicitWidth: optionContent.implicitWidth
+                        implicitHeight: optionContent.implicitHeight
+
+                        RowLayout {
+                            id: optionContent
+                            anchors.centerIn: parent
+                            width: Math.min(optionContent.implicitWidth, parent.width)
+                            spacing: 6
+
+                            Rectangle {
+                                visible: option.index < root.swatches.length && root.swatches[option.index].a > 0
+                                Layout.preferredWidth: 7
+                                Layout.preferredHeight: 7
+                                radius: 2
+                                color: option.index < root.swatches.length ? root.swatches[option.index] : "transparent"
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: option.modelData
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                color: option.selected ? Theme.colorTextPrimary : Theme.colorTextSecondary
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                elide: Text.ElideRight
+                            }
+                        }
                     }
                 }
             }

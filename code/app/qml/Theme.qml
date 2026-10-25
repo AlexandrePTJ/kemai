@@ -48,6 +48,13 @@ QtObject {
     readonly property color colorWarningSoft: Qt.rgba(0.878, 0.659, 0.227, 0.12)
     readonly property color colorWarningLine: Qt.rgba(0.878, 0.659, 0.227, 0.45)
 
+    // Log levels (log journal): info, and the error row tint
+    readonly property color colorInfo: "#6fa8dc"
+    readonly property color colorInfoSoft: Qt.rgba(0.435, 0.659, 0.863, 0.10)
+    readonly property color colorInfoLine: Qt.rgba(0.435, 0.659, 0.863, 0.35)
+    readonly property color colorRowError: Qt.rgba(0.898, 0.224, 0.208, 0.06)
+    readonly property color colorRowFresh: Qt.rgba(0.298, 0.686, 0.314, 0.08)
+
     readonly property color colorAccentRed: "#E53935"
     readonly property color colorAccentRedTint: "#66751919"
     readonly property color colorAccentRedHover: "#E53935"
@@ -75,7 +82,7 @@ QtObject {
     readonly property int fontSizeXLarge: 18
     readonly property int fontSizeTimer: 26
 
-    // Hexadecimal values only (certificate fingerprints): numbers use fontFeaturesTabular
+    // Hexadecimal values (certificate fingerprints) and raw log text only: numbers use fontFeaturesTabular
     readonly property string fontFamilyMono: "monospace"
     // Times and durations in the UI font: tabular figures keep digits aligned (font.features)
     readonly property var fontFeaturesTabular: ({

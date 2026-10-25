@@ -18,6 +18,7 @@ Page {
 
     signal logoutRequested
     signal settingsRequested
+    signal logJournalRequested
 
     // Back to the foreground: reload what may have changed on the server meanwhile
     readonly property bool windowActive: Window.active
@@ -102,6 +103,7 @@ Page {
             settingsAvailable: root.settingsAvailable
             onLogoutRequested: root.logoutRequested()
             onSettingsRequested: root.settingsRequested()
+            onLogJournalRequested: root.logJournalRequested()
             onResourceCreated: detail => notificationBanner.show(SessionController.Success, SessionController.ResourceCreated, detail)
         }
     }

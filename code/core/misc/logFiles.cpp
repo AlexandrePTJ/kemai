@@ -4,6 +4,7 @@
 
 // Qt headers
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 
 // 3rd party headers
@@ -12,11 +13,24 @@
 
 namespace kemai
 {
-    spdlog::sink_ptr LogFiles::makeRotatingSink(const QString &path, std::size_t maxFileBytes, std::size_t maxFiles)
+    spdlog::sink_ptr LogFiles::makeRotatingSink(const QString &path, std::size_t maxFileBytes, std::size_t maxFiles, QString *error)
     {
-        if (maxFiles == 0 || !QFileInfo(path).absoluteDir().mkpath("."))
+        const auto fail = [error](const QString &reason) -> spdlog::sink_ptr
         {
+            if (error != nullptr)
+            {
+                *error = reason;
+            }
             return nullptr;
+        };
+
+        if (maxFiles == 0)
+        {
+            return fail("no file allowed");
+        }
+        if (!QFileInfo(path).absoluteDir().mkpath("."))
+        {
+            return fail("the folder can't be created");
         }
 
         try
@@ -26,7 +40,9 @@ namespace kemai
         }
         catch (const spdlog::spdlog_ex &)
         {
-            return nullptr;
+            // spdlog's message is technical: ask Qt for the system's reason
+            QFile file(path);
+            return fail(file.open(QIODevice::Append) ? QString("unknown error") : file.errorString().toLower());
         }
     }
 } // namespace kemai

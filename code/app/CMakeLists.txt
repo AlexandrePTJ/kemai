@@ -42,6 +42,7 @@ set(KEMAI_QML_FILES
         qml/Components/ViewSwitch.qml
         qml/Views/CertificatePrompt.qml
         qml/Views/DateTimeEditDialog.qml
+        qml/Views/LogJournalDialog.qml
         qml/Views/LoginView.qml
         qml/Views/LogoutConfirmDialog.qml
         qml/Views/MainView.qml
@@ -59,6 +60,8 @@ set(KEMAI_QML_SOURCES
         context/appPreferences.h
         context/kemaiContext.cpp
         context/kemaiContext.h
+        context/logJournal.cpp
+        context/logJournal.h
         context/referenceData.cpp
         context/referenceData.h
         context/sessionContext.cpp
@@ -69,6 +72,8 @@ set(KEMAI_QML_SOURCES
         helpers/qmlFormatHelpers.h
         model/activityFilterProxyModel.cpp
         model/activityFilterProxyModel.h
+        model/logFilterProxyModel.cpp
+        model/logFilterProxyModel.h
 )
 
 qt_add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE main.cpp)

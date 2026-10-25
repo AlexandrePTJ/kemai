@@ -59,5 +59,7 @@ TEST_CASE("LogFiles::makeRotatingSink - unwritable directory gives no sink", "[l
     REQUIRE(blocker.open(QIODevice::WriteOnly));
     blocker.close();
 
-    REQUIRE(LogFiles::makeRotatingSink(QDir(tempDir.path()).filePath("logs/kemai.log")) == nullptr);
+    QString error;
+    REQUIRE(LogFiles::makeRotatingSink(QDir(tempDir.path()).filePath("logs/kemai.log"), LogFiles::DefaultMaxFileBytes, LogFiles::DefaultMaxFiles, &error) == nullptr);
+    REQUIRE_FALSE(error.isEmpty());
 }

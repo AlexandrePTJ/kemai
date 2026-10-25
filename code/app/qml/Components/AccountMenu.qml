@@ -8,7 +8,7 @@ import QtQuick.Layouts
 
 import Kemai
 
-// Account chip opening a menu that holds "Log out" (future settings go above it, Log out stays last)
+// Account chip opening a menu: Settings…, Log journal…, then Log out (always last)
 AbstractButton {
     id: root
 
@@ -19,6 +19,7 @@ AbstractButton {
 
     signal logoutRequested
     signal settingsRequested
+    signal logJournalRequested
 
     // Up to two initials from the account name ("KimaiDev" -> "KD", "susan_super" -> "SS")
     function initials(name) {
@@ -217,8 +218,52 @@ AbstractButton {
                 }
             }
 
+            AbstractButton {
+                id: logJournalItem
+                objectName: "logJournalMenuItem"
+
+                Layout.fillWidth: true
+                padding: 10
+                topPadding: 8
+                bottomPadding: 8
+                focusPolicy: Qt.StrongFocus
+
+                onClicked: {
+                    menu.close()
+                    root.logJournalRequested()
+                }
+
+                Keys.onReturnPressed: logJournalItem.clicked()
+                Keys.onEnterPressed: logJournalItem.clicked()
+
+                HoverHandler {
+                    cursorShape: Qt.PointingHandCursor
+                }
+
+                background: Rectangle {
+                    radius: Theme.radiusSmall
+                    color: logJournalItem.hovered || logJournalItem.activeFocus ? Theme.colorSurface : "transparent"
+                }
+
+                contentItem: RowLayout {
+                    spacing: 10
+
+                    Icon {
+                        name: "list"
+                        size: 15
+                        color: logJournalItem.hovered || logJournalItem.activeFocus ? Theme.colorTextPrimary : Theme.colorTextSecondary
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Log journal…"
+                        color: Theme.colorTextPrimary
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+                }
+            }
+
             Rectangle {
-                visible: root.settingsAvailable
                 Layout.fillWidth: true
                 Layout.leftMargin: -4
                 Layout.rightMargin: -4

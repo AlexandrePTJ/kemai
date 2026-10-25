@@ -35,12 +35,16 @@ set(KEMAI_LIB_SOURCES
         misc/jsonHelpers.cpp
         misc/logFiles.h
         misc/logFiles.cpp
+        misc/logJournalSink.h
+        misc/logJournalSink.cpp
         misc/pathHelpers.h
         misc/pathHelpers.cpp
         misc/windowPlacement.h
         misc/windowPlacement.cpp
         model/activityListModel.cpp
         model/activityListModel.h
+        model/logEntryModel.cpp
+        model/logEntryModel.h
         model/profile.cpp
         model/profile.h
         model/taskModel.cpp

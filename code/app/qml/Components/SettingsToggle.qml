@@ -5,7 +5,7 @@ import QtQuick.Controls
 
 import Kemai
 
-// On/off switch of the settings dialog; Space toggles it when focused
+// On/off switch (settings dialog, log journal: any size, the knob follows); Space toggles it when focused
 AbstractButton {
     id: root
 
@@ -38,11 +38,11 @@ AbstractButton {
         }
 
         Rectangle {
-            x: root.checked ? 16 : 2
+            x: root.checked ? root.width - root.height + 2 : 2
             y: 3
-            width: 14
-            height: 14
-            radius: 7
+            width: root.height - 6
+            height: root.height - 6
+            radius: height / 2
             color: root.checked ? Theme.colorTextOnAccent : Theme.colorTextSecondary
         }
     }

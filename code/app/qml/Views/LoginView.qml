@@ -15,6 +15,7 @@ Page {
     property bool settingsAvailable: false
 
     signal settingsRequested
+    signal logJournalRequested
 
     property bool loginPending: false
     property string loginError: ""
@@ -56,7 +57,7 @@ Page {
                 return
             }
             root._httpsHost = kind === SessionController.HttpsRedirect ? detail : ""
-            root.loginError = root._loginMessage(kind, detail)
+            root.loginError = root._loginMessage(kind, detail) + " <a href=\"log\"><font color=\"" + Theme.colorAccentGreen + "\">Show log</font></a>"
         }
     }
 
@@ -115,6 +116,41 @@ Page {
 
             Item {
                 Layout.fillWidth: true
+            }
+
+            AbstractButton {
+                id: logJournalButton
+                objectName: "loginLogJournalButton"
+
+                Layout.alignment: Qt.AlignTop
+                Layout.preferredWidth: 28
+                Layout.preferredHeight: 28
+                focusPolicy: Qt.StrongFocus
+                onClicked: root.logJournalRequested()
+
+                ToolTip.visible: logJournalButton.hovered
+                ToolTip.delay: 500
+                ToolTip.text: "Log journal"
+
+                HoverHandler {
+                    cursorShape: Qt.PointingHandCursor
+                }
+
+                background: Rectangle {
+                    radius: Theme.radiusMedium
+                    color: logJournalButton.hovered || logJournalButton.visualFocus ? Theme.colorSurface : "transparent"
+                    border.width: 1
+                    border.color: Theme.colorBorderSubtle
+                }
+
+                contentItem: Item {
+                    Icon {
+                        anchors.centerIn: parent
+                        name: "list"
+                        size: 15
+                        color: logJournalButton.hovered ? Theme.colorTextPrimary : Theme.colorTextSecondary
+                    }
+                }
             }
 
             AbstractButton {
@@ -356,8 +392,12 @@ Page {
             color: Theme.colorAccentRed
             font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.WordWrap
-            // "Use https://…": fix the host, the user connects again
-            onLinkActivated: {
+            // "Show log": the failure's technical detail; "Use https://…": fix the host, the user connects again
+            onLinkActivated: link => {
+                if (link === "log") {
+                    root.logJournalRequested()
+                    return
+                }
                 hostField.text = root._httpsHost
                 root.loginError = ""
             }

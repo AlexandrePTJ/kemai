@@ -21,6 +21,7 @@ Item {
 
     signal logoutRequested
     signal settingsRequested
+    signal logJournalRequested
     // A resource was created from the edit dialog: NotificationKind.ResourceCreated detail
     signal resourceCreated(string detail)
 
@@ -92,6 +93,7 @@ Item {
                 timerRunning: root.sessionContext.hasActiveTimesheet
                 settingsAvailable: root.settingsAvailable
                 onSettingsRequested: root.settingsRequested()
+                onLogJournalRequested: root.logJournalRequested()
                 onLogoutRequested: root.sessionContext.hasActiveTimesheet ? logoutConfirm.open() : root.logoutRequested()
             }
         }
