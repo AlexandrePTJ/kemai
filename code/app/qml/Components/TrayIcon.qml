@@ -47,10 +47,9 @@ Platform.SystemTrayIcon {
     }
 
     function showWindow() {
-        if (root.window.visibility === Window.Minimized)
+        // Hidden (tray) or minimized: back in the state it was shown in
+        if (!root.window.visible || root.window.visibility === Window.Minimized)
             root.window.visibility = root._restoreVisibility
-        else
-            root.window.show()
         root.window.raise()
         root.window.requestActivate()
     }

@@ -30,11 +30,33 @@ ApplicationWindow {
     onYChanged: main._trackNormalGeometry()
     onWidthChanged: main._trackNormalGeometry()
     onHeightChanged: main._trackNormalGeometry()
-    onVisibilityChanged: main._trackNormalGeometry()
-    function _saveGeometry() {
-        appContext.saveWindowGeometry(main._normalGeometry, main.visibility === Window.Maximized)
+    // Last shown state: what a hidden or minimized window comes back to, and what is saved
+    property int _shownVisibility: Window.Windowed
+    onVisibilityChanged: {
+        main._trackNormalGeometry()
+        if (main.visibility === Window.Windowed || main.visibility === Window.Maximized || main.visibility === Window.FullScreen)
+            main._shownVisibility = main.visibility
+        else
+        // Minimize to tray: off the taskbar, back from the tray icon
+        if (main.visibility === Window.Minimized && main._toTray(appContext.preferences.minimizeToTray))
+            Qt.callLater(main.hide)
     }
-    onClosing: main._saveGeometry()
+    function _saveGeometry() {
+        appContext.saveWindowGeometry(main._normalGeometry, main._shownVisibility === Window.Maximized)
+    }
+    // Only while the tray icon can bring the window back
+    function _toTray(enabled) {
+        const tray = trayInstantiator.object as TrayIcon
+        return enabled && tray !== null && tray.available
+    }
+    onClosing: close => {
+        main._saveGeometry()
+        // Close to tray: Kemai keeps running, quit from the tray menu
+        if (main._toTray(appContext.preferences.closeToTray)) {
+            close.accepted = false
+            main.hide()
+        }
+    }
 
     KemaiContext {
         id: appContext
