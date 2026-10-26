@@ -290,15 +290,15 @@ Page {
                     Layout.fillWidth: true
                 }
 
-                Text {
-                    text: "Manage profiles..."
-                    color: Theme.colorAccentGreen
-                    font.pixelSize: Theme.fontSizeSmall
+                // A button, not a TapHandler on the text: the page accepts presses and took them over
+                AbstractButton {
+                    focusPolicy: Qt.NoFocus
+                    onClicked: profileManagerDialog.open()
 
-                    TapHandler {
-
-                        gesturePolicy: TapHandler.ReleaseWithinBounds
-                        onTapped: profileManagerDialog.open()
+                    contentItem: Text {
+                        text: "Manage profiles..."
+                        color: Theme.colorAccentGreen
+                        font.pixelSize: Theme.fontSizeSmall
                     }
 
                     HoverHandler {
