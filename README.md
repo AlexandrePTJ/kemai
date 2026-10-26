@@ -66,7 +66,7 @@ brew install kemai
 
 ### Rewrite (alpha)
 
-Alpha releases are listed as *pre-releases* on the [Releases](https://github.com/AlexandrePTJ/kemai/releases) page and named after their date: `YEAR.MONTH.PATCH`, for example `2026.11.1`.
+Alpha releases are listed as *pre-releases* on the [Releases](https://github.com/AlexandrePTJ/kemai/releases) page and named after their date: `YEAR.MONTH.PATCH`, for example `2026.10.1`.
 
 They are **source only**: no ready-made binary is provided, because publishing unsigned programs would trigger security warnings on Windows and macOS. Build Kemai as described in [Build from source](#build-from-source); each release's notes give the exact commands for that release.
 
@@ -159,8 +159,8 @@ cmake --install build/release --prefix <target dir>
 **Building a given release.** Check out its tag and pass its version and channel, as given in its release notes:
 
 ```shell
-git checkout 2026.11.1
-cmake --preset release -DCMAKE_PREFIX_PATH=<...> -DKEMAI_VERSION=2026.11.1 -DKEMAI_CHANNEL=alpha
+git checkout 2026.10.1
+cmake --preset release -DCMAKE_PREFIX_PATH=<...> -DKEMAI_VERSION=2026.10.1 -DKEMAI_CHANNEL=alpha
 cmake --build --preset release
 ```
 
