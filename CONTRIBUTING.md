@@ -76,6 +76,18 @@ For a change in the interface, try it in the running application, and mention in
 - CI builds and tests on Windows, macOS and Linux, and lints the QML, on every push: enable GitHub Actions on your fork to see the result on your branch before opening the pull request, and make it pass.
 - Please do not ask for a release right after a merge: releases are cut from `develop` when the maintainer decides.
 
+## Using AI tools
+
+AI coding assistants are welcome in Kemai, used with common sense. Whatever tool you use, **you** are the author of what you submit: you have read and understood every line, built it, tested it, and can answer review questions about it yourself.
+
+- **Bug fixes**: a pull request written with an AI assistant is fine. Link the issue (or describe how to reproduce the bug), keep the change limited to the fix, and add a test that fails without it when possible.
+- **New features and changes of behavior**: these start with a **written proposal**, not with code. Open a discussion or an issue that explains the need, what the user will see and do, what is out of scope, and what it changes for existing users. Code comes once the maintainer has agreed on the proposal. Pull requests for features or behavior changes without an agreed proposal will be closed, however complete they are.
+- **Say so**: mention in the pull request which AI tool you used and for what (writing code, tests, investigation…). It does not count against your contribution; it helps the review.
+- **Keep the conversation human**: do not let an agent open issues, post comments or answer reviews on your behalf. Check AI-written descriptions before posting them, and keep them short and to the point.
+- **Licensing**: only submit code you have the right to release under the MIT license.
+
+[AGENTS.md](AGENTS.md) gives AI coding agents the project's rules and commands. Most agents read it on their own, and Claude Code loads it through `CLAUDE.md`; point any other tool to it.
+
 ## Translations
 
 The rewrite is not translatable yet; translation will come in a later alpha. Translations of 0.11.x are managed on [Weblate](https://hosted.weblate.org/engage/kemai/).
