@@ -4,6 +4,8 @@ Thank you for considering a contribution to Kemai. Bug reports, ideas, documenta
 
 Kemai is maintained on its author's free time: reviews and answers may take a few days.
 
+Everyone taking part in the project is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Where things stand
 
 Kemai is being rewritten (Qt 6 / QML) on the `develop` branch, published as alpha releases. The 0.11.x line (`master`) no longer receives changes: bugs and feature requests are handled in the rewrite. Please base all work on `develop`.

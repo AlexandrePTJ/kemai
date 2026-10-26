@@ -175,7 +175,7 @@ Without them, Kemai reports itself as a development build (`dev-<commit>`) and d
 
 ## Contributing
 
-Contributions are welcome: bug reports, ideas, documentation and code. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request; new work starts from the `develop` branch.
+Contributions are welcome: bug reports, ideas, documentation and code. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request; new work starts from the `develop` branch. Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 Translations of Kemai 0.11.x are managed on [Weblate](https://hosted.weblate.org/engage/kemai/). The rewrite is not translatable yet.
 
