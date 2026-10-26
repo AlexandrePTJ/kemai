@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project uses [calendar versions](https://calver.org/) (`YEAR.MONTH.PATCH`) since the rewrite; versions up to 0.11.1 followed [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
@@ -19,6 +19,7 @@ First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is prov
 - Running timer kept in sync with the web interface and other clients
 - Stopping the timer when idle or when the session is locked (optional, in the settings)
 - Settings dialog; window size and position remembered
+- System tray icon showing whether a timer runs (project, activity and duration in its tooltip), with a menu to show the window, stop the timer or quit; optional close and minimize to the tray (on Linux, needs a desktop that hosts tray icons)
 - Trusting a self-signed certificate for one server, after checking its fingerprint; trusted certificates listed in the settings
 - Log files and a log journal (filter, copy for a bug report, open the log folder), without any API token in them
 - Update check at start and on demand: a notice links to the release page of a newer version of your channel (nothing is downloaded); About dialog; open Kimai in the browser
@@ -26,12 +27,9 @@ First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is prov
 - Calendar versions (`YEAR.MONTH.PATCH`), alpha releases from the `develop` branch
 
 ### Not there yet (compared with 0.11.1)
-- System tray
 - Translations
 
 Login requires an API token (Kimai 2.14 or later): login with username and API password is no longer supported.
-
-
 
 ## [0.11.1] - 2024-06-30
 
