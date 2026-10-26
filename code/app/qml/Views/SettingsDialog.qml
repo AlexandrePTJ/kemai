@@ -372,6 +372,7 @@ Popup {
 
                 SettingsRow {
                     Layout.fillWidth: true
+                    last: root.updates.devBuild
                     title: "Check for a new version at start"
                     description: "Kemai asks GitHub once when it starts. Nothing is installed without you."
                     unavailableReason: root.updates.devBuild ? "Development build — update checks are off." : ""
@@ -382,7 +383,9 @@ Popup {
                     }
                 }
 
+                // Development builds never check: no manual check either
                 SettingsRow {
+                    visible: !root.updates.devBuild
                     Layout.fillWidth: true
                     last: updateRows.preferences.ignoredVersion === ""
                     title: "Check now"
@@ -574,7 +577,7 @@ Popup {
                 }
 
                 SettingsRow {
-                    visible: updateRows.preferences.ignoredVersion !== ""
+                    visible: !root.updates.devBuild && updateRows.preferences.ignoredVersion !== ""
                     Layout.fillWidth: true
                     last: true
                     title: "Ignored version"
