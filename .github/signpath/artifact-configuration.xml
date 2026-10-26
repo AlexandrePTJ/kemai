@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+SPDX-License-Identifier: MIT
+
+Reference copy of the SignPath artifact configuration used by the release workflow (.github/workflows/release.yml).
+The artifact is the folder installed by `cmake install`, zipped by actions/upload-artifact; only Kemai.exe is
+signed, and SignPath refuses it unless its product name and version match. Keep it in sync with SignPath.
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" required="true" />
+  </parameters>
+  <zip-file>
+    <pe-file path="bin/Kemai.exe" product-name="Kemai" product-version="${version}">
+      <authenticode-sign />
+    </pe-file>
+  </zip-file>
+</artifact-configuration>
