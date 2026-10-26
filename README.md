@@ -21,6 +21,7 @@ Kemai runs on Windows, macOS and Linux. It is free software under the [MIT licen
 - [Getting started](#getting-started)
 - [Using Kemai](#using-kemai)
 - [Your data and privacy](#your-data-and-privacy)
+- [Code signing policy](#code-signing-policy)
 - [Build from source](#build-from-source)
 - [Getting help](#getting-help)
 - [Contributing](#contributing)
@@ -68,7 +69,15 @@ brew install kemai
 
 Alpha releases are listed as *pre-releases* on the [Releases](https://github.com/AlexandrePTJ/kemai/releases) page and named after their date: `YEAR.MONTH.PATCH`, for example `2026.10.1`.
 
-They are **source only**: no ready-made binary is provided, because publishing unsigned programs would trigger security warnings on Windows and macOS. Build Kemai as described in [Build from source](#build-from-source); each release's notes give the exact commands for that release.
+So far they are **source only**: Kemai never publishes unsigned programs, which would trigger security warnings on Windows and macOS. Build Kemai as described in [Build from source](#build-from-source); each release's notes give the exact commands for that release.
+
+**Windows.** Signed Windows packages are being prepared (see the [code signing policy](#code-signing-policy)). When a release offers one, its notes say so and `Kemai-<version>-windows-x64.zip` is attached to it:
+
+1. Download the ZIP and unzip it anywhere, for example in your user folder.
+2. Run `Kemai.exe` in the `bin` folder. Nothing is installed and no administrator rights are needed.
+3. To remove Kemai, delete the folder. Your settings stay in your user configuration folder (see [Your data and privacy](#your-data-and-privacy)).
+
+`Kemai.exe` is signed: Windows shows **SignPath Foundation** as its publisher. Right after a release, Windows SmartScreen may still warn about a file it has not seen often yet; *More info* then shows the publisher before you choose to run it.
 
 The rewrite can be installed next to Kemai 0.11.x. Each keeps its own settings and the rewrite never modifies those of 0.11.x. Profiles are not imported: create them again in the rewrite.
 
@@ -129,6 +138,17 @@ Kemai checks at start whether a newer version of your channel (stable or alpha) 
 - **Profiles and settings** are stored as JSON files in your user configuration folder.
 - **Logs** are written for troubleshooting (three files of at most 5 MB, the oldest are deleted). They contain no token. *Log journal…* in the account menu shows them and opens their folder.
 - **Network**: Kemai connects to your Kimai server, and to GitHub's public API to check for a new version (no account or personal data is sent; turn it off in *Settings › Updates*). There is no telemetry, analytics or tracking of any kind.
+
+## Code signing policy
+
+Windows packages of Kemai are signed for free: free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+- Committers and reviewers: [Alexandre Petitjean](https://github.com/AlexandrePTJ). Contributions from anyone else are reviewed before they are merged, workflows and build scripts included.
+- Approvers: [Alexandre Petitjean](https://github.com/AlexandrePTJ). Every signing request is approved by hand.
+
+Only `Kemai.exe`, built from this repository by its GitHub Actions release workflow, is signed. The Qt libraries and the Visual C++ runtime shipped next to it are third-party components, under their own licenses and signatures.
+
+Privacy: Kemai sends nothing to anyone but your Kimai server and, for the update check that you can turn off, GitHub. See [Your data and privacy](#your-data-and-privacy).
 
 ## Build from source
 
