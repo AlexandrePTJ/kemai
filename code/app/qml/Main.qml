@@ -20,6 +20,8 @@ ApplicationWindow {
 
     // Geometry of the window when not maximized, saved on close
     property rect _normalGeometry: Qt.rect(0, 0, 0, 0)
+    // Open session, null on the login view (tray icon)
+    property SessionContext _session: null
     function _trackNormalGeometry() {
         if (main.visibility === Window.Windowed)
             main._normalGeometry = Qt.rect(main.x, main.y, main.width, main.height)
@@ -29,18 +31,43 @@ ApplicationWindow {
     onWidthChanged: main._trackNormalGeometry()
     onHeightChanged: main._trackNormalGeometry()
     onVisibilityChanged: main._trackNormalGeometry()
-    onClosing: appContext.saveWindowGeometry(main._normalGeometry, main.visibility === Window.Maximized)
+    function _saveGeometry() {
+        appContext.saveWindowGeometry(main._normalGeometry, main.visibility === Window.Maximized)
+    }
+    onClosing: main._saveGeometry()
 
     KemaiContext {
         id: appContext
         onLoginSucceeded: session => {
             // Central 401 handling: an expired session drops back to the login view
-            session.sessionExpired.connect(() => stackView.replace(null, loginViewComponent))
+            session.sessionExpired.connect(() => {
+                main._session = null
+                stackView.replace(null, loginViewComponent)
+            })
+            main._session = session
             stackView.replace(null, mainViewComponent, {
                 sessionContext: session
             })
         }
-        onLoggedOut: stackView.replace(null, loginViewComponent)
+        onLoggedOut: {
+            main._session = null
+            stackView.replace(null, loginViewComponent)
+        }
+    }
+
+    // Tray icon; never created offscreen (no tray, and Qt warns about it)
+    Instantiator {
+        id: trayInstantiator
+        active: Qt.platform.pluginName !== "offscreen" && Qt.platform.pluginName !== "minimal"
+        delegate: TrayIcon {
+            window: main
+            session: main._session
+            // Quitting keeps a running timer running on the server
+            onQuitRequested: {
+                main._saveGeometry()
+                Qt.quit()
+            }
+        }
     }
 
     // Idle time and session lock, for the inactivity settings and stops
@@ -59,6 +86,7 @@ ApplicationWindow {
         kemaiContext: appContext
         presence: presenceMonitor
         updates: updateNotifier
+        tray: trayInstantiator.object
         // A version found from Settings › Updates stays announced once the dialog is closed
         onClosed: updateNotifier.showInStrip()
     }

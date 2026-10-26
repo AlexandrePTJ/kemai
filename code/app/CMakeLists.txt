@@ -38,6 +38,7 @@ set(KEMAI_QML_FILES
         qml/Components/TasksPane.qml
         qml/Components/WheelScroller.qml
         qml/Components/TimeEntryDelegate.qml
+        qml/Components/TrayIcon.qml
         qml/Components/TimeWheel.qml
         qml/Components/TimerBar.qml
         qml/Components/UpdateStrip.qml
@@ -121,6 +122,10 @@ qt_add_resources(
         assets/fonts/RaveoVF.ttf
         assets/fonts/RaveoVF-OFL.txt
         assets/images/kimai_logo.svg
+        assets/images/tray/kemai-tray-idle.svg
+        assets/images/tray/kemai-tray-idle-template.svg
+        assets/images/tray/kemai-tray-running.svg
+        assets/images/tray/kemai-tray-running-template.svg
         assets/data/countries.json
         assets/data/currencies.json
 )
