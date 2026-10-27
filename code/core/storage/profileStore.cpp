@@ -140,9 +140,9 @@ namespace kemai
                 }
                 catch (const std::runtime_error &e)
                 {
-                    // Unreadable, corrupt or newer-format file: overwriting it would lose every
-                    // other profile. No UI channel for profile errors yet: log and keep the file.
+                    // Unreadable, corrupt or newer-format file: overwriting it would lose every other profile
                     spdlog::error("Profile not saved, {} left untouched: {}", m_storePath, e.what());
+                    emit profileSaveFailed(profile.id, QString::fromUtf8(e.what()));
                     return;
                 }
             }
@@ -160,15 +160,32 @@ namespace kemai
             else
             {
                 profiles.push_back(profile);
+                m_addedProfiles.push_back(profile.id);
             }
 
-            saveProfilesToJson(m_storePath, profiles);
+            try
+            {
+                saveProfilesToJson(m_storePath, profiles);
+            }
+            catch (const std::runtime_error &e)
+            {
+                spdlog::error("Profile not saved: {}", e.what());
+                std::erase(m_addedProfiles, profile.id);
+                emit profileSaveFailed(profile.id, QString::fromUtf8(e.what()));
+                return;
+            }
 
             m_secretStorage.writeSecret(getSecretKey(profile.id), profile.token);
         }
     }
 
     void ProfileStore::remove(const ProfileId &profileId)
+    {
+        removeFromFile(profileId);
+        m_secretStorage.deleteSecret(getSecretKey(profileId));
+    }
+
+    void ProfileStore::removeFromFile(const ProfileId &profileId)
     {
         std::vector<Profile> profiles;
         try
@@ -186,8 +203,6 @@ namespace kemai
                       { return p.id == profileId; });
 
         saveProfilesToJson(m_storePath, profiles);
-
-        m_secretStorage.deleteSecret(getSecretKey(profileId));
     }
 
     void ProfileStore::onSecretRead(const QString &key, const QString &token)
@@ -209,6 +224,7 @@ namespace kemai
     void ProfileStore::onSecretWritten(const QString &key)
     {
         auto profileId = getProfileIdFromSecretKey(key);
+        std::erase(m_addedProfiles, profileId);
         emit profileSaved(profileId);
     }
 
@@ -236,6 +252,20 @@ namespace kemai
     {
         auto profileId = getProfileIdFromSecretKey(key);
         spdlog::error("Failed to write secret for profile {}: {}", profileId, message);
+
+        // A new profile without its token cannot log in: remove it again. An existing one keeps its previous token.
+        if (std::erase(m_addedProfiles, profileId) > 0)
+        {
+            try
+            {
+                removeFromFile(profileId);
+            }
+            catch (const std::runtime_error &e)
+            {
+                spdlog::error("Profile {} without token left in {}: {}", profileId, m_storePath, e.what());
+            }
+        }
+        emit profileSaveFailed(profileId, message);
     }
 
     void ProfileStore::onSecretDeleteError(const QString &key, const QString &message)

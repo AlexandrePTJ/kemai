@@ -33,6 +33,8 @@ namespace kemai
         Q_PROPERTY(bool checkUpdatesAtStart READ checkUpdatesAtStart WRITE setCheckUpdatesAtStart NOTIFY checkUpdatesAtStartChanged)
         Q_PROPERTY(QString ignoredVersion READ ignoredVersion WRITE setIgnoredVersion NOTIFY ignoredVersionChanged)
         Q_PROPERTY(QDateTime lastUpdateCheck READ lastUpdateCheck WRITE setLastUpdateCheck NOTIFY lastUpdateCheckChanged)
+        // Profiles import (legacy-profile-import): offer Kemai 0.11's profiles at start, until "Don't ask again"
+        Q_PROPERTY(bool legacyImportOffer READ legacyImportOffer WRITE setLegacyImportOffer NOTIFY legacyImportOfferChanged)
 
     public:
         explicit AppPreferences(QObject *parent = nullptr);
@@ -66,6 +68,8 @@ namespace kemai
         void      setIgnoredVersion(const QString &version);
         QDateTime lastUpdateCheck() const;
         void      setLastUpdateCheck(const QDateTime &when);
+        bool      legacyImportOffer() const;
+        void      setLegacyImportOffer(bool offer);
 
     signals:
         // A preference was written: the owner saves the settings
@@ -78,6 +82,7 @@ namespace kemai
         void checkUpdatesAtStartChanged();
         void ignoredVersionChanged();
         void lastUpdateCheckChanged();
+        void legacyImportOfferChanged();
 
     protected:
         QJsonValue value(const QString &key, const QJsonValue &defaultValue) const;

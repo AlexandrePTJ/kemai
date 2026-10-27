@@ -14,7 +14,9 @@ namespace kemai
         {
             Profiles,
             AppSettings,
-            LogFile
+            LogFile,
+            // Kemai 0.11.x's settings (profiles and tokens): read only, to import its profiles
+            LegacySettings
         };
 
         /*!

@@ -24,6 +24,7 @@ qt_add_executable(${PROJECT_NAME}
     model/tst_taskModel.cpp
     model/tst_timesheetModel.cpp
     storage/tst_appSettingsStore.cpp
+    storage/tst_legacySettingsReader.cpp
     storage/tst_profileStore.cpp
 )
 

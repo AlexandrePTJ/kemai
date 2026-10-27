@@ -55,6 +55,8 @@ set(KEMAI_LIB_SOURCES
         model/timesheetModel.h
         storage/appSettingsStore.cpp
         storage/appSettingsStore.h
+        storage/legacySettingsReader.cpp
+        storage/legacySettingsReader.h
         storage/profileStore.cpp
         storage/profileStore.h
         storage/secretStorage.cpp

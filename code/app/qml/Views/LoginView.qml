@@ -15,6 +15,11 @@ Page {
     property bool settingsAvailable: false
     required property UpdateNotifier updates
 
+    // Kemai 0.11's profiles are offered at start only: decided once per run (Main keeps it across login views),
+    // whether the dialog opens or not, so a profile removed later does not bring it back
+    property bool offerLegacyImport: true
+    signal legacyImportOffered
+
     signal settingsRequested
     signal logJournalRequested
     signal aboutRequested
@@ -23,6 +28,18 @@ Page {
     property string loginError: ""
     // https address to use instead of the http:// host typed (HttpsRedirect)
     property string _httpsHost: ""
+    // 0.11's last profile, selected once imported when no session chose one
+    property string _importedProfileName: ""
+
+    function _offerLegacyImport() {
+        // Wait for the existing profiles and for auto-login, then decide
+        if (!root.offerLegacyImport || root.kemaiContext.autoLoginPending || !profileManager.legacyCandidatesKnown)
+            return
+        root.legacyImportOffered()
+        if (root.loginPending || !root.kemaiContext.preferences.legacyImportOffer || !profileManager.hasLegacyCandidates)
+            return
+        legacyImportDialog.open()
+    }
 
     function _loginMessage(kind, detail) {
         switch (kind) {
@@ -50,6 +67,9 @@ Page {
         function onLoginSucceeded() {
             root.loginPending = false
         }
+        function onAutoLoginPendingChanged() {
+            root._offerLegacyImport()
+        }
         function onLoginFailed(kind, detail) {
             root.loginPending = false
             // A certificate problem is explained by the prompt, not by an error line
@@ -69,7 +89,20 @@ Page {
 
     ProfileManager {
         id: profileManager
+        onLegacyCandidatesChanged: root._offerLegacyImport()
     }
+
+    LegacyImportDialog {
+        id: legacyImportDialog
+        profileManager: profileManager
+        onImported: {
+            root._importedProfileName = profileManager.legacyLastProfileName
+            profileCombo.selectLastProfile()
+        }
+        onDeclined: root.kemaiContext.preferences.legacyImportOffer = false
+    }
+
+    Component.onCompleted: Qt.callLater(root._offerLegacyImport)
 
     CertificatePrompt {
         id: certificatePrompt
@@ -315,9 +348,10 @@ Page {
                 textRole: "name"
                 valueRole: "profileId"
 
-                // Back from a session: keep the profile it was opened from
+                // Back from a session: keep the profile it was opened from; after an import: 0.11's last one
                 function selectLastProfile() {
-                    const index = profileCombo.find(root.kemaiContext.lastAccountName)
+                    const name = root.kemaiContext.lastAccountName !== "" ? root.kemaiContext.lastAccountName : root._importedProfileName
+                    const index = profileCombo.find(name)
                     if (index >= 0)
                         profileCombo.currentIndex = index
                 }

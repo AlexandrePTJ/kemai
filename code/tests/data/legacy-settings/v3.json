@@ -1,0 +1,48 @@
+{
+    "events": {
+        "autoRefreshCurrentTimeSheet": false,
+        "autoRefreshCurrentTimeSheetDelaySeconds": 15,
+        "idleDelayMinutes": 5,
+        "stopOnIdle": false,
+        "stopOnLock": true
+    },
+    "kemai": {
+        "checkUpdateAtStartup": true,
+        "closeToSystemTray": true,
+        "geometry": "",
+        "ignoredVersion": "0.0.0",
+        "language": "fr_FR",
+        "lastConnectedProfile": "{6f1c2b9e-3d4a-4c8b-9e21-5a7d0c3b8f14}",
+        "minimizeToSystemTray": false
+    },
+    "profiles": [
+        {
+            "apiToken": "example-api-token-work",
+            "host": "https://kimai.example.com",
+            "id": "{6f1c2b9e-3d4a-4c8b-9e21-5a7d0c3b8f14}",
+            "name": "Work",
+            "token": "",
+            "username": ""
+        },
+        {
+            "apiToken": "",
+            "host": "https://old.example.org",
+            "id": "{0b8e4d2a-7c61-4f3e-a9d5-2e6f1b7c4a90}",
+            "name": "Old",
+            "token": "example-legacy-password",
+            "username": "someone"
+        },
+        {
+            "apiToken": "example-api-token-nameless",
+            "host": "https://nameless.example.net",
+            "id": "{c3a7e5f1-9b2d-4e8a-b6c4-1d5f3a9e7b02}",
+            "name": "",
+            "token": "",
+            "username": ""
+        }
+    ],
+    "trustedCertificates": [
+        "-----BEGIN CERTIFICATE-----\nMIIBexample\n-----END CERTIFICATE-----\n"
+    ],
+    "version": 3
+}

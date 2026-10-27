@@ -117,3 +117,27 @@ TEST_CASE("ProfileStore::save - never overwrites a corrupt file", "[profileStore
 
     REQUIRE(readFile(path) == original);
 }
+
+TEST_CASE("ProfileStore::save - reports a profile it does not save", "[profileStore][unit]")
+{
+    QTemporaryDir tempDir;
+    REQUIRE(tempDir.isValid());
+    const auto path = tempDir.filePath("profiles.json");
+    writeFile(path, R"({"version": "1.0", "profiles": [ {"name": "Home")");
+
+    ProfileStore store;
+    store.setStorePath(path);
+
+    ProfileId failedId;
+    QString   failure;
+    QObject::connect(&store, &ProfileStore::profileSaveFailed, [&failedId, &failure](ProfileId id, const QString &message)
+                     {
+                         failedId = id;
+                         failure  = message; });
+
+    const auto profile = makeValidProfile();
+    store.save(profile);
+
+    CHECK(failedId == profile.id);
+    CHECK_FALSE(failure.isEmpty());
+}

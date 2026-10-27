@@ -95,7 +95,7 @@ flatpak install flathub-beta io.github.AlexandrePTJ.Kemai
 
 Flathub delivers the updates, so this Kemai does not check for new versions itself. It runs in a sandbox: its profiles and settings are kept apart from those of a Kemai built from source or of Kemai 0.11.x (whose profiles it cannot import), and stopping the timer when the session is locked is not available (stopping it when you are idle is).
 
-The rewrite can be installed next to Kemai 0.11.x. Each keeps its own settings and the rewrite never modifies those of 0.11.x. Profiles are not imported: create them again in the rewrite.
+The rewrite can be installed next to Kemai 0.11.x. Each keeps its own settings and the rewrite never modifies those of 0.11.x; it offers to import 0.11.x's profiles (see [Coming from Kemai 0.11](#coming-from-kemai-011)).
 
 ## Getting started
 
@@ -104,6 +104,10 @@ The rewrite can be installed next to Kemai 0.11.x. Each keeps its own settings a
 3. **Keep a profile** (optional). Save the server and token as a profile to log in again without typing them. Several profiles can be saved, one per server or account.
 
 Once logged in, pick a project and an activity in the timer bar and start the timer. Your recent entries are listed below it.
+
+### Coming from Kemai 0.11
+
+When Kemai 0.11 is installed on the same computer, the login screen offers to import its profiles: their names, server addresses and API tokens, which move to your system's keychain. Nothing else is imported (preferences, trusted certificates), and Kemai 0.11's own settings are left untouched. A profile that only has the old API password of Kemai 0.11 is not imported: create an API token in Kimai and add that profile by hand. If you decline the import for good, profiles can still be created by hand.
 
 ## Using Kemai
 

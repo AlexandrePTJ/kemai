@@ -64,3 +64,15 @@ TEST_CASE("AppPreferences - keys of a newer Kemai survive", "[preferences][unit]
     preferences.setIgnoredVersion("2026.12.1");
     REQUIRE(preferences.json().value("futureKey").toInt() == 42);
 }
+
+TEST_CASE("AppPreferences - the 0.11 import is offered until declined for good", "[preferences][unit]")
+{
+    AppPreferences preferences;
+    REQUIRE(preferences.legacyImportOffer());
+
+    preferences.setLegacyImportOffer(false);
+
+    AppPreferences reread;
+    reread.setJson(preferences.json());
+    REQUIRE_FALSE(reread.legacyImportOffer());
+}

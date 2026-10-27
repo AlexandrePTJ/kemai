@@ -55,7 +55,7 @@ Integration tests run against a real Kimai server when `KEMAI_TEST_HOST` and `KE
   ```
 
 - **Dependencies**: do not add one without the contributor's agreement. When one is added, removed or relicensed, update `code/app/qml/Views/ThirdParty.js` in the same change.
-- **Settings files**: never read or write `settings.json`: it belongs to Kemai 0.11.x, which may be installed alongside.
+- **Settings files**: never write, move or delete `settings.json`: it belongs to Kemai 0.11.x, which may be installed alongside. Read it only through `LegacySettingsReader`, to import its profiles.
 - **Kimai API**: Kimai 2.x rejects unknown fields in request bodies; send only the fields the endpoint needs.
 
 ## Commits

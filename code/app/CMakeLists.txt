@@ -48,6 +48,7 @@ set(KEMAI_QML_FILES
         qml/Views/DateTimeEditDialog.qml
         qml/Views/LogJournalDialog.qml
         qml/Views/LoginView.qml
+        qml/Views/LegacyImportDialog.qml
         qml/Views/LogoutConfirmDialog.qml
         qml/Views/MainView.qml
         qml/Views/ProfileManagerDialog.qml

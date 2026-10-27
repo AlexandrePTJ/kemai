@@ -33,6 +33,9 @@ namespace kemai
     signals:
         void profilesLoaded(const std::vector<kemai::Profile> &profiles);
         void profileSaved(kemai::ProfileId profileId);
+        // The profile could not be saved (profiles file unreadable or not writable, keychain refused the token);
+        // message is technical, for the log and the UI to word
+        void profileSaveFailed(kemai::ProfileId profileId, const QString &message);
         void profileRemoved(kemai::ProfileId profileId);
 
     private:
@@ -43,8 +46,13 @@ namespace kemai
         void onSecretWriteError(const QString &key, const QString &message);
         void onSecretDeleteError(const QString &key, const QString &message);
 
+        void removeFromFile(const ProfileId &profileId);
+
         SecretStorage m_secretStorage;
         QString       m_storePath;
+
+        // Profiles added by a save() whose token is not in the keychain yet: removed again if the keychain refuses it
+        std::vector<ProfileId> m_addedProfiles;
 
         // Transient state during loadAll()
         std::vector<Profile> m_pendingProfiles;

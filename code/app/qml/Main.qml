@@ -22,6 +22,8 @@ ApplicationWindow {
     property rect _normalGeometry: Qt.rect(0, 0, 0, 0)
     // Open session, null on the login view (tray icon)
     property SessionContext _session: null
+    // Kemai 0.11 profiles offered once per run, whatever login view shows next
+    property bool _legacyImportOffered: false
     function _trackNormalGeometry() {
         if (main.visibility === Window.Windowed)
             main._normalGeometry = Qt.rect(main.x, main.y, main.width, main.height)
@@ -143,6 +145,8 @@ ApplicationWindow {
         id: loginViewComponent
         LoginView {
             kemaiContext: appContext
+            offerLegacyImport: !main._legacyImportOffered
+            onLegacyImportOffered: main._legacyImportOffered = true
             updates: updateNotifier
             settingsAvailable: settingsDialog.hasSections
             onSettingsRequested: settingsDialog.open()

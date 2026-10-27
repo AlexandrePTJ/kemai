@@ -46,6 +46,19 @@ namespace kemai
         m_settingsPersistent = m_settingsStore->canSave();
         m_preferences->setJson(m_pendingSettings->preferences);
 
+        // The first login to answer ends it: auto-login, or one the user started meanwhile
+        m_autoLoginPending      = m_pendingSettings->autoLogin.has_value();
+        const auto endAutoLogin = [this]
+        {
+            if (m_autoLoginPending)
+            {
+                m_autoLoginPending = false;
+                emit autoLoginPendingChanged();
+            }
+        };
+        connect(this, &KemaiContext::loginSucceeded, this, endAutoLogin);
+        connect(this, &KemaiContext::loginFailed, this, endAutoLogin);
+
         connect(m_preferences.get(),
                 &AppPreferences::changed,
                 this,
@@ -61,6 +74,11 @@ namespace kemai
     void KemaiContext::initialize()
     {
         m_settingsStore->load();
+    }
+
+    bool KemaiContext::autoLoginPending() const
+    {
+        return m_autoLoginPending;
     }
 
     AppPreferences *KemaiContext::preferences() const

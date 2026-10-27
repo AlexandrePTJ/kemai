@@ -29,6 +29,8 @@ namespace kemai
         // Account of the last session, and whether it ended by logout (not persisted): the login view's notice
         Q_PROPERTY(QString lastAccountName READ lastAccountName NOTIFY lastSessionChanged)
         Q_PROPERTY(bool justLoggedOut READ justLoggedOut NOTIFY lastSessionChanged)
+        // Auto-login is set up and has not answered yet (the keychain read and the login run after the window shows)
+        Q_PROPERTY(bool autoLoginPending READ autoLoginPending NOTIFY autoLoginPendingChanged)
         // "Kemai <version>", plus " alpha" for an alpha release
         Q_PROPERTY(QString windowTitle READ windowTitle CONSTANT)
         // Settings dialog: the preferences, and false when the settings file could not be read (changes kept for this session only)
@@ -47,6 +49,7 @@ namespace kemai
         Q_INVOKABLE void initialize();
         QString          lastAccountName() const;
         bool             justLoggedOut() const;
+        bool             autoLoginPending() const;
         QString          windowTitle() const;
         AppPreferences  *preferences() const;
         bool             settingsPersistent() const;
@@ -72,6 +75,7 @@ namespace kemai
         Q_INVOKABLE void saveWindowGeometry(const QRect &normalGeometry, bool maximized);
 
     signals:
+        void autoLoginPendingChanged();
         void loginSucceeded(kemai::SessionContext *session);
         // The login view words it from `kind`; `detail`: Kimai's message, or the https address (HttpsRedirect)
         void loginFailed(kemai::SessionController::NotificationKind kind, const QString &detail);
@@ -99,6 +103,7 @@ namespace kemai
         };
         LoginRequest m_lastLogin;
         QString      m_lastAccountName;
-        bool         m_justLoggedOut = false;
+        bool         m_justLoggedOut    = false;
+        bool         m_autoLoginPending = false;
     };
 } // namespace kemai

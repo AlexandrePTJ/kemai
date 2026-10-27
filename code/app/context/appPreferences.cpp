@@ -126,6 +126,19 @@ namespace kemai
         }
     }
 
+    bool AppPreferences::legacyImportOffer() const
+    {
+        return value("legacyImportOffer", true).toBool();
+    }
+
+    void AppPreferences::setLegacyImportOffer(bool offer)
+    {
+        if (setValue("legacyImportOffer", offer))
+        {
+            emit legacyImportOfferChanged();
+        }
+    }
+
     QJsonValue AppPreferences::value(const QString &key, const QJsonValue &defaultValue) const
     {
         return m_json.contains(key) ? m_json.value(key) : defaultValue;

@@ -1,0 +1,30 @@
+{
+    "events": {
+        "autoRefreshCurrentTimeSheet": false,
+        "autoRefreshCurrentTimeSheetDelaySeconds": 15,
+        "idleDelayMinutes": 5,
+        "stopOnIdle": false,
+        "stopOnLock": false
+    },
+    "kemai": {
+        "checkUpdateAtStartup": true,
+        "closeToSystemTray": false,
+        "geometry": "",
+        "ignoredVersion": "0.0.0",
+        "language": "en_US",
+        "lastConnectedProfile": "{9d2f6a4c-1e8b-4b7d-8c3a-6f0e2d5b9a17}",
+        "minimizeToSystemTray": false
+    },
+    "profiles": [
+        {
+            "apiToken": "ignored-before-version-3",
+            "host": "https://kimai.example.com",
+            "id": "{9d2f6a4c-1e8b-4b7d-8c3a-6f0e2d5b9a17}",
+            "name": "Home",
+            "token": "example-legacy-password",
+            "username": "someone"
+        }
+    ],
+    "trustedCertificates": [],
+    "version": 2
+}

@@ -9,6 +9,7 @@ Alpha releases are marked by ` [alpha]` after their date (`## [2026.10.1] - 2026
 
 ### Added
 - Linux: desktop entry, icon and AppStream metadata installed with Kemai; a Flatpak manifest, for Flathub
+- Profiles of Kemai 0.11 found on the same computer are offered for import at start, with their API tokens moved to the system keychain
 
 ### Changed
 - Debug messages are no longer printed on the console (hence the system journal) unless Kemai is started with `--verbose`; log files and the log journal still have them
