@@ -60,7 +60,8 @@ int main(int argc, char *argv[])
         parser.addVersionOption();
 
         parser.addOptions({
-            {{"r", "root"}, "Override default OS configuration/data directories root path", "root"}
+            {{"r", "root"}, "Override default OS configuration/data directories root path", "root"},
+            {"verbose", "Also print debug messages on the console"}
         });
 
         parser.process(app);
@@ -79,7 +80,11 @@ int main(int argc, char *argv[])
                                                { journalSink->detach(); });
 
         std::vector<spdlog::sink_ptr> sinks;
-        sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+        // The console ends up in the system journal when a session manager starts Kemai: keep debug messages (a request
+        // trace every 30 s) out of it unless asked. The files and the in-app journal still get them
+        auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        consoleSink->set_level(parser.isSet("verbose") ? spdlog::level::debug : spdlog::level::info);
+        sinks.emplace_back(std::move(consoleSink));
         sinks.emplace_back(journalSink);
 
         const auto logFilePath = kemai::PathHelpers::getFilePath(kemai::PathHelpers::FilePathType::LogFile);
