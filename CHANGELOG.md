@@ -9,6 +9,9 @@ and this project uses [calendar versions](https://calver.org/) (`YEAR.MONTH.PATC
 ### Changed
 - Debug messages are no longer printed on the console (hence the system journal) unless Kemai is started with `--verbose`; log files and the log journal still have them
 
+### Fixed
+- Log files no longer lose their last lines when Kemai crashes or is killed
+
 ## [2026.10.1] - 2026-10-26
 
 First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is provided, build it as shown below. It can be installed next to Kemai 0.11.x: it keeps its own settings and never modifies 0.11.x's (profiles are not imported).

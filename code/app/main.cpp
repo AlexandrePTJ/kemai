@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+#include <chrono>
+
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
@@ -97,7 +99,10 @@ int main(int argc, char *argv[])
         logJournal.setLogFile(logFilePath, logFileError);
 
         auto logger = std::make_shared<spdlog::logger>("kemai", sinks.begin(), sinks.end());
+        // Written at once for warnings and errors, every few seconds otherwise: a crash or a kill must not lose them
+        logger->flush_on(spdlog::level::warn);
         spdlog::register_logger(logger);
+        spdlog::flush_every(std::chrono::seconds(5));
         spdlog::set_level(spdlog::level::debug);
         spdlog::set_default_logger(logger);
 
