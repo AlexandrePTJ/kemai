@@ -168,8 +168,32 @@ install(TARGETS ${PROJECT_NAME}
         BUNDLE DESTINATION .
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-qt_generate_deploy_qml_app_script(
-        TARGET ${PROJECT_NAME}
-        OUTPUT_SCRIPT deploy_script
-)
-install(SCRIPT ${deploy_script})
+if (UNIX AND NOT APPLE)
+    # Desktop integration, named after the app ID (main.cpp sets it as the desktop file name)
+    install(FILES ${CMAKE_SOURCE_DIR}/packaging/linux/io.github.AlexandrePTJ.Kemai.desktop
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/assets/images/kimai_logo.svg
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
+            RENAME io.github.AlexandrePTJ.Kemai.svg)
+
+    # AppStream metadata: releases from the changelog, screenshots at the build's tag
+    include(changelogToMetainfo)
+    kemai_metainfo_releases(${CMAKE_SOURCE_DIR}/CHANGELOG.md "${KEMAI_VERSION}" KEMAI_METAINFO_RELEASES)
+    if (KEMAI_VERSION)
+        set(KEMAI_SCREENSHOTS_REF ${KEMAI_VERSION})
+    else ()
+        set(KEMAI_SCREENSHOTS_REF develop)
+    endif ()
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/CHANGELOG.md)
+    configure_file(${CMAKE_SOURCE_DIR}/packaging/linux/io.github.AlexandrePTJ.Kemai.metainfo.xml.in
+            ${CMAKE_CURRENT_BINARY_DIR}/io.github.AlexandrePTJ.Kemai.metainfo.xml @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/io.github.AlexandrePTJ.Kemai.metainfo.xml
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+endif ()
+if (KEMAI_DEPLOY_QT)
+    qt_generate_deploy_qml_app_script(
+            TARGET ${PROJECT_NAME}
+            OUTPUT_SCRIPT deploy_script
+    )
+    install(SCRIPT ${deploy_script})
+endif ()

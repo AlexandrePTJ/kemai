@@ -26,7 +26,7 @@ jobs:
 
       - name: Install linux packages
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libsecret-1-dev libxcb-screensaver0-dev
+        run: sudo apt-get update && sudo apt-get install -y libsecret-1-dev libxcb-screensaver0-dev desktop-file-utils appstream
 
       - name: Setup MSVC
         if: runner.os == 'Windows'
@@ -44,6 +44,13 @@ jobs:
           KEMAI_TEST_HOST: ${{ secrets.KEMAI_TEST_HOST }}
           KEMAI_TEST_TOKEN: ${{ secrets.KEMAI_TEST_TOKEN }}
         run: ctest --preset release --output-on-failure
+
+      # Desktop entry and AppStream metadata (releases generated from CHANGELOG.md) installed on Linux
+      - name: Desktop files
+        if: runner.os == 'Linux'
+        run: |
+          desktop-file-validate packaging/linux/io.github.AlexandrePTJ.Kemai.desktop
+          appstreamcli validate --no-net build/release/code/app/io.github.AlexandrePTJ.Kemai.metainfo.xml
 
       # qmllint exits 0 on warnings and the Qt-generated target takes no extra args:
       # fail on any "Warning:" line. QML output is platform-independent, Linux is enough.

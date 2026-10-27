@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: MIT
 #include "secretStorage.h"
 
+// Built along with Kemai (CPM), qtkeychain's headers are in qtkeychain/; installed, in qt6keychain/
+#if __has_include(<qt6keychain/keychain.h>)
+#include <qt6keychain/keychain.h>
+#else
 #include <qtkeychain/keychain.h>
+#endif
 
 namespace
 {

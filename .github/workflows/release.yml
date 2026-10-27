@@ -12,6 +12,9 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      channel: ${{ steps.release.outputs.channel }}
 
     steps:
       - name: Checkout repo
@@ -30,7 +33,13 @@ jobs:
         env:
           VERSION: ${{ steps.release.outputs.version }}
           CHANNEL: ${{ steps.release.outputs.channel }}
-        run: .github/scripts/release-notes.sh "$VERSION" "$CHANNEL" > "$RUNNER_TEMP/notes.md"
+          FLATHUB: ${{ vars.KEMAI_FLATHUB }}
+        run: |
+          flags=()
+          if [ "$FLATHUB" = true ]; then
+            flags+=(--flathub)
+          fi
+          .github/scripts/release-notes.sh "${flags[@]}" "$VERSION" "$CHANNEL" > "$RUNNER_TEMP/notes.md"
 
       - name: Publish
         env:
@@ -43,3 +52,49 @@ jobs:
             flags+=(--prerelease)
           fi
           gh release create "$VERSION" --verify-tag --title "Kemai $VERSION" --notes-file "$RUNNER_TEMP/notes.md" "${flags[@]}"
+
+  # Once Kemai is on Flathub (KEMAI_FLATHUB): opens the pull requests updating its Flathub repository to this release,
+  # on beta for an alpha, on master and beta for a stable release (beta users must not stay behind). Flathub builds
+  # each pull request; merging it, by hand, publishes.
+  flathub:
+    needs: publish
+    if: vars.KEMAI_FLATHUB == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Manifest
+        env:
+          VERSION: ${{ needs.publish.outputs.version }}
+          CHANNEL: ${{ needs.publish.outputs.channel }}
+          SHA: ${{ github.sha }}
+        run: .github/scripts/flathub-manifest.sh "$VERSION" "$SHA" "$CHANNEL" > "$RUNNER_TEMP/io.github.AlexandrePTJ.Kemai.yml"
+
+      - name: Pull requests on Flathub
+        env:
+          # Write access to flathub/io.github.AlexandrePTJ.Kemai only
+          GH_TOKEN: ${{ secrets.FLATHUB_TOKEN }}
+          VERSION: ${{ needs.publish.outputs.version }}
+          CHANNEL: ${{ needs.publish.outputs.channel }}
+        run: |
+          repo=flathub/io.github.AlexandrePTJ.Kemai
+          bases=(beta)
+          if [ "$CHANNEL" = stable ]; then
+            bases=(master beta)
+          fi
+          gh auth setup-git
+          gh repo clone "$repo" flathub -- --no-single-branch
+          cd flathub
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for base in "${bases[@]}"; do
+            branch="release-$VERSION-$base"
+            git switch --create "$branch" "origin/$base"
+            cp "$RUNNER_TEMP/io.github.AlexandrePTJ.Kemai.yml" io.github.AlexandrePTJ.Kemai.yml
+            git commit --all --message "Update to Kemai $VERSION"
+            git push --set-upstream origin "$branch"
+            gh pr create --repo "$repo" --base "$base" --head "$branch" --title "Kemai $VERSION" \
+              --body "Kemai $VERSION ($CHANNEL): https://github.com/AlexandrePTJ/kemai/releases/tag/$VERSION"
+          done

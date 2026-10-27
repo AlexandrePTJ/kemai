@@ -2,13 +2,18 @@
 # SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 # SPDX-License-Identifier: MIT
 #
-# Usage: release-notes.sh [--windows-zip <file name>] <version> <channel> [<changelog>]
+# Usage: release-notes.sh [--flathub] [--windows-zip <file name>] <version> <channel> [<changelog>]
 # Prints the release notes: the "## [<version>]" section of the changelog (default CHANGELOG.md), then, with
-# --windows-zip, how to run the signed Windows package attached under that name, then how to build that release
-# from source. Exits non-zero when the changelog has no entry for <version>.
+# --flathub, how to install it from Flathub (flathub-beta for an alpha), with --windows-zip, how to run the signed
+# Windows package attached under that name, then how to build that release from source. Exits non-zero when the changelog has no entry for <version>.
 set -euo pipefail
 
-usage="usage: release-notes.sh [--windows-zip <file name>] <version> <channel> [<changelog>]"
+usage="usage: release-notes.sh [--flathub] [--windows-zip <file name>] <version> <channel> [<changelog>]"
+flathub=false
+if [[ "${1:-}" == "--flathub" ]]; then
+    flathub=true
+    shift
+fi
 windows_zip=""
 if [[ "${1:-}" == "--windows-zip" ]]; then
     windows_zip="${2:?$usage}"
@@ -33,6 +38,29 @@ fi
 cat <<NOTES
 $entry
 NOTES
+
+if [[ "$flathub" == true ]]; then
+    if [[ "$channel" == alpha ]]; then
+        cat <<NOTES
+
+## Linux
+
+Install it from Flathub's beta repository, once its build is published there:
+
+\`\`\`
+flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+flatpak install flathub-beta io.github.AlexandrePTJ.Kemai
+\`\`\`
+NOTES
+    else
+        cat <<NOTES
+
+## Linux
+
+Install it from [Flathub](https://flathub.org/apps/io.github.AlexandrePTJ.Kemai), once its build is published there: \`flatpak install flathub io.github.AlexandrePTJ.Kemai\`.
+NOTES
+    fi
+fi
 
 if [[ -n "$windows_zip" ]]; then
     cat <<NOTES

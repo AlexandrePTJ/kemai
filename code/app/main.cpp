@@ -55,6 +55,10 @@ int main(int argc, char *argv[])
         QGuiApplication::setApplicationName("Kemai");
         QGuiApplication::setOrganizationName("Kemai");
         QGuiApplication::setApplicationVersion(KEMAI_VERSION);
+#if defined(Q_OS_LINUX)
+        // Wayland compositors match the window to the desktop entry (name, icon) by this app ID
+        QGuiApplication::setDesktopFileName("io.github.AlexandrePTJ.Kemai");
+#endif
 
         // CLI options
         QCommandLineParser parser;

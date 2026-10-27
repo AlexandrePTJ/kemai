@@ -56,6 +56,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 # Options
 option(KEMAI_ENABLE_UPDATE_CHECK "Allow Kemai to check for update from Github releases" ON)
 option(KEMAI_BUILD_LOCAL_DEPENDENCIES "Download and build dependencies (except Qt6)" ON)
+# OFF: `cmake --install` installs only Kemai's own files, for packages whose Qt comes from the system or a runtime
+option(KEMAI_DEPLOY_QT "Copy Qt (libraries, plugins, QML imports) next to Kemai at install time" ON)
 
 # Qt first: qtkeychain finds it too, and Qt's deploy support (used by cmake --install) must be set up
 # from this scope, otherwise its QML deployment commands are missing at install time
@@ -67,6 +69,7 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 # Install dependencies sources to build if required
+# Keep these versions in step with the modules of packaging/flatpak/io.github.AlexandrePTJ.Kemai.yml
 if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
     include(cmake/get_cpm.cmake)
     CPMAddPackage("gh:fmtlib/fmt#12.2.0")
@@ -80,7 +83,12 @@ endif (KEMAI_BUILD_LOCAL_DEPENDENCIES)
 find_package(fmt REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(qtkeychain REQUIRED)
+if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
+    find_package(qtkeychain REQUIRED)
+else ()
+    # Installed qtkeychain names its package after the Qt version; the target stays qt6keychain
+    find_package(Qt6Keychain REQUIRED)
+endif ()
 
 # Enable Qt auto-tools globally (AUTOMOC, AUTOUIC, AUTORCC) for all subdirectories
 qt_standard_project_setup(REQUIRES 6.11)

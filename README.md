@@ -9,6 +9,8 @@ Start and stop your timer, review and correct your recent entries, and see what 
 
 Kemai runs on Windows, macOS and Linux. It is free software under the [MIT license](LICENSE.txt), developed independently of the Kimai project.
 
+![Kemai's main window: a timer running on a support task, above today's and yesterday's time entries](docs/screenshots/main-view.png)
+
 > [!IMPORTANT]
 > **Kemai is being rewritten.** The `develop` branch holds a complete rewrite (Qt 6 / QML), published as **alpha** releases, **source only**.
 > The current stable version is **0.11.1** (`master` branch). Bugs and feature requests are now addressed in the rewrite, not in 0.11.x.
@@ -44,6 +46,11 @@ The rewrite (alpha) offers:
 
 Not available yet in the rewrite: translations (the interface is in English).
 
+<p>
+  <img src="docs/screenshots/edit-entry.png" width="49%" alt="Editing a time entry: project and activity, description, start and end, tags">
+  <img src="docs/screenshots/login.png" width="49%" alt="The login view, with a saved profile selected">
+</p>
+
 ## Requirements
 
 - A Kimai server, version **2.14 or later**, and an account on it.
@@ -78,6 +85,15 @@ So far they are **source only**: Kemai never publishes unsigned programs, which 
 3. To remove Kemai, delete the folder. Your settings stay in your user configuration folder (see [Your data and privacy](#your-data-and-privacy)).
 
 `Kemai.exe` is signed: Windows shows **SignPath Foundation** as its publisher. Right after a release, Windows SmartScreen may still warn about a file it has not seen often yet; *More info* then shows the publisher before you choose to run it.
+
+**Linux.** Kemai is being prepared for [Flathub](https://flathub.org), which builds it from each release's source for every distribution. Once it is published there, stable releases install with `flatpak install flathub io.github.AlexandrePTJ.Kemai`, and alphas from Flathub's beta repository:
+
+```shell
+flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+flatpak install flathub-beta io.github.AlexandrePTJ.Kemai
+```
+
+Flathub delivers the updates, so this Kemai does not check for new versions itself. It runs in a sandbox: its profiles and settings are kept apart from those of a Kemai built from source or of Kemai 0.11.x (whose profiles it cannot import), and stopping the timer when the session is locked is not available (stopping it when you are idle is).
 
 The rewrite can be installed next to Kemai 0.11.x. Each keeps its own settings and the rewrite never modifies those of 0.11.x. Profiles are not imported: create them again in the rewrite.
 
@@ -186,7 +202,12 @@ cmake --build --preset release
 
 Without them, Kemai reports itself as a development build (`dev-<commit>`) and does not check for updates.
 
-**For packagers.** `-DKEMAI_ENABLE_UPDATE_CHECK=OFF` builds Kemai without the update check, for distributions that deliver updates themselves.
+**For packagers.**
+
+- `-DKEMAI_ENABLE_UPDATE_CHECK=OFF` builds Kemai without the update check, for distributions that deliver updates themselves.
+- `-DKEMAI_DEPLOY_QT=OFF` makes `cmake --install` install only Kemai's own files, without copying Qt next to it, when Qt comes from the system or a runtime.
+- `-DKEMAI_BUILD_LOCAL_DEPENDENCIES=OFF` uses the installed spdlog, fmt, magic_enum and qtkeychain instead of downloading them (tests then need `-DBUILD_TESTING=OFF` or an installed Catch2).
+- On Linux, the install also puts the desktop entry, the icon and the AppStream metadata in `share/`, named after the app ID `io.github.AlexandrePTJ.Kemai`.
 
 ## Getting help
 

@@ -3,8 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project uses [calendar versions](https://calver.org/) (`YEAR.MONTH.PATCH`) since the rewrite; versions up to 0.11.1 followed [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Alpha releases are marked by ` [alpha]` after their date (`## [2026.10.1] - 2026-10-26 [alpha]`); the release metadata shown by Linux software centers lists them as development releases.
 
 ## [Unreleased]
+
+### Added
+- Linux: desktop entry, icon and AppStream metadata installed with Kemai; a Flatpak manifest, for Flathub
 
 ### Changed
 - Debug messages are no longer printed on the console (hence the system journal) unless Kemai is started with `--verbose`; log files and the log journal still have them
@@ -12,7 +16,7 @@ and this project uses [calendar versions](https://calver.org/) (`YEAR.MONTH.PATC
 ### Fixed
 - Log files no longer lose their last lines when Kemai crashes or is killed
 
-## [2026.10.1] - 2026-10-26
+## [2026.10.1] - 2026-10-26 [alpha]
 
 First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is provided, build it as shown below. It can be installed next to Kemai 0.11.x: it keeps its own settings and never modifies 0.11.x's (profiles are not imported).
 
