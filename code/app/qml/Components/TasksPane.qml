@@ -16,6 +16,8 @@ Item {
     required property SessionContext sessionContext
 
     signal backToHistoryRequested
+    // Starting the task would leave a required custom field empty: the edit dialog asks for it first
+    signal startWithFieldsRequested(int taskId, int projectId, int activityId, string title)
 
     readonly property TaskModel _tasks: root.sessionContext.tasks
     readonly property int _load: root.sessionContext.tasksLoad
@@ -39,10 +41,15 @@ Item {
         return copy
     }
 
-    function _start(taskId) {
+    function _start(taskId, projectId, activityId, title) {
         if (root._pending[taskId] !== undefined)
             return
         root._rowErrors = root._set(root._rowErrors, taskId, undefined)
+        // A required custom field would be left empty: the dialog asks first, and starts the task
+        if (root.sessionContext.needsCustomFields(projectId, activityId)) {
+            root.startWithFieldsRequested(taskId, projectId, activityId, title)
+            return
+        }
         root._pending = root._set(root._pending, taskId, "starting")
         root.sessionContext.startTask(taskId)
     }
@@ -55,10 +62,10 @@ Item {
         root.sessionContext.closeTask(taskId)
     }
 
-    function _retry(taskId) {
+    function _retry(taskId, projectId, activityId, title) {
         const error = root._rowErrors[taskId]
         if (error.action === "start")
-            root._start(taskId)
+            root._start(taskId, projectId, activityId, title)
         else
             root._close(taskId)
     }
@@ -195,6 +202,8 @@ Item {
             required property string todo
             required property string status
             required property bool running
+            required property int projectId
+            required property int activityId
             required property string projectName
             required property string activityName
             required property string activityColor
@@ -446,7 +455,7 @@ Item {
                         visible: !row.running
                         Layout.preferredWidth: 28
                         Layout.preferredHeight: 28
-                        onClicked: root._start(row.taskId)
+                        onClicked: root._start(row.taskId, row.projectId, row.activityId, row.title)
 
                         ToolTip.visible: startButton.hovered && row.pending === ""
                         ToolTip.delay: 500
@@ -662,7 +671,7 @@ Item {
 
                         DialogButton {
                             text: "Retry"
-                            onClicked: root._retry(row.taskId)
+                            onClicked: root._retry(row.taskId, row.projectId, row.activityId, row.title)
                         }
 
                         Icon {

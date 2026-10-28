@@ -8,6 +8,8 @@
 #include <QElapsedTimer>
 #include <QEventLoop>
 #include <QFutureWatcher>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QTcpServer>
@@ -442,6 +444,17 @@ TEST_CASE("KimaiClient - an http host redirecting to https fails as HttpsRedirec
     }
 }
 
+// Shape of GET config/colors (demo.kimai.org 2026-10-28, Kimai's default palette)
+TEST_CASE("KimaiClient::colorChoicesFromJson - the palette by name", "[client][unit]")
+{
+    const auto doc = QJsonDocument::fromJson(R"({"Silver":"#c0c0c0","Lavender":"#E6E6FA","Broken":null})");
+    REQUIRE(KimaiClient::colorChoicesFromJson(doc) == KimaiColorChoices{
+                                                          {.name = "Lavender", .color = "#E6E6FA"},
+                                                          {.name = "Silver",   .color = "#c0c0c0"}
+    });
+    REQUIRE_THROWS(KimaiClient::colorChoicesFromJson(QJsonDocument::fromJson("[]")));
+}
+
 TEST_CASE("KimaiClient::tagNamesFromJson - accepts tag objects and plain names", "[client][unit]")
 {
     const auto objects = QJsonDocument::fromJson(R"([{"id": 1, "name": "QML", "color": null}, {"id": 2, "name": "Frontend"}])");
@@ -470,4 +483,122 @@ TEST_CASE("KimaiClient - requestTags finds existing tags by name", "[client][int
 
     const auto found = waitForFuture(client.requestTags(allTags.first()));
     REQUIRE(found.contains(allTags.first()));
+}
+
+TEST_CASE("KimaiMetaFieldRule::fromJson - definition of a custom field", "[client][unit][customFields]")
+{
+    // Shape of GET metafields?entity=timesheet (MetaFieldsBundle, demo.kimai.org 2026-10-27)
+    const auto json = QJsonDocument::fromJson(R"([
+        {"id": 3, "name": "ticket", "label": "Ticket", "help": "Issue number", "value": null, "type": "text",
+         "visible": true, "required": true, "entityType": "timesheet", "customer": null, "project": 120, "activity": null},
+        {"id": 4, "name": "kind", "label": "Kind", "help": null, "value": ",dev|Development,ops|Operations",
+         "type": "choice", "visible": true, "required": false, "entityType": "timesheet", "customer": 5, "project": null, "activity": 9}
+    ])")
+                          .array();
+
+    const auto ticket = KimaiMetaFieldRule::fromJson(json.at(0));
+    CHECK(ticket.name == "ticket");
+    CHECK(ticket.label == "Ticket");
+    CHECK(ticket.help == "Issue number");
+    CHECK(ticket.type == "text");
+    CHECK(ticket.rawValue.isEmpty());
+    CHECK(ticket.required);
+    CHECK(ticket.customerId == 0);
+    CHECK(ticket.projectId == 120);
+    CHECK(ticket.activityId == 0);
+
+    const auto kind = KimaiMetaFieldRule::fromJson(json.at(1));
+    CHECK(kind.help.isEmpty());
+    CHECK(kind.rawValue == ",dev|Development,ops|Operations");
+    CHECK_FALSE(kind.required);
+    CHECK(kind.customerId == 5);
+    CHECK(kind.activityId == 9);
+
+    CHECK_THROWS(KimaiMetaFieldRule::fromJson(QJsonValue(QStringLiteral("not an object"))));
+}
+
+TEST_CASE("KimaiClient::setTimeSheetMeta - PATCH timesheets/{id}/meta with name and value", "[client][unit][customFields]")
+{
+    // Captures one request and answers with the updated entry
+    QTcpServer server;
+    REQUIRE(server.listen(QHostAddress::LocalHost));
+    QByteArray request;
+    QObject::connect(&server,
+                     &QTcpServer::newConnection,
+                     &server,
+                     [&server, &request]()
+                     {
+                         auto *socket = server.nextPendingConnection();
+                         QObject::connect(socket,
+                                          &QTcpSocket::readyRead,
+                                          socket,
+                                          [socket, &request]()
+                                          {
+                                              request += socket->readAll();
+                                              const auto headerEnd = request.indexOf("\r\n\r\n");
+                                              if (headerEnd < 0)
+                                              {
+                                                  return;
+                                              }
+                                              const auto lengthAt = request.toLower().indexOf("content-length:");
+                                              const auto length   = request.mid(lengthAt + 15, request.indexOf("\r\n", lengthAt) - lengthAt - 15).trimmed().toInt();
+                                              if (request.size() < headerEnd + 4 + length)
+                                              {
+                                                  return;
+                                              }
+                                              const QByteArray body = R"({"id": 42, "begin": "2026-10-28T09:00:00+0100", "project": 1, "activity": 2, "metaFields": [{"name": "ticket", "value": "KEM-1"}]})";
+                                              socket->write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + QByteArray::number(body.size()) +
+                                                            "\r\nConnection: close\r\n\r\n" + body);
+                                              socket->disconnectFromHost();
+                                          });
+                     });
+
+    KimaiClient client;
+    client.setHost(QString("http://127.0.0.1:%1").arg(server.serverPort()));
+    client.setToken("token");
+
+    const auto updated = waitForFuture(client.setTimeSheetMeta(42, "ticket", "KEM-1"), 5000);
+    CHECK(updated.id == 42);
+    CHECK(updated.metaFields.value("ticket") == "KEM-1");
+
+    REQUIRE(request.startsWith("PATCH /api/timesheets/42/meta "));
+    const auto body = QJsonDocument::fromJson(request.mid(request.indexOf("\r\n\r\n") + 4)).object();
+    CHECK(body == QJsonObject{
+                      {"name",  "ticket"},
+                      {"value", "KEM-1" }
+    });
+}
+
+TEST_CASE("KimaiClient::setTimeSheetMeta - sets then reads a value on the test instance", "[client][integration][customFields]")
+{
+    // Needs an instance with the custom fields plugin and a text field of time entries named by KEMAI_TEST_META_FIELD
+    const auto field = qEnvironmentVariable("KEMAI_TEST_META_FIELD");
+    if (host.isEmpty() || token.isEmpty() || field.isEmpty())
+    {
+        SKIP("Set KEMAI_TEST_HOST, KEMAI_TEST_TOKEN and KEMAI_TEST_META_FIELD to run this integration test");
+    }
+
+    KimaiClient client;
+    client.setHost(host);
+    client.setToken(token);
+
+    const auto activities = waitForFuture(client.requestActivities());
+    const auto it         = std::ranges::find_if(activities, [](const KimaiActivity &a)
+                                                 { return a.project.has_value(); });
+    REQUIRE(it != activities.end());
+
+    KimaiTimeSheet ts;
+    ts.project         = *it->project;
+    ts.activity        = *it;
+    ts.beginAt         = QDateTime::currentDateTime().addSecs(-3600);
+    ts.endAt           = QDateTime::currentDateTime().addSecs(-1800);
+    ts.description     = QStringLiteral("kemai integration test (setTimeSheetMeta)");
+    const auto created = waitForFuture(client.startTimeSheet(ts, KimaiTimeSheetConfig::TrackingMode::Default));
+    REQUIRE(created.id > 0);
+
+    const auto value   = QStringLiteral("kemai-%1").arg(QDateTime::currentSecsSinceEpoch());
+    const auto updated = waitForFuture(client.setTimeSheetMeta(created.id, field, value));
+    CHECK(updated.metaFields.value(field) == value);
+
+    REQUIRE_NOTHROW(waitForFuture(client.deleteTimeSheet(created.id)));
 }

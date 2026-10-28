@@ -36,7 +36,8 @@ namespace kemai
             TimesheetId,
             BeginAt,
             EndAt,
-            Tags
+            Tags,
+            CustomValues
         };
 
         explicit TimesheetModel(QObject *parent = nullptr);
@@ -45,6 +46,8 @@ namespace kemai
         void setTimeSheets(const KimaiTimeSheets &timeSheets);
 
         std::optional<KimaiTimeSheet> findById(int timesheetId) const;
+        // The entry's roles by name (as a delegate sees them), empty when it is not in the list
+        Q_INVOKABLE QVariantMap entry(int timesheetId) const;
 
         int                    rowCount(const QModelIndex &parent = {}) const override;
         QVariant               data(const QModelIndex &index, int role) const override;

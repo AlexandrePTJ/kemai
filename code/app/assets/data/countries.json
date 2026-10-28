@@ -153,7 +153,6 @@
   "NR": "Nauru",
   "NP": "Nepal",
   "NL": "Netherlands",
-  "AN": "Netherlands Antilles",
   "NC": "New Caledonia",
   "NZ": "New Zealand",
   "NI": "Nicaragua",
@@ -243,5 +242,10 @@
   "EH": "Western Sahara",
   "YE": "Yemen",
   "ZM": "Zambia",
-  "ZW": "Zimbabwe"
+  "ZW": "Zimbabwe",
+  "BQ": "Caribbean Netherlands",
+  "CW": "Curaçao",
+  "KP": "North Korea",
+  "SX": "Sint Maarten",
+  "SS": "South Sudan"
 }

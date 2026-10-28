@@ -43,6 +43,10 @@ namespace kemai
         const KimaiProjects        &projects() const;
         const KimaiActivities      &activities() const;
         const KimaiTimeSheetConfig &timesheetConfig() const;
+        // Required custom fields of time entries; empty without the custom fields plugin
+        const KimaiMetaFieldRules &timesheetMetaFields() const;
+        // The instance's color palette, loaded only when a color field is among them
+        const KimaiColorChoices &colorChoices() const;
 
         // Set when the last load() failed; an incomplete cache is useless, so any
         // resource failure fails the whole load.
@@ -58,7 +62,8 @@ namespace kemai
             Customers,
             Projects,
             Activities,
-            TimesheetConfig
+            TimesheetConfig,
+            MetaFields
         };
 
         struct Snapshot
@@ -67,9 +72,13 @@ namespace kemai
             KimaiProjects        projects;
             KimaiActivities      activities;
             KimaiTimeSheetConfig timesheetConfig;
+            KimaiMetaFieldRules  metaFields;
+            KimaiColorChoices    colorChoices;
         };
 
         void onResourceLoaded(int generation, Resource resource);
+        // Palette for color fields, then the end of the MetaFields resource
+        void loadColorChoices(IKimaiClient *client, int generation);
         void onResourceFailed(int generation, Resource resource, const KimaiApiError &error);
 
         static void consolidateProjects(Snapshot &snapshot);   // fills project.customer from customers

@@ -42,6 +42,17 @@ namespace
         return list;
     }
 
+    QSet<QString> readCodes(const QString &resource)
+    {
+        QFile file(resource);
+        if (!file.open(QIODevice::ReadOnly))
+        {
+            return {};
+        }
+        const auto keys = QJsonDocument::fromJson(file.readAll()).object().keys();
+        return {keys.cbegin(), keys.cend()};
+    }
+
     bool containsCode(const QVariantList &list, const QString &code)
     {
         return std::ranges::any_of(list, [&code](const QVariant &item)
@@ -69,6 +80,21 @@ namespace kemai
         static const auto list = readCodeNames(":/assets/data/currencies.json", [](const QString &name)
                                                { return !name.contains('('); });
         return list;
+    }
+
+    QVariantList ReferenceData::languages() const
+    {
+        static const auto list = readCodeNames(":/assets/data/languages.json", [](const QString &)
+                                               { return true; });
+        return list;
+    }
+
+    CustomFields::KnownCodes ReferenceData::knownCodes()
+    {
+        static const CustomFields::KnownCodes codes{.countries  = readCodes(":/assets/data/countries.json"),
+                                                    .currencies = readCodes(":/assets/data/currencies.json"),
+                                                    .languages  = readCodes(":/assets/data/languages.json")};
+        return codes;
     }
 
     QStringList ReferenceData::timezones() const

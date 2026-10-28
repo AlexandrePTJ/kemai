@@ -7,6 +7,8 @@ set(KEMAI_QML_FILES
         qml/Components/CreateOffer.qml
         qml/Components/ActivityComboBox.qml
         qml/Components/CalendarView.qml
+        qml/Components/CustomFieldRow.qml
+        qml/Components/CustomFieldsSection.qml
         qml/Components/DashedBorder.qml
         qml/Components/DialogButton.qml
         qml/Components/EntriesHeader.qml
@@ -66,6 +68,8 @@ set(KEMAI_QML_SOURCES
         context/appPreferences.h
         context/buildInfo.cpp
         context/buildInfo.h
+        context/customFieldsForm.cpp
+        context/customFieldsForm.h
         context/kemaiContext.cpp
         context/kemaiContext.h
         context/logJournal.cpp
@@ -129,6 +133,7 @@ qt_add_resources(
         assets/images/tray/kemai-tray-running-template.svg
         assets/data/countries.json
         assets/data/currencies.json
+        assets/data/languages.json
 )
 
 qt_add_resources(

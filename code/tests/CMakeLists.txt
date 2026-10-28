@@ -16,11 +16,13 @@ qt_add_executable(${PROJECT_NAME}
     ../app/context/appPreferences.cpp
     ../app/context/appPreferences.h
     context/tst_sessionController.cpp
+    misc/tst_customFields.cpp
     misc/tst_formatHelpers.cpp
     misc/tst_fuzzyMatch.cpp
     misc/tst_logFiles.cpp
     misc/tst_windowPlacement.cpp
     model/tst_logEntryModel.cpp
+    model/tst_customFieldsModel.cpp
     model/tst_taskModel.cpp
     model/tst_timesheetModel.cpp
     storage/tst_appSettingsStore.cpp

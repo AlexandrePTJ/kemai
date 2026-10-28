@@ -8,6 +8,7 @@ const components = [
     { name: "Qt", license: "LGPL-3.0", url: "https://www.qt.io" },
     { name: "Lucide icons", license: "ISC", url: "https://lucide.dev" },
     { name: "Kimai logo (tray icons)", license: "CC-BY-SA-4.0", url: "https://github.com/kimai/images" },
+    { name: "Unicode CLDR (country, currency and language lists, via Symfony Intl)", license: "Unicode-3.0", url: "https://cldr.unicode.org" },
     { name: "Raveo", license: "OFL-1.1", url: "https://github.com/jakubfoglar/raveo" },
     { name: "qtkeychain", license: "BSD-3-Clause", url: "https://github.com/frankosterfeld/qtkeychain" },
     { name: "spdlog", license: "MIT", url: "https://github.com/gabime/spdlog" },

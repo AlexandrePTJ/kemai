@@ -26,17 +26,21 @@ namespace kemai
     public:
         virtual ~IKimaiClient() = default;
 
-        virtual QFuture<KimaiVersion>         requestKimaiVersion()                                          = 0;
-        virtual QFuture<KimaiUser>            requestMeUserInfo()                                            = 0;
-        virtual QFuture<KimaiTimeSheetConfig> requestTimeSheetConfig()                                       = 0;
-        virtual QFuture<KimaiPlugins>         requestPlugins()                                               = 0;
-        virtual QFuture<KimaiCustomers>       requestCustomers()                                             = 0;
-        virtual QFuture<KimaiTimeSheets>      requestTimeSheets()                                            = 0;
-        virtual QFuture<KimaiTimeSheets>      requestActiveTimeSheets()                                      = 0;
-        virtual QFuture<KimaiTimeSheets>      requestRecentTimeSheets()                                      = 0;
-        virtual QFuture<KimaiProjects>        requestProjects(std::optional<int> customerId = std::nullopt)  = 0;
-        virtual QFuture<KimaiActivities>      requestActivities(std::optional<int> projectId = std::nullopt) = 0;
-        virtual QFuture<QStringList>          requestTags(const QString &name)                               = 0; // names containing `name`
+        virtual QFuture<KimaiVersion>         requestKimaiVersion()    = 0;
+        virtual QFuture<KimaiUser>            requestMeUserInfo()      = 0;
+        virtual QFuture<KimaiTimeSheetConfig> requestTimeSheetConfig() = 0;
+        virtual QFuture<KimaiPlugins>         requestPlugins()         = 0;
+        // Custom fields of time entries; fails with NotFound when the instance has no custom fields plugin
+        virtual QFuture<KimaiMetaFieldRules> requestTimeSheetMetaFields() = 0;
+        // The instance's color palette (name -> #rrggbb)
+        virtual QFuture<KimaiColorChoices> requestColorChoices()                                          = 0;
+        virtual QFuture<KimaiCustomers>    requestCustomers()                                             = 0;
+        virtual QFuture<KimaiTimeSheets>   requestTimeSheets()                                            = 0;
+        virtual QFuture<KimaiTimeSheets>   requestActiveTimeSheets()                                      = 0;
+        virtual QFuture<KimaiTimeSheets>   requestRecentTimeSheets()                                      = 0;
+        virtual QFuture<KimaiProjects>     requestProjects(std::optional<int> customerId = std::nullopt)  = 0;
+        virtual QFuture<KimaiActivities>   requestActivities(std::optional<int> projectId = std::nullopt) = 0;
+        virtual QFuture<QStringList>       requestTags(const QString &name)                               = 0; // names containing `name`
 
         virtual QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer) = 0;
         virtual QFuture<KimaiProject>  addProject(const KimaiProject &project)    = 0;
@@ -47,6 +51,8 @@ namespace kemai
         virtual QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode)  = 0;
         virtual QFuture<KimaiTimeSheet> updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode) = 0;
         virtual QFuture<void>           deleteTimeSheet(int timeSheetId)                                                                  = 0;
+        // One custom field value; fails with NotFound when that field does not apply to the entry
+        virtual QFuture<KimaiTimeSheet> setTimeSheetMeta(int timeSheetId, const QString &name, const QString &value) = 0;
         // Stops a running timesheet now (server time); works in punch mode, where an update cannot send an end
         virtual QFuture<KimaiTimeSheet> stopTimeSheet(int timeSheetId) = 0;
 

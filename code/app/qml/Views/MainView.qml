@@ -73,7 +73,7 @@ Page {
             entryDescription: root.sessionContext.activeTimesheetLabel
             isRunning: root.sessionContext.hasActiveTimesheet
             activityModel: root.sessionContext.activityModel
-            onStartClicked: (activityId, projectId) => root.sessionContext.startTimeSheet(activityId, projectId)
+            onStartClicked: (activityId, projectId) => historyView.startEntry(activityId, projectId, null)
             onStopClicked: root.sessionContext.stopActiveTimeSheet()
             onCreateRequested: (kind, name) => timerBarCreation.openFor(kind, name, root.sessionContext.lastUsedProjectId())
         }
@@ -105,6 +105,7 @@ Page {
         }
 
         TimesheetHistoryView {
+            id: historyView
             Layout.fillWidth: true
             Layout.fillHeight: true
             sessionContext: root.sessionContext

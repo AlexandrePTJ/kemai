@@ -40,6 +40,9 @@ namespace kemai
         QFuture<KimaiUser>            requestMeUserInfo() override;
         QFuture<KimaiTimeSheetConfig> requestTimeSheetConfig() override;
         QFuture<KimaiPlugins>         requestPlugins() override;
+        QFuture<KimaiMetaFieldRules>  requestTimeSheetMetaFields() override;
+        QFuture<KimaiColorChoices>    requestColorChoices() override;
+        QFuture<KimaiTimeSheet>       setTimeSheetMeta(int timeSheetId, const QString &name, const QString &value) override;
         QFuture<KimaiCustomers>       requestCustomers() override;
         QFuture<KimaiTimeSheets>      requestTimeSheets() override;
         QFuture<KimaiTimeSheets>      requestActiveTimeSheets() override;
@@ -66,6 +69,8 @@ namespace kemai
 
         // Tag names from a tags reply, accepting tag objects ({"name": ...}) or plain names; throws if not an array
         static QStringList tagNamesFromJson(const QJsonDocument &doc);
+        // Palette of a config/colors reply ({"Silver": "#c0c0c0", ...}), by name; throws if not an object
+        static KimaiColorChoices colorChoicesFromJson(const QJsonDocument &doc);
         // Host as typed by the user → base URL: https:// when no scheme is given (QUrl::fromUserInput would pick
         // http://, and servers redirecting to https turn PATCH/POST into GET: 405), no trailing slash
         static QString normalizedHost(const QString &host);

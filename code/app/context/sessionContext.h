@@ -6,6 +6,7 @@
 #include <QtQmlIntegration/qqmlintegration.h>
 
 // Project headers
+#include "referenceData.h"
 #include <context/sessionController.h>
 
 namespace kemai
@@ -17,7 +18,11 @@ namespace kemai
         QML_UNCREATABLE("SessionContext is created by the application")
 
     public:
-        using SessionController::SessionController;
+        SessionContext(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, QObject *parent = nullptr):
+        SessionController(std::move(client), user, parent)
+        {
+            setKnownCodes(ReferenceData::knownCodes());
+        }
     };
 
     // QML registrations for core types used as QML property types

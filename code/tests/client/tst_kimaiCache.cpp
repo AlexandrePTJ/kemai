@@ -189,3 +189,94 @@ TEST_CASE("KimaiCache - a new load supersedes the one in flight", "[cache][unit]
     REQUIRE_FALSE(cache.isLoading());
     REQUIRE(cache.customers().first().name == "Second");
 }
+
+TEST_CASE("KimaiCache - custom field definitions: required ones kept, none without the plugin", "[cache][unit][customFields]")
+{
+    SECTION("required definitions are kept")
+    {
+        auto fake = makeFakeWithResources();
+        fake.metaFieldRules.append(KimaiMetaFieldRule{.name = "ticket", .type = "text", .required = true});
+        fake.metaFieldRules.append(KimaiMetaFieldRule{.name = "note", .type = "text", .required = false});
+
+        KimaiCache cache;
+        cache.load(&fake);
+        processEvents();
+
+        REQUIRE(cache.hasData());
+        REQUIRE(cache.timesheetMetaFields().size() == 1);
+        CHECK(cache.timesheetMetaFields().first().name == "ticket");
+    }
+
+    SECTION("404: no plugin, the load still succeeds with no field")
+    {
+        auto fake = makeFakeWithResources();
+        fake.failWith("requestTimeSheetMetaFields", ApiErrorKind::NotFound, 404);
+
+        KimaiCache cache;
+        int        failedCount = 0;
+        QObject::connect(&cache, &KimaiCache::loadFailed, [&failedCount]
+                         { ++failedCount; });
+        cache.load(&fake);
+        processEvents();
+
+        CHECK(failedCount == 0);
+        REQUIRE(cache.hasData());
+        CHECK(cache.timesheetMetaFields().isEmpty());
+    }
+
+    SECTION("any other failure fails the whole load")
+    {
+        auto fake = makeFakeWithResources();
+        fake.failWith("requestTimeSheetMetaFields", ApiErrorKind::ServerError, 500);
+
+        KimaiCache cache;
+        cache.load(&fake);
+        processEvents();
+
+        CHECK_FALSE(cache.hasData());
+        REQUIRE(cache.lastError().has_value());
+        CHECK(cache.lastError()->kind() == ApiErrorKind::ServerError);
+    }
+
+    SECTION("the palette is loaded only with a color field")
+    {
+        auto fake         = makeFakeWithResources();
+        fake.colorChoices = {
+            {.name = "Silver", .color = "#c0c0c0"}
+        };
+        fake.metaFieldRules.append(KimaiMetaFieldRule{.name = "ticket", .type = "text", .required = true});
+
+        KimaiCache cache;
+        cache.load(&fake);
+        processEvents();
+        CHECK_FALSE(fake.calls.contains("requestColorChoices"));
+        CHECK(cache.colorChoices().isEmpty());
+
+        fake.metaFieldRules.append(KimaiMetaFieldRule{.name = "label", .type = "color", .required = true});
+        cache.load(&fake);
+        processEvents();
+        REQUIRE(cache.hasData());
+        CHECK(cache.colorChoices() == KimaiColorChoices{
+                                          {.name = "Silver", .color = "#c0c0c0"}
+        });
+    }
+
+    SECTION("a palette failure fails the load, except 404")
+    {
+        auto fake = makeFakeWithResources();
+        fake.metaFieldRules.append(KimaiMetaFieldRule{.name = "label", .type = "color-free", .required = true});
+
+        fake.failWith("requestColorChoices", ApiErrorKind::NotFound, 404);
+        KimaiCache cache;
+        cache.load(&fake);
+        processEvents();
+        REQUIRE(cache.hasData());
+        CHECK(cache.colorChoices().isEmpty());
+
+        fake.failWith("requestColorChoices", ApiErrorKind::ServerError, 500);
+        KimaiCache failing;
+        failing.load(&fake);
+        processEvents();
+        CHECK_FALSE(failing.hasData());
+    }
+}

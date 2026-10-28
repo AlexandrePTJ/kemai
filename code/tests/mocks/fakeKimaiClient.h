@@ -33,6 +33,8 @@ namespace kemai
         KimaiUser            user;
         KimaiTimeSheetConfig timesheetConfig;
         KimaiPlugins         plugins;
+        KimaiMetaFieldRules  metaFieldRules;
+        KimaiColorChoices    colorChoices;
         KimaiCustomers       customers;
         KimaiProjects        projects;
         KimaiActivities      activities;
@@ -62,6 +64,10 @@ namespace kemai
         { return result("requestTimeSheetConfig", timesheetConfig); }
         QFuture<KimaiPlugins> requestPlugins() override
         { return result("requestPlugins", plugins); }
+        QFuture<KimaiMetaFieldRules> requestTimeSheetMetaFields() override
+        { return result("requestTimeSheetMetaFields", metaFieldRules); }
+        QFuture<KimaiColorChoices> requestColorChoices() override
+        { return result("requestColorChoices", colorChoices); }
         QFuture<KimaiCustomers> requestCustomers() override
         { return result("requestCustomers", customers); }
         QFuture<KimaiTimeSheets> requestTimeSheets() override
@@ -118,6 +124,30 @@ namespace kemai
             return result("deleteTimeSheet");
         }
 
+        // Records each write (and applies the successful ones to `timeSheets`); failures registered for "setTimeSheetMeta:<name>" affect that field only
+        QFuture<KimaiTimeSheet> setTimeSheetMeta(int timeSheetId, const QString &name, const QString &value) override
+        {
+            metaWrites.append({timeSheetId, name, value});
+            const auto perField = QStringLiteral("setTimeSheetMeta:%1").arg(name);
+            if (errors.contains(perField))
+            {
+                calls.append(QStringLiteral("setTimeSheetMeta"));
+                return result(qPrintable(perField), timeSheetResult);
+            }
+            // As the server: a written value shows in the next timesheet list
+            if (!errors.contains(QStringLiteral("setTimeSheetMeta")))
+            {
+                for (auto &timeSheet : timeSheets)
+                {
+                    if (timeSheet.id == timeSheetId)
+                    {
+                        timeSheet.metaFields.insert(name, value);
+                    }
+                }
+            }
+            return result("setTimeSheetMeta", timeSheetResult);
+        }
+
         QFuture<KimaiTimeSheet> stopTimeSheet(int timeSheetId) override
         {
             lastStoppedTimeSheetId = timeSheetId;
@@ -133,6 +163,14 @@ namespace kemai
         }
         QFuture<KimaiTask> closeTask(int) override
         { return result("closeTask", taskResult); }
+
+        struct MetaWrite
+        {
+            int     timeSheetId = 0;
+            QString name;
+            QString value;
+        };
+        QList<MetaWrite> metaWrites;
 
         KimaiTimeSheet lastUpdatedTimeSheet;
         int            lastDeletedTimeSheetId = 0;

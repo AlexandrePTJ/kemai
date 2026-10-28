@@ -19,6 +19,7 @@
 #include <client/kimaiCache.h>
 #include <client/kimaiSystem.h>
 #include <client/kimaiTimesheets.h>
+#include <misc/customFields.h>
 #include <model/activityListModel.h>
 #include <model/taskModel.h>
 #include <model/timesheetModel.h>
@@ -146,6 +147,8 @@ namespace kemai
         NotificationKind tasksError() const;
         // Project of the most recent entry (prefill of new activities), 0 without entries
         Q_INVOKABLE int lastUsedProjectId() const;
+        // The entry's page in Kimai's web interface (in the Kimai user's language)
+        Q_INVOKABLE QUrl timeSheetWebUrl(int timesheetId) const;
 
         // Where the session comes from, for display: `profileName` may be empty (credentials typed by hand)
         void setAccount(const QString &profileName, const QString &host);
@@ -153,7 +156,23 @@ namespace kemai
         // Cache age beyond which refreshIfStale() reloads it.
         void setStaleAfter(std::chrono::seconds staleAfter);
 
-        Q_INVOKABLE void startTimeSheet(int activityId, int projectId);
+        // Starts a timer at once. Required custom fields get their default value, or the value they have in
+        // `sourceTimesheetId` (a history entry restarted); a failed write emits customFieldsSaveFailed.
+        Q_INVOKABLE void startTimeSheet(int activityId, int projectId, int sourceTimesheetId = 0);
+        // Starts a timer from the dialog's new entry mode, then writes `customValues` (name -> value). Answered by
+        // timeSheetSaved(new id), or timeSheetSaveFailed(0, ...) when nothing started, or customFieldsSaveFailed.
+        Q_INVOKABLE void startTimeSheetWith(int projectId, int activityId, const QString &description, const QStringList &tags, const QStringList &newTags, const QVariantMap &customValues);
+        // Whether starting on that project and activity would leave a required custom field Kemai can fill empty
+        // or invalid, after defaults and the values of `sourceTimesheetId` (0: none): the UI then asks for them first
+        Q_INVOKABLE bool needsCustomFields(int projectId, int activityId, int sourceTimesheetId = 0) const;
+        // Codes a country, currency or language field may hold (given by the app, which has the lists)
+        void                            setKnownCodes(const CustomFields::KnownCodes &codes);
+        const CustomFields::KnownCodes &knownCodes() const;
+        // Required custom fields of time entries and the palette of color fields, from the cache
+        const KimaiMetaFieldRules &customFieldRules() const;
+        const KimaiColorChoices   &colorChoices() const;
+        // Customer of a cached project (id 0 when the project is unknown)
+        KimaiCustomer    customerOfProject(int projectId) const;
         Q_INVOKABLE void stopActiveTimeSheet();
         // Stops the running timesheet with `end` as its end (the user left at that time): applied through an update,
         // except in punch mode or when `end` is not after the begin, where it is a plain stop. Answered by
@@ -163,7 +182,11 @@ namespace kemai
         // and a running entry keeps no end. Returns false (nothing sent) when end <= begin or project/activity
         // are invalid; otherwise answered by timeSheetSaved or timeSheetSaveFailed.
         // `newTags` (among `tags`) do not exist on the server yet: they are created before the update.
-        Q_INVOKABLE bool updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags, const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags = {});
+        // `customValues` (name -> value) are written after the update, only those that differ from the server's.
+        Q_INVOKABLE bool updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags, const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags = {}, const QVariantMap &customValues = {});
+        // Writes only the custom values of an existing entry (Retry after a partial failure), those that differ from
+        // the server's as far as the history knows them. Answered by timeSheetSaved or customFieldsSaveFailed.
+        Q_INVOKABLE void saveCustomValues(int timesheetId, int projectId, int activityId, const QVariantMap &customValues);
         // Deletes the timesheet on the server, then refreshes active + recent (stops tracking if it was active).
         // Returns false (nothing sent) for an invalid id; otherwise answered by timeSheetDeleted or timeSheetDeleteFailed.
         Q_INVOKABLE bool deleteTimeSheet(int timesheetId);
@@ -184,6 +207,9 @@ namespace kemai
         // Starts a timer on the task (Kimai stops a running one when only one may run), titled after the task.
         // Answered by taskStarted, or taskActionFailed(id, "start", ...) for the row to show (401 → sessionExpired)
         Q_INVOKABLE void startTask(int taskId);
+        // startTask from the dialog's new entry mode, then writes `customValues`. Answered by taskStarted and
+        // timeSheetSaved(new id), or timeSheetSaveFailed(0, ...) when the task did not start, or customFieldsSaveFailed.
+        Q_INVOKABLE void startTaskWith(int taskId, const QVariantMap &customValues);
         // Marks the task done (Kimai also stops its running timer). Answered by taskClosed, or taskActionFailed(id, "close", ...)
         Q_INVOKABLE void closeTask(int taskId);
 
@@ -222,6 +248,8 @@ namespace kemai
         // Update/delete outcomes, for the edit dialog that shows its own failures (never 401: sessionExpired instead)
         void timeSheetSaved(int timesheetId);
         void timeSheetSaveFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
+        // Writing custom values of the (existing) entry stopped at the first failure; `pendingNames` were not written
+        void customFieldsSaveFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail, const QStringList &pendingNames);
         void timeSheetDeleted(int timesheetId);
         void timeSheetDeleteFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
         void pluginsChanged();
@@ -250,6 +278,15 @@ namespace kemai
         void invalidateSync();
         // Creates `names` one after the other, then runs `next`; a failure reports timeSheetSaveFailed instead
         void createTagsThen(QStringList names, int timesheetId, std::function<void()> next);
+        using CustomValues = QMap<QString, QString>;
+        using CustomWrites = QList<std::pair<QString, QString>>;
+        QList<CustomFields::Field> resolveCustomFields(int projectId, int activityId, const CustomValues &values) const;
+        // Values of `wanted` for the fields that apply and Kemai can fill, which differ from `current`
+        CustomWrites customWrites(int projectId, int activityId, const CustomValues &wanted, const CustomValues &current) const;
+        // Starts a task, titles its timesheet after it, then runs `next` with the started timesheet
+        void startTaskThen(int taskId, std::function<void(const KimaiTimeSheet &)> next, std::function<void(const KimaiApiError &)> failed);
+        // Writes `pending` one after the other, then runs `done`; the first failure emits customFieldsSaveFailed
+        void writeCustomValues(int timesheetId, CustomWrites pending, std::function<void()> done);
         void handleCreateError(const KimaiApiError &error, ResourceKind kind);
         void handleTaskError(const KimaiApiError &error, int taskId, const QString &action);
         void requestPlugins();
@@ -283,5 +320,6 @@ namespace kemai
         TasksLoad                          m_tasksLoad         = TasksLoad::NotLoaded;
         NotificationKind                   m_tasksError        = NotificationKind::UnknownError;
         int                                m_tasksGeneration   = 0;
+        CustomFields::KnownCodes           m_knownCodes;
     };
 } // namespace kemai

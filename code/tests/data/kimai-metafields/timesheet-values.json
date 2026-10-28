@@ -1,0 +1,88 @@
+{
+  "activity": 695,
+  "project": 35,
+  "user": 8,
+  "tags": [],
+  "id": 11517,
+  "begin": "2026-10-28T16:06:00+0100",
+  "end": "2026-10-28T16:08:00+0100",
+  "duration": 120,
+  "break": 0,
+  "description": null,
+  "rate": 3.3,
+  "internalRate": 3.3,
+  "fixedRate": null,
+  "hourlyRate": 99.0,
+  "exported": false,
+  "billable": true,
+  "metaFields": [
+    {
+      "name": "kemai_test_lang",
+      "value": "ab"
+    },
+    {
+      "name": "kemai_test_choice",
+      "value": "a"
+    },
+    {
+      "name": "kemai_test_colorchoice",
+      "value": "#33415b"
+    },
+    {
+      "name": "kemai_test_color",
+      "value": "#c0c0c0"
+    },
+    {
+      "name": "kemai_test_numberdec",
+      "value": "4.123"
+    },
+    {
+      "name": "kemai_test_date",
+      "value": "2026-10-01"
+    },
+    {
+      "name": "kemai_test_currency",
+      "value": "AFN"
+    },
+    {
+      "name": "kemai_test_country",
+      "value": "AF"
+    },
+    {
+      "name": "kemai_test_text",
+      "value": "dfghdfgh"
+    },
+    {
+      "name": "kemai_test_dropdown",
+      "value": "b"
+    },
+    {
+      "name": "kemai_test_datetime",
+      "value": "2026-10-22 08:30:00"
+    },
+    {
+      "name": "kemai_test_yesno",
+      "value": "1"
+    },
+    {
+      "name": "kemai_test_money",
+      "value": "123"
+    },
+    {
+      "name": "kemai_test_duration",
+      "value": "1242000"
+    },
+    {
+      "name": "kemai_test_url",
+      "value": "https://kimai.org"
+    },
+    {
+      "name": "kemai_test_email",
+      "value": "bob@gmail.com"
+    },
+    {
+      "name": "kemai_test_number",
+      "value": "1231"
+    }
+  ]
+}

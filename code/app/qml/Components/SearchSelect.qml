@@ -139,7 +139,7 @@ FocusScope {
             // The label gives way first: the meta (customer, code) stays readable
             Text {
                 Layout.fillWidth: true
-                Layout.maximumWidth: root.currentItem === null ? -1 : implicitWidth
+                Layout.maximumWidth: root.currentItem === null ? -1 : Math.ceil(implicitWidth)
                 text: root.currentItem !== null ? root.currentItem.label : root.placeholder
                 color: root.currentItem !== null ? Theme.colorTextPrimary : Theme.colorTextDim
                 font.pixelSize: Theme.fontSizeMedium

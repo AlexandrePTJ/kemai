@@ -580,6 +580,17 @@ TEST_CASE("SessionController::webUrl - the instance's web interface, https when 
     REQUIRE(controller.webUrl() == QUrl("http://kimai.lan:8001"));
 }
 
+TEST_CASE("SessionController::timeSheetWebUrl - the entry's page, in the user's language", "[session][unit]")
+{
+    SessionController controller(std::make_shared<FakeKimaiClient>(), KimaiUser{.language = "de"});
+    controller.setAccount("", "https://kimai.lan/sub");
+    REQUIRE(controller.timeSheetWebUrl(12) == QUrl("https://kimai.lan/sub/de/timesheet/12/edit"));
+
+    SessionController noLanguage(std::make_shared<FakeKimaiClient>(), KimaiUser{});
+    noLanguage.setAccount("", "demo.kimai.org");
+    REQUIRE(noLanguage.timeSheetWebUrl(11517) == QUrl("https://demo.kimai.org/en/timesheet/11517/edit"));
+}
+
 TEST_CASE("SessionController - punch mode follows the timesheet config", "[session][unit]")
 {
     auto fake                          = std::make_shared<FakeKimaiClient>();
@@ -1246,4 +1257,363 @@ TEST_CASE("SessionController - a failed first task load shows in the pane", "[se
     REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::Failed);
     REQUIRE(controller.tasksError() == SessionController::NotificationKind::NoNetwork);
     REQUIRE(probe.notificationCount == 0);
+}
+
+namespace
+{
+    KimaiMetaFieldRule requiredField(const QString &name, const QString &type = "text", const QString &rawValue = {})
+    {
+        return {.name = name, .label = name, .type = type, .rawValue = rawValue, .required = true};
+    }
+
+    struct CustomFieldsProbe
+    {
+        int         saved     = 0;
+        int         savedId   = 0;
+        int         saveFails = 0;
+        int         fails     = 0;
+        int         failedId  = 0;
+        QStringList pending;
+
+        void attach(SessionController &controller)
+        {
+            QObject::connect(&controller, &SessionController::timeSheetSaved, [this](int id)
+                             {
+                                 ++saved;
+                                 savedId = id; });
+            QObject::connect(&controller, &SessionController::timeSheetSaveFailed, [this](int, SessionController::NotificationKind, const QString &)
+                             { ++saveFails; });
+            QObject::connect(&controller,
+                             &SessionController::customFieldsSaveFailed,
+                             [this](int id, SessionController::NotificationKind, const QString &, const QStringList &names)
+                             {
+                                 ++fails;
+                                 failedId = id;
+                                 pending  = names;
+                             });
+        }
+    };
+
+    QStringList writtenNames(const FakeKimaiClient &fake)
+    {
+        QStringList names;
+        for (const auto &write : fake.metaWrites)
+        {
+            names.append(write.name);
+        }
+        return names;
+    }
+} // namespace
+
+TEST_CASE("SessionController::needsCustomFields - asks only when something is missing", "[session][customFields][unit]")
+{
+    auto         fake = std::make_shared<FakeKimaiClient>();
+    KimaiProject project;
+    project.id          = 7;
+    project.customer.id = 3;
+    fake->projects      = {project};
+
+    auto restricted       = requiredField("ticket");
+    restricted.projectId  = 99;
+    auto byCustomer       = requiredField("po");
+    byCustomer.customerId = 3;
+
+    SECTION("Nothing applies")
+    {
+        fake->metaFieldRules = {restricted};
+        SessionController controller(fake, KimaiUser{});
+        processEvents();
+        REQUIRE_FALSE(controller.needsCustomFields(7, 11));
+        REQUIRE(controller.needsCustomFields(99, 11));
+    }
+
+    SECTION("A field restricted to the project's customer applies")
+    {
+        fake->metaFieldRules = {byCustomer};
+        SessionController controller(fake, KimaiUser{});
+        processEvents();
+        REQUIRE(controller.needsCustomFields(7, 11));
+    }
+
+    SECTION("A default fills it")
+    {
+        fake->metaFieldRules = {requiredField("kind", "choice", "a|Alpha,b|Beta")};
+        SessionController controller(fake, KimaiUser{});
+        processEvents();
+        REQUIRE_FALSE(controller.needsCustomFields(7, 11));
+    }
+
+    SECTION("The restarted entry's value fills it")
+    {
+        fake->metaFieldRules = {requiredField("ticket")};
+        auto source          = makeTimeSheet(40, QDateTime::currentDateTimeUtc().addDays(-1), QDateTime::currentDateTimeUtc().addDays(-1).addSecs(3600));
+        source.metaFields    = {
+            {"ticket", "KEM-12"}
+        };
+        fake->timeSheets = {source};
+        SessionController controller(fake, KimaiUser{});
+        processEvents();
+        REQUIRE(controller.needsCustomFields(7, 11));
+        REQUIRE_FALSE(controller.needsCustomFields(7, 11, 40));
+    }
+
+    SECTION("Only a field Kemai cannot fill is missing")
+    {
+        fake->metaFieldRules = {requiredField("template", "invoice-template"), requiredField("kind", "choice")};
+        SessionController controller(fake, KimaiUser{});
+        processEvents();
+        REQUIRE_FALSE(controller.needsCustomFields(7, 11));
+    }
+
+    SECTION("An invalid value is asked for again")
+    {
+        fake->metaFieldRules = {requiredField("contact", "email")};
+        auto source          = makeTimeSheet(40, QDateTime::currentDateTimeUtc().addDays(-1), QDateTime::currentDateTimeUtc().addDays(-1).addSecs(3600));
+        source.metaFields    = {
+            {"contact", "john@"}
+        };
+        fake->timeSheets = {source};
+        SessionController controller(fake, KimaiUser{});
+        processEvents();
+        REQUIRE(controller.needsCustomFields(7, 11, 40));
+    }
+}
+
+TEST_CASE("SessionController::startTimeSheet - writes defaulted and reused values", "[session][customFields][unit]")
+{
+    auto fake            = std::make_shared<FakeKimaiClient>();
+    fake->metaFieldRules = {requiredField("kind", "choice", "a|Alpha,b|Beta"), requiredField("ticket"), requiredField("template", "invoice-template")};
+    auto source          = makeTimeSheet(40, QDateTime::currentDateTimeUtc().addDays(-1), QDateTime::currentDateTimeUtc().addDays(-1).addSecs(3600));
+    source.metaFields    = {
+        {"kind",   "b"     },
+        {"ticket", "KEM-12"}
+    };
+    fake->timeSheets      = {source};
+    fake->timeSheetResult = makeTimeSheet(500, QDateTime::currentDateTimeUtc());
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SECTION("Restart reuses the entry's values")
+    {
+        controller.startTimeSheet(11, 7, 40);
+        processEvents();
+        REQUIRE(fake->metaWrites.size() == 2);
+        REQUIRE(fake->metaWrites[0].timeSheetId == 500);
+        REQUIRE(fake->metaWrites[0].name == "kind");
+        REQUIRE(fake->metaWrites[0].value == "b");
+        REQUIRE(fake->metaWrites[1].value == "KEM-12");
+    }
+
+    SECTION("A plain start writes the defaults only")
+    {
+        controller.startTimeSheet(11, 7);
+        processEvents();
+        REQUIRE(writtenNames(*fake) == QStringList{"kind"});
+        REQUIRE(fake->metaWrites[0].value == "a");
+    }
+
+    SECTION("A value Kimai already has is not written again")
+    {
+        fake->timeSheetResult.metaFields = {
+            {"kind", "a"}
+        };
+        controller.startTimeSheet(11, 7);
+        processEvents();
+        REQUIRE(fake->metaWrites.isEmpty());
+    }
+
+    SECTION("A failed write is reported for the running entry")
+    {
+        CustomFieldsProbe probe;
+        probe.attach(controller);
+        fake->failWith("setTimeSheetMeta:kind", ApiErrorKind::NoNetwork);
+        controller.startTimeSheet(11, 7, 40);
+        processEvents();
+        REQUIRE(probe.fails == 1);
+        REQUIRE(probe.failedId == 500);
+        REQUIRE(probe.pending == QStringList{"kind", "ticket"});
+    }
+}
+
+TEST_CASE("SessionController::startTimeSheetWith - starts, then writes the values one by one", "[session][customFields][unit]")
+{
+    auto fake             = std::make_shared<FakeKimaiClient>();
+    fake->metaFieldRules  = {requiredField("ticket"), requiredField("contact", "email"), requiredField("other")};
+    fake->timeSheetResult = makeTimeSheet(500, QDateTime::currentDateTimeUtc());
+    auto running          = fake->timeSheetResult;
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    CustomFieldsProbe probe;
+    probe.attach(controller);
+
+    const QVariantMap values{
+        {"ticket",  "KEM-12"          },
+        {"contact", "john@example.com"},
+        {"other",   "x"               },
+        {"removed", "not applying"    }
+    };
+
+    SECTION("All written")
+    {
+        controller.startTimeSheetWith(7, 11, "Release", {"kemai"}, {}, values);
+        processEvents();
+        REQUIRE(writtenNames(*fake) == QStringList{"ticket", "contact", "other"});
+        REQUIRE(probe.saved == 1);
+        REQUIRE(probe.savedId == 500);
+    }
+
+    SECTION("Nothing starts when the start fails")
+    {
+        fake->failWith("startTimeSheet", ApiErrorKind::NoNetwork);
+        controller.startTimeSheetWith(7, 11, {}, {}, {}, values);
+        processEvents();
+        REQUIRE(probe.saveFails == 1);
+        REQUIRE(fake->metaWrites.isEmpty());
+    }
+
+    SECTION("A failure on the second keeps the first; a retry sends only the pending ones")
+    {
+        fake->timeSheets = {running};
+        fake->failWith("setTimeSheetMeta:contact", ApiErrorKind::NoNetwork);
+        controller.startTimeSheetWith(7, 11, {}, {}, {}, values);
+        processEvents();
+        REQUIRE(writtenNames(*fake) == QStringList{"ticket", "contact"});
+        REQUIRE(probe.saved == 0);
+        REQUIRE(probe.fails == 1);
+        REQUIRE(probe.pending == QStringList{"contact", "other"});
+
+        // Retry from the dialog, now in edit mode on the running entry
+        fake->errors.clear();
+        fake->metaWrites.clear();
+        REQUIRE(controller.updateTimeSheet(500, 7, 11, {}, {}, {}, {}, {}, values));
+        processEvents();
+        REQUIRE(writtenNames(*fake) == QStringList{"contact", "other"});
+        REQUIRE(probe.saved == 1);
+    }
+
+    SECTION("A retry of the values alone writes only the pending ones and keeps the rest of the entry")
+    {
+        fake->timeSheets = {running};
+        fake->failWith("setTimeSheetMeta:contact", ApiErrorKind::NoNetwork);
+        controller.startTimeSheetWith(7, 11, {}, {}, {}, values);
+        processEvents();
+        REQUIRE(probe.fails == 1);
+
+        fake->errors.clear();
+        fake->metaWrites.clear();
+        fake->calls.clear();
+        controller.saveCustomValues(500, 7, 11, values);
+        processEvents();
+        REQUIRE(writtenNames(*fake) == QStringList{"contact", "other"});
+        REQUIRE_FALSE(fake->calls.contains("updateTimeSheet"));
+        REQUIRE(probe.saved == 1);
+        REQUIRE(probe.savedId == 500);
+    }
+
+    SECTION("401 while writing expires the session")
+    {
+        SignalProbe expiry;
+        expiry.attach(controller);
+        fake->failWith("setTimeSheetMeta:ticket", ApiErrorKind::AuthFailed, 401);
+        controller.startTimeSheetWith(7, 11, {}, {}, {}, values);
+        processEvents();
+        REQUIRE(expiry.sessionExpiredCount == 1);
+        REQUIRE(probe.fails == 0);
+    }
+
+    SECTION("A field removed from Kimai meanwhile counts as written")
+    {
+        fake->failWith("setTimeSheetMeta:ticket", ApiErrorKind::NotFound, 404);
+        controller.startTimeSheetWith(7, 11, {}, {}, {}, values);
+        processEvents();
+        REQUIRE(writtenNames(*fake) == QStringList{"ticket", "contact", "other"});
+        REQUIRE(probe.saved == 1);
+    }
+}
+
+TEST_CASE("SessionController::updateTimeSheet - writes only the values that changed", "[session][customFields][unit]")
+{
+    auto fake            = std::make_shared<FakeKimaiClient>();
+    fake->metaFieldRules = {requiredField("ticket"), requiredField("contact", "email")};
+    auto entry           = makeTimeSheet(40, QDateTime::currentDateTimeUtc().addSecs(-7200), QDateTime::currentDateTimeUtc().addSecs(-3600));
+    entry.metaFields     = {
+        {"ticket",  "KEM-12"          },
+        {"contact", "john@example.com"}
+    };
+    fake->timeSheets = {entry};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    CustomFieldsProbe probe;
+    probe.attach(controller);
+
+    REQUIRE(controller.updateTimeSheet(40, 7, 11, "Edited", {
+    },
+                                       {},
+                                       {},
+                                       {},
+                                       {{"ticket", "KEM-12"}, {"contact", "jane@example.com"}}));
+    processEvents();
+    REQUIRE(writtenNames(*fake) == QStringList{"contact"});
+    REQUIRE(probe.saved == 1);
+
+    fake->metaWrites.clear();
+    REQUIRE(controller.updateTimeSheet(40, 7, 11, "Edited again", {
+    },
+                                       {},
+                                       {},
+                                       {},
+                                       {{"ticket", "KEM-12"}, {"contact", "jane@example.com"}}));
+    processEvents();
+    REQUIRE(fake->metaWrites.isEmpty());
+    REQUIRE(probe.saved == 2);
+}
+
+TEST_CASE("SessionController - task starts write the custom values", "[session][customFields][tasks][unit]")
+{
+    auto fake             = std::make_shared<FakeKimaiClient>();
+    fake->plugins         = taskManagementPlugin();
+    fake->tasks           = {openTask(1, "Monthly invoices")};
+    fake->metaFieldRules  = {requiredField("kind", "choice", "a|Alpha,b|Beta"), requiredField("ticket")};
+    fake->timeSheetResult = makeTimeSheet(500, QDateTime::currentDateTimeUtc());
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+    controller.loadTasks();
+    processEvents();
+    CustomFieldsProbe probe;
+    probe.attach(controller);
+
+    SECTION("Plain start: the defaults")
+    {
+        controller.startTask(1);
+        processEvents();
+        REQUIRE(writtenNames(*fake) == QStringList{"kind"});
+    }
+
+    SECTION("From the dialog: the values given, then saved")
+    {
+        controller.startTaskWith(1, {
+                                        {"kind",   "b"     },
+                                        {"ticket", "KEM-12"}
+        });
+        processEvents();
+        REQUIRE(writtenNames(*fake) == QStringList{"kind", "ticket"});
+        REQUIRE(fake->metaWrites[0].value == "b");
+        REQUIRE(probe.saved == 1);
+        REQUIRE(probe.savedId == 500);
+    }
+
+    SECTION("From the dialog: a refused start goes back to it")
+    {
+        fake->failWith("startTask", ApiErrorKind::NoNetwork);
+        controller.startTaskWith(1, {
+                                        {"ticket", "KEM-12"}
+        });
+        processEvents();
+        REQUIRE(probe.saveFails == 1);
+        REQUIRE(fake->metaWrites.isEmpty());
+    }
 }

@@ -117,6 +117,16 @@ namespace kemai
         case TimesheetRole::Tags:
             return ts.tags;
 
+        case TimesheetRole::CustomValues:
+        {
+            QVariantMap values;
+            for (const auto &[name, value] : ts.metaFields.asKeyValueRange())
+            {
+                values.insert(name, value);
+            }
+            return values;
+        }
+
         default:
             return {};
         }
@@ -137,7 +147,8 @@ namespace kemai
             {magic_enum::enum_integer(TimesheetRole::TimesheetId),   "timesheetId"  },
             {magic_enum::enum_integer(TimesheetRole::BeginAt),       "beginAt"      },
             {magic_enum::enum_integer(TimesheetRole::EndAt),         "endAt"        },
-            {magic_enum::enum_integer(TimesheetRole::Tags),          "tags"         }
+            {magic_enum::enum_integer(TimesheetRole::Tags),          "tags"         },
+            {magic_enum::enum_integer(TimesheetRole::CustomValues),  "customValues" }
         };
     }
 
@@ -150,6 +161,24 @@ namespace kemai
             return std::nullopt;
         }
         return *it;
+    }
+
+    QVariantMap TimesheetModel::entry(int timesheetId) const
+    {
+        const auto it = std::ranges::find_if(m_timeSheets, [timesheetId](const KimaiTimeSheet &ts)
+                                             { return ts.id == timesheetId; });
+        if (it == m_timeSheets.cend())
+        {
+            return {};
+        }
+        const auto  row = index(static_cast<int>(std::distance(m_timeSheets.cbegin(), it)));
+        QVariantMap result;
+        const auto  roles = roleNames();
+        for (auto role = roles.cbegin(); role != roles.cend(); ++role)
+        {
+            result.insert(QString::fromUtf8(role.value()), data(row, role.key()));
+        }
+        return result;
     }
 
     void TimesheetModel::refreshActiveDurations()

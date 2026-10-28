@@ -27,6 +27,26 @@ Item {
     // A resource was created from the edit dialog: NotificationKind.ResourceCreated detail
     signal resourceCreated(string detail)
 
+    // Starts a timer at once, or through the dialog when a required custom field would be left empty.
+    // `source`: the history entry restarted (its custom values are reused), or null
+    function startEntry(activityId, projectId, source) {
+        const sourceId = source !== null ? source.timesheetId : 0
+        if (root.sessionContext.needsCustomFields(projectId, activityId, sourceId))
+            editDialog.openForStart(projectId, activityId, source !== null ? source.customValues : ({}), 0, "")
+        else
+            root.sessionContext.startTimeSheet(activityId, projectId, sourceId)
+    }
+
+    // Started at once, but some custom values could not be written: the dialog shows the entry to retry them
+    Connections {
+        target: root.sessionContext
+
+        function onCustomFieldsSaveFailed(timesheetId: int, kind: int, detail: string, pendingNames: list<string>) {
+            if (!editDialog.opened)
+                editDialog.openForUnsaved(timesheetId, kind, pendingNames)
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -109,6 +129,7 @@ Item {
             Layout.fillHeight: true
             sessionContext: root.sessionContext
             onBackToHistoryRequested: root._view = "history"
+            onStartWithFieldsRequested: (taskId, projectId, activityId, title) => editDialog.openForStart(projectId, activityId, ({}), taskId, title)
         }
 
         ListView {
@@ -127,7 +148,7 @@ Item {
             delegate: TimeEntryDelegate {
                 id: entryDelegate
 
-                onStartRequested: (activityId, projectId) => root.sessionContext.startTimeSheet(activityId, projectId)
+                onStartRequested: (activityId, projectId) => root.startEntry(activityId, projectId, entryDelegate)
                 onEditRequested: editDialog.openFor(entryDelegate)
             }
         }

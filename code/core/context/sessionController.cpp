@@ -110,6 +110,15 @@ namespace kemai
         return QUrl(KimaiClient::normalizedHost(m_host));
     }
 
+    QUrl SessionController::timeSheetWebUrl(int timesheetId) const
+    {
+        // Kimai's pages start with a locale: without one the path is not found
+        const auto language = m_user.language.isEmpty() ? QStringLiteral("en") : m_user.language;
+        auto       url      = webUrl();
+        url.setPath(QStringLiteral("%1/%2/timesheet/%3/edit").arg(url.path(), language).arg(timesheetId));
+        return url;
+    }
+
     void SessionController::setAccount(const QString &profileName, const QString &host)
     {
         m_profileName = profileName;
@@ -492,6 +501,45 @@ namespace kemai
 
     void SessionController::startTask(int taskId)
     {
+        startTaskThen(
+            taskId,
+            [this](const KimaiTimeSheet &started)
+            {
+                const auto writes = customWrites(started.project.id, started.activity.id, {}, started.metaFields);
+                writeCustomValues(started.id, writes, [this, writes]()
+                                  {
+                                      if (!writes.isEmpty())
+                                      {
+                                          refreshRecentTimeSheets();
+                                      } });
+            },
+            [this, taskId](const KimaiApiError &e)
+            { handleTaskError(e, taskId, "start"); });
+    }
+
+    void SessionController::startTaskWith(int taskId, const QVariantMap &customValues)
+    {
+        CustomValues wanted;
+        for (auto it = customValues.begin(); it != customValues.end(); ++it)
+        {
+            wanted.insert(it.key(), it.value().toString());
+        }
+
+        startTaskThen(
+            taskId,
+            [this, wanted](const KimaiTimeSheet &started)
+            {
+                writeCustomValues(started.id, customWrites(started.project.id, started.activity.id, wanted, started.metaFields), [this, id = started.id]()
+                                  {
+                                      refreshRecentTimeSheets();
+                                      emit timeSheetSaved(id); });
+            },
+            [this](const KimaiApiError &e)
+            { handleOperationError(e, "Failed to start task", 0, &SessionController::timeSheetSaveFailed); });
+    }
+
+    void SessionController::startTaskThen(int taskId, std::function<void(const KimaiTimeSheet &)> next, std::function<void(const KimaiApiError &)> failed)
+    {
         const auto *task = m_tasks->findById(taskId);
         if (task == nullptr)
         {
@@ -503,7 +551,7 @@ namespace kemai
         invalidateSync();
         m_client->startTask(taskId)
             .then(this,
-                  [this, taskId, title](const KimaiTimeSheet &started)
+                  [this, taskId, title, next](const KimaiTimeSheet &started)
                   {
                       emit taskStarted(taskId);
 
@@ -520,9 +568,10 @@ namespace kemai
                       }
                       refreshActiveTimeSheets();
                       refreshRecentTimeSheets();
+                      next(started);
                   })
-            .onFailed(this, [this, taskId](const KimaiApiError &e)
-                      { handleTaskError(e, taskId, "start"); });
+            .onFailed(this, [failed](const KimaiApiError &e)
+                      { failed(e); });
     }
 
     void SessionController::closeTask(int taskId)
@@ -718,7 +767,7 @@ namespace kemai
                       });
     }
 
-    void SessionController::startTimeSheet(int activityId, int projectId)
+    void SessionController::startTimeSheet(int activityId, int projectId, int sourceTimesheetId)
     {
         if (m_activeTimeSheet)
         {
@@ -736,16 +785,176 @@ namespace kemai
         ts.project.id  = projectId;
         ts.beginAt     = QDateTime::currentDateTimeUtc();
 
+        const auto source = sourceTimesheetId > 0 ? m_recentTimeSheets->findById(sourceTimesheetId) : std::nullopt;
+        const auto reused = source ? source->metaFields : CustomValues{};
+
         invalidateSync();
         m_client->startTimeSheet(ts, m_cache->timesheetConfig().trackingMode)
             .then(this,
-                  [this](const KimaiTimeSheet &)
+                  [this, reused](const KimaiTimeSheet &started)
                   {
                       refreshActiveTimeSheets();
                       refreshRecentTimeSheets();
+
+                      const auto writes = customWrites(started.project.id, started.activity.id, reused, started.metaFields);
+                      writeCustomValues(started.id, writes, [this, writes]()
+                                        {
+                                            if (!writes.isEmpty())
+                                            {
+                                                refreshRecentTimeSheets();
+                                            } });
                   })
             .onFailed(this, [this](const KimaiApiError &e)
                       { handleApiError(e, "Failed to start timesheet"); });
+    }
+
+    void SessionController::startTimeSheetWith(int projectId, int activityId, const QString &description, const QStringList &tags, const QStringList &newTags, const QVariantMap &customValues)
+    {
+        if (m_activeTimeSheet)
+        {
+            spdlog::warn("Start ignored: a timesheet is already active");
+            return;
+        }
+        if (activityId <= 0 || projectId <= 0)
+        {
+            spdlog::error("Start ignored: invalid activityId={} or projectId={}", activityId, projectId);
+            return;
+        }
+
+        KimaiTimeSheet ts;
+        ts.activity.id = activityId;
+        ts.project.id  = projectId;
+        ts.description = description;
+        ts.tags        = tags;
+        ts.beginAt     = QDateTime::currentDateTimeUtc();
+
+        CustomValues wanted;
+        for (auto it = customValues.begin(); it != customValues.end(); ++it)
+        {
+            wanted.insert(it.key(), it.value().toString());
+        }
+
+        QStringList tagsToCreate;
+        for (const auto &tag : newTags)
+        {
+            if (tags.contains(tag))
+            {
+                tagsToCreate.append(tag);
+            }
+        }
+
+        createTagsThen(tagsToCreate,
+                       0,
+                       [this, ts, wanted]()
+                       {
+                           invalidateSync();
+                           m_client->startTimeSheet(ts, m_cache->timesheetConfig().trackingMode)
+                               .then(this,
+                                     [this, wanted](const KimaiTimeSheet &started)
+                                     {
+                                         refreshActiveTimeSheets();
+                                         refreshRecentTimeSheets();
+                                         writeCustomValues(started.id, customWrites(started.project.id, started.activity.id, wanted, started.metaFields), [this, id = started.id]()
+                                                           {
+                                                               refreshRecentTimeSheets();
+                                                               emit timeSheetSaved(id); });
+                                     })
+                               .onFailed(this, [this](const KimaiApiError &e)
+                                         { handleOperationError(e, "Failed to start timesheet", 0, &SessionController::timeSheetSaveFailed); }); });
+    }
+
+    bool SessionController::needsCustomFields(int projectId, int activityId, int sourceTimesheetId) const
+    {
+        const auto source = sourceTimesheetId > 0 ? m_recentTimeSheets->findById(sourceTimesheetId) : std::nullopt;
+        const auto fields = resolveCustomFields(projectId, activityId, source ? source->metaFields : CustomValues{});
+        return std::ranges::any_of(fields, [](const CustomFields::Field &field)
+                                   { return field.state == CustomFields::State::Missing || field.state == CustomFields::State::Invalid; });
+    }
+
+    void SessionController::setKnownCodes(const CustomFields::KnownCodes &codes)
+    {
+        m_knownCodes = codes;
+    }
+
+    const CustomFields::KnownCodes &SessionController::knownCodes() const
+    {
+        return m_knownCodes;
+    }
+
+    const KimaiMetaFieldRules &SessionController::customFieldRules() const
+    {
+        return m_cache->timesheetMetaFields();
+    }
+
+    const KimaiColorChoices &SessionController::colorChoices() const
+    {
+        return m_cache->colorChoices();
+    }
+
+    KimaiCustomer SessionController::customerOfProject(int projectId) const
+    {
+        const auto project = std::ranges::find(m_cache->projects(), projectId, &KimaiProject::id);
+        return project != m_cache->projects().cend() ? project->customer : KimaiCustomer{};
+    }
+
+    QList<CustomFields::Field> SessionController::resolveCustomFields(int projectId, int activityId, const CustomValues &values) const
+    {
+        return CustomFields::resolve(m_cache->timesheetMetaFields(), customerOfProject(projectId).id, projectId, activityId, values, m_knownCodes);
+    }
+
+    SessionController::CustomWrites SessionController::customWrites(int projectId, int activityId, const CustomValues &wanted, const CustomValues &current) const
+    {
+        CustomWrites writes;
+        for (const auto &field : resolveCustomFields(projectId, activityId, wanted))
+        {
+            // A field Kemai cannot fill keeps what Kimai has; an invalid or missing value is never sent
+            if (field.state == CustomFields::State::Ok && field.value != current.value(field.rule.name))
+            {
+                writes.append({field.rule.name, field.value});
+            }
+        }
+        return writes;
+    }
+
+    void SessionController::writeCustomValues(int timesheetId, CustomWrites pending, std::function<void()> done)
+    {
+        if (pending.isEmpty())
+        {
+            done();
+            return;
+        }
+
+        const auto [name, value] = pending.takeFirst();
+        m_client->setTimeSheetMeta(timesheetId, name, value)
+            .then(this, [this, timesheetId, pending, done](const KimaiTimeSheet &)
+                  { writeCustomValues(timesheetId, pending, done); })
+            .onFailed(this,
+                      [this, timesheetId, name, pending, done](const KimaiApiError &e)
+                      {
+                          // 404: the field was removed from Kimai since the cache was loaded, nothing left to fill
+                          if (e.kind() == ApiErrorKind::NotFound)
+                          {
+                              spdlog::warn("Custom field {} no longer exists, not written: {}", name.toStdString(), e.what());
+                              writeCustomValues(timesheetId, pending, done);
+                              return;
+                          }
+
+                          spdlog::error("Failed to write custom field {}: {}", name.toStdString(), e.what());
+                          // The entry shows what was written meanwhile
+                          refreshRecentTimeSheets();
+                          if (e.kind() == ApiErrorKind::AuthFailed)
+                          {
+                              emit sessionExpired();
+                              return;
+                          }
+
+                          QStringList pendingNames{name};
+                          for (const auto &write : pending)
+                          {
+                              pendingNames.append(write.first);
+                          }
+                          emit customFieldsSaveFailed(timesheetId, notificationKindFromError(e.kind()), e.serverMessage(), pendingNames);
+                      });
     }
 
     void SessionController::stopActiveTimeSheet()
@@ -804,7 +1013,7 @@ namespace kemai
                       { handleApiError(e, "Failed to stop timesheet at the time the user left"); });
     }
 
-    bool SessionController::updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags, const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags)
+    bool SessionController::updateTimeSheet(int timesheetId, int projectId, int activityId, const QString &description, const QStringList &tags, const QDateTime &beginAt, const QDateTime &endAt, const QStringList &newTags, const QVariantMap &customValues)
     {
         const auto timeSheet = m_recentTimeSheets->findById(timesheetId);
         if (!timeSheet)
@@ -850,22 +1059,49 @@ namespace kemai
             }
         }
 
+        CustomValues wanted = timeSheet->metaFields;
+        for (auto it = customValues.begin(); it != customValues.end(); ++it)
+        {
+            wanted.insert(it.key(), it.value().toString());
+        }
+        // Compared with the server's values: after a partial failure, a retry sends only what is still pending
+        const auto writes = customWrites(projectId, activityId, wanted, timeSheet->metaFields);
+
         createTagsThen(tagsToCreate,
                        timesheetId,
-                       [this, updated, timesheetId]()
+                       [this, updated, timesheetId, writes]()
                        {
                            invalidateSync();
                            m_client->updateTimeSheet(updated, m_cache->timesheetConfig().trackingMode)
                                .then(this,
-                                     [this, timesheetId](const KimaiTimeSheet &)
+                                     [this, timesheetId, writes](const KimaiTimeSheet &)
                                      {
                                          refreshActiveTimeSheets();
-                                         refreshRecentTimeSheets();
-                                         emit timeSheetSaved(timesheetId);
+                                         writeCustomValues(timesheetId, writes, [this, timesheetId]()
+                                                           {
+                                                               refreshRecentTimeSheets();
+                                                               emit timeSheetSaved(timesheetId); });
                                      })
                                .onFailed(this, [this, timesheetId](const KimaiApiError &e)
                                          { handleOperationError(e, "Failed to update timesheet", timesheetId, &SessionController::timeSheetSaveFailed); }); });
         return true;
+    }
+
+    void SessionController::saveCustomValues(int timesheetId, int projectId, int activityId, const QVariantMap &customValues)
+    {
+        // A timer started a moment ago may not be in the history yet: then every value is written
+        const auto timeSheet = m_recentTimeSheets->findById(timesheetId);
+        const auto current   = timeSheet ? timeSheet->metaFields : CustomValues{};
+
+        CustomValues wanted = current;
+        for (auto it = customValues.begin(); it != customValues.end(); ++it)
+        {
+            wanted.insert(it.key(), it.value().toString());
+        }
+        writeCustomValues(timesheetId, customWrites(projectId, activityId, wanted, current), [this, timesheetId]()
+                          {
+                              refreshRecentTimeSheets();
+                              emit timeSheetSaved(timesheetId); });
     }
 
     void SessionController::createTagsThen(QStringList names, int timesheetId, std::function<void()> next)

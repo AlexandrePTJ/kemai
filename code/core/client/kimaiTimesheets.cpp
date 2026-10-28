@@ -60,6 +60,33 @@ namespace kemai
     }
 
     /*
+     * KimaiMetaFieldRule
+     */
+    KimaiMetaFieldRule KimaiMetaFieldRule::fromJson(const QJsonValue &json)
+    {
+        JsonHelpers::checkTypeOrThrow("KimaiMetaFieldRule", json, {QJsonValue::Object});
+
+        auto jsonObject = json.toObject();
+        JsonHelpers::checkKeysOrThrow("KimaiMetaFieldRule", jsonObject, {"name", "type"});
+
+        // Restrictions are ids, or null when unrestricted
+        const auto restriction = [&jsonObject](const char *key)
+        { return jsonObject.value(key).toInt(); };
+
+        KimaiMetaFieldRule rule;
+        rule.name       = jsonObject.value("name").toString();
+        rule.label      = jsonObject.value("label").toString();
+        rule.help       = jsonObject.value("help").toString();
+        rule.type       = jsonObject.value("type").toString();
+        rule.rawValue   = jsonObject.value("value").toVariant().toString();
+        rule.required   = jsonObject.value("required").toBool();
+        rule.customerId = restriction("customer");
+        rule.projectId  = restriction("project");
+        rule.activityId = restriction("activity");
+        return rule;
+    }
+
+    /*
      * KimaiTimeSheet
      */
     KimaiTimeSheet KimaiTimeSheet::fromJson(const QJsonValue &json)
@@ -88,6 +115,17 @@ namespace kemai
         for (const auto &jsTag : jsonObject.value("tags").toArray())
         {
             timeSheet.tags.push_back(jsTag.toString());
+        }
+
+        // [{name, value}]; an unfilled field has a null value
+        for (const auto &jvMeta : jsonObject.value("metaFields").toArray())
+        {
+            const auto meta = jvMeta.toObject();
+            const auto name = meta.value("name").toString();
+            if (!name.isEmpty())
+            {
+                timeSheet.metaFields.insert(name, meta.value("value").toVariant().toString());
+            }
         }
 
         return timeSheet;

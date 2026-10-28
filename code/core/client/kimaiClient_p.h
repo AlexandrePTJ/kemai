@@ -47,7 +47,9 @@ namespace kemai
         TaskStart,
         TaskStop,
         TaskClose,
-        TimeSheetConfig
+        TimeSheetConfig,
+        ColorsConfig,
+        MetaFields
     };
     QString apiMethodToString(ApiMethod method);
 

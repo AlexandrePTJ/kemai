@@ -13,6 +13,8 @@ Popup {
 
     property string title: "Edit Time"
     property date initialDateTime: new Date()
+    // Picks a day only (date custom fields): no time field, wheel or minute shortcuts
+    property bool dateOnly: false
 
     readonly property date selectedDateTime: new Date(_year, _month, _day, _hour, _minute, 0, 0)
 
@@ -26,7 +28,7 @@ Popup {
     property bool _is24h: true
 
     modal: true
-    width: 560
+    width: root.dateOnly ? 400 : 560
     height: 520
     x: parent ? (parent.width - width) / 2 : 0
     y: parent ? (parent.height - height) / 2 : 0
@@ -171,6 +173,7 @@ Popup {
 
             KemaiTextField {
                 id: timeField
+                visible: !root.dateOnly
                 Layout.fillWidth: true
                 inputMask: "99:99"
                 font.features: Theme.fontFeaturesTabular
@@ -229,6 +232,7 @@ Popup {
 
             TimeWheel {
                 id: timeWheel
+                visible: !root.dateOnly
                 Layout.preferredWidth: 170
                 Layout.fillHeight: true
                 selectedHour: root._hour
@@ -256,7 +260,7 @@ Popup {
                 spacing: Theme.spacingSmall
 
                 Text {
-                    text: root._shortDateLabel(root._year, root._month, root._day) + " — " + root._formatTime(root._hour, root._minute)
+                    text: root._shortDateLabel(root._year, root._month, root._day) + (root.dateOnly ? "" : " — " + root._formatTime(root._hour, root._minute))
                     color: Theme.colorAccentGreen
                     font.pixelSize: Theme.fontSizeSmall
                     font.features: Theme.fontFeaturesTabular
@@ -267,7 +271,7 @@ Popup {
                 }
 
                 Repeater {
-                    model: [0, 15, 30, 45]
+                    model: root.dateOnly ? [] : [0, 15, 30, 45]
                     delegate: SecondaryButton {
                         required property int modelData
                         text: ":" + (modelData < 10 ? "0" + modelData : modelData)
@@ -280,7 +284,7 @@ Popup {
                 }
 
                 SecondaryButton {
-                    text: "Now"
+                    text: root.dateOnly ? "Today" : "Now"
                     Layout.preferredHeight: 28
                     onClicked: root._setNow()
                 }

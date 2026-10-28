@@ -26,7 +26,7 @@ namespace kemai
 
         m_staging = {};
         m_stagingError.reset();
-        m_pendingResources = {Resource::Customers, Resource::Projects, Resource::Activities, Resource::TimesheetConfig};
+        m_pendingResources = {Resource::Customers, Resource::Projects, Resource::Activities, Resource::TimesheetConfig, Resource::MetaFields};
 
         client->requestCustomers()
             .then(this,
@@ -79,6 +79,68 @@ namespace kemai
                   })
             .onFailed(this, [this, generation](const KimaiApiError &e)
                       { onResourceFailed(generation, Resource::TimesheetConfig, e); });
+
+        client->requestTimeSheetMetaFields()
+            .then(this,
+                  [this, client, generation](const KimaiMetaFieldRules &rules)
+                  {
+                      if (generation == m_generation)
+                      {
+                          // Only required fields matter for now (asked before starting, checked when saving)
+                          for (const auto &rule : rules)
+                          {
+                              if (rule.required)
+                              {
+                                  m_staging.metaFields.append(rule);
+                              }
+                          }
+                          if (std::ranges::any_of(m_staging.metaFields, [](const KimaiMetaFieldRule &rule)
+                                                  { return rule.type == "color" || rule.type == "color-free"; }))
+                          {
+                              loadColorChoices(client, generation);
+                              return;
+                          }
+                      }
+                      onResourceLoaded(generation, Resource::MetaFields);
+                  })
+            .onFailed(this,
+                      [this, generation](const KimaiApiError &e)
+                      {
+                          if (e.kind() == ApiErrorKind::NotFound)
+                          {
+                              // No custom fields plugin on this instance: no field, not a failure
+                              spdlog::debug("KimaiCache: no custom fields plugin ({})", e.what());
+                              onResourceLoaded(generation, Resource::MetaFields);
+                              return;
+                          }
+                          onResourceFailed(generation, Resource::MetaFields, e);
+                      });
+    }
+
+    void KimaiCache::loadColorChoices(IKimaiClient *client, int generation)
+    {
+        client->requestColorChoices()
+            .then(this,
+                  [this, generation](const KimaiColorChoices &colors)
+                  {
+                      if (generation == m_generation)
+                      {
+                          m_staging.colorChoices = colors;
+                      }
+                      onResourceLoaded(generation, Resource::MetaFields);
+                  })
+            .onFailed(this,
+                      [this, generation](const KimaiApiError &e)
+                      {
+                          if (e.kind() == ApiErrorKind::NotFound)
+                          {
+                              // Kimai without the endpoint: color fields fall back to a typed #rrggbb
+                              spdlog::warn("KimaiCache: no color palette ({})", e.what());
+                              onResourceLoaded(generation, Resource::MetaFields);
+                              return;
+                          }
+                          onResourceFailed(generation, Resource::MetaFields, e);
+                      });
     }
 
     void KimaiCache::onResourceLoaded(int generation, Resource resource)
@@ -217,6 +279,16 @@ namespace kemai
     const KimaiTimeSheetConfig &KimaiCache::timesheetConfig() const
     {
         return m_current.timesheetConfig;
+    }
+
+    const KimaiMetaFieldRules &KimaiCache::timesheetMetaFields() const
+    {
+        return m_current.metaFields;
+    }
+
+    const KimaiColorChoices &KimaiCache::colorChoices() const
+    {
+        return m_current.colorChoices;
     }
 
     const std::optional<KimaiApiError> &KimaiCache::lastError() const

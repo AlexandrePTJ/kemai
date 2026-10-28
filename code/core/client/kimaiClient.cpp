@@ -73,6 +73,12 @@ QString kemai::apiMethodToString(ApiMethod method)
     case ApiMethod::TimeSheetConfig:
         return "config/timesheet";
 
+    case ApiMethod::ColorsConfig:
+        return "config/colors";
+
+    case ApiMethod::MetaFields:
+        return "metafields";
+
     default:
         return "";
     }
@@ -476,6 +482,42 @@ QFuture<KimaiPlugins> KimaiClient::requestPlugins()
     return m_d->processApiNetworkReplyArray<KimaiPlugin>(ApiMethod::Plugins, reply);
 }
 
+QFuture<KimaiMetaFieldRules> KimaiClient::requestTimeSheetMetaFields()
+{
+    auto request = m_d->prepareRequest(ApiMethod::MetaFields, {
+                                                                  {"entity", "timesheet"}
+    });
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReplyArray<KimaiMetaFieldRule>(ApiMethod::MetaFields, reply);
+}
+
+QFuture<KimaiColorChoices> KimaiClient::requestColorChoices()
+{
+    auto request = m_d->prepareRequest(ApiMethod::ColorsConfig);
+    auto reply   = m_d->sendGetRequest(request);
+    return m_d->processApiNetworkReply<KimaiColorChoices>(ApiMethod::ColorsConfig, reply, &KimaiClient::colorChoicesFromJson);
+}
+
+KimaiColorChoices KimaiClient::colorChoicesFromJson(const QJsonDocument &doc)
+{
+    if (!doc.isObject())
+    {
+        throw std::runtime_error("JSON response is not an object");
+    }
+
+    // A JSON object has no order once parsed: the palette comes sorted by name, not in Kimai's order
+    KimaiColorChoices colors;
+    const auto        object = doc.object();
+    for (auto it = object.begin(); it != object.end(); ++it)
+    {
+        if (const auto color = it.value().toString(); !color.isEmpty())
+        {
+            colors.append({.name = it.key(), .color = color});
+        }
+    }
+    return colors;
+}
+
 QFuture<KimaiCustomers> KimaiClient::requestCustomers()
 {
     auto request = m_d->prepareRequest(ApiMethod::Customers);
@@ -584,6 +626,17 @@ QFuture<KimaiTimeSheet> KimaiClient::updateTimeSheet(const KimaiTimeSheet &timeS
 {
     auto data    = JsonHelpers::toByteArray(timeSheet.toJson(trackingMode));
     auto request = m_d->prepareRequest(ApiMethod::TimeSheets, {}, data, QString::number(timeSheet.id));
+    auto reply   = m_d->sendPatchRequest(request, data);
+    return m_d->processApiNetworkReplySingleObject<KimaiTimeSheet>(ApiMethod::TimeSheets, reply);
+}
+
+QFuture<KimaiTimeSheet> KimaiClient::setTimeSheetMeta(int timeSheetId, const QString &name, const QString &value)
+{
+    auto data    = JsonHelpers::toByteArray(QJsonObject{
+        {"name",  name },
+        {"value", value}
+    });
+    auto request = m_d->prepareRequest(ApiMethod::TimeSheets, {}, data, QString("%1/meta").arg(timeSheetId));
     auto reply   = m_d->sendPatchRequest(request, data);
     return m_d->processApiNetworkReplySingleObject<KimaiTimeSheet>(ApiMethod::TimeSheets, reply);
 }

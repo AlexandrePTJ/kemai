@@ -29,6 +29,8 @@ set(KEMAI_LIB_SOURCES
         data/appSettings.h
         data/profile.cpp
         data/profile.h
+        misc/customFields.h
+        misc/customFields.cpp
         misc/formatHelpers.h
         misc/formatHelpers.cpp
         misc/fuzzyMatch.h
@@ -45,6 +47,8 @@ set(KEMAI_LIB_SOURCES
         misc/windowPlacement.cpp
         model/activityListModel.cpp
         model/activityListModel.h
+        model/customFieldsModel.cpp
+        model/customFieldsModel.h
         model/logEntryModel.cpp
         model/logEntryModel.h
         model/profile.cpp
