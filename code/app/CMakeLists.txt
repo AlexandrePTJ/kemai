@@ -155,6 +155,11 @@ target_link_libraries(${PROJECT_NAME}
 
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE wtsapi32)
+    # Icon and product metadata (name, version) of Kemai.exe; the numeric version is 0.0.0.0 for development builds
+    set(KEMAI_WINDOWS_ICON "${CMAKE_SOURCE_DIR}/bundle/windows/kemai.ico")
+    set(KEMAI_RC_VERSION "${KemaiProject_VERSION_MAJOR},${KemaiProject_VERSION_MINOR},${KemaiProject_VERSION_PATCH},0")
+    configure_file(kemai.rc.in ${CMAKE_CURRENT_BINARY_DIR}/kemai.rc @ONLY)
+    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/kemai.rc)
 elseif (APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreGraphics" "-framework Foundation")
 else ()
@@ -196,10 +201,39 @@ if (UNIX AND NOT APPLE)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/io.github.AlexandrePTJ.Kemai.metainfo.xml
             DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 endif ()
+if (WIN32)
+    # MSVC runtime next to Kemai.exe, so the installed folder runs without the Visual C++ redistributable installed
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ${CMAKE_INSTALL_BINDIR})
+    include(InstallRequiredSystemLibraries)
+    # ... instead of the vc_redist installer windeployqt would add
+    set(_kemai_deploy_options DEPLOY_TOOL_OPTIONS --no-compiler-runtime)
+endif ()
 if (KEMAI_DEPLOY_QT)
     qt_generate_deploy_qml_app_script(
             TARGET ${PROJECT_NAME}
             OUTPUT_SCRIPT deploy_script
+            ${_kemai_deploy_options}
     )
     install(SCRIPT ${deploy_script})
+endif ()
+
+# Windows installer of stable releases (cpack -G WIX, WiX 4+ .NET tool); none for development builds.
+# Same upgrade code as the 0.x installers; those were per-user installs, which a per-machine MSI cannot upgrade, so
+# setup stops until Kemai 0.11 is uninstalled (packaging/windows/legacy-check.xml). Later stable MSIs upgrade it.
+if (WIN32 AND KEMAI_VERSION)
+    set(CPACK_GENERATOR WIX)
+    set(CPACK_WIX_VERSION 4)
+    set(CPACK_PACKAGE_NAME "Kemai")
+    set(CPACK_PACKAGE_VENDOR "Alexandre Petitjean")
+    set(CPACK_PACKAGE_VERSION "${KEMAI_VERSION}")
+    set(CPACK_PACKAGE_FILE_NAME "Kemai-${KEMAI_VERSION}-windows-x64")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Kemai")
+    set(CPACK_PACKAGE_EXECUTABLES Kemai Kemai)
+    set(CPACK_CREATE_DESKTOP_LINKS Kemai)
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
+    set(CPACK_WIX_UPGRADE_GUID "88815E44-85A0-469C-9740-B4887D456BAA")
+    set(CPACK_WIX_INSTALL_SCOPE perMachine)
+    set(CPACK_WIX_PRODUCT_ICON "${KEMAI_WINDOWS_ICON}")
+    set(CPACK_WIX_PATCH_FILE "${CMAKE_SOURCE_DIR}/packaging/windows/legacy-check.xml")
+    include(CPack)
 endif ()

@@ -53,6 +53,7 @@ Follow [Build from source](README.md#build-from-source) in the README. Tests are
 - Never log, store in a plain file, or show an API token.
 - Adding, removing or relicensing a dependency (library, Qt module, font, icon set) also updates the credits list in `code/app/qml/Views/ThirdParty.js`, shown in the About dialog.
 - Do not change files unrelated to your work (formatting sweeps, `.gitignore`, editor settings).
+- Build scripts, CMake files and GitHub workflows are reviewed like code: the signed Windows packages are built from them.
 
 ### Check it
 

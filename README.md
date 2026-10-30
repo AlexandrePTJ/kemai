@@ -74,7 +74,7 @@ brew install kemai
 
 ### Rewrite (alpha)
 
-Alpha releases are listed as *pre-releases* on the [Releases](https://github.com/AlexandrePTJ/kemai/releases) page and named after their date: `YEAR.MONTH.PATCH`, for example `2026.10.1`.
+Alpha releases are listed as *pre-releases* on the [Releases](https://github.com/AlexandrePTJ/kemai/releases) page and named after their date: `YY.MONTH.PATCH`, for example `26.10.1`.
 
 So far they are **source only**: Kemai never publishes unsigned programs, which would trigger security warnings on Windows and macOS. Build Kemai as described in [Build from source](#build-from-source); each release's notes give the exact commands for that release.
 
@@ -86,6 +86,10 @@ So far they are **source only**: Kemai never publishes unsigned programs, which 
 
 `Kemai.exe` is signed: Windows shows **SignPath Foundation** as its publisher. Right after a release, Windows SmartScreen may still warn about a file it has not seen often yet; *More info* then shows the publisher before you choose to run it.
 
+The portable ZIP runs next to an installed Kemai 0.11.x. Each keeps its own settings and the rewrite never modifies those of 0.11.x; it offers to import 0.11.x's profiles (see [Coming from Kemai 0.11](#coming-from-kemai-011)).
+
+Stable releases of the rewrite will come with a signed installer instead, `Kemai-<version>-windows-x64.msi`. It installs Kemai for all users in `Program Files\Kemai`, with Start menu and desktop shortcuts, and Kemai is removed from the installed apps. It **does not install while Kemai 0.11.x is installed**: uninstall 0.11.x from the installed apps first, then run the installer again. Uninstalling 0.11.x keeps its settings file, and its profiles are offered for import at first start. A copy of 0.11.x installed any other way than by its installer is not detected; remove it by hand.
+
 **Linux.** Kemai is being prepared for [Flathub](https://flathub.org), which builds it from each release's source for every distribution. Once it is published there, stable releases install with `flatpak install flathub io.github.AlexandrePTJ.Kemai`, and alphas from Flathub's beta repository:
 
 ```shell
@@ -94,8 +98,6 @@ flatpak install flathub-beta io.github.AlexandrePTJ.Kemai
 ```
 
 Flathub delivers the updates, so this Kemai does not check for new versions itself. It runs in a sandbox: its profiles and settings are kept apart from those of a Kemai built from source or of Kemai 0.11.x (whose profiles it cannot import), and stopping the timer when the session is locked is not available (stopping it when you are idle is).
-
-The rewrite can be installed next to Kemai 0.11.x. Each keeps its own settings and the rewrite never modifies those of 0.11.x; it offers to import 0.11.x's profiles (see [Coming from Kemai 0.11](#coming-from-kemai-011)).
 
 ## Getting started
 
@@ -166,7 +168,7 @@ Windows packages of Kemai are signed for free: free code signing provided by [Si
 - Committers and reviewers: [Alexandre Petitjean](https://github.com/AlexandrePTJ). Contributions from anyone else are reviewed before they are merged, workflows and build scripts included.
 - Approvers: [Alexandre Petitjean](https://github.com/AlexandrePTJ). Every signing request is approved by hand.
 
-Only `Kemai.exe`, built from this repository by its GitHub Actions release workflow, is signed. The Qt libraries and the Visual C++ runtime shipped next to it are third-party components, under their own licenses and signatures.
+Only Kemai's own files are signed: `Kemai.exe` and the Windows installer, built from this repository by its GitHub Actions release workflow. The Qt libraries and the Visual C++ runtime shipped next to it are third-party components, under their own licenses and signatures.
 
 Privacy: Kemai sends nothing to anyone but your Kimai server and, for the update check that you can turn off, GitHub. See [Your data and privacy](#your-data-and-privacy).
 
@@ -199,8 +201,8 @@ cmake --install build/release --prefix <target dir>
 **Building a given release.** Check out its tag and pass its version and channel, as given in its release notes:
 
 ```shell
-git checkout 2026.10.1
-cmake --preset release -DCMAKE_PREFIX_PATH=<...> -DKEMAI_VERSION=2026.10.1 -DKEMAI_CHANNEL=alpha
+git checkout 26.10.1
+cmake --preset release -DCMAKE_PREFIX_PATH=<...> -DKEMAI_VERSION=26.10.1 -DKEMAI_CHANNEL=alpha
 cmake --build --preset release
 ```
 

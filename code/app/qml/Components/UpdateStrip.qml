@@ -40,7 +40,7 @@ Rectangle {
         return ""
     }
 
-    // "2026.12.1 alpha": the channel only when it isn't stable
+    // "26.12.1 alpha": the channel only when it isn't stable
     readonly property string _latest: root.notifier.latestVersion + (root.notifier.latestPrerelease ? " alpha" : "")
     readonly property string _current: root.notifier.currentVersion + (root.notifier.channel === "alpha" ? " alpha" : "")
     readonly property string _reason: {

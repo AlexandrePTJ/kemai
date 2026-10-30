@@ -19,7 +19,7 @@ TEST_CASE("AppPreferences - update preferences and their defaults", "[preference
     QObject::connect(&preferences, &AppPreferences::changed, [&changes]
                      { ++changes; });
     preferences.setCheckUpdatesAtStart(false);
-    preferences.setIgnoredVersion("2026.12.1");
+    preferences.setIgnoredVersion("26.12.1");
     const auto when = QDateTime(QDate(2026, 10, 25), QTime(8, 42), QTimeZone::UTC);
     preferences.setLastUpdateCheck(when);
     REQUIRE(changes == 3);
@@ -28,15 +28,15 @@ TEST_CASE("AppPreferences - update preferences and their defaults", "[preference
     AppPreferences reread;
     reread.setJson(preferences.json());
     REQUIRE_FALSE(reread.checkUpdatesAtStart());
-    REQUIRE(reread.ignoredVersion() == "2026.12.1");
+    REQUIRE(reread.ignoredVersion() == "26.12.1");
     REQUIRE(reread.lastUpdateCheck() == when);
 
     // Same value: nothing to save
-    reread.setIgnoredVersion("2026.12.1");
+    reread.setIgnoredVersion("26.12.1");
     bool saved = false;
     QObject::connect(&reread, &AppPreferences::changed, [&saved]
                      { saved = true; });
-    reread.setIgnoredVersion("2026.12.1");
+    reread.setIgnoredVersion("26.12.1");
     REQUIRE_FALSE(saved);
 }
 
@@ -61,7 +61,7 @@ TEST_CASE("AppPreferences - keys of a newer Kemai survive", "[preferences][unit]
     preferences.setJson(QJsonObject{
         {"futureKey", 42}
     });
-    preferences.setIgnoredVersion("2026.12.1");
+    preferences.setIgnoredVersion("26.12.1");
     REQUIRE(preferences.json().value("futureKey").toInt() == 42);
 }
 

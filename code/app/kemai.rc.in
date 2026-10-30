@@ -1,0 +1,38 @@
+// SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+// SPDX-License-Identifier: MIT
+
+// Windows resources of Kemai.exe, configured by CMake: the icon, and the product metadata shown in the file
+// properties and checked by the code signing service.
+
+#include <winver.h>
+
+IDI_ICON1 ICON "@KEMAI_WINDOWS_ICON@"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     @KEMAI_RC_VERSION@
+PRODUCTVERSION  @KEMAI_RC_VERSION@
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName",      "Kemai"
+            VALUE "FileDescription",  "Kemai"
+            VALUE "FileVersion",      "@KEMAI_DISPLAY_VERSION@"
+            VALUE "InternalName",     "Kemai"
+            VALUE "LegalCopyright",   "Copyright (C) 2020-2026 Alexandre Petitjean, MIT License"
+            VALUE "OriginalFilename", "Kemai.exe"
+            VALUE "ProductName",      "Kemai"
+            VALUE "ProductVersion",   "@KEMAI_DISPLAY_VERSION@"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

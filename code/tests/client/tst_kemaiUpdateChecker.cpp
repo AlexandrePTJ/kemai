@@ -68,11 +68,11 @@ namespace
 
 TEST_CASE("KemaiUpdateChecker - calendar versions only", "[updates][unit]")
 {
-    REQUIRE(KemaiUpdateChecker::isCalendarVersion("2026.11.1"));
-    REQUIRE(KemaiUpdateChecker::isCalendarVersion("2026.12.10"));
+    REQUIRE(KemaiUpdateChecker::isCalendarVersion("26.11.1"));
+    REQUIRE(KemaiUpdateChecker::isCalendarVersion("26.12.10"));
     REQUIRE_FALSE(KemaiUpdateChecker::isCalendarVersion("0.11.1"));
-    REQUIRE_FALSE(KemaiUpdateChecker::isCalendarVersion("2026.13.1"));
-    REQUIRE_FALSE(KemaiUpdateChecker::isCalendarVersion("v2026.11.1"));
+    REQUIRE_FALSE(KemaiUpdateChecker::isCalendarVersion("26.13.1"));
+    REQUIRE_FALSE(KemaiUpdateChecker::isCalendarVersion("v26.11.1"));
     REQUIRE_FALSE(KemaiUpdateChecker::isCalendarVersion("98-break-ui"));
 }
 
@@ -82,55 +82,55 @@ TEST_CASE("KemaiUpdateChecker::newestRelease - channels, old tags, drafts", "[up
 
     SECTION("An alpha sees the newer pre-release, never the draft")
     {
-        const auto newest = KemaiUpdateChecker::newestRelease(releases, "2026.11.1", Channel::Alpha);
+        const auto newest = KemaiUpdateChecker::newestRelease(releases, "26.11.1", Channel::Alpha);
         REQUIRE(newest.has_value());
-        REQUIRE(newest->version == "2026.12.1");
+        REQUIRE(newest->version == "26.12.1");
         REQUIRE(newest->prerelease);
-        REQUIRE(newest->url == QUrl("https://github.com/AlexandrePTJ/kemai/releases/tag/2026.12.1"));
+        REQUIRE(newest->url == QUrl("https://github.com/AlexandrePTJ/kemai/releases/tag/26.12.1"));
     }
 
     SECTION("A stable build ignores pre-releases")
     {
-        const auto newest = KemaiUpdateChecker::newestRelease(releases, "2026.11.1", Channel::Stable);
+        const auto newest = KemaiUpdateChecker::newestRelease(releases, "26.11.1", Channel::Stable);
         REQUIRE(newest.has_value());
-        REQUIRE(newest->version == "2026.11.2");
-        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(releases, "2026.11.2", Channel::Stable).has_value());
+        REQUIRE(newest->version == "26.11.2");
+        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(releases, "26.11.2", Channel::Stable).has_value());
     }
 
     SECTION("Up to date")
     {
-        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(releases, "2026.12.1", Channel::Alpha).has_value());
+        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(releases, "26.12.1", Channel::Alpha).has_value());
     }
 
     SECTION("0.11.x and other tags are never updates")
     {
         const auto onlyOld = recorded("kemai-2026-10-25.json");
-        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(onlyOld, "2026.11.1", Channel::Alpha).has_value());
-        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(onlyOld, "2026.11.1", Channel::Stable).has_value());
+        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(onlyOld, "26.11.1", Channel::Alpha).has_value());
+        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(onlyOld, "26.11.1", Channel::Stable).has_value());
     }
 
     SECTION("A development build is older than any release")
     {
         const auto newest = KemaiUpdateChecker::newestRelease(releases, "dev-1a2b3c4", Channel::Dev);
         REQUIRE(newest.has_value());
-        REQUIRE(newest->version == "2026.12.1");
+        REQUIRE(newest->version == "26.12.1");
     }
 
     SECTION("An ignored version is skipped, a later one reported")
     {
-        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(releases, "2026.11.1", Channel::Alpha, "2026.12.1").has_value());
+        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(releases, "26.11.1", Channel::Alpha, "26.12.1").has_value());
         // Ignoring a newer one silences the older ones too
-        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(releases, "2026.11.1", Channel::Stable, "2026.12.1").has_value());
-        const auto later = KemaiUpdateChecker::newestRelease(releases, "2026.11.1", Channel::Alpha, "2026.11.2");
+        REQUIRE_FALSE(KemaiUpdateChecker::newestRelease(releases, "26.11.1", Channel::Stable, "26.12.1").has_value());
+        const auto later = KemaiUpdateChecker::newestRelease(releases, "26.11.1", Channel::Alpha, "26.11.2");
         REQUIRE(later.has_value());
-        REQUIRE(later->version == "2026.12.1");
+        REQUIRE(later->version == "26.12.1");
     }
 
     SECTION("Malformed replies fail")
     {
-        REQUIRE_THROWS_AS(KemaiUpdateChecker::newestRelease(QJsonDocument::fromJson(R"({"message": "Not Found"})"), "2026.11.1", Channel::Alpha), UpdateCheckError);
-        REQUIRE_THROWS_AS(KemaiUpdateChecker::newestRelease(QJsonDocument::fromJson(R"([{"name": "x"}])"), "2026.11.1", Channel::Alpha), UpdateCheckError);
-        REQUIRE_THROWS_AS(KemaiUpdateChecker::newestRelease(QJsonDocument(), "2026.11.1", Channel::Alpha), UpdateCheckError);
+        REQUIRE_THROWS_AS(KemaiUpdateChecker::newestRelease(QJsonDocument::fromJson(R"({"message": "Not Found"})"), "26.11.1", Channel::Alpha), UpdateCheckError);
+        REQUIRE_THROWS_AS(KemaiUpdateChecker::newestRelease(QJsonDocument::fromJson(R"([{"name": "x"}])"), "26.11.1", Channel::Alpha), UpdateCheckError);
+        REQUIRE_THROWS_AS(KemaiUpdateChecker::newestRelease(QJsonDocument(), "26.11.1", Channel::Alpha), UpdateCheckError);
     }
 }
 
@@ -145,10 +145,10 @@ TEST_CASE("KemaiUpdateChecker::check - over HTTP", "[updates][unit]")
         FakeGitHub github(200, file.readAll());
         checker.setReleasesUrl(github.url());
 
-        auto future = checker.check("2026.11.1", Channel::Alpha);
+        auto future = checker.check("26.11.1", Channel::Alpha);
         wait(future);
         REQUIRE(future.result().has_value());
-        REQUIRE(future.result()->version == "2026.12.1");
+        REQUIRE(future.result()->version == "26.12.1");
     }
 
     SECTION("Rate limited")
@@ -156,7 +156,7 @@ TEST_CASE("KemaiUpdateChecker::check - over HTTP", "[updates][unit]")
         FakeGitHub github(403, R"({"message": "API rate limit exceeded"})");
         checker.setReleasesUrl(github.url());
 
-        auto future = checker.check("2026.11.1", Channel::Alpha);
+        auto future = checker.check("26.11.1", Channel::Alpha);
         wait(future);
         try
         {
@@ -179,7 +179,7 @@ TEST_CASE("KemaiUpdateChecker::check - over HTTP", "[updates][unit]")
         }
         checker.setReleasesUrl(QUrl(QString("http://127.0.0.1:%1/releases").arg(port)));
 
-        auto future = checker.check("2026.11.1", Channel::Alpha);
+        auto future = checker.check("26.11.1", Channel::Alpha);
         wait(future);
         try
         {

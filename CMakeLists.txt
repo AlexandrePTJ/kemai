@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.30)
 
 # Version: a release build gets the calendar git tag (KEMAI_VERSION) and its channel (KEMAI_CHANNEL, from the
 # tagged branch) from the release workflow; any other build is a development build named after its commit.
-set(KEMAI_VERSION "" CACHE STRING "Release version (calendar tag YEAR.MONTH.PATCH); empty for a development build")
+set(KEMAI_VERSION "" CACHE STRING "Release version (calendar tag YY.MONTH.PATCH); empty for a development build")
 set(KEMAI_CHANNEL "" CACHE STRING "Release channel (alpha or stable); required with KEMAI_VERSION")
 if (KEMAI_VERSION)
-    if (NOT KEMAI_VERSION MATCHES "^20[0-9][0-9]\\.(1[0-2]|[1-9])\\.[0-9]+$")
-        message(FATAL_ERROR "KEMAI_VERSION '${KEMAI_VERSION}' is not a calendar version YEAR.MONTH.PATCH")
+    if (NOT KEMAI_VERSION MATCHES "^[0-9][0-9]\\.(1[0-2]|[1-9])\\.[0-9]+$")
+        message(FATAL_ERROR "KEMAI_VERSION '${KEMAI_VERSION}' is not a calendar version YY.MONTH.PATCH")
     endif ()
     if (NOT KEMAI_CHANNEL MATCHES "^(alpha|stable)$")
         message(FATAL_ERROR "KEMAI_CHANNEL must be alpha or stable with KEMAI_VERSION (got '${KEMAI_CHANNEL}')")

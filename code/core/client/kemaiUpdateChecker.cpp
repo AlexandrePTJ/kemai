@@ -125,7 +125,7 @@ namespace kemai
     bool KemaiUpdateChecker::isCalendarVersion(const QString &version)
     {
         // Same rule as the release workflow (.github/scripts/release-channel.sh)
-        static const QRegularExpression calendar(R"(^20\d{2}\.(1[0-2]|[1-9])\.\d+$)");
+        static const QRegularExpression calendar(R"(^\d{2}\.(1[0-2]|[1-9])\.\d+$)");
         return calendar.match(version).hasMatch();
     }
 

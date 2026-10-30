@@ -2,23 +2,25 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project uses [calendar versions](https://calver.org/) (`YEAR.MONTH.PATCH`) since the rewrite; versions up to 0.11.1 followed [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-Alpha releases are marked by ` [alpha]` after their date (`## [2026.10.1] - 2026-10-26 [alpha]`); the release metadata shown by Linux software centers lists them as development releases.
+and this project uses [calendar versions](https://calver.org/) (`YY.MONTH.PATCH`) since the rewrite; versions up to 0.11.1 followed [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Alpha releases are marked by ` [alpha]` after their date (`## [26.10.1] - 2026-10-26 [alpha]`); the release metadata shown by Linux software centers lists them as development releases.
 
 ## [Unreleased]
 
 ### Added
+- Signed Windows packages, once the project is accepted by SignPath Foundation: a portable ZIP for alpha releases, an installer for stable releases, which asks to uninstall Kemai 0.11.x first
 - Linux: desktop entry, icon and AppStream metadata installed with Kemai; a Flatpak manifest, for Flathub
 - Profiles of Kemai 0.11 found on the same computer are offered for import at start, with their API tokens moved to the system keychain
 - Required custom fields of time entries (Kimai's custom fields plugin) are asked for before a timer starts when they would be left empty, and shown and checked when editing an entry
 
 ### Changed
+- Versions have a two-digit year (`26.10.1`), the same number everywhere, Windows installer included; the first alpha, published as 2026.10.1, does not see later releases in its update check
 - Debug messages are no longer printed on the console (hence the system journal) unless Kemai is started with `--verbose`; log files and the log journal still have them
 
 ### Fixed
 - Log files no longer lose their last lines when Kemai crashes or is killed
 
-## [2026.10.1] - 2026-10-26 [alpha]
+## [26.10.1] - 2026-10-26 [alpha]
 
 First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is provided, build it as shown below. It can be installed next to Kemai 0.11.x: it keeps its own settings and never modifies 0.11.x's (profiles are not imported).
 
@@ -36,7 +38,7 @@ First alpha of the complete rewrite (Qt 6 / QML). Source-only: no binary is prov
 - Log files and a log journal (filter, copy for a bug report, open the log folder), without any API token in them
 - Update check at start and on demand: a notice links to the release page of a newer version of your channel (nothing is downloaded); About dialog; open Kimai in the browser
 - Projects and activities cache refreshed on demand and when it gets old; clear messages when the network or the server fails
-- Calendar versions (`YEAR.MONTH.PATCH`), alpha releases from the `develop` branch
+- Calendar versions (`YY.MONTH.PATCH`), alpha releases from the `develop` branch
 
 ### Not there yet (compared with 0.11.1)
 - Translations

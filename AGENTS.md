@@ -22,7 +22,7 @@ code/app/    the QML application: thin QML wrappers over core controllers, QML v
 code/tests/  Catch2 tests of core and app logic, with a fake Kimai client (mocks/fakeKimaiClient.h).
 ```
 
-Business logic goes in a core controller, which the app exposes to QML through a thin wrapper. Read [docs/CODE_STYLE.md](docs/CODE_STYLE.md) before changing code: it describes the layers, the error-handling rules and the C++ and QML conventions.
+Business logic goes in a core controller, which the app exposes to QML through a thin wrapper. Read [docs/CODE_STYLE.md](docs/CODE_STYLE.md) before changing code: it describes the layers, the error-handling rules and the C++ and QML conventions. The release workflow and the Windows packaging (version resource, runtime deployment, installer, signing) are described in [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Commands
 
@@ -55,7 +55,7 @@ Integration tests run against a real Kimai server when `KEMAI_TEST_HOST` and `KE
   ```
 
 - **Dependencies**: do not add one without the contributor's agreement. When one is added, removed or relicensed, update `code/app/qml/Views/ThirdParty.js` in the same change.
-- **Settings files**: never write, move or delete `settings.json`: it belongs to Kemai 0.11.x, which may be installed alongside. Read it only through `LegacySettingsReader`, to import its profiles.
+- **Settings files**: never write, move or delete `settings.json`: it belongs to Kemai 0.11.x, which may be installed alongside. Read it only through `LegacySettingsReader`, to import its profiles. The stable Windows installer stops until 0.11.x is uninstalled, and never touches its settings.
 - **Kimai API**: Kimai 2.x rejects unknown fields in request bodies; send only the fields the endpoint needs.
 
 ## Commits

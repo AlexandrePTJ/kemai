@@ -2,23 +2,31 @@
 # SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 # SPDX-License-Identifier: MIT
 #
-# Usage: release-notes.sh [--flathub] [--windows-zip <file name>] <version> <channel> [<changelog>]
+# Usage: release-notes.sh [--flathub] [--windows-zip <file name> | --windows-msi <file name>] <version> <channel> [<changelog>]
 # Prints the release notes: the "## [<version>]" section of the changelog (default CHANGELOG.md), then, with
-# --flathub, how to install it from Flathub (flathub-beta for an alpha), with --windows-zip, how to run the signed
-# Windows package attached under that name, then how to build that release from source. Exits non-zero when the changelog has no entry for <version>.
+# --flathub, how to install it from Flathub (flathub-beta for an alpha), with --windows-zip (alpha) or --windows-msi
+# (stable), how to run or install the signed Windows package attached under that name, then how to build that release
+# from source. Exits non-zero when the changelog has no entry for <version>.
 set -euo pipefail
 
-usage="usage: release-notes.sh [--flathub] [--windows-zip <file name>] <version> <channel> [<changelog>]"
+usage="usage: release-notes.sh [--flathub] [--windows-zip <file name> | --windows-msi <file name>] <version> <channel> [<changelog>]"
 flathub=false
 if [[ "${1:-}" == "--flathub" ]]; then
     flathub=true
     shift
 fi
 windows_zip=""
-if [[ "${1:-}" == "--windows-zip" ]]; then
-    windows_zip="${2:?$usage}"
-    shift 2
-fi
+windows_msi=""
+case "${1:-}" in
+    --windows-zip)
+        windows_zip="${2:?$usage}"
+        shift 2
+        ;;
+    --windows-msi)
+        windows_msi="${2:?$usage}"
+        shift 2
+        ;;
+esac
 
 version="${1:?$usage}"
 channel="${2:?$usage}"
@@ -70,6 +78,19 @@ if [[ -n "$windows_zip" ]]; then
 Download \`$windows_zip\` below, unzip it anywhere and run \`Kemai.exe\`: nothing is installed, delete the folder to remove it. Windows 10 or later, 64-bit.
 
 \`Kemai.exe\` is signed: Windows shows **SignPath Foundation** as its publisher. See the [code signing policy](https://github.com/AlexandrePTJ/kemai#code-signing-policy).
+NOTES
+fi
+
+if [[ -n "$windows_msi" ]]; then
+    cat <<NOTES
+
+## Windows
+
+Download \`$windows_msi\` below and run it: Kemai is installed for all users, with Start menu and desktop shortcuts, and can be removed from the installed apps. Windows 10 or later, 64-bit.
+
+If Kemai 0.11 is installed, uninstall it from the installed apps first: the installer stops until it is removed. The profiles saved in Kemai 0.11 are not lost: Kemai offers to import them at first start.
+
+The installer and \`Kemai.exe\` are signed: Windows shows **SignPath Foundation** as their publisher. See the [code signing policy](https://github.com/AlexandrePTJ/kemai#code-signing-policy).
 NOTES
 fi
 

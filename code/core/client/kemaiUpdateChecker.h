@@ -22,7 +22,7 @@ namespace kemai
     // A published Kemai release
     struct KemaiRelease
     {
-        QString version; // calendar version, e.g. "2026.12.1"
+        QString version; // calendar version, e.g. "26.12.1"
         QUrl    url;     // its GitHub page
         bool    prerelease = false;
     };

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 #
 # Usage: release-channel.sh <tag> [<commit>]
-# Checks that <tag> is a calendar version (YEAR.MONTH.PATCH) and derives the release channel from the remote
+# Checks that <tag> is a calendar version (YY.MONTH.PATCH) and derives the release channel from the remote
 # branches containing <commit> (default: the tag's commit): main/master -> stable, else develop -> alpha.
 # Prints "version=<tag>" and "channel=<channel>" (GitHub output format); exits non-zero when nothing may be published.
 # Needs the full history and the remote branches (actions/checkout with fetch-depth: 0).
@@ -12,8 +12,8 @@ set -euo pipefail
 tag="${1:?usage: release-channel.sh <tag> [<commit>]}"
 commit="${2:-$tag}"
 
-if [[ ! "$tag" =~ ^20[0-9]{2}\.(1[0-2]|[1-9])\.[0-9]+$ ]]; then
-    echo "error: tag '$tag' is not a calendar version YEAR.MONTH.PATCH" >&2
+if [[ ! "$tag" =~ ^[0-9]{2}\.(1[0-2]|[1-9])\.[0-9]+$ ]]; then
+    echo "error: tag '$tag' is not a calendar version YY.MONTH.PATCH" >&2
     exit 1
 fi
 

@@ -14,8 +14,8 @@ commit="${2:?$usage}"
 channel="${3:?$usage}"
 reference="${4:-packaging/flatpak/io.github.AlexandrePTJ.Kemai.yml}"
 
-if [[ ! "$version" =~ ^20[0-9]{2}\.(1[0-2]|[1-9])\.[0-9]+$ ]]; then
-    echo "error: '$version' is not a calendar version YEAR.MONTH.PATCH" >&2
+if [[ ! "$version" =~ ^[0-9]{2}\.(1[0-2]|[1-9])\.[0-9]+$ ]]; then
+    echo "error: '$version' is not a calendar version YY.MONTH.PATCH" >&2
     exit 1
 fi
 if [[ ! "$commit" =~ ^[0-9a-f]{40}$ ]]; then

@@ -1,17 +1,33 @@
 name: Release
-# Pushing a calendar tag (YEAR.MONTH.PATCH) publishes a source-only GitHub release: alpha (pre-release) when the
-# tagged commit is only on develop, stable when it is on main or master. No build here: every commit already went
-# through the CI workflow.
+# Pushing a calendar tag (YY.MONTH.PATCH) publishes a GitHub release: alpha (pre-release) when the tagged commit is
+# only on develop, stable when it is on main or master. The release is first source-only; once Windows signing is
+# enabled (KEMAI_WINDOWS_SIGNING), the windows job attaches the channel's signed package: a portable ZIP for alphas,
+# an installer for stable releases. Nothing unsigned is ever attached: if anything fails, the release stays
+# source-only. Run by hand (workflow_dispatch), the windows job only builds and tests a package: nothing is signed or
+# uploaded, not even as a workflow artifact.
 on:
   push:
-    tags: ['20*.*.*']
+    tags: ['[0-9][0-9].*.*']
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Package to build and test (alpha = portable ZIP, stable = installer)
+        type: choice
+        options: [alpha, stable]
+        default: alpha
+      version:
+        description: Throwaway calendar version for the test build
+        default: '99.12.1'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   publish:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       version: ${{ steps.release.outputs.version }}
       channel: ${{ steps.release.outputs.channel }}
@@ -53,6 +69,184 @@ jobs:
           fi
           gh release create "$VERSION" --verify-tag --title "Kemai $VERSION" --notes-file "$RUNNER_TEMP/notes.md" "${flags[@]}"
 
+  # Signing needs a manual approval on SignPath. If it comes after the timeout, re-run this job from the same workflow
+  # run (SignPath checks the request comes from this repository's workflow).
+  windows:
+    needs: publish
+    if: >-
+      !cancelled() && (
+        (github.event_name == 'push' && needs.publish.result == 'success' && vars.KEMAI_WINDOWS_SIGNING == 'true') ||
+        github.event_name == 'workflow_dispatch')
+    runs-on: windows-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write # gh release upload
+      actions: read # SignPath reads the job details and downloads the unsigned artifact
+    env:
+      VERSION: ${{ github.event_name == 'push' && needs.publish.outputs.version || inputs.version }}
+      CHANNEL: ${{ github.event_name == 'push' && needs.publish.outputs.channel || inputs.channel }}
+      SIGN: ${{ github.event_name == 'push' }}
+      TEST_SIGNING: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG == 'test-signing' }} # test certificate, not trusted by Windows
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.11.3'
+          # aqtinstall 3.3.0 (latest release) misses the Qt 6.11 Windows repo layout (miurahr/aqtinstall#1000); drop once released
+          aqtsource: 'git+https://github.com/miurahr/aqtinstall.git@076e1659807d0b362a3ed684d54c2e9c775eb9c7'
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure CMake
+        run: cmake --preset release "-DKEMAI_VERSION=$env:VERSION" "-DKEMAI_CHANNEL=$env:CHANNEL" -DBUILD_TESTING=OFF
+
+      - name: Build
+        run: cmake --build --preset release
+
+      - name: Install
+        run: cmake --install build/release --prefix staging/Kemai
+
+      - name: Smoke test
+        run: .github/scripts/windows-smoke-test.ps1 -Exe staging/Kemai/bin/Kemai.exe -Version $env:VERSION
+
+      # Alpha: portable ZIP of the installed folder, with Kemai.exe signed
+
+      - name: Upload the folder to sign
+        id: unsigned-zip
+        if: env.SIGN == 'true' && env.CHANNEL == 'alpha'
+        uses: actions/upload-artifact@v4
+        with:
+          name: kemai-unsigned
+          path: staging/Kemai
+          if-no-files-found: error
+          retention-days: 1 # only for SignPath to fetch, never published
+
+      - name: Sign Kemai.exe
+        if: env.SIGN == 'true' && env.CHANNEL == 'alpha'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+          github-artifact-id: ${{ steps.unsigned-zip.outputs.artifact-id }}
+          parameters: |
+            version: ${{ toJSON(env.VERSION) }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 14400
+          output-artifact-directory: signed/Kemai-${{ env.VERSION }}
+
+      - name: Check and package the signed folder
+        if: env.SIGN == 'true' && env.CHANNEL == 'alpha'
+        run: |
+          $exe = "signed/Kemai-$env:VERSION/bin/Kemai.exe"
+          .github/scripts/windows-check-signature.ps1 -Path $exe -Version $env:VERSION -TestSigning:($env:TEST_SIGNING -eq 'true')
+          .github/scripts/windows-smoke-test.ps1 -Exe $exe -Version $env:VERSION
+          $package = "Kemai-$env:VERSION-windows-x64.zip"
+          Compress-Archive -Path "signed/Kemai-$env:VERSION" -DestinationPath $package
+          "PACKAGE=$package" >> $env:GITHUB_ENV
+          "NOTES_OPTION=--windows-zip" >> $env:GITHUB_ENV
+
+      # Stable: installer, with Kemai.exe inside it and the installer itself signed
+
+      - name: Install WiX
+        if: env.CHANNEL == 'stable'
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          wix extension add --global WixToolset.UI.wixext/5.0.2
+          wix extension add --global WixToolset.Util.wixext/5.0.2
+
+      - name: Build the installer
+        if: env.CHANNEL == 'stable'
+        run: |
+          cpack -G WIX --config build/release/CPackConfig.cmake -B build/package
+          "MSI=build/package/Kemai-$env:VERSION-windows-x64.msi" >> $env:GITHUB_ENV
+
+      - name: Upload the installer to sign
+        id: unsigned-msi
+        if: env.SIGN == 'true' && env.CHANNEL == 'stable'
+        uses: actions/upload-artifact@v4
+        with:
+          name: kemai-unsigned-msi
+          path: ${{ env.MSI }}
+          if-no-files-found: error
+          retention-days: 1 # only for SignPath to fetch, never published
+
+      - name: Sign the installer
+        if: env.SIGN == 'true' && env.CHANNEL == 'stable'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_MSI_ARTIFACT_CONFIGURATION_SLUG }}
+          github-artifact-id: ${{ steps.unsigned-msi.outputs.artifact-id }}
+          parameters: |
+            version: ${{ toJSON(env.VERSION) }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 14400
+          output-artifact-directory: signed
+
+      - name: Check the signed installer
+        if: env.SIGN == 'true' && env.CHANNEL == 'stable'
+        run: |
+          $msi = "signed/Kemai-$env:VERSION-windows-x64.msi"
+          .github/scripts/windows-check-signature.ps1 -Path $msi -TestSigning:($env:TEST_SIGNING -eq 'true')
+          # Administrative install: extracts the files without installing them
+          $extracted = Join-Path $env:RUNNER_TEMP 'kemai-msi'
+          Start-Process msiexec.exe -ArgumentList '/a', "`"$((Resolve-Path $msi).Path)`"", '/qn', "TARGETDIR=`"$extracted`"" -Wait
+          $exe = Get-ChildItem $extracted -Recurse -Filter Kemai.exe | Select-Object -First 1
+          if (-not $exe) { throw "No Kemai.exe in $msi" }
+          .github/scripts/windows-check-signature.ps1 -Path $exe.FullName -Version $env:VERSION -TestSigning:($env:TEST_SIGNING -eq 'true')
+          "MSI=$msi" >> $env:GITHUB_ENV
+
+      - name: Download Kemai 0.11.1
+        if: env.CHANNEL == 'stable'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download 0.11.1 --pattern Kemai-0.11.1-win64.msi --dir $env:RUNNER_TEMP
+
+      - name: Installer test
+        if: env.CHANNEL == 'stable'
+        run: |
+          .github/scripts/windows-installer-test.ps1 -Msi (Resolve-Path $env:MSI).Path -Version $env:VERSION -LegacyMsi "$env:RUNNER_TEMP/Kemai-0.11.1-win64.msi"
+          if ($env:SIGN -eq 'true') {
+            $package = Split-Path $env:MSI -Leaf
+            Copy-Item $env:MSI $package
+            "PACKAGE=$package" >> $env:GITHUB_ENV
+            "NOTES_OPTION=--windows-msi" >> $env:GITHUB_ENV
+          }
+
+      # Both channels: attach the package, then mention it in the notes
+
+      - name: Attach to the release
+        if: env.SIGN == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FLATHUB: ${{ vars.KEMAI_FLATHUB }}
+        run: |
+          gh release upload "$VERSION" "$PACKAGE" --clobber
+          flags=()
+          if [ "$FLATHUB" = true ]; then
+            flags+=(--flathub)
+          fi
+          .github/scripts/release-notes.sh "${flags[@]}" "$NOTES_OPTION" "$PACKAGE" "$VERSION" "$CHANNEL" > "$RUNNER_TEMP/notes.md"
+          gh release edit "$VERSION" --notes-file "$RUNNER_TEMP/notes.md"
+
   # Once Kemai is on Flathub (KEMAI_FLATHUB): opens the pull requests updating its Flathub repository to this release,
   # on beta for an alpha, on master and beta for a stable release (beta users must not stay behind). Flathub builds
   # each pull request; merging it, by hand, publishes.
@@ -60,6 +254,8 @@ jobs:
     needs: publish
     if: vars.KEMAI_FLATHUB == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repo
