@@ -1,3 +1,4 @@
+.pragma library
 // SPDX-FileCopyrightText: Lucide Contributors 2022, Cole Bemis 2013-2022 (Feather)
 // SPDX-License-Identifier: ISC
 //
@@ -20,7 +21,6 @@
 // WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-.pragma library
 
 const paths = {
     "clock": "M2 12A10 10 0 1 0 22 12A10 10 0 1 0 2 12ZM12 6L12 12L16 14",
