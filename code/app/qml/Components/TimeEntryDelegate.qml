@@ -1,9 +1,9 @@
+import "Highlight.js" as Highlight
+import Kemai
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
 import QtQuick
 import QtQuick.Layouts
-
-import Kemai
 
 Rectangle {
     id: root
@@ -23,20 +23,25 @@ Rectangle {
     required property date endAt
     required property var tags
     required property var customValues
-
+    // Starts after now
+    required property bool planned
+    // The history filter text: its matches are highlighted
+    property string highlight: ""
     property bool isRunning: status === "active"
 
     signal startRequested(int activityId, int projectId)
-    signal editRequested
+    signal editRequested()
 
     width: ListView.view ? ListView.view.width : 0
     implicitHeight: mainLayout.implicitHeight + 22
     color: {
         if (isRunning)
-            return Theme.colorAccentGreenTint
+            return Theme.colorAccentGreenTint;
+
         if (rowHover.hovered)
-            return Theme.colorRowHover
-        return "transparent"
+            return Theme.colorRowHover;
+
+        return "transparent";
     }
 
     // Bottom border
@@ -63,6 +68,9 @@ Rectangle {
 
     RowLayout {
         id: mainLayout
+
+        spacing: 12
+
         anchors {
             left: parent.left
             right: parent.right
@@ -70,7 +78,6 @@ Rectangle {
             leftMargin: 16
             rightMargin: 18
         }
-        spacing: 12
 
         // Entry info (name + description)
         ColumnLayout {
@@ -81,7 +88,8 @@ Rectangle {
                 spacing: 7
 
                 Text {
-                    text: root.projectName
+                    text: Highlight.highlight(root.projectName, root.highlight, Theme.colorAccentGreen)
+                    textFormat: Text.StyledText
                     color: Theme.colorTextPrimary
                     font.pixelSize: Theme.fontSizeMedium
                     font.bold: true
@@ -96,19 +104,44 @@ Rectangle {
                 }
 
                 Text {
-                    text: root.activityName
+                    text: Highlight.highlight(root.activityName, root.highlight, Theme.colorAccentGreen)
+                    textFormat: Text.StyledText
                     color: Theme.colorTextSecondary
                     font.pixelSize: Theme.fontSizeSmall
                 }
+
+                Rectangle {
+                    visible: root.planned
+                    Layout.preferredWidth: Math.ceil(plannedText.implicitWidth) + 10
+                    Layout.preferredHeight: 16
+                    radius: 3
+                    color: "transparent"
+                    border.width: 1
+                    border.color: Theme.colorBorderSubtle
+
+                    Text {
+                        id: plannedText
+
+                        anchors.centerIn: parent
+                        text: "Planned"
+                        color: Theme.colorTextSecondary
+                        font.pixelSize: Theme.fontSizeTiny
+                        font.weight: Font.DemiBold
+                    }
+
+                }
+
             }
 
             Text {
-                text: root.description
+                text: Highlight.highlight(root.description, root.highlight, Theme.colorAccentGreen)
+                textFormat: Text.StyledText
                 color: Theme.colorTextSecondary
                 font.pixelSize: Theme.fontSizeXSmall
                 elide: Text.ElideRight
                 Layout.fillWidth: true
             }
+
         }
 
         // Duration + time range
@@ -127,17 +160,21 @@ Rectangle {
                 SequentialAnimation on opacity {
                     running: root.isRunning
                     loops: Animation.Infinite
+
                     NumberAnimation {
                         to: 0.7
                         duration: 500
                         easing.type: Easing.InOutQuad
                     }
+
                     NumberAnimation {
-                        to: 1.0
+                        to: 1
                         duration: 500
                         easing.type: Easing.InOutQuad
                     }
+
                 }
+
             }
 
             Text {
@@ -147,6 +184,7 @@ Rectangle {
                 font.pixelSize: Theme.fontSizeXSmall
                 Layout.alignment: Qt.AlignRight
             }
+
         }
 
         // Action buttons
@@ -175,6 +213,9 @@ Rectangle {
                 textSize: Theme.fontSizeXSmall
                 onClicked: root.startRequested(root.activityId, root.projectId)
             }
+
         }
+
     }
+
 }

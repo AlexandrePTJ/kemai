@@ -211,7 +211,7 @@ namespace kemai
                   [this, client, host, token, rememberLogin, profileName](KimaiUser user)
                   {
                       spdlog::info("Logged in to {} as {}", QUrl(host).toString(QUrl::RemoveUserInfo), user.username);
-                      auto *session = new SessionContext(std::move(client), user, this);
+                      auto *session = new SessionContext(std::move(client), user, HistoryPeriods::fromKey(m_preferences->historyPeriod()), this);
                       session->setAccount(profileName, host);
                       m_lastAccountName = session->accountName();
                       m_justLoggedOut   = false;

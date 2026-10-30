@@ -35,6 +35,8 @@ namespace kemai
         Q_PROPERTY(QDateTime lastUpdateCheck READ lastUpdateCheck WRITE setLastUpdateCheck NOTIFY lastUpdateCheckChanged)
         // Profiles import (legacy-profile-import): offer Kemai 0.11's profiles at start, until "Don't ask again"
         Q_PROPERTY(bool legacyImportOffer READ legacyImportOffer WRITE setLegacyImportOffer NOTIFY legacyImportOfferChanged)
+        // History (history-period): the period the history shows, "week" (default), "month" or "last30"
+        Q_PROPERTY(QString historyPeriod READ historyPeriod WRITE setHistoryPeriod NOTIFY historyPeriodChanged)
 
     public:
         explicit AppPreferences(QObject *parent = nullptr);
@@ -70,6 +72,9 @@ namespace kemai
         void      setLastUpdateCheck(const QDateTime &when);
         bool      legacyImportOffer() const;
         void      setLegacyImportOffer(bool offer);
+        // An unknown stored value reads as "week"
+        QString historyPeriod() const;
+        void    setHistoryPeriod(const QString &period);
 
     signals:
         // A preference was written: the owner saves the settings
@@ -83,6 +88,7 @@ namespace kemai
         void ignoredVersionChanged();
         void lastUpdateCheckChanged();
         void legacyImportOfferChanged();
+        void historyPeriodChanged();
 
     protected:
         QJsonValue value(const QString &key, const QJsonValue &defaultValue) const;

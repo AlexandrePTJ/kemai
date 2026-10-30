@@ -26,6 +26,9 @@ namespace kemai
     public:
         virtual ~IKimaiClient() = default;
 
+        // Page size of requestTimeSheets with a begin date (the largest Kimai serves)
+        static constexpr int TimeSheetsPageSize = 500;
+
         virtual QFuture<KimaiVersion>         requestKimaiVersion()    = 0;
         virtual QFuture<KimaiUser>            requestMeUserInfo()      = 0;
         virtual QFuture<KimaiTimeSheetConfig> requestTimeSheetConfig() = 0;
@@ -35,13 +38,13 @@ namespace kemai
         // The instance's color palette (name -> #rrggbb)
         virtual QFuture<KimaiColorChoices> requestColorChoices() = 0;
         virtual QFuture<KimaiCustomers>    requestCustomers()    = 0;
-        // The latest 50 entries; with `since`, every entry started from then on (up to 500)
-        virtual QFuture<KimaiTimeSheets> requestTimeSheets(std::optional<QDateTime> since = std::nullopt) = 0;
-        virtual QFuture<KimaiTimeSheets> requestActiveTimeSheets()                                        = 0;
-        virtual QFuture<KimaiTimeSheets> requestRecentTimeSheets()                                        = 0;
-        virtual QFuture<KimaiProjects>   requestProjects(std::optional<int> customerId = std::nullopt)    = 0;
-        virtual QFuture<KimaiActivities> requestActivities(std::optional<int> projectId = std::nullopt)   = 0;
-        virtual QFuture<QStringList>     requestTags(const QString &name)                                 = 0; // names containing `name`
+        // The latest 50 entries; with `begin`, the entries started from then on (until `end` when given), by pages of 500
+        virtual QFuture<KimaiTimeSheets> requestTimeSheets(std::optional<QDateTime> begin = std::nullopt, std::optional<QDateTime> end = std::nullopt, int page = 1) = 0;
+        virtual QFuture<KimaiTimeSheets> requestActiveTimeSheets()                                                                                                   = 0;
+        virtual QFuture<KimaiTimeSheets> requestRecentTimeSheets()                                                                                                   = 0;
+        virtual QFuture<KimaiProjects>   requestProjects(std::optional<int> customerId = std::nullopt)                                                               = 0;
+        virtual QFuture<KimaiActivities> requestActivities(std::optional<int> projectId = std::nullopt)                                                              = 0;
+        virtual QFuture<QStringList>     requestTags(const QString &name)                                                                                            = 0; // names containing `name`
 
         virtual QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer) = 0;
         virtual QFuture<KimaiProject>  addProject(const KimaiProject &project)    = 0;

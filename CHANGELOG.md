@@ -12,10 +12,13 @@ Alpha releases are marked by ` [alpha]` after their date (`## [26.10.1] - 2026-1
 - Linux: desktop entry, icon and AppStream metadata installed with Kemai; a Flatpak manifest, for Flathub
 - Profiles of Kemai 0.11 found on the same computer are offered for import at start, with their API tokens moved to the system keychain
 - Required custom fields of time entries (Kimai's custom fields plugin) are asked for before a timer starts when they would be left empty, and shown and checked when editing an entry
+- The history can be filtered by text (project, activity, description, tags) within the period it shows
 
 ### Changed
 - Versions have a two-digit year (`26.10.1`), the same number everywhere, Windows installer included; the first alpha, published as 2026.10.1, does not see later releases in its update check
 - Debug messages are no longer printed on the console (hence the system journal) unless Kemai is started with `--verbose`; log files and the log journal still have them
+- The history shows a period — this week by default, this month or the last 30 days, remembered — named in its header with its dates, instead of the latest 50 entries; a timer running since before the period stays listed, entries planned later in the period are marked
+- With Kimai's Task Management plugin, the History | Tasks switch moved to the right of the timer status line
 
 ### Fixed
 - Log files no longer lose their last lines when Kemai crashes or is killed

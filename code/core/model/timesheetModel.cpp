@@ -27,11 +27,12 @@ namespace kemai
 
     TimesheetModel::~TimesheetModel() = default;
 
-    void TimesheetModel::setTimeSheets(const KimaiTimeSheets &timeSheets)
+    void TimesheetModel::setTimeSheets(const KimaiTimeSheets &timeSheets, const QDate &periodStart)
     {
         beginResetModel();
 
-        m_timeSheets = timeSheets;
+        m_timeSheets  = timeSheets;
+        m_periodStart = periodStart;
 
         // Show most recent timesheets first, with active timesheets (without endAt) on top
         // (entries planned in the future must not push the running one down)
@@ -45,9 +46,90 @@ namespace kemai
                               return a.beginAt > b.beginAt;
                           });
 
+        rebuild();
         computeAggregates();
 
         endResetModel();
+        emit countChanged();
+    }
+
+    int TimesheetModel::totalCount() const
+    {
+        return static_cast<int>(m_timeSheets.size());
+    }
+
+    QString TimesheetModel::filterText() const
+    {
+        return m_filterText;
+    }
+
+    void TimesheetModel::setFilterText(const QString &text)
+    {
+        if (text == m_filterText)
+        {
+            return;
+        }
+        beginResetModel();
+        m_filterText = text;
+        rebuild();
+        endResetModel();
+        emit filterTextChanged();
+        emit countChanged();
+    }
+
+    bool TimesheetModel::startedBeforePeriod(const KimaiTimeSheet &ts) const
+    {
+        return !ts.endAt.isValid() && m_periodStart.isValid() && ts.beginAt.toLocalTime().date() < m_periodStart;
+    }
+
+    void TimesheetModel::rebuild()
+    {
+        const auto query   = m_filterText.trimmed();
+        const auto matches = [&query](const KimaiTimeSheet &ts)
+        {
+            return query.isEmpty() || ts.project.name.contains(query, Qt::CaseInsensitive) || ts.activity.name.contains(query, Qt::CaseInsensitive) ||
+                   ts.description.contains(query, Qt::CaseInsensitive) ||
+                   std::ranges::any_of(ts.tags, [&query](const QString &tag)
+                                       { return tag.contains(query, Qt::CaseInsensitive); });
+        };
+
+        m_shown.clear();
+        m_hasBeforePeriod = false;
+        for (int i = 0; i < m_timeSheets.size(); ++i)
+        {
+            if (matches(m_timeSheets[i]))
+            {
+                m_shown.append(i);
+                m_hasBeforePeriod = m_hasBeforePeriod || startedBeforePeriod(m_timeSheets[i]);
+            }
+        }
+    }
+
+    void TimesheetModel::ensureListed(const KimaiTimeSheet &running)
+    {
+        if (findById(running.id))
+        {
+            return;
+        }
+        auto sheets = m_timeSheets;
+        sheets.prepend(running);
+        setTimeSheets(sheets, m_periodStart);
+    }
+
+    int TimesheetModel::latestProjectId() const
+    {
+        std::optional<KimaiTimeSheet> latest;
+        for (const auto *list : {&m_timeSheets, &m_totalsTimeSheets})
+        {
+            for (const auto &sheet : *list)
+            {
+                if (!latest || sheet.beginAt > latest->beginAt)
+                {
+                    latest = sheet;
+                }
+            }
+        }
+        return latest ? latest->project.id : 0;
     }
 
     void TimesheetModel::setTotalsTimeSheets(const KimaiTimeSheets &timeSheets)
@@ -64,18 +146,21 @@ namespace kemai
 
     int TimesheetModel::rowCount(const QModelIndex &parent) const
     {
-        return parent.isValid() ? 0 : static_cast<int>(m_timeSheets.size());
+        return parent.isValid() ? 0 : static_cast<int>(m_shown.size());
     }
 
     QVariant TimesheetModel::data(const QModelIndex &index, int role) const
     {
-        if (!index.isValid() || index.row() >= m_timeSheets.size())
+        if (!index.isValid() || index.row() >= m_shown.size())
         {
             return {};
         }
+        return roleValue(m_timeSheets[m_shown[index.row()]], static_cast<TimesheetRole>(role));
+    }
 
-        const auto &ts = m_timeSheets[index.row()];
-        switch (static_cast<TimesheetRole>(role))
+    QVariant TimesheetModel::roleValue(const KimaiTimeSheet &ts, TimesheetRole role) const
+    {
+        switch (role)
         {
         case TimesheetRole::Status:
             return ts.endAt.isValid() ? QStringLiteral("stopped") : QStringLiteral("active");
@@ -139,6 +224,16 @@ namespace kemai
             return values;
         }
 
+        case TimesheetRole::Section:
+            if (!m_hasBeforePeriod)
+            {
+                return QString();
+            }
+            return startedBeforePeriod(ts) ? QStringLiteral("before") : QStringLiteral("period");
+
+        case TimesheetRole::Planned:
+            return ts.beginAt > QDateTime::currentDateTimeUtc();
+
         default:
             return {};
         }
@@ -160,7 +255,9 @@ namespace kemai
             {magic_enum::enum_integer(TimesheetRole::BeginAt),       "beginAt"      },
             {magic_enum::enum_integer(TimesheetRole::EndAt),         "endAt"        },
             {magic_enum::enum_integer(TimesheetRole::Tags),          "tags"         },
-            {magic_enum::enum_integer(TimesheetRole::CustomValues),  "customValues" }
+            {magic_enum::enum_integer(TimesheetRole::CustomValues),  "customValues" },
+            {magic_enum::enum_integer(TimesheetRole::Section),       "section"      },
+            {magic_enum::enum_integer(TimesheetRole::Planned),       "planned"      }
         };
     }
 
@@ -183,24 +280,27 @@ namespace kemai
         {
             return {};
         }
-        const auto  row = index(static_cast<int>(std::distance(m_timeSheets.cbegin(), it)));
+        // Also an entry the filter hides
         QVariantMap result;
         const auto  roles = roleNames();
         for (auto role = roles.cbegin(); role != roles.cend(); ++role)
         {
-            result.insert(QString::fromUtf8(role.value()), data(row, role.key()));
+            result.insert(QString::fromUtf8(role.value()), roleValue(*it, static_cast<TimesheetRole>(role.key())));
         }
         return result;
     }
 
     void TimesheetModel::refreshActiveDurations()
     {
-        for (int i = 0; i < m_timeSheets.size(); ++i)
+        // A planned entry stops being planned when it starts: rows that started within the last minutes too
+        const auto recently = QDateTime::currentDateTimeUtc().addSecs(-120);
+        for (int row = 0; row < m_shown.size(); ++row)
         {
-            if (!m_timeSheets[i].endAt.isValid())
+            const auto &ts = m_timeSheets[m_shown[row]];
+            if (!ts.endAt.isValid() || ts.beginAt > recently)
             {
-                const auto idx = index(i);
-                emit       dataChanged(idx, idx, {magic_enum::enum_integer(TimesheetRole::Duration), magic_enum::enum_integer(TimesheetRole::TimeRange)});
+                const auto idx = index(row);
+                emit       dataChanged(idx, idx, {magic_enum::enum_integer(TimesheetRole::Duration), magic_enum::enum_integer(TimesheetRole::TimeRange), magic_enum::enum_integer(TimesheetRole::Planned)});
             }
         }
         computeAggregates();
@@ -253,9 +353,9 @@ namespace kemai
         const auto newLabel = QLocale().toString(todayLocal, QStringLiteral("ddd, MMM d"));
 
         // Day changed (midnight): every range's "Yesterday"/day prefix shifts, not only active rows
-        if (m_dateLabel != newLabel && !m_timeSheets.isEmpty())
+        if (m_dateLabel != newLabel && !m_shown.isEmpty())
         {
-            emit dataChanged(index(0), index(static_cast<int>(m_timeSheets.size()) - 1), {magic_enum::enum_integer(TimesheetRole::TimeRange)});
+            emit dataChanged(index(0), index(static_cast<int>(m_shown.size()) - 1), {magic_enum::enum_integer(TimesheetRole::TimeRange), magic_enum::enum_integer(TimesheetRole::Planned)});
         }
 
         if (m_todayDuration != newToday || m_weekDuration != newWeek || m_dateLabel != newLabel)

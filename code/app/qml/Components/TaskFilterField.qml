@@ -1,15 +1,25 @@
+import Kemai
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
 import QtQuick
 import QtQuick.Layouts
 
-import Kemai
-
-// "Filter tasks" field of the tasks header: search icon, clear × once there is text
+// Filter field of the tasks and history headers: search icon, then the match count and a clear × once there is text
 Rectangle {
     id: root
 
     property alias text: filterInput.text
+    property string placeholder: "Filter tasks"
+    // "2 of 7", shown while filtering
+    property string matchText: ""
+    readonly property bool inputFocused: filterInput.activeFocus
+
+    // Escape, or the focus lost with no text (the narrow header folds the field back)
+    signal dismissed()
+
+    function focusInput() {
+        filterInput.forceActiveFocus();
+    }
 
     implicitWidth: 220
     implicitHeight: 30
@@ -42,20 +52,38 @@ Rectangle {
 
         TextInput {
             id: filterInput
+
             Layout.fillWidth: true
             color: Theme.colorTextPrimary
             selectionColor: Theme.colorAccentGreenDim
             font.pixelSize: Theme.fontSizeSmall
             clip: true
-            Keys.onEscapePressed: filterInput.text = ""
+            Keys.onEscapePressed: {
+                filterInput.text = "";
+                root.dismissed();
+            }
+            onActiveFocusChanged: {
+                if (!filterInput.activeFocus && filterInput.text === "") {
+                    root.dismissed();
+                }
+            }
 
             Text {
                 visible: filterInput.text === ""
                 anchors.verticalCenter: parent.verticalCenter
-                text: "Filter tasks"
+                text: root.placeholder
                 color: Theme.colorTextDim
                 font.pixelSize: Theme.fontSizeSmall
             }
+
+        }
+
+        Text {
+            visible: filterInput.text !== "" && root.matchText !== ""
+            text: root.matchText
+            color: Theme.colorTextSecondary
+            font.pixelSize: Theme.fontSizeXSmall
+            font.features: Theme.fontFeaturesTabular
         }
 
         Icon {
@@ -65,7 +93,6 @@ Rectangle {
             color: Theme.colorTextSecondary
 
             TapHandler {
-
                 gesturePolicy: TapHandler.ReleaseWithinBounds
                 onTapped: filterInput.text = ""
             }
@@ -73,6 +100,9 @@ Rectangle {
             HoverHandler {
                 cursorShape: Qt.PointingHandCursor
             }
+
         }
+
     }
+
 }

@@ -15,6 +15,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
+#include <QUrlQuery>
 
 #include "client/kimaiApiError.h"
 #include "client/kimaiClient.h"
@@ -567,6 +568,52 @@ TEST_CASE("KimaiClient::setTimeSheetMeta - PATCH timesheets/{id}/meta with name 
                       {"name",  "ticket"},
                       {"value", "KEM-1" }
     });
+}
+
+TEST_CASE("KimaiClient::requestTimeSheets - period query with begin, end, page size and page", "[client][unit]")
+{
+    // Captures one request and answers with an empty page
+    QTcpServer server;
+    REQUIRE(server.listen(QHostAddress::LocalHost));
+    QByteArray request;
+    QObject::connect(&server,
+                     &QTcpServer::newConnection,
+                     &server,
+                     [&server, &request]()
+                     {
+                         auto *socket = server.nextPendingConnection();
+                         QObject::connect(socket,
+                                          &QTcpSocket::readyRead,
+                                          socket,
+                                          [socket, &request]()
+                                          {
+                                              request += socket->readAll();
+                                              if (!request.contains("\r\n\r\n"))
+                                              {
+                                                  return;
+                                              }
+                                              socket->write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\nConnection: close\r\n\r\n[]");
+                                              socket->disconnectFromHost();
+                                          });
+                     });
+
+    KimaiClient client;
+    client.setHost(QString("http://127.0.0.1:%1").arg(server.serverPort()));
+    client.setToken("token");
+
+    const QDateTime begin(QDate(2026, 10, 25), QTime(0, 0));
+    const QDateTime end(QDate(2026, 11, 2), QTime(23, 59, 59));
+    const auto      sheets = waitForFuture(client.requestTimeSheets(begin, end, 2), 5000);
+    CHECK(sheets.isEmpty());
+
+    const auto requestLine = request.left(request.indexOf("\r\n"));
+    REQUIRE(requestLine.startsWith("GET /api/timesheets?"));
+    const QUrlQuery query(QUrl::fromPercentEncoding(requestLine.mid(4, requestLine.lastIndexOf(' ') - 4)).section('?', 1));
+    CHECK(query.queryItemValue("begin") == "2026-10-25T00:00:00");
+    CHECK(query.queryItemValue("end") == "2026-11-02T23:59:59");
+    CHECK(query.queryItemValue("size") == "500");
+    CHECK(query.queryItemValue("page") == "2");
+    CHECK(query.queryItemValue("full") == "true");
 }
 
 TEST_CASE("KimaiClient::setTimeSheetMeta - sets then reads a value on the test instance", "[client][integration][customFields]")

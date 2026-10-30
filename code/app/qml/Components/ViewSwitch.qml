@@ -8,18 +8,20 @@ import QtQuick.Layouts
 
 import Kemai
 
-// History | Tasks switch of the entries header (only with the Task Management plugin)
+// History | Tasks switch of the timer hint line (only with the Task Management plugin)
 Rectangle {
     id: root
 
     property string current: "history" // history | tasks
     property int taskCount: 0
     property bool taskCountVisible: false
+    // Narrow window: icons only, the labels become tooltips
+    property bool compact: false
 
     signal selected(string view)
 
-    implicitWidth: switchRow.implicitWidth + 4
-    implicitHeight: 30
+    implicitWidth: switchRow.implicitWidth + 6
+    implicitHeight: 28
     radius: Theme.radiusMedium
     color: Theme.colorBackgroundDark
     border.width: 1
@@ -28,7 +30,7 @@ Rectangle {
     RowLayout {
         id: switchRow
         anchors.fill: parent
-        anchors.margins: 2
+        anchors.margins: 3
         spacing: 0
 
         Repeater {
@@ -52,11 +54,15 @@ Rectangle {
 
                 readonly property bool active: root.current === segment.modelData.key
 
-                Layout.fillHeight: true
-                leftPadding: 12
-                rightPadding: 12
+                Layout.preferredHeight: 22
+                leftPadding: root.compact ? 7 : 10
+                rightPadding: root.compact ? 7 : 10
                 focusPolicy: Qt.TabFocus
                 onClicked: root.selected(segment.modelData.key)
+
+                ToolTip.visible: root.compact && segment.hovered
+                ToolTip.delay: 500
+                ToolTip.text: segment.modelData.label
 
                 HoverHandler {
                     cursorShape: Qt.PointingHandCursor
@@ -70,15 +76,16 @@ Rectangle {
                 }
 
                 contentItem: RowLayout {
-                    spacing: 6
+                    spacing: 5
 
                     Icon {
                         name: segment.modelData.icon
-                        size: 13
+                        size: 12
                         color: segment.active ? Theme.colorAccentGreen : Theme.colorTextSecondary
                     }
 
                     Text {
+                        visible: !root.compact
                         text: segment.modelData.label
                         color: segment.active ? Theme.colorTextPrimary : Theme.colorTextSecondary
                         font.pixelSize: Theme.fontSizeSmall
@@ -87,9 +94,9 @@ Rectangle {
 
                     Rectangle {
                         visible: segment.modelData.key === "tasks" && root.taskCountVisible
-                        Layout.preferredWidth: Math.max(countText.implicitWidth + 10, 16)
-                        Layout.preferredHeight: 16
-                        radius: 8
+                        Layout.preferredWidth: Math.max(Math.ceil(countText.implicitWidth) + 10, 16)
+                        Layout.preferredHeight: 15
+                        radius: 7.5
                         color: segment.active ? Theme.colorAccentGreenSoft : Theme.colorSurfaceDark
 
                         Text {

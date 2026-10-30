@@ -1,9 +1,8 @@
+import Kemai
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
 import QtQuick
 import QtQuick.Layouts
-
-import Kemai
 
 Rectangle {
     id: root
@@ -13,19 +12,23 @@ Rectangle {
     // The running timer belongs to this task (Task Management), started at `since`
     property string taskTitle: ""
     property date since
+    // Controls at the right end (the History | Tasks switch); the text gives way to them
+    default property alias trailing: trailingRow.data
+    readonly property bool _hasTrailing: trailingRow.visibleChildren.length > 0
 
-    implicitHeight: 30
+    implicitHeight: root._hasTrailing ? 34 : 30
     color: Theme.colorSurfaceDark
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 18
-        anchors.rightMargin: 18
+        anchors.leftMargin: root._hasTrailing ? 16 : 18
+        anchors.rightMargin: root._hasTrailing ? 12 : 18
         spacing: 7
 
         // Pulsing green dot
         Rectangle {
             id: dot
+
             Layout.preferredWidth: 7
             Layout.preferredHeight: 7
             radius: 3.5
@@ -34,17 +37,21 @@ Rectangle {
             SequentialAnimation on opacity {
                 running: root.isActive
                 loops: Animation.Infinite
+
                 NumberAnimation {
                     to: 0.4
                     duration: 1000
                     easing.type: Easing.InOutQuad
                 }
+
                 NumberAnimation {
-                    to: 1.0
+                    to: 1
                     duration: 1000
                     easing.type: Easing.InOutQuad
                 }
+
             }
+
         }
 
         Text {
@@ -59,16 +66,29 @@ Rectangle {
             font.pixelSize: Theme.fontSizeXSmall
             font.bold: true
             elide: Text.ElideRight
-            Layout.fillWidth: root.taskTitle === ""
+            // Its own width at most, less when the switch needs the room
+            Layout.fillWidth: true
+            Layout.maximumWidth: Math.ceil(implicitWidth)
         }
 
         Text {
             visible: root.isActive && root.taskTitle !== "" && !isNaN(root.since.getTime())
-            Layout.fillWidth: true
             text: "since " + Qt.formatTime(root.since, "HH:mm")
             color: Theme.colorTextSecondary
             font.pixelSize: Theme.fontSizeXSmall
             font.features: Theme.fontFeaturesTabular
         }
+
+        Item {
+            Layout.fillWidth: true
+        }
+
+        RowLayout {
+            id: trailingRow
+
+            spacing: 8
+        }
+
     }
+
 }

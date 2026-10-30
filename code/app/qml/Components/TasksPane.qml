@@ -8,6 +8,8 @@ import QtQuick.Layouts
 
 import Kemai
 
+import "Highlight.js" as Highlight
+
 // Tasks assigned to the user (Task Management plugin): grouped list, start / close per task, and the
 // loading, empty, no-match and failed states. Loads the tasks whenever it becomes visible.
 Item {
@@ -104,11 +106,7 @@ Item {
     }
 
     function _highlight(text, query) {
-        const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
-        const i = query === "" ? -1 : text.toLowerCase().indexOf(query.toLowerCase())
-        if (i < 0)
-            return esc(text)
-        return esc(text.slice(0, i)) + "<font color='" + Theme.colorAccentGreen + "'>" + esc(text.slice(i, i + query.length)) + "</font>" + esc(text.slice(i + query.length))
+        return Highlight.highlight(text, query, Theme.colorAccentGreen)
     }
 
     onVisibleChanged: if (root.visible)

@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+pragma ComponentBehavior: Bound
+
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 
 import Kemai
@@ -10,154 +13,171 @@ Item {
 
     property string todayDuration: "0h 00m"
     property string weekDuration: "0h 00m"
-    property string dateLabel: ""
     property bool refreshing: false
+    // Narrow window: "WK" for the week total, tighter spacing
+    property bool narrow: false
 
     // Extra controls at the far right, after a divider (e.g. the account menu)
     default property alias trailing: trailingRow.data
-    // Replaces the title when set (e.g. the History | Tasks switch)
+    // At the left: the list's title (e.g. the history period)
     property alias leading: leadingRow.data
-    // Right of the spacer, in place of the stats and refresh when those are hidden (e.g. the tasks filter)
+    // Right of the spacer, before the totals (e.g. a filter field)
     property alias middle: middleRow.data
+    // The Today / Week totals and the refresh button
     property bool statsVisible: true
-    // False when `leading` takes the title's place
-    property bool titleVisible: true
+    // The totals alone (a narrow header gives their room to an open filter)
+    property bool totalsVisible: true
+    // `middle` takes all the free width (e.g. an open filter in a narrow header)
+    property bool middleFills: false
 
     signal refreshClicked
 
-    implicitHeight: 38
+    implicitHeight: 48
+
+    component Stat: Item {
+        id: stat
+
+        property string label
+        property string value
+
+        implicitWidth: 64
+        implicitHeight: 30
+
+        Text {
+            id: statLabel
+            anchors.horizontalCenter: parent.horizontalCenter
+            // The letter spacing also follows the last letter: centre the letters, not the box
+            anchors.horizontalCenterOffset: 0.6
+            y: 0
+            height: 12
+            verticalAlignment: Text.AlignVCenter
+            text: stat.label.toUpperCase()
+            color: Theme.colorTextLabel
+            font.pixelSize: Theme.fontSizeTiny
+            font.weight: Font.DemiBold
+            font.letterSpacing: 1.2
+        }
+
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: statLabel.bottom
+            height: 18
+            verticalAlignment: Text.AlignVCenter
+            text: stat.value
+            color: Theme.colorAccentGreen
+            font.pixelSize: Theme.fontSizeMedium
+            font.weight: Font.DemiBold
+            font.features: Theme.fontFeaturesTabular
+        }
+    }
 
     RowLayout {
         anchors.fill: parent
-        spacing: 8
+        spacing: root.narrow ? 10 : 14
 
         RowLayout {
             id: leadingRow
-            visible: !root.titleVisible
             spacing: 8
-        }
-
-        // Title
-        RowLayout {
-            visible: root.titleVisible
-            spacing: 8
-
-            Icon {
-                name: "calendar"
-                size: 15
-                color: Theme.colorAccentGreen
-            }
-
-            Text {
-                text: "Time Entries"
-                color: Theme.colorTextPrimary
-                font.pixelSize: Theme.fontSizeMedium
-                font.bold: true
-            }
+            Layout.fillWidth: false
+            Layout.minimumWidth: 0
         }
 
         Item {
+            visible: !root.middleFills
             Layout.fillWidth: true
         }
 
+        // Takes free width up to what its items allow (a filter field shrinks rather than push the account menu out)
         RowLayout {
             id: middleRow
             spacing: 8
+            Layout.fillWidth: true
         }
 
-        // Stats
+        // Totals: always today and the current week, whatever the list shows
         RowLayout {
-            visible: root.statsVisible
+            visible: root.statsVisible && root.totalsVisible
             spacing: 4
+            Layout.fillWidth: false
+            Layout.fillHeight: false
+            Layout.preferredHeight: 30
 
-            Text {
-                text: "Today:"
-                color: Theme.colorTextSecondary
-                font.pixelSize: Theme.fontSizeSmall
-            }
-            Text {
-                text: root.todayDuration
-                color: Theme.colorAccentGreen
-                font.pixelSize: Theme.fontSizeSmall
-                font.bold: true
-                font.features: Theme.fontFeaturesTabular
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.fillHeight: true
+                Layout.rightMargin: 6
+                color: Theme.colorDivider
             }
 
-            Text {
-                text: "·"
-                color: Theme.colorBorderHighlight
-                font.pixelSize: Theme.fontSizeSmall
-                Layout.leftMargin: 8
-                Layout.rightMargin: 8
+            Stat {
+                label: "Today"
+                value: root.todayDuration
             }
 
-            Text {
-                text: "This week:"
-                color: Theme.colorTextSecondary
-                font.pixelSize: Theme.fontSizeSmall
-            }
-            Text {
-                text: root.weekDuration
-                color: Theme.colorAccentGreen
-                font.pixelSize: Theme.fontSizeSmall
-                font.bold: true
-                font.features: Theme.fontFeaturesTabular
-            }
+            Stat {
+                id: weekStat
+                label: root.narrow ? "Wk" : "Week"
+                value: root.weekDuration
 
-            Text {
-                text: "·"
-                color: Theme.colorBorderHighlight
-                font.pixelSize: Theme.fontSizeSmall
-                visible: root.dateLabel.length > 0
-                Layout.leftMargin: 8
-                Layout.rightMargin: 8
-            }
+                HoverHandler {
+                    id: weekHover
+                }
 
-            Text {
-                text: root.dateLabel
-                color: Theme.colorTextSecondary
-                font.pixelSize: Theme.fontSizeSmall
-                visible: root.dateLabel.length > 0
+                ToolTip.visible: weekHover.hovered
+                ToolTip.delay: 500
+                ToolTip.text: "Current week, Mon – Sun, whatever the period shown"
             }
         }
 
         // Refresh (projects/activities cache + timesheets)
-        Icon {
-            id: refreshIcon
+        AbstractButton {
+            id: refreshButton
             visible: root.statsVisible
-            name: "refresh-cw"
-            size: 14
-            color: root.refreshing ? Theme.colorTextSecondary : Theme.colorTextPrimary
-            Layout.leftMargin: 8
+            enabled: !root.refreshing
+            Layout.preferredWidth: 30
+            Layout.preferredHeight: 30
+            focusPolicy: Qt.TabFocus
+            onClicked: root.refreshClicked()
 
-            RotationAnimator on rotation {
-                running: root.refreshing
-                from: 0
-                to: 360
-                duration: 1000
-                loops: Animation.Infinite
-                onStopped: refreshIcon.rotation = 0
-            }
-
-            TapHandler {
-
-                gesturePolicy: TapHandler.ReleaseWithinBounds
-                margin: 6
-                enabled: !root.refreshing
-                onTapped: root.refreshClicked()
-            }
+            ToolTip.visible: refreshButton.hovered
+            ToolTip.delay: 500
+            ToolTip.text: "Refresh"
 
             HoverHandler {
-                margin: 6
-                enabled: !root.refreshing
                 cursorShape: Qt.PointingHandCursor
+            }
+
+            background: Rectangle {
+                radius: Theme.radiusMedium
+                color: refreshButton.hovered ? Theme.colorSurface : "transparent"
+                border.width: 1
+                border.color: refreshButton.visualFocus ? Theme.colorAccentGreenDim : Theme.colorBorderSubtle
+            }
+
+            contentItem: Item {
+                Icon {
+                    id: refreshIcon
+                    anchors.centerIn: parent
+                    name: "refresh-cw"
+                    size: 14
+                    color: Theme.colorTextSecondary
+
+                    RotationAnimator on rotation {
+                        running: root.refreshing
+                        from: 0
+                        to: 360
+                        duration: 1000
+                        loops: Animation.Infinite
+                        onStopped: refreshIcon.rotation = 0
+                    }
+                }
             }
         }
 
         Rectangle {
             visible: trailingRow.children.length > 0
-            Layout.leftMargin: 6
-            Layout.rightMargin: 6
+            Layout.leftMargin: 2
+            Layout.rightMargin: 2
             Layout.preferredWidth: 1
             Layout.preferredHeight: 20
             color: Theme.colorDivider
@@ -166,6 +186,7 @@ Item {
         RowLayout {
             id: trailingRow
             spacing: 8
+            Layout.fillWidth: false
         }
     }
 }

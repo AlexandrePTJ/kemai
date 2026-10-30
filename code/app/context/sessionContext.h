@@ -18,8 +18,8 @@ namespace kemai
         QML_UNCREATABLE("SessionContext is created by the application")
 
     public:
-        SessionContext(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, QObject *parent = nullptr):
-        SessionController(std::move(client), user, parent)
+        SessionContext(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, HistoryPeriod historyPeriod, QObject *parent = nullptr):
+        SessionController(std::move(client), user, parent, historyPeriod)
         {
             setKnownCodes(ReferenceData::knownCodes());
         }

@@ -42,6 +42,8 @@ namespace kemai
         KimaiTimeSheets      activeTimeSheets;
         // Reply to requestTimeSheets(since), `timeSheets` when unset
         std::optional<KimaiTimeSheets> weekTimeSheets;
+        // Entries of the history period requests (served by pages of 500), `timeSheets` when unset
+        std::optional<KimaiTimeSheets> periodTimeSheets;
         KimaiTasks                     tasks;
         KimaiTimeSheet                 timeSheetResult;
         QStringList                    tags;
@@ -72,11 +74,26 @@ namespace kemai
         { return result("requestColorChoices", colorChoices); }
         QFuture<KimaiCustomers> requestCustomers() override
         { return result("requestCustomers", customers); }
-        QFuture<KimaiTimeSheets> requestTimeSheets(std::optional<QDateTime> since = std::nullopt) override
+        QFuture<KimaiTimeSheets> requestTimeSheets(std::optional<QDateTime> begin = std::nullopt, std::optional<QDateTime> end = std::nullopt, int page = 1) override
         {
-            if (since.has_value())
+            if (begin.has_value() && end.has_value())
             {
-                lastTimeSheetsSince = *since;
+                // A history period: pages of 500, NotFound past the last one (as Kimai)
+                periodRequests.append({*begin, *end, page});
+                const auto &sheets = periodTimeSheets ? *periodTimeSheets : timeSheets;
+                const auto  first  = (page - 1) * TimeSheetsPageSize;
+                if (page > 1 && first >= sheets.size() && !errors.contains(QStringLiteral("requestTimeSheetsPeriod")))
+                {
+                    errors.insert(QStringLiteral("requestTimeSheetsPeriod"), KimaiApiError{ApiErrorKind::NotFound, 404, "requestTimeSheetsPeriod", "page"});
+                    auto future = result("requestTimeSheetsPeriod", KimaiTimeSheets{});
+                    errors.remove(QStringLiteral("requestTimeSheetsPeriod"));
+                    return future;
+                }
+                return result("requestTimeSheetsPeriod", sheets.mid(first, TimeSheetsPageSize));
+            }
+            if (begin.has_value())
+            {
+                lastTimeSheetsSince = *begin;
                 return result("requestTimeSheetsSince", weekTimeSheets.value_or(timeSheets));
             }
             return result("requestTimeSheets", timeSheets);
@@ -191,7 +208,14 @@ namespace kemai
         int            nextCreatedId = 100;
         QString        lastTagsQuery;
         QDateTime      lastTimeSheetsSince;
-        QStringList    createdTags;
+        struct PeriodRequest
+        {
+            QDateTime begin;
+            QDateTime end;
+            int       page;
+        };
+        QList<PeriodRequest> periodRequests;
+        QStringList          createdTags;
 
     private:
         // Body-less variant (e.g. DELETE): resolves or fails like result()

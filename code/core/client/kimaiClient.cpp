@@ -525,18 +525,26 @@ QFuture<KimaiCustomers> KimaiClient::requestCustomers()
     return m_d->processApiNetworkReplyArray<KimaiCustomer>(ApiMethod::Customers, reply);
 }
 
-QFuture<KimaiTimeSheets> KimaiClient::requestTimeSheets(std::optional<QDateTime> since)
+QFuture<KimaiTimeSheets> KimaiClient::requestTimeSheets(std::optional<QDateTime> begin, std::optional<QDateTime> end, int page)
 {
     std::map<QString, QString> parameters = {
         {"full",    "true" },
         {"order",   "DESC" },
         {"orderBy", "begin"}
     };
-    if (since.has_value())
+    if (begin.has_value())
     {
-        // Kimai reads it in the user's time zone; 500 is the largest page it serves
-        parameters.emplace("begin", since->toString("yyyy-MM-ddTHH:mm:ss"));
-        parameters.emplace("size", "500");
+        // Kimai reads the dates in the user's time zone; 500 is the largest page it serves
+        parameters.emplace("begin", begin->toString("yyyy-MM-ddTHH:mm:ss"));
+        parameters.emplace("size", QString::number(TimeSheetsPageSize));
+    }
+    if (end.has_value())
+    {
+        parameters.emplace("end", end->toString("yyyy-MM-ddTHH:mm:ss"));
+    }
+    if (page > 1)
+    {
+        parameters.emplace("page", QString::number(page));
     }
 
     auto request = m_d->prepareRequest(ApiMethod::TimeSheets, parameters);

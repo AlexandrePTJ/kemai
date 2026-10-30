@@ -54,17 +54,20 @@ namespace
 
 namespace kemai
 {
-    SessionController::SessionController(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, QObject *parent):
+    SessionController::SessionController(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, QObject *parent, HistoryPeriod historyPeriod):
     QObject(parent),
     m_client(std::move(client)),
     m_user(user),
     m_recentTimeSheets(std::make_unique<TimesheetModel>(this)),
     m_activityModel(std::make_unique<ActivityListModel>(this)),
     m_cache(std::make_unique<KimaiCache>(this)),
-    m_tasks(std::make_unique<TaskModel>(this))
+    m_tasks(std::make_unique<TaskModel>(this)),
+    m_historyPeriod(historyPeriod),
+    m_historyRange(HistoryPeriods::range(historyPeriod, QDate::currentDate()))
     {
         m_recentRefreshTimer.setInterval(std::chrono::minutes(1));
         connect(&m_recentRefreshTimer, &QTimer::timeout, m_recentTimeSheets.get(), &TimesheetModel::refreshActiveDurations);
+        connect(&m_recentRefreshTimer, &QTimer::timeout, this, &SessionController::checkHistoryRollover);
 
         m_activeDurationTimer.setInterval(std::chrono::seconds(1));
         connect(&m_activeDurationTimer, &QTimer::timeout, this, &SessionController::activeTimesheetChanged);
@@ -203,7 +206,7 @@ namespace kemai
 
     int SessionController::lastUsedProjectId() const
     {
-        return m_lastUsedProjectId;
+        return m_recentTimeSheets->latestProjectId();
     }
 
     QString SessionController::userTimezone() const
@@ -424,6 +427,53 @@ namespace kemai
         return m_tasksError;
     }
 
+    QString SessionController::historyPeriod() const
+    {
+        return HistoryPeriods::keyOf(m_historyPeriod);
+    }
+
+    QDate SessionController::historyFirstDate() const
+    {
+        return m_historyRange.first;
+    }
+
+    QDate SessionController::historyLastDate() const
+    {
+        return m_historyRange.last;
+    }
+
+    QString SessionController::pendingHistoryPeriod() const
+    {
+        return m_pendingHistoryPeriod ? HistoryPeriods::keyOf(*m_pendingHistoryPeriod) : QString{};
+    }
+
+    SessionController::HistoryLoad SessionController::historyLoad() const
+    {
+        return m_historyLoad;
+    }
+
+    void SessionController::setHistoryPeriod(const QString &period)
+    {
+        const auto wanted = HistoryPeriods::fromKey(period);
+        if (wanted == m_historyPeriod && !m_pendingHistoryPeriod)
+        {
+            return;
+        }
+
+        m_pendingHistoryPeriod = wanted != m_historyPeriod ? std::make_optional(wanted) : std::nullopt;
+        emit historyPeriodChanged();
+        refreshRecentTimeSheets();
+    }
+
+    QVariantMap SessionController::historyRangeOf(const QString &period) const
+    {
+        const auto range = HistoryPeriods::range(HistoryPeriods::fromKey(period), m_today());
+        return {
+            {"first", range.first},
+            {"last",  range.last }
+        };
+    }
+
     void SessionController::requestPlugins()
     {
         m_client->requestPlugins()
@@ -433,6 +483,8 @@ namespace kemai
                       m_hasTaskManagement = std::ranges::any_of(plugins, [](const KimaiPlugin &p)
                                                                 { return p.apiPlugin == ApiPlugin::TaskManagement; });
                       emit pluginsChanged();
+                      // The History | Tasks switch shows the open-task count from the start
+                      loadTasks();
                   })
             .onFailed(this,
                       [this](const KimaiApiError &e)
@@ -651,17 +703,15 @@ namespace kemai
 
     void SessionController::refreshRecentTimeSheets()
     {
-        m_client->requestTimeSheets()
-            .then(this,
-                  [this](const KimaiTimeSheets &sheets)
-                  {
-                      const auto latest   = std::ranges::max_element(sheets, {}, &KimaiTimeSheet::beginAt);
-                      m_lastUsedProjectId = latest != sheets.cend() ? latest->project.id : 0;
-                      m_recentTimeSheets->setTimeSheets(sheets);
-                      m_recentRefreshTimer.start();
-                  })
-            .onFailed(this, [this](const KimaiApiError &e)
-                      { handleApiError(e, "Failed to fetch recent timesheets"); });
+        if (m_historyLoad == HistoryLoad::NotLoaded || m_historyLoad == HistoryLoad::Failed)
+        {
+            m_historyLoad = HistoryLoad::Loading;
+            emit historyLoadChanged();
+        }
+
+        // A later load (period changed again, reload meanwhile) supersedes this one
+        const auto period = m_pendingHistoryPeriod.value_or(m_historyPeriod);
+        loadHistoryPage(++m_historyGeneration, period, HistoryPeriods::range(period, m_today()), 1, {});
 
         // A reply of an earlier refresh arriving last must not bring back older totals
         const auto generation = ++m_totalsGeneration;
@@ -676,6 +726,112 @@ namespace kemai
                   })
             .onFailed(this, [this](const KimaiApiError &e)
                       { handleApiError(e, "Failed to fetch the week's timesheets"); });
+    }
+
+    void SessionController::loadHistoryPage(int generation, HistoryPeriod period, HistoryRange range, int page, KimaiTimeSheets loaded)
+    {
+        // A day of margin on each side: Kimai reads the dates in the Kimai user's time zone, which may not be ours;
+        // the entries are then kept by their local start date
+        const auto begin = range.first.addDays(-1).startOfDay();
+        const auto end   = range.last.addDays(2).startOfDay().addSecs(-1);
+
+        m_client->requestTimeSheets(begin, end, page)
+            .then(this,
+                  [this, generation, period, range, page, loaded](const KimaiTimeSheets &sheets) mutable
+                  {
+                      if (generation != m_historyGeneration)
+                      {
+                          return;
+                      }
+                      loaded.append(sheets);
+                      if (sheets.size() == IKimaiClient::TimeSheetsPageSize)
+                      {
+                          loadHistoryPage(generation, period, range, page + 1, std::move(loaded));
+                          return;
+                      }
+                      applyHistory(period, range, loaded);
+                  })
+            .onFailed(this,
+                      [this, generation, period, range, page, loaded](const KimaiApiError &e)
+                      {
+                          if (generation != m_historyGeneration)
+                          {
+                              // A later load replaced this one: its outcome is the one shown
+                              spdlog::info("Superseded history load failed: {}", e.what());
+                              return;
+                          }
+                          // Kimai answers 404 for a page past the last one: the previous page was full by chance
+                          if (page > 1 && e.kind() == ApiErrorKind::NotFound)
+                          {
+                              applyHistory(period, range, loaded);
+                              return;
+                          }
+                          failHistoryLoad(period, e);
+                      });
+    }
+
+    void SessionController::applyHistory(HistoryPeriod period, HistoryRange range, const KimaiTimeSheets &loaded)
+    {
+        KimaiTimeSheets sheets;
+        std::ranges::copy_if(loaded,
+                             std::back_inserter(sheets),
+                             [&range](const KimaiTimeSheet &sheet)
+                             {
+                                 const auto day = sheet.beginAt.toLocalTime().date();
+                                 return day >= range.first && day <= range.last;
+                             });
+
+        // A timer left running since before the period is listed all the same
+        if (m_activeTimeSheet && std::ranges::none_of(sheets, [this](const KimaiTimeSheet &sheet)
+                                                      { return sheet.id == m_activeTimeSheet->id; }))
+        {
+            sheets.prepend(*m_activeTimeSheet);
+        }
+
+        m_historyPeriod = period;
+        m_historyRange  = range;
+        m_pendingHistoryPeriod.reset();
+        m_recentTimeSheets->setTimeSheets(sheets, range.first);
+        m_recentRefreshTimer.start();
+        emit historyPeriodChanged();
+
+        if (m_historyLoad != HistoryLoad::Ready)
+        {
+            m_historyLoad = HistoryLoad::Ready;
+            emit historyLoadChanged();
+        }
+    }
+
+    void SessionController::failHistoryLoad(HistoryPeriod period, const KimaiApiError &error)
+    {
+        if (m_historyLoad == HistoryLoad::Loading)
+        {
+            m_historyLoad = HistoryLoad::Failed;
+            emit historyLoadChanged();
+        }
+
+        // A change of period that failed: the previous period and its list stay, the header names it again
+        if (m_pendingHistoryPeriod && period == *m_pendingHistoryPeriod && error.kind() != ApiErrorKind::AuthFailed)
+        {
+            spdlog::error("Failed to load the {} history: {}", HistoryPeriods::keyOf(period), error.what());
+            m_pendingHistoryPeriod.reset();
+            emit historyPeriodChanged();
+            emit notificationRequested(NotificationLevel::Error,
+                                       NotificationKind::HistoryPeriodFailed,
+                                       QStringLiteral("%1|%2|%3")
+                                           .arg(HistoryPeriods::keyOf(period), HistoryPeriods::keyOf(m_historyPeriod), QString::fromUtf8(magic_enum::enum_name(notificationKindFromError(error.kind())).data())));
+            return;
+        }
+
+        handleApiError(error, "Failed to fetch the history");
+    }
+
+    void SessionController::checkHistoryRollover()
+    {
+        if (!m_pendingHistoryPeriod && HistoryPeriods::range(m_historyPeriod, m_today()) != m_historyRange)
+        {
+            refreshRecentTimeSheets();
+        }
     }
 
     void SessionController::refreshActiveTimeSheets()
@@ -714,6 +870,12 @@ namespace kemai
         {
             emit activeTimesheetChanged();
 
+            // A timer running since before the period, learnt after the history loaded
+            if (m_activeTimeSheet && m_historyLoad == HistoryLoad::Ready)
+            {
+                m_recentTimeSheets->ensureListed(*m_activeTimeSheet);
+            }
+
             // A timer started or stopped anywhere changes task statuses
             m_tasks->setActiveTimeSheetId(m_activeTimeSheet ? m_activeTimeSheet->id : 0);
             if (m_tasksLoad == TasksLoad::Ready || m_tasksLoad == TasksLoad::Failed)
@@ -722,6 +884,11 @@ namespace kemai
             }
         }
         return changed;
+    }
+
+    void SessionController::setCurrentDate(std::function<QDate()> today)
+    {
+        m_today = std::move(today);
     }
 
     void SessionController::setSyncInterval(std::chrono::milliseconds interval)

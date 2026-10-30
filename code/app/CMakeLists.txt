@@ -19,6 +19,8 @@ set(KEMAI_QML_FILES
         qml/Components/KemaiTextField.qml
         qml/Components/MenuEntry.qml
         qml/Components/LucideIcons.js
+        qml/Components/Highlight.js
+        qml/Components/HistoryPeriods.js
         qml/Components/NotificationBanner.qml
         qml/Components/PrimaryEditButton.qml
         qml/Components/PrimaryRedButton.qml
@@ -37,6 +39,7 @@ set(KEMAI_QML_FILES
         qml/Components/StartStopButton.qml
         qml/Components/TagsInput.qml
         qml/Components/TaskFilterField.qml
+        qml/Components/PeriodSelector.qml
         qml/Components/TasksPane.qml
         qml/Components/WheelScroller.qml
         qml/Components/TimeEntryDelegate.qml

@@ -44,7 +44,7 @@ namespace kemai
         QFuture<KimaiColorChoices>    requestColorChoices() override;
         QFuture<KimaiTimeSheet>       setTimeSheetMeta(int timeSheetId, const QString &name, const QString &value) override;
         QFuture<KimaiCustomers>       requestCustomers() override;
-        QFuture<KimaiTimeSheets>      requestTimeSheets(std::optional<QDateTime> since = std::nullopt) override;
+        QFuture<KimaiTimeSheets>      requestTimeSheets(std::optional<QDateTime> begin = std::nullopt, std::optional<QDateTime> end = std::nullopt, int page = 1) override;
         QFuture<KimaiTimeSheets>      requestActiveTimeSheets() override;
         QFuture<KimaiTimeSheets>      requestRecentTimeSheets() override;
         QFuture<KimaiProjects>        requestProjects(std::optional<int> customerId = std::nullopt) override;

@@ -20,6 +20,7 @@
 #include <client/kimaiSystem.h>
 #include <client/kimaiTimesheets.h>
 #include <misc/customFields.h>
+#include <misc/historyPeriods.h>
 #include <model/activityListModel.h>
 #include <model/taskModel.h>
 #include <model/timesheetModel.h>
@@ -60,6 +61,13 @@ namespace kemai
         Q_PROPERTY(kemai::SessionController::NotificationKind tasksError READ tasksError NOTIFY tasksLoadChanged)
         // IANA timezone of the Kimai user (prefill of new customers)
         Q_PROPERTY(QString userTimezone READ userTimezone CONSTANT)
+        // Period of the listed entries ("week", "month", "last30") and its local dates; it changes once a load succeeds
+        Q_PROPERTY(QString historyPeriod READ historyPeriod NOTIFY historyPeriodChanged)
+        Q_PROPERTY(QDate historyFirstDate READ historyFirstDate NOTIFY historyPeriodChanged)
+        Q_PROPERTY(QDate historyLastDate READ historyLastDate NOTIFY historyPeriodChanged)
+        // Period being loaded after setHistoryPeriod, empty otherwise
+        Q_PROPERTY(QString pendingHistoryPeriod READ pendingHistoryPeriod NOTIFY historyPeriodChanged)
+        Q_PROPERTY(kemai::SessionController::HistoryLoad historyLoad READ historyLoad NOTIFY historyLoadChanged)
 
     public:
         enum class NotificationLevel
@@ -88,7 +96,8 @@ namespace kemai
             CacheRefreshFailed, // refresh: previous cache kept
             TimerStoppedIdle,   // detail: end time, reported when the user is back
             TimerStoppedLocked,
-            ResourceCreated // detail: "activity|name|project" (project empty for a global one) or "project|name|"
+            ResourceCreated,    // detail: "activity|name|project" (project empty for a global one) or "project|name|"
+            HistoryPeriodFailed // detail: "<period not loaded>|<period still shown>|<NotificationKind of the error>"
         };
         Q_ENUM(NotificationKind)
 
@@ -109,6 +118,15 @@ namespace kemai
         };
         Q_ENUM(TasksLoad)
 
+        enum class HistoryLoad
+        {
+            NotLoaded,
+            Loading, // first load only: later loads keep the list (Ready) meanwhile
+            Ready,
+            Failed
+        };
+        Q_ENUM(HistoryLoad)
+
         enum class ResourceKind
         {
             Customer,
@@ -117,7 +135,8 @@ namespace kemai
         };
         Q_ENUM(ResourceKind)
 
-        explicit SessionController(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, QObject *parent = nullptr);
+        // `historyPeriod`: the period the history loads first (the user's saved choice)
+        explicit SessionController(std::shared_ptr<IKimaiClient> client, const KimaiUser &user, QObject *parent = nullptr, HistoryPeriod historyPeriod = HistoryPeriod::ThisWeek);
 
         // The UI kind of an API error (also used for login failures, before any session)
         static NotificationKind notificationKindOf(ApiErrorKind kind);
@@ -145,6 +164,16 @@ namespace kemai
         TaskModel       *tasks() const;
         TasksLoad        tasksLoad() const;
         NotificationKind tasksError() const;
+        QString          historyPeriod() const;
+        QDate            historyFirstDate() const;
+        QDate            historyLastDate() const;
+        QString          pendingHistoryPeriod() const;
+        HistoryLoad      historyLoad() const;
+        // Loads the entries of that period ("week", "month", "last30"); the list and historyPeriod change once
+        // they are all loaded. A failure keeps them and is notified as HistoryPeriodFailed.
+        Q_INVOKABLE void setHistoryPeriod(const QString &period);
+        // Local dates of a period today: {first, last}
+        Q_INVOKABLE QVariantMap historyRangeOf(const QString &period) const;
         // Project of the most recent entry (prefill of new activities), 0 without entries
         Q_INVOKABLE int lastUsedProjectId() const;
         // The entry's page in Kimai's web interface (in the Kimai user's language)
@@ -237,6 +266,11 @@ namespace kemai
         // elsewhere updates the active state and reloads the history; an unchanged one causes no visible refresh.
         Q_INVOKABLE void syncActiveTimeSheet();
         void             setSyncInterval(std::chrono::milliseconds interval);
+        // Source of today's date for the history periods (tests)
+        void setCurrentDate(std::function<QDate()> today);
+        // Reloads the history when today's period no longer has the shown dates (a new day, week or month);
+        // also checked every minute
+        void checkHistoryRollover();
 
         static constexpr std::chrono::seconds DefaultSyncInterval{30};
 
@@ -254,6 +288,8 @@ namespace kemai
         void timeSheetDeleteFailed(int timesheetId, kemai::SessionController::NotificationKind kind, const QString &detail);
         void pluginsChanged();
         void tasksLoadChanged();
+        void historyPeriodChanged();
+        void historyLoadChanged();
         void taskStarted(int taskId);
         void taskClosed(int taskId);
         void taskActionFailed(int taskId, const QString &action, kemai::SessionController::NotificationKind error, const QString &detail);
@@ -270,7 +306,12 @@ namespace kemai
         void notificationRequested(kemai::SessionController::NotificationLevel level, kemai::SessionController::NotificationKind kind, const QString &detail);
 
     private:
+        // Loads the shown period again, or the pending one, and the totals
         void refreshRecentTimeSheets();
+        // Requests one page of the period's entries, then the next while pages are full
+        void loadHistoryPage(int generation, HistoryPeriod period, HistoryRange range, int page, KimaiTimeSheets loaded);
+        void applyHistory(HistoryPeriod period, HistoryRange range, const KimaiTimeSheets &loaded);
+        void failHistoryLoad(HistoryPeriod period, const KimaiApiError &error);
         void refreshActiveTimeSheets();
         // Takes the server's active timesheets as the current state; returns whether it differs from the previous one
         bool applyActiveTimeSheets(const KimaiTimeSheets &sheets);
@@ -310,17 +351,22 @@ namespace kemai
         QTimer                             m_recentRefreshTimer;
         QTimer                             m_activeDurationTimer;
         QTimer                             m_syncTimer;
-        bool                               m_syncInFlight      = false;
-        bool                               m_syncFailing       = false;
-        int                                m_syncGeneration    = 0;
-        std::chrono::seconds               m_staleAfter        = std::chrono::minutes(10);
-        int                                m_lastUsedProjectId = 0;
+        bool                               m_syncInFlight   = false;
+        bool                               m_syncFailing    = false;
+        int                                m_syncGeneration = 0;
+        std::chrono::seconds               m_staleAfter     = std::chrono::minutes(10);
         std::unique_ptr<TaskModel>         m_tasks;
         bool                               m_hasTaskManagement = false;
         TasksLoad                          m_tasksLoad         = TasksLoad::NotLoaded;
         NotificationKind                   m_tasksError        = NotificationKind::UnknownError;
         int                                m_tasksGeneration   = 0;
         int                                m_totalsGeneration  = 0;
+        HistoryPeriod                      m_historyPeriod;
+        std::optional<HistoryPeriod>       m_pendingHistoryPeriod;
+        HistoryRange                       m_historyRange;
+        HistoryLoad                        m_historyLoad       = HistoryLoad::NotLoaded;
+        int                                m_historyGeneration = 0;
+        std::function<QDate()>             m_today             = &QDate::currentDate;
         CustomFields::KnownCodes           m_knownCodes;
     };
 } // namespace kemai

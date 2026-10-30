@@ -23,6 +23,12 @@ namespace
         }
     }
 
+    // Today at that local time: within every history period
+    QDateTime todayAt(int hour, int minute)
+    {
+        return QDateTime(QDate::currentDate(), QTime(hour, minute)).toUTC();
+    }
+
     KimaiTimeSheet makeTimeSheet(int id, const QDateTime &beginAt, const QDateTime &endAt = {})
     {
         KimaiTimeSheet ts;
@@ -43,6 +49,7 @@ namespace
 
         SessionController::NotificationLevel lastLevel = SessionController::NotificationLevel::Info;
         SessionController::NotificationKind  lastKind  = SessionController::NotificationKind::UnknownError;
+        QString                              lastDetail;
 
         void attach(SessionController &controller)
         {
@@ -50,11 +57,12 @@ namespace
                              { ++sessionExpiredCount; });
             QObject::connect(&controller,
                              &SessionController::notificationRequested,
-                             [this](SessionController::NotificationLevel level, SessionController::NotificationKind kind, const QString &)
+                             [this](SessionController::NotificationLevel level, SessionController::NotificationKind kind, const QString &detail)
                              {
                                  ++notificationCount;
-                                 lastLevel = level;
-                                 lastKind  = kind;
+                                 lastLevel  = level;
+                                 lastKind   = kind;
+                                 lastDetail = detail;
                              });
         }
     };
@@ -76,7 +84,7 @@ TEST_CASE("SessionController - nominal start triggers refreshes", "[session][uni
 
     REQUIRE(fake->calls.contains("startTimeSheet"));
     REQUIRE(fake->calls.contains("requestActiveTimeSheets"));
-    REQUIRE(fake->calls.contains("requestTimeSheets"));
+    REQUIRE(fake->calls.contains("requestTimeSheetsPeriod"));
     REQUIRE(probe.sessionExpiredCount == 0);
     REQUIRE(probe.notificationCount == 0);
 }
@@ -182,8 +190,8 @@ TEST_CASE("SessionController - cache failure on 401 expires the session", "[sess
 
 TEST_CASE("SessionController::updateTimeSheet - rejects end before begin", "[session][unit]")
 {
-    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
-    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+    const auto begin = todayAt(10, 0);
+    const auto end   = todayAt(12, 0);
 
     auto fake = std::make_shared<FakeKimaiClient>();
     fake->timeSheets.append(makeTimeSheet(42, begin, end));
@@ -200,9 +208,9 @@ TEST_CASE("SessionController::updateTimeSheet - rejects end before begin", "[ses
 
 TEST_CASE("SessionController::updateTimeSheet - invalid datetime leaves field unchanged", "[session][unit]")
 {
-    const auto begin  = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
-    const auto end    = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
-    const auto newEnd = QDateTime::fromString("2026-06-10T13:30:00Z", Qt::ISODate);
+    const auto begin  = todayAt(10, 0);
+    const auto end    = todayAt(12, 0);
+    const auto newEnd = todayAt(13, 30);
 
     auto fake = std::make_shared<FakeKimaiClient>();
     fake->timeSheets.append(makeTimeSheet(42, begin, end));
@@ -221,8 +229,8 @@ TEST_CASE("SessionController::updateTimeSheet - invalid datetime leaves field un
 
 TEST_CASE("SessionController::updateTimeSheet - applies project, activity, description and tags", "[session][unit]")
 {
-    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
-    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+    const auto begin = todayAt(10, 0);
+    const auto end   = todayAt(12, 0);
 
     auto fake      = std::make_shared<FakeKimaiClient>();
     auto ts        = makeTimeSheet(42, begin, end);
@@ -246,12 +254,12 @@ TEST_CASE("SessionController::updateTimeSheet - applies project, activity, descr
     REQUIRE(fake->lastUpdatedTimeSheet.endAt == end);
     // Success refreshes the lists
     REQUIRE(fake->calls.contains("requestActiveTimeSheets"));
-    REQUIRE(fake->calls.contains("requestTimeSheets"));
+    REQUIRE(fake->calls.contains("requestTimeSheetsPeriod"));
 }
 
 TEST_CASE("SessionController::updateTimeSheet - running entry keeps no end", "[session][unit]")
 {
-    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
+    const auto begin = todayAt(10, 0);
 
     auto fake = std::make_shared<FakeKimaiClient>();
     fake->timeSheets.append(makeTimeSheet(42, begin));
@@ -268,8 +276,8 @@ TEST_CASE("SessionController::updateTimeSheet - running entry keeps no end", "[s
 
 TEST_CASE("SessionController::updateTimeSheet - rejects an invalid project or activity", "[session][unit]")
 {
-    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
-    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+    const auto begin = todayAt(10, 0);
+    const auto end   = todayAt(12, 0);
 
     auto fake = std::make_shared<FakeKimaiClient>();
     fake->timeSheets.append(makeTimeSheet(42, begin, end));
@@ -352,7 +360,7 @@ TEST_CASE("SessionController::refreshIfStale - only reloads a stale or missing c
     controller.refreshIfStale();
     processEvents();
     REQUIRE(fake->calls.contains("requestActivities"));
-    REQUIRE(fake->calls.contains("requestTimeSheets"));
+    REQUIRE(fake->calls.contains("requestTimeSheetsPeriod"));
 }
 
 TEST_CASE("SessionController::refreshIfStale - retries after a failed initial load", "[session][unit]")
@@ -382,13 +390,13 @@ TEST_CASE("SessionController::refresh - coalesces with a cache load in flight", 
     processEvents();
 
     REQUIRE_FALSE(fake->calls.contains("requestActivities"));
-    REQUIRE(fake->calls.contains("requestTimeSheets"));
+    REQUIRE(fake->calls.contains("requestTimeSheetsPeriod"));
 }
 
 TEST_CASE("SessionController::deleteTimeSheet - deletes then refreshes the lists", "[session][unit]")
 {
-    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
-    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+    const auto begin = todayAt(10, 0);
+    const auto end   = todayAt(12, 0);
 
     auto fake = std::make_shared<FakeKimaiClient>();
     fake->timeSheets.append(makeTimeSheet(42, begin, end));
@@ -402,7 +410,7 @@ TEST_CASE("SessionController::deleteTimeSheet - deletes then refreshes the lists
 
     REQUIRE(fake->lastDeletedTimeSheetId == 42);
     REQUIRE(fake->calls.indexOf("deleteTimeSheet") < fake->calls.indexOf("requestActiveTimeSheets"));
-    REQUIRE(fake->calls.contains("requestTimeSheets"));
+    REQUIRE(fake->calls.contains("requestTimeSheetsPeriod"));
 }
 
 TEST_CASE("SessionController::deleteTimeSheet - deleting the active entry stops tracking", "[session][unit]")
@@ -476,8 +484,8 @@ TEST_CASE("SessionController::deleteTimeSheet - success emits timeSheetDeleted",
 
 TEST_CASE("SessionController::updateTimeSheet - reports success or failure to the caller", "[session][error][unit]")
 {
-    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
-    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+    const auto begin = todayAt(10, 0);
+    const auto end   = todayAt(12, 0);
 
     auto fake = std::make_shared<FakeKimaiClient>();
     fake->timeSheets.append(makeTimeSheet(42, begin, end));
@@ -533,8 +541,8 @@ TEST_CASE("SessionController::updateTimeSheet - reports success or failure to th
 
 TEST_CASE("SessionController::updateTimeSheet - creates new tags before updating", "[session][unit]")
 {
-    const auto begin = QDateTime::fromString("2026-06-10T10:00:00Z", Qt::ISODate);
-    const auto end   = QDateTime::fromString("2026-06-10T12:00:00Z", Qt::ISODate);
+    const auto begin = todayAt(10, 0);
+    const auto end   = todayAt(12, 0);
 
     auto fake = std::make_shared<FakeKimaiClient>();
     fake->timeSheets.append(makeTimeSheet(42, begin, end));
@@ -709,7 +717,7 @@ TEST_CASE("SessionController::syncActiveTimeSheet - follows a timer started or s
 
     REQUIRE(controller.hasActiveTimesheet());
     REQUIRE(controller.activeProjectName() == "Rocket");
-    REQUIRE(fake->calls.count("requestTimeSheets") == 1);
+    REQUIRE(fake->calls.count("requestTimeSheetsPeriod") == 1);
 
     // Stopped from another client
     fake->activeTimeSheets.clear();
@@ -718,7 +726,7 @@ TEST_CASE("SessionController::syncActiveTimeSheet - follows a timer started or s
     processEvents();
 
     REQUIRE_FALSE(controller.hasActiveTimesheet());
-    REQUIRE(fake->calls.count("requestTimeSheets") == 1);
+    REQUIRE(fake->calls.count("requestTimeSheetsPeriod") == 1);
 }
 
 TEST_CASE("SessionController::syncActiveTimeSheet - unchanged timer reloads nothing", "[session][sync][unit]")
@@ -755,7 +763,7 @@ TEST_CASE("SessionController::syncActiveTimeSheet - an edit of the running entry
     controller.syncActiveTimeSheet();
     processEvents();
 
-    REQUIRE(fake->calls.count("requestTimeSheets") == 1);
+    REQUIRE(fake->calls.count("requestTimeSheetsPeriod") == 1);
 }
 
 TEST_CASE("SessionController::syncActiveTimeSheet - reply older than a local action is dropped", "[session][sync][unit]")
@@ -775,7 +783,7 @@ TEST_CASE("SessionController::syncActiveTimeSheet - reply older than a local act
     processEvents();
 
     REQUIRE_FALSE(controller.hasActiveTimesheet());
-    REQUIRE(fake->calls.count("requestTimeSheets") == 1);
+    REQUIRE(fake->calls.count("requestTimeSheetsPeriod") == 1);
 }
 
 TEST_CASE("SessionController::syncActiveTimeSheet - a check in flight is not restarted", "[session][sync][unit]")
@@ -1175,10 +1183,15 @@ TEST_CASE("SessionController - loads, starts and closes tasks", "[session][tasks
     processEvents();
     REQUIRE(controller.hasTaskManagement());
 
-    controller.loadTasks();
-    REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::Loading);
-    processEvents();
+    // Loaded with the session: the switch shows the count before the tasks are opened
+    REQUIRE(fake->calls.count("requestTasks") == 1);
     REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::Ready);
+    REQUIRE(controller.tasks()->totalCount() == 2);
+
+    // A later load keeps the list shown
+    controller.loadTasks();
+    REQUIRE(controller.tasksLoad() == SessionController::TasksLoad::Ready);
+    processEvents();
     REQUIRE(controller.tasks()->totalCount() == 2);
 
     // Start: the task's timer, titled after it
@@ -1643,5 +1656,255 @@ TEST_CASE("SessionController - task starts write the custom values", "[session][
         processEvents();
         REQUIRE(probe.saveFails == 1);
         REQUIRE(fake->metaWrites.isEmpty());
+    }
+}
+
+TEST_CASE("SessionController - the history lists the period's entries", "[session][history][unit]")
+{
+    const auto week = HistoryPeriods::range(HistoryPeriod::ThisWeek, QDate::currentDate());
+
+    auto fake              = std::make_shared<FakeKimaiClient>();
+    fake->periodTimeSheets = KimaiTimeSheets{makeTimeSheet(1, todayAt(9, 0), todayAt(10, 0)),
+                                             // Within the margin day Kimai may return, outside the week
+                                             makeTimeSheet(2, QDateTime(week.first.addDays(-1), QTime(12, 0)), QDateTime(week.first.addDays(-1), QTime(13, 0)))};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    REQUIRE(controller.historyPeriod() == "week");
+    REQUIRE(controller.historyLoad() == SessionController::HistoryLoad::Ready);
+    REQUIRE(controller.historyFirstDate() == week.first);
+    REQUIRE(controller.historyLastDate() == week.last);
+    REQUIRE(controller.recentTimeSheets()->rowCount() == 1);
+
+    // A day of margin on each side of the period
+    REQUIRE_FALSE(fake->periodRequests.isEmpty());
+    REQUIRE(fake->periodRequests.first().begin == week.first.addDays(-1).startOfDay());
+    REQUIRE(fake->periodRequests.first().end == week.last.addDays(2).startOfDay().addSecs(-1));
+}
+
+TEST_CASE("SessionController - the initial period is the given one", "[session][history][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{}, nullptr, HistoryPeriod::ThisMonth);
+    processEvents();
+
+    const auto month = HistoryPeriods::range(HistoryPeriod::ThisMonth, QDate::currentDate());
+    REQUIRE(controller.historyPeriod() == "month");
+    REQUIRE(fake->periodRequests.size() == 1);
+    REQUIRE(fake->periodRequests.first().begin == month.first.addDays(-1).startOfDay());
+}
+
+TEST_CASE("SessionController - every page of a long period is loaded", "[session][history][unit]")
+{
+    SECTION("620 entries: two pages")
+    {
+        auto            fake = std::make_shared<FakeKimaiClient>();
+        KimaiTimeSheets sheets;
+        for (int id = 1; id <= 620; ++id)
+        {
+            sheets.append(makeTimeSheet(id, todayAt(8, 0), todayAt(8, 1)));
+        }
+        fake->periodTimeSheets = sheets;
+
+        SessionController controller(fake, KimaiUser{});
+        processEvents(20);
+
+        REQUIRE(fake->periodRequests.size() == 2);
+        REQUIRE(fake->periodRequests.last().page == 2);
+        REQUIRE(controller.recentTimeSheets()->rowCount() == 620);
+    }
+
+    SECTION("exactly 500 entries: the 404 of the next page ends the period")
+    {
+        auto            fake = std::make_shared<FakeKimaiClient>();
+        KimaiTimeSheets sheets;
+        for (int id = 1; id <= 500; ++id)
+        {
+            sheets.append(makeTimeSheet(id, todayAt(8, 0), todayAt(8, 1)));
+        }
+        fake->periodTimeSheets = sheets;
+
+        SignalProbe       probe;
+        SessionController controller(fake, KimaiUser{});
+        probe.attach(controller);
+        processEvents(20);
+
+        REQUIRE(fake->periodRequests.size() == 2);
+        REQUIRE(controller.recentTimeSheets()->rowCount() == 500);
+        REQUIRE(controller.historyLoad() == SessionController::HistoryLoad::Ready);
+        REQUIRE(probe.notificationCount == 0);
+    }
+}
+
+TEST_CASE("SessionController - a timer running since before the period is listed first", "[session][history][unit]")
+{
+    const auto week    = HistoryPeriods::range(HistoryPeriod::ThisWeek, QDate::currentDate());
+    const auto running = makeTimeSheet(9, QDateTime(week.first.addDays(-3), QTime(16, 0)));
+
+    auto fake              = std::make_shared<FakeKimaiClient>();
+    fake->periodTimeSheets = KimaiTimeSheets{makeTimeSheet(1, todayAt(0, 30), todayAt(0, 45))};
+    fake->activeTimeSheets = {running};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    auto *model = controller.recentTimeSheets();
+    REQUIRE(model->rowCount() == 2);
+    REQUIRE(model->data(model->index(0), static_cast<int>(TimesheetModel::TimesheetRole::TimesheetId)).toInt() == 9);
+
+    // Also when the running entry is known before the history arrives (a reload)
+    controller.refresh();
+    processEvents();
+    REQUIRE(model->rowCount() == 2);
+    REQUIRE(model->data(model->index(0), static_cast<int>(TimesheetModel::TimesheetRole::TimesheetId)).toInt() == 9);
+}
+
+TEST_CASE("SessionController - planned entries are listed within the period only", "[session][history][unit]")
+{
+    const auto week     = HistoryPeriods::range(HistoryPeriod::ThisWeek, QDate::currentDate());
+    const auto tomorrow = QDate::currentDate().addDays(1);
+
+    auto fake              = std::make_shared<FakeKimaiClient>();
+    fake->periodTimeSheets = KimaiTimeSheets{makeTimeSheet(1, QDateTime(week.last, QTime(9, 0)), QDateTime(week.last, QTime(10, 0))),
+                                             makeTimeSheet(2, QDateTime(tomorrow, QTime(9, 0)), QDateTime(tomorrow, QTime(10, 0)))};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    // Sunday's planned entry belongs to this week; tomorrow's too, unless today is Sunday
+    const auto expected = tomorrow <= week.last ? 2 : 1;
+    REQUIRE(controller.recentTimeSheets()->rowCount() == expected);
+
+    controller.setHistoryPeriod("last30");
+    processEvents();
+
+    // Last 30 days end today
+    REQUIRE(controller.historyPeriod() == "last30");
+    REQUIRE(controller.recentTimeSheets()->rowCount() == (week.last == QDate::currentDate() ? 1 : 0));
+}
+
+TEST_CASE("SessionController - a period change shows the pending period, then the loaded one", "[session][history][unit]")
+{
+    auto fake              = std::make_shared<FakeKimaiClient>();
+    fake->periodTimeSheets = KimaiTimeSheets{makeTimeSheet(1, todayAt(9, 0), todayAt(10, 0))};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    controller.setHistoryPeriod("month");
+    REQUIRE(controller.pendingHistoryPeriod() == "month");
+    REQUIRE(controller.historyPeriod() == "week");
+    REQUIRE(controller.recentTimeSheets()->rowCount() == 1);
+
+    processEvents();
+    REQUIRE(controller.pendingHistoryPeriod().isEmpty());
+    REQUIRE(controller.historyPeriod() == "month");
+    REQUIRE(controller.historyFirstDate() == HistoryPeriods::range(HistoryPeriod::ThisMonth, QDate::currentDate()).first);
+}
+
+TEST_CASE("SessionController - a failed period change keeps the list and the period", "[session][history][error][unit]")
+{
+    auto fake              = std::make_shared<FakeKimaiClient>();
+    fake->periodTimeSheets = KimaiTimeSheets{makeTimeSheet(1, todayAt(9, 0), todayAt(10, 0))};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    SignalProbe probe;
+    probe.attach(controller);
+    fake->failWith("requestTimeSheetsPeriod", ApiErrorKind::NoNetwork);
+
+    controller.setHistoryPeriod("month");
+    processEvents();
+
+    REQUIRE(controller.historyPeriod() == "week");
+    REQUIRE(controller.pendingHistoryPeriod().isEmpty());
+    REQUIRE(controller.historyLoad() == SessionController::HistoryLoad::Ready);
+    REQUIRE(controller.recentTimeSheets()->rowCount() == 1);
+    REQUIRE(probe.lastKind == SessionController::NotificationKind::HistoryPeriodFailed);
+    REQUIRE(probe.lastDetail == "month|week|NoNetwork");
+}
+
+TEST_CASE("SessionController - a failed first load leaves the history failed", "[session][history][error][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+    fake->failWith("requestTimeSheetsPeriod", ApiErrorKind::ServerError, 500);
+
+    SessionController controller(fake, KimaiUser{});
+    SignalProbe       probe;
+    probe.attach(controller);
+    processEvents();
+
+    REQUIRE(controller.historyLoad() == SessionController::HistoryLoad::Failed);
+    REQUIRE(probe.lastKind == SessionController::NotificationKind::ServerError);
+}
+
+TEST_CASE("SessionController - a superseded period load is dropped", "[session][history][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    int changes = 0;
+    QObject::connect(&controller, &SessionController::historyPeriodChanged, [&changes]
+                     { ++changes; });
+
+    controller.setHistoryPeriod("month");
+    controller.setHistoryPeriod("last30");
+    processEvents();
+
+    REQUIRE(controller.historyPeriod() == "last30");
+    // Two pending changes, then one loaded period: the month reply never applied
+    REQUIRE(changes == 3);
+}
+
+TEST_CASE("SessionController - a new week reloads the history", "[session][history][unit]")
+{
+    auto fake = std::make_shared<FakeKimaiClient>();
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    const auto nextWeek = QDate::currentDate().addDays(7);
+    controller.checkHistoryRollover();
+    processEvents();
+    REQUIRE(fake->periodRequests.size() == 1);
+
+    controller.setCurrentDate([nextWeek]
+                              { return nextWeek; });
+    controller.checkHistoryRollover();
+    processEvents();
+
+    REQUIRE(fake->periodRequests.size() == 2);
+    REQUIRE(controller.historyFirstDate() == HistoryPeriods::range(HistoryPeriod::ThisWeek, nextWeek).first);
+}
+
+TEST_CASE("SessionController::lastUsedProjectId - from the period or the week's entries", "[session][history][unit]")
+{
+    SECTION("empty period, nothing this week")
+    {
+        auto fake              = std::make_shared<FakeKimaiClient>();
+        fake->periodTimeSheets = KimaiTimeSheets{};
+        fake->weekTimeSheets   = KimaiTimeSheets{};
+
+        SessionController controller(fake, KimaiUser{});
+        processEvents();
+        REQUIRE(controller.lastUsedProjectId() == 0);
+    }
+
+    SECTION("empty period, an entry in the week's request")
+    {
+        auto fake              = std::make_shared<FakeKimaiClient>();
+        fake->periodTimeSheets = KimaiTimeSheets{};
+        auto sheet             = makeTimeSheet(3, todayAt(8, 0), todayAt(9, 0));
+        sheet.project.id       = 21;
+        fake->weekTimeSheets   = KimaiTimeSheets{sheet};
+
+        SessionController controller(fake, KimaiUser{});
+        processEvents();
+        REQUIRE(controller.lastUsedProjectId() == 21);
     }
 }

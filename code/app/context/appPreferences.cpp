@@ -5,6 +5,9 @@
 // STL headers
 #include <algorithm>
 
+// Project headers
+#include <misc/historyPeriods.h>
+
 namespace kemai
 {
     AppPreferences::AppPreferences(QObject *parent):
@@ -136,6 +139,19 @@ namespace kemai
         if (setValue("legacyImportOffer", offer))
         {
             emit legacyImportOfferChanged();
+        }
+    }
+
+    QString AppPreferences::historyPeriod() const
+    {
+        return HistoryPeriods::keyOf(HistoryPeriods::fromKey(value("historyPeriod", QString()).toString()));
+    }
+
+    void AppPreferences::setHistoryPeriod(const QString &period)
+    {
+        if (setValue("historyPeriod", HistoryPeriods::keyOf(HistoryPeriods::fromKey(period))))
+        {
+            emit historyPeriodChanged();
         }
     }
 

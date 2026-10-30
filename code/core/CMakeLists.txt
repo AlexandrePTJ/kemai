@@ -43,6 +43,8 @@ set(KEMAI_LIB_SOURCES
         misc/logJournalSink.cpp
         misc/pathHelpers.h
         misc/pathHelpers.cpp
+        misc/historyPeriods.h
+        misc/historyPeriods.cpp
         misc/windowPlacement.h
         misc/windowPlacement.cpp
         model/activityListModel.cpp

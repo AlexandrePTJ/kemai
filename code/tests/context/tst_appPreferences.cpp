@@ -76,3 +76,21 @@ TEST_CASE("AppPreferences - the 0.11 import is offered until declined for good",
     reread.setJson(preferences.json());
     REQUIRE_FALSE(reread.legacyImportOffer());
 }
+
+TEST_CASE("AppPreferences - the history period is this week until chosen", "[preferences][unit]")
+{
+    AppPreferences preferences;
+    REQUIRE(preferences.historyPeriod() == "week");
+
+    preferences.setHistoryPeriod("month");
+
+    AppPreferences reread;
+    reread.setJson(preferences.json());
+    REQUIRE(reread.historyPeriod() == "month");
+
+    // A value this build does not know (a newer Kemai's, a hand edit) reads as this week
+    reread.setJson(QJsonObject{
+        {"historyPeriod", "quarter"}
+    });
+    REQUIRE(reread.historyPeriod() == "week");
+}
