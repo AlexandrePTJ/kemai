@@ -40,10 +40,12 @@ namespace kemai
         KimaiActivities      activities;
         KimaiTimeSheets      timeSheets;
         KimaiTimeSheets      activeTimeSheets;
-        KimaiTasks           tasks;
-        KimaiTimeSheet       timeSheetResult;
-        QStringList          tags;
-        KimaiTask            taskResult;
+        // Reply to requestTimeSheets(since), `timeSheets` when unset
+        std::optional<KimaiTimeSheets> weekTimeSheets;
+        KimaiTasks                     tasks;
+        KimaiTimeSheet                 timeSheetResult;
+        QStringList                    tags;
+        KimaiTask                      taskResult;
 
         // Method name -> error to fail with
         QHash<QString, KimaiApiError> errors;
@@ -70,8 +72,15 @@ namespace kemai
         { return result("requestColorChoices", colorChoices); }
         QFuture<KimaiCustomers> requestCustomers() override
         { return result("requestCustomers", customers); }
-        QFuture<KimaiTimeSheets> requestTimeSheets() override
-        { return result("requestTimeSheets", timeSheets); }
+        QFuture<KimaiTimeSheets> requestTimeSheets(std::optional<QDateTime> since = std::nullopt) override
+        {
+            if (since.has_value())
+            {
+                lastTimeSheetsSince = *since;
+                return result("requestTimeSheetsSince", weekTimeSheets.value_or(timeSheets));
+            }
+            return result("requestTimeSheets", timeSheets);
+        }
         QFuture<KimaiTimeSheets> requestActiveTimeSheets() override
         { return result("requestActiveTimeSheets", activeTimeSheets); }
         QFuture<KimaiTimeSheets> requestRecentTimeSheets() override
@@ -181,6 +190,7 @@ namespace kemai
         KimaiActivity  lastAddedActivity;
         int            nextCreatedId = 100;
         QString        lastTagsQuery;
+        QDateTime      lastTimeSheetsSince;
         QStringList    createdTags;
 
     private:

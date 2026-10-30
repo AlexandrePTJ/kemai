@@ -81,6 +81,34 @@ TEST_CASE("SessionController - nominal start triggers refreshes", "[session][uni
     REQUIRE(probe.notificationCount == 0);
 }
 
+TEST_CASE("SessionController - week totals come from a request covering the week", "[session][unit]")
+{
+    const auto todayStart = QDate::currentDate().startOfDay();
+
+    KimaiTimeSheet listed;
+    listed.id      = 1;
+    listed.beginAt = todayStart;
+    listed.endAt   = todayStart.addSecs(3600);
+
+    KimaiTimeSheet unlisted = listed;
+    unlisted.id             = 2;
+    unlisted.beginAt        = todayStart.addSecs(7200);
+    unlisted.endAt          = todayStart.addSecs(10800);
+
+    auto fake            = std::make_shared<FakeKimaiClient>();
+    fake->timeSheets     = {listed};
+    fake->weekTimeSheets = KimaiTimeSheets{listed, unlisted};
+
+    SessionController controller(fake, KimaiUser{});
+    processEvents();
+
+    REQUIRE(fake->calls.contains("requestTimeSheetsSince"));
+    REQUIRE(fake->lastTimeSheetsSince == TimesheetModel::totalsPeriodStart());
+    REQUIRE(controller.recentTimeSheets()->rowCount() == 1);
+    REQUIRE(controller.recentTimeSheets()->todayDuration() == "2h 00m");
+    REQUIRE(controller.recentTimeSheets()->weekDuration() == "2h 00m");
+}
+
 TEST_CASE("SessionController - 401 on action emits sessionExpired, no notification", "[session][error][unit]")
 {
     auto fake = std::make_shared<FakeKimaiClient>();

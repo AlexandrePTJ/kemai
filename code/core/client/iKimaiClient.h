@@ -33,14 +33,15 @@ namespace kemai
         // Custom fields of time entries; fails with NotFound when the instance has no custom fields plugin
         virtual QFuture<KimaiMetaFieldRules> requestTimeSheetMetaFields() = 0;
         // The instance's color palette (name -> #rrggbb)
-        virtual QFuture<KimaiColorChoices> requestColorChoices()                                          = 0;
-        virtual QFuture<KimaiCustomers>    requestCustomers()                                             = 0;
-        virtual QFuture<KimaiTimeSheets>   requestTimeSheets()                                            = 0;
-        virtual QFuture<KimaiTimeSheets>   requestActiveTimeSheets()                                      = 0;
-        virtual QFuture<KimaiTimeSheets>   requestRecentTimeSheets()                                      = 0;
-        virtual QFuture<KimaiProjects>     requestProjects(std::optional<int> customerId = std::nullopt)  = 0;
-        virtual QFuture<KimaiActivities>   requestActivities(std::optional<int> projectId = std::nullopt) = 0;
-        virtual QFuture<QStringList>       requestTags(const QString &name)                               = 0; // names containing `name`
+        virtual QFuture<KimaiColorChoices> requestColorChoices() = 0;
+        virtual QFuture<KimaiCustomers>    requestCustomers()    = 0;
+        // The latest 50 entries; with `since`, every entry started from then on (up to 500)
+        virtual QFuture<KimaiTimeSheets> requestTimeSheets(std::optional<QDateTime> since = std::nullopt) = 0;
+        virtual QFuture<KimaiTimeSheets> requestActiveTimeSheets()                                        = 0;
+        virtual QFuture<KimaiTimeSheets> requestRecentTimeSheets()                                        = 0;
+        virtual QFuture<KimaiProjects>   requestProjects(std::optional<int> customerId = std::nullopt)    = 0;
+        virtual QFuture<KimaiActivities> requestActivities(std::optional<int> projectId = std::nullopt)   = 0;
+        virtual QFuture<QStringList>     requestTags(const QString &name)                                 = 0; // names containing `name`
 
         virtual QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer) = 0;
         virtual QFuture<KimaiProject>  addProject(const KimaiProject &project)    = 0;

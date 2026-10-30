@@ -525,13 +525,19 @@ QFuture<KimaiCustomers> KimaiClient::requestCustomers()
     return m_d->processApiNetworkReplyArray<KimaiCustomer>(ApiMethod::Customers, reply);
 }
 
-QFuture<KimaiTimeSheets> KimaiClient::requestTimeSheets()
+QFuture<KimaiTimeSheets> KimaiClient::requestTimeSheets(std::optional<QDateTime> since)
 {
     std::map<QString, QString> parameters = {
         {"full",    "true" },
         {"order",   "DESC" },
         {"orderBy", "begin"}
     };
+    if (since.has_value())
+    {
+        // Kimai reads it in the user's time zone; 500 is the largest page it serves
+        parameters.emplace("begin", since->toString("yyyy-MM-ddTHH:mm:ss"));
+        parameters.emplace("size", "500");
+    }
 
     auto request = m_d->prepareRequest(ApiMethod::TimeSheets, parameters);
     auto reply   = m_d->sendGetRequest(request);

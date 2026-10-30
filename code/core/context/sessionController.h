@@ -320,6 +320,7 @@ namespace kemai
         TasksLoad                          m_tasksLoad         = TasksLoad::NotLoaded;
         NotificationKind                   m_tasksError        = NotificationKind::UnknownError;
         int                                m_tasksGeneration   = 0;
+        int                                m_totalsGeneration  = 0;
         CustomFields::KnownCodes           m_knownCodes;
     };
 } // namespace kemai

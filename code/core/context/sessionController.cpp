@@ -662,6 +662,20 @@ namespace kemai
                   })
             .onFailed(this, [this](const KimaiApiError &e)
                       { handleApiError(e, "Failed to fetch recent timesheets"); });
+
+        // A reply of an earlier refresh arriving last must not bring back older totals
+        const auto generation = ++m_totalsGeneration;
+        m_client->requestTimeSheets(TimesheetModel::totalsPeriodStart())
+            .then(this,
+                  [this, generation](const KimaiTimeSheets &sheets)
+                  {
+                      if (generation == m_totalsGeneration)
+                      {
+                          m_recentTimeSheets->setTotalsTimeSheets(sheets);
+                      }
+                  })
+            .onFailed(this, [this](const KimaiApiError &e)
+                      { handleApiError(e, "Failed to fetch the week's timesheets"); });
     }
 
     void SessionController::refreshActiveTimeSheets()

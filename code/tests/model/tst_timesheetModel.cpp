@@ -95,3 +95,36 @@ TEST_CASE("TimesheetModel::entry - an entry's roles by name", "[model][unit]")
     REQUIRE(entry.value("customValues").toMap().value("ticket") == "KEM-1");
     REQUIRE(model.entry(6).isEmpty());
 }
+
+TEST_CASE("TimesheetModel - totals count the week's entries, not only the listed ones", "[model][unit]")
+{
+    const auto todayStart = QDate::currentDate().startOfDay();
+
+    KimaiTimeSheet listed;
+    listed.id      = 1;
+    listed.beginAt = todayStart;
+    listed.endAt   = todayStart.addSecs(3600);
+
+    KimaiTimeSheet older = listed;
+    older.id             = 2;
+    older.beginAt        = todayStart.addSecs(7200);
+    older.endAt          = todayStart.addSecs(9000);
+
+    TimesheetModel model;
+    model.setTimeSheets({listed});
+    model.setTotalsTimeSheets({listed, older});
+
+    REQUIRE(model.rowCount() == 1);
+    REQUIRE(model.todayDuration() == "1h 30m");
+    REQUIRE(model.weekDuration() == "1h 30m");
+}
+
+TEST_CASE("TimesheetModel::totalsPeriodStart - covers the week from the day before Monday", "[model][unit]")
+{
+    const auto start = TimesheetModel::totalsPeriodStart();
+
+    REQUIRE(start.time() == QTime(0, 0));
+    REQUIRE(start.date().dayOfWeek() == Qt::Sunday);
+    REQUIRE(start.date().daysTo(QDate::currentDate()) >= 1);
+    REQUIRE(start.date().daysTo(QDate::currentDate()) <= 7);
+}

@@ -44,6 +44,10 @@ namespace kemai
         ~TimesheetModel() override;
 
         void setTimeSheets(const KimaiTimeSheets &timeSheets);
+        // Entries the totals are computed from: the list holds only the latest ones, which may not cover the week
+        void setTotalsTimeSheets(const KimaiTimeSheets &timeSheets);
+        // What setTotalsTimeSheets must cover: the week, a day earlier for a server in another time zone
+        static QDateTime totalsPeriodStart();
 
         std::optional<KimaiTimeSheet> findById(int timesheetId) const;
         // The entry's roles by name (as a delegate sees them), empty when it is not in the list
@@ -66,6 +70,7 @@ namespace kemai
         void computeAggregates();
 
         KimaiTimeSheets m_timeSheets;
+        KimaiTimeSheets m_totalsTimeSheets;
         QString         m_todayDuration;
         QString         m_weekDuration;
         QString         m_dateLabel;

@@ -19,6 +19,7 @@ Alpha releases are marked by ` [alpha]` after their date (`## [26.10.1] - 2026-1
 
 ### Fixed
 - Log files no longer lose their last lines when Kemai crashes or is killed
+- The day and week totals of the history count every entry of the week, not only those among the latest 50 listed
 
 ## [26.10.1] - 2026-10-26 [alpha]
 

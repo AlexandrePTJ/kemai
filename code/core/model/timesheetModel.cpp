@@ -50,6 +50,18 @@ namespace kemai
         endResetModel();
     }
 
+    void TimesheetModel::setTotalsTimeSheets(const KimaiTimeSheets &timeSheets)
+    {
+        m_totalsTimeSheets = timeSheets;
+        computeAggregates();
+    }
+
+    QDateTime TimesheetModel::totalsPeriodStart()
+    {
+        const auto today = QDate::currentDate();
+        return today.addDays(-(today.dayOfWeek() - 1) - 1).startOfDay();
+    }
+
     int TimesheetModel::rowCount(const QModelIndex &parent) const
     {
         return parent.isValid() ? 0 : static_cast<int>(m_timeSheets.size());
@@ -219,7 +231,7 @@ namespace kemai
         qint64 todaySeconds = 0;
         qint64 weekSeconds  = 0;
 
-        for (const auto &ts : m_timeSheets)
+        for (const auto &ts : m_totalsTimeSheets)
         {
             const auto endTime   = ts.endAt.isValid() ? ts.endAt : now;
             const auto beginDate = ts.beginAt.toLocalTime().date();
