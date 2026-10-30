@@ -3,8 +3,9 @@ name: Release
 # only on develop, stable when it is on main or master. The release is first source-only; once Windows signing is
 # enabled (KEMAI_WINDOWS_SIGNING), the windows job attaches the channel's signed package: a portable ZIP for alphas,
 # an installer for stable releases. Nothing unsigned is ever attached: if anything fails, the release stays
-# source-only. Run by hand (workflow_dispatch), the windows job only builds and tests a package: nothing is signed or
-# uploaded, not even as a workflow artifact.
+# source-only, and so is it while the signing policy is test-signing (test certificate, not trusted by Windows). Run
+# by hand (workflow_dispatch), the windows job builds and tests a package; with the test-signing policy it also has it
+# signed, to check the SignPath setup. Nothing is ever attached or published from such a run.
 on:
   push:
     tags: ['[0-9][0-9].*.*']
@@ -85,8 +86,9 @@ jobs:
     env:
       VERSION: ${{ github.event_name == 'push' && needs.publish.outputs.version || inputs.version }}
       CHANNEL: ${{ github.event_name == 'push' && needs.publish.outputs.channel || inputs.channel }}
-      SIGN: ${{ github.event_name == 'push' }}
+      SIGN: ${{ github.event_name == 'push' || vars.SIGNPATH_SIGNING_POLICY_SLUG == 'test-signing' }}
       TEST_SIGNING: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG == 'test-signing' }} # test certificate, not trusted by Windows
+      PUBLISH: ${{ github.event_name == 'push' && vars.SIGNPATH_SIGNING_POLICY_SLUG != 'test-signing' }}
     defaults:
       run:
         shell: pwsh
@@ -232,8 +234,13 @@ jobs:
 
       # Both channels: attach the package, then mention it in the notes
 
+      - name: Leave the release source-only
+        if: github.event_name == 'push' && env.TEST_SIGNING == 'true'
+        run: |
+          Write-Output "::warning::Signed with the test certificate, which Windows does not trust: nothing attached to $env:VERSION"
+
       - name: Attach to the release
-        if: env.SIGN == 'true'
+        if: env.PUBLISH == 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}

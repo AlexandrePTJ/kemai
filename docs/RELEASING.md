@@ -80,11 +80,15 @@ ever attached.
 | `SIGNPATH_MSI_ARTIFACT_CONFIGURATION_SLUG` | variable | MSI configuration (`.github/signpath/artifact-configuration-msi.xml`) |
 | `SIGNPATH_API_TOKEN` | secret | token of SignPath's CI submitter user |
 
+SignPath's [GitHub App](https://github.com/apps/signpath) must be installed on the repository: its connector reads
+the job and downloads the unsigned artifact through it. Without it, the signing step fails with "Failed to retrieve
+GitHub App token".
+
 The XML files in `.github/signpath/` are the reference copies of the artifact configurations set on SignPath:
 change both together. Setting `KEMAI_WINDOWS_SIGNING` to `false` makes releases source-only again.
 
 With `test-signing`, Windows does not trust the test certificate: the job then only checks that a signature is
-present.
+present, and attaches nothing to a tagged release, which stays source-only.
 
 ### Approval
 
@@ -99,3 +103,8 @@ Run the workflow by hand (*Actions › Release › Run workflow*) on a branch, c
 version: the `windows` job builds, installs and tests the package (the installer test included, for stable), then
 stops. Nothing is signed, uploaded or published, not even as a workflow artifact. Use it to check a change to the
 Windows build before a release.
+
+While `SIGNPATH_SIGNING_POLICY_SLUG` is `test-signing`, such a run also has the package signed with the test
+certificate (approval on SignPath, signature checks), whatever `KEMAI_WINDOWS_SIGNING` says: this checks the
+SignPath setup before the release certificate is available. The unsigned file is then a one-day workflow artifact
+for SignPath; nothing is attached or published.
