@@ -1,78 +1,30 @@
-# Releasing and Windows packaging
+# Releasing
 
-This document describes how a Kemai release is published by `.github/workflows/release.yml`, and how the
-Windows package is built, signed and checked. Users' side of it is in the README (*Installation*,
-*Code signing policy*).
+Pushing a calendar tag `YY.MONTH.PATCH` (`26.11.1`) runs `.github/workflows/release.yml`:
 
-## Publishing a release
+- **`publish`** derives the channel from the branches containing the tagged commit (`release-channel.sh`: `main`/`master` → stable, `develop` → alpha, a GitHub pre-release), writes the notes from the `CHANGELOG.md` section (`release-notes.sh`) and creates the release, source only.
+- **`windows`** attaches the signed Windows package, when `KEMAI_WINDOWS_SIGNING` is `true`.
+- **`flathub`** opens the pull requests updating Kemai on Flathub, when `KEMAI_FLATHUB` is `true`.
 
-Pushing a calendar tag `YY.MONTH.PATCH` (`26.11.1`) runs the release workflow:
-
-- `publish` checks the tag and derives the channel from the remote branches containing the tagged commit
-  (`.github/scripts/release-channel.sh`): `main` or `master` gives a stable release, `develop` only gives an
-  alpha (a GitHub pre-release). It writes the notes from `CHANGELOG.md` (`release-notes.sh`) and creates the
-  release, with no file: every release is first source-only.
-- `windows` attaches the channel's signed Windows package, once Windows signing is enabled (below).
-- `flathub` opens the pull requests updating Kemai on Flathub, once `KEMAI_FLATHUB` is `true`.
+To cut a release: add its changelog section (an alpha's heading ends with ` [alpha]`), commit, tag the commit on the right branch, push the tag.
 
 ## Windows build
 
-- **Product metadata.** `code/app/kemai.rc.in`, configured by CMake on Windows, gives `Kemai.exe` its icon and
-  its `VERSIONINFO`: product name and file description `Kemai`, version strings = the display version
-  (`26.11.1`, or `dev-<commit>` for a development build), numeric version `26,11,1,0` (`0,0,0,0` for a
-  development build). The code signing service checks the product name and version against these fields.
-- **Deployment.** `cmake --install` copies Qt (libraries, plugins, QML imports) with Qt's QML deploy script,
-  and the MSVC runtime (`msvcp140*.dll`, `vcruntime140*.dll`, `concrt140.dll`) next to `Kemai.exe` with
-  `InstallRequiredSystemLibraries`. Qt's `vc_redist` installer is left out: the installed folder runs on a
-  Windows without the Visual C++ runtime, with no installation.
-- **Installer.** A release build (`KEMAI_VERSION` set) on Windows has a CPack WIX package; a development build
-  has none. Build it with the WiX .NET tool and its UI and Util extensions installed:
-
-  ```shell
-  cpack -G WIX --config build/release/CPackConfig.cmake -B build/package
-  ```
-
-  Use a short output folder: a long one makes windeployqt exceed the Windows path length limit.
-
-  The MSI is per-machine, installs in `Program Files\Kemai` with Start menu and desktop shortcuts, and is
-  named `Kemai-<version>-windows-x64.msi`. It keeps the upgrade code of the Kemai 0.9–0.11.1 installers,
-  `88815E44-85A0-469C-9740-B4887D456BAA`: later stable installers upgrade it in place, and downgrades are refused.
-  **Never change this upgrade code.**
-
-  The 0.x installers left `ALLUSERS` unset, so Windows registered them per-user, and Windows Installer cannot
-  upgrade a per-user product from a per-machine one. Setup therefore stops while Kemai 0.11.x is installed, asking
-  to uninstall it first (`packaging/windows/legacy-check.xml`, added with `CPACK_WIX_PATCH_FILE`). It finds 0.x by
-  the `installed` value of `HKCU\Software\Humanity\Kemai` (written by the 0.x installers for the user who installed
-  them; "Humanity" was CPack's default vendor), or by a `Kemai.exe` at the root of `Program Files\Kemai` (0.x's
-  layout; the rewrite's is in `bin`). Uninstalling 0.11.x keeps its `settings.json`.
-
-  Its version is the release version (`26.11.1`): the two-digit year keeps the first field under the 255 that
-  Windows Installer allows, so the installed apps list, the file name, the executable and the application all show
-  the same number.
+- **Metadata**: `code/app/kemai.rc.in` gives `Kemai.exe` its icon and `VERSIONINFO` (product `Kemai`, version strings = the display version, numeric `26,11,1,0`, `0,0,0,0` for dev builds). SignPath checks the product name and version against them.
+- **Deployment**: `cmake --install` copies Qt with its QML deploy script and the MSVC runtime with `InstallRequiredSystemLibraries` (no `vc_redist`): the installed folder runs anywhere, and is the alpha ZIP.
+- **Installer** (release builds only): `cpack -G WIX --config build/release/CPackConfig.cmake -B build/package`, with the WiX .NET tool and its UI and Util extensions. Keep the output folder short (Windows path limit). Per-machine MSI, `Program Files\Kemai`, Start menu and desktop shortcuts, `Kemai-<version>-windows-x64.msi`, MSI version = the release version.
+- **Upgrade code** `88815E44-85A0-469C-9740-B4887D456BAA`, the 0.9–0.11.1 installers': later installers upgrade in place, downgrades are refused. **Never change it.**
+- **0.11.x**: its installers registered per-user, which a per-machine MSI cannot upgrade, so setup stops while 0.11.x is installed (`packaging/windows/legacy-check.xml`). It is found by `HKCU\Software\Humanity\Kemai` `installed`, or a `Kemai.exe` at the root of `Program Files\Kemai`. Uninstalling 0.11.x keeps its `settings.json`.
 
 ## The `windows` job
 
-It runs after `publish` when the repository variable `KEMAI_WINDOWS_SIGNING` is `true`, on a GitHub-hosted
-`windows-latest` runner, and builds the package of the release's channel:
+On `windows-latest`, it builds the channel's package: alpha → `Kemai-<version>-windows-x64.zip` with `Kemai.exe` signed; stable → the MSI, signed, with its `Kemai.exe` signed too.
 
-- **alpha**: a portable ZIP, `Kemai-<version>-windows-x64.zip`, of the installed folder with `Kemai.exe` signed;
-- **stable**: the installer, signed, with `Kemai.exe` inside it signed too.
-
-Signing goes through SignPath Foundation's free code signing for open source (certificate issued to
-SignPath Foundation, which Windows shows as the publisher). The unsigned file is a workflow artifact kept one day,
-only for SignPath to fetch. Before anything is attached, the job checks the signatures and product version
-(`windows-check-signature.ps1`), starts the signed `Kemai.exe` (`windows-smoke-test.ps1`) and, for an installer,
-checks it refuses to install while Kemai 0.11.1 is installed, then installs it once 0.11.1 is removed, runs it and
-uninstalls it (`windows-installer-test.ps1`). Then it attaches the
-package with `gh release upload` and rewrites the notes with the Windows section (`release-notes.sh
---windows-zip` or `--windows-msi`). If any step fails, the release stays source-only: nothing unsigned is
-ever attached.
-
-### Settings
+SignPath Foundation signs it (Windows shows *SignPath Foundation* as publisher), fetching the unsigned file from a one-day workflow artifact. Then the job checks the signatures and version (`windows-check-signature.ps1`), runs the app (`windows-smoke-test.ps1`), and for the MSI checks it refuses to install over 0.11.1, installs once 0.11.1 is gone, runs and uninstalls (`windows-installer-test.ps1`). Only then does it upload the package and regenerate the notes (`release-notes.sh --windows-zip|--windows-msi`). Any failure leaves the release source-only.
 
 | Name | Kind | Value |
 | --- | --- | --- |
-| `KEMAI_WINDOWS_SIGNING` | variable | `true` to build and attach the Windows package |
+| `KEMAI_WINDOWS_SIGNING` | variable | `true` to build and attach the package |
 | `SIGNPATH_ORGANIZATION_ID` | variable | SignPath organization id |
 | `SIGNPATH_PROJECT_SLUG` | variable | SignPath project |
 | `SIGNPATH_SIGNING_POLICY_SLUG` | variable | `release-signing`, or `test-signing` for a dry run |
@@ -80,31 +32,8 @@ ever attached.
 | `SIGNPATH_MSI_ARTIFACT_CONFIGURATION_SLUG` | variable | MSI configuration (`.github/signpath/artifact-configuration-msi.xml`) |
 | `SIGNPATH_API_TOKEN` | secret | token of SignPath's CI submitter user |
 
-SignPath's [GitHub App](https://github.com/apps/signpath) must be installed on the repository: its connector reads
-the job and downloads the unsigned artifact through it. Without it, the signing step fails with "Failed to retrieve
-GitHub App token".
-
-The XML files in `.github/signpath/` are the reference copies of the artifact configurations set on SignPath:
-change both together. Setting `KEMAI_WINDOWS_SIGNING` to `false` makes releases source-only again.
-
-With `test-signing`, Windows does not trust the test certificate: the job then only checks that a signature is
-present, and attaches nothing to a tagged release, which stays source-only.
-
-### Approval
-
-Every signing request waits for a manual approval on SignPath, for up to four hours. If the approval comes later,
-the job fails and the release stays source-only: re-run only the failed `windows` job (*Re-run failed jobs*) of the
-same workflow run, then approve the new request. Re-running all jobs fails in `publish`, as the release already
-exists.
-
-### Build-only runs
-
-Run the workflow by hand (*Actions › Release › Run workflow*) on a branch, choosing a channel and a throwaway
-version: the `windows` job builds, installs and tests the package (the installer test included, for stable), then
-stops. Nothing is signed, uploaded or published, not even as a workflow artifact. Use it to check a change to the
-Windows build before a release.
-
-While `SIGNPATH_SIGNING_POLICY_SLUG` is `test-signing`, such a run also has the package signed with the test
-certificate (approval on SignPath, signature checks), whatever `KEMAI_WINDOWS_SIGNING` says: this checks the
-SignPath setup before the release certificate is available. The unsigned file is then a one-day workflow artifact
-for SignPath; nothing is attached or published.
+- SignPath's [GitHub App](https://github.com/apps/signpath) must be installed on the repository, or signing fails with "Failed to retrieve GitHub App token".
+- The XML files in `.github/signpath/` mirror the configurations set on SignPath: change both together.
+- With `test-signing`, the job only checks that a signature is present and never attaches anything to a release.
+- **Approval**: each signing request waits up to four hours for a manual approval. If it comes later, re-run only the failed `windows` job of the same run (*Re-run failed jobs*), then approve the new request; re-running all jobs fails in `publish`.
+- **Build-only runs**: *Actions › Release › Run workflow* with a channel and a throwaway version builds and tests the package without signing or publishing anything — except with `test-signing`, where it is also test-signed (whatever `KEMAI_WINDOWS_SIGNING` says) to check the SignPath setup.
