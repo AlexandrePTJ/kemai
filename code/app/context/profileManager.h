@@ -27,15 +27,22 @@ namespace kemai
     public:
         explicit ProfileManager(QObject *parent = nullptr);
 
-        Q_INVOKABLE void upsert(const ProfileId &profileId, const QString &name, const QString &host, const QString &token);
-        Q_INVOKABLE void remove(const ProfileId &profileId);
-        Q_INVOKABLE void importLegacyProfiles();
+        // Returns the id of the saved profile (new for a new one), which saveSucceeded / saveFailed carry
+        Q_INVOKABLE kemai::ProfileId upsert(const ProfileId &profileId, const QString &name, const QString &host, const QString &token);
+        Q_INVOKABLE void             remove(const ProfileId &profileId);
+        Q_INVOKABLE void             importLegacyProfiles();
 
         QVariantList legacyCandidateList() const;
 
+        // "profilesFileUnreadable" | "profilesFileUnwritable" | "keychainRefused", worded by the UI
+        static QString reasonKey(ProfileSaveError error);
+
     signals:
-        // failures: [{name, reason}] (reason technical, for the dialog to show after its own wording)
+        // failures: [{name, reason}] (reason: a reasonKey)
         void legacyImportCompleted(int importedCount, const QVariantList &failures);
+        // Outcome of upsert(); `reason`: a reasonKey
+        void saveSucceeded(kemai::ProfileId profileId);
+        void saveFailed(kemai::ProfileId profileId, const QString &reason);
     };
 
     // QML registration for the core model used as a QML property type

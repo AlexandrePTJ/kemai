@@ -142,7 +142,7 @@ namespace kemai
                 {
                     // Unreadable, corrupt or newer-format file: overwriting it would lose every other profile
                     spdlog::error("Profile not saved, {} left untouched: {}", m_storePath, e.what());
-                    emit profileSaveFailed(profile.id, QString::fromUtf8(e.what()));
+                    emit profileSaveFailed(profile.id, ProfileSaveError::ProfilesFileUnreadable, QString::fromUtf8(e.what()));
                     return;
                 }
             }
@@ -171,7 +171,7 @@ namespace kemai
             {
                 spdlog::error("Profile not saved: {}", e.what());
                 std::erase(m_addedProfiles, profile.id);
-                emit profileSaveFailed(profile.id, QString::fromUtf8(e.what()));
+                emit profileSaveFailed(profile.id, ProfileSaveError::ProfilesFileUnwritable, QString::fromUtf8(e.what()));
                 return;
             }
 
@@ -265,7 +265,7 @@ namespace kemai
                 spdlog::error("Profile {} without token left in {}: {}", profileId, m_storePath, e.what());
             }
         }
-        emit profileSaveFailed(profileId, message);
+        emit profileSaveFailed(profileId, ProfileSaveError::KeychainRefused, message);
     }
 
     void ProfileStore::onSecretDeleteError(const QString &key, const QString &message)

@@ -3,6 +3,7 @@
 #include "profile.h"
 
 // magic_enum headers
+#include <algorithm>
 #include <utility>
 
 #include <magic_enum/magic_enum.hpp>
@@ -57,6 +58,13 @@ namespace kemai
             }
         }
         return {};
+    }
+
+    int ProfileModel::indexOf(const ProfileId &id) const
+    {
+        const auto it = std::ranges::find_if(m_profiles, [&id](const Profile &profile)
+                                             { return profile.id == id; });
+        return it == m_profiles.cend() ? -1 : static_cast<int>(std::distance(m_profiles.cbegin(), it));
     }
 
     int ProfileModel::rowCount(const QModelIndex &parent) const

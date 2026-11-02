@@ -5,6 +5,9 @@
 // 3rd party headers
 #include <spdlog/spdlog.h>
 
+// STL headers
+#include <utility>
+
 // Qt headers
 #include <QFileInfo>
 
@@ -45,7 +48,7 @@ namespace kemai
         return m_profileModel.get();
     }
 
-    void ProfileController::upsert(const ProfileId &profileId, const QString &name, const QString &host, const QString &token)
+    ProfileId ProfileController::upsert(const ProfileId &profileId, const QString &name, const QString &host, const QString &token)
     {
         Profile profile;
         profile.id    = profileId.isNull() ? ProfileId::createUuid() : profileId;
@@ -54,6 +57,7 @@ namespace kemai
         profile.token = token;
 
         m_profileStore->save(profile);
+        return profile.id;
     }
 
     void ProfileController::remove(const ProfileId &profileId)
@@ -192,6 +196,11 @@ namespace kemai
         m_profilesKnown = true;
         m_profileModel->setProfiles(profiles);
         updateLegacyCandidates();
+
+        for (const auto &profileId : std::exchange(m_savedAwaitingReload, {}))
+        {
+            emit profileSaveSucceeded(profileId);
+        }
     }
 
     void ProfileController::onProfileSaved(ProfileId profileId)
@@ -206,18 +215,23 @@ namespace kemai
             }
             return;
         }
+        m_savedAwaitingReload.append(profileId);
         m_profileStore->loadAll();
     }
 
-    void ProfileController::onProfileSaveFailed(ProfileId profileId, const QString &message)
+    void ProfileController::onProfileSaveFailed(ProfileId profileId, ProfileSaveError error, const QString & /*message*/)
     {
-        // Logged by the store. Outside an import, the profile manager has no error channel yet: the profile simply
-        // does not appear
+        // Logged by the store, with its technical message
         if (m_importing && profileId == m_importCurrent)
         {
-            m_importFailures.insert(profileId, message);
+            m_importFailures.insert(profileId, error);
             importNextLegacyProfile();
+            return;
         }
+        // Queued: a file failure arrives while save() runs, before upsert() has returned the id to compare with
+        QMetaObject::invokeMethod(this, [this, profileId, error]
+                                  { emit profileSaveFailed(profileId, error); },
+                                  Qt::QueuedConnection);
     }
 
     void ProfileController::onProfileRemoved(ProfileId /*profileId*/)

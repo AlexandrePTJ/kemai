@@ -1,9 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+#include <optional>
+
 #include <catch2/catch_test_macros.hpp>
 #include <spdlog/sinks/ringbuffer_sink.h>
 #include <spdlog/spdlog.h>
 
+#include <QCoreApplication>
 #include <QEventLoop>
 #include <QFile>
 #include <QJsonObject>
@@ -194,6 +197,18 @@ TEST_CASE("ProfileModel::getById - existing id returns correct data", "[model][u
     REQUIRE(map["name"].toString() == "Home");
 }
 
+TEST_CASE("ProfileModel::indexOf - row of a profile, -1 when absent", "[model][unit]")
+{
+    ProfileModel model;
+    Profile      p1{QUuid::createUuid(), "Work", "https://kimai.example.com", "tok1"};
+    Profile      p2{QUuid::createUuid(), "Home", "https://home.kimai.org", "tok2"};
+    model.setProfiles({p1, p2});
+
+    REQUIRE(model.indexOf(p1.id) == 0);
+    REQUIRE(model.indexOf(p2.id) == 1);
+    REQUIRE(model.indexOf(QUuid::createUuid()) == -1);
+}
+
 TEST_CASE("ProfileModel::getById - nonexistent id returns empty map", "[model][unit]")
 {
     ProfileModel model;
@@ -231,6 +246,41 @@ TEST_CASE("ProfileController - starts empty when no file exists", "[context]")
     REQUIRE(ctrl.profileModel()->rowCount({}) == 0);
 }
 
+TEST_CASE("ProfileController::upsert - a failed save is reported with its reason", "[context]")
+{
+    QTemporaryDir tempDir;
+    REQUIRE(tempDir.isValid());
+    PathHelpers::overrideDefaultRootPath(tempDir.path());
+
+    // A file of a newer Kemai: refused before the keychain is touched
+    {
+        QFile file(PathHelpers::getFilePath(PathHelpers::FilePathType::Profiles));
+        REQUIRE(file.open(QIODevice::WriteOnly));
+        file.write(R"({"version": "2.0", "profiles": []})");
+    }
+
+    ProfileController               ctrl;
+    ProfileId                       failedId;
+    std::optional<ProfileSaveError> reason;
+    int                             succeeded = 0;
+    QObject::connect(&ctrl, &ProfileController::profileSaveFailed, [&](ProfileId id, ProfileSaveError error)
+                     {
+                         failedId = id;
+                         reason   = error; });
+    QObject::connect(&ctrl, &ProfileController::profileSaveSucceeded, [&succeeded]
+                     { ++succeeded; });
+
+    const auto savedId = ctrl.upsert(QUuid{}, "Work", "https://kimai.example.com", "secret123");
+
+    REQUIRE_FALSE(savedId.isNull());
+    // Not before upsert() has returned the id
+    REQUIRE_FALSE(reason.has_value());
+    QCoreApplication::processEvents();
+    REQUIRE(failedId == savedId);
+    REQUIRE(reason == ProfileSaveError::ProfilesFileUnreadable);
+    REQUIRE(succeeded == 0);
+}
+
 TEST_CASE("ProfileController::upsert - null UUID auto-generates id", "[context][integration]")
 {
     if (!keychainEnabled)
@@ -241,10 +291,19 @@ TEST_CASE("ProfileController::upsert - null UUID auto-generates id", "[context][
     PathHelpers::overrideDefaultRootPath(tempDir.path());
 
     ProfileController ctrl;
-    ctrl.upsert(QUuid{}, "Work", "https://kimai.example.com", "secret123");
+    // Confirmed once the model holds the saved profile
+    ProfileId confirmed;
+    int       rowsWhenConfirmed = -1;
+    QObject::connect(&ctrl, &ProfileController::profileSaveSucceeded, [&](ProfileId id)
+                     {
+                         confirmed         = id;
+                         rowsWhenConfirmed = ctrl.profileModel()->rowCount({}); });
+    const auto savedId = ctrl.upsert(QUuid{}, "Work", "https://kimai.example.com", "secret123");
 
     REQUIRE(waitForModelReset(ctrl.profileModel()));
     REQUIRE(ctrl.profileModel()->rowCount({}) == 1);
+    REQUIRE(confirmed == savedId);
+    REQUIRE(rowsWhenConfirmed == 1);
 
     auto map = ctrl.profileModel()->getByIndex(0);
     REQUIRE(map["name"].toString() == "Work");
@@ -471,11 +530,15 @@ TEST_CASE("ProfileController::importLegacyProfiles - failures are reported and n
     spdlog::set_default_logger(std::make_shared<spdlog::logger>("capture", capture));
     spdlog::set_level(spdlog::level::trace);
 
-    QList<ProfileId>         imported{QUuid::createUuid()};
-    QMap<ProfileId, QString> failures;
+    QList<ProfileId>                  imported{QUuid::createUuid()};
+    QMap<ProfileId, ProfileSaveError> failures;
+    int                               dialogFailures = 0;
     {
         ProfileController ctrl;
-        QObject::connect(&ctrl, &ProfileController::legacyImportFinished, [&imported, &failures](const QList<ProfileId> &ids, const QMap<ProfileId, QString> &failed)
+        // An import's saves are not the profile manager's
+        QObject::connect(&ctrl, &ProfileController::profileSaveFailed, [&dialogFailures]
+                         { ++dialogFailures; });
+        QObject::connect(&ctrl, &ProfileController::legacyImportFinished, [&imported, &failures](const QList<ProfileId> &ids, const QMap<ProfileId, ProfileSaveError> &failed)
                          {
                              imported = ids;
                              failures = failed; });
@@ -488,7 +551,8 @@ TEST_CASE("ProfileController::importLegacyProfiles - failures are reported and n
 
     CHECK(imported.isEmpty());
     REQUIRE(failures.size() == 1);
-    CHECK(failures.contains(QUuid("{6f1c2b9e-3d4a-4c8b-9e21-5a7d0c3b8f14}")));
+    CHECK(failures.value(QUuid("{6f1c2b9e-3d4a-4c8b-9e21-5a7d0c3b8f14}")) == ProfileSaveError::ProfilesFileUnreadable);
+    CHECK(dialogFailures == 0);
     CHECK(readBytes(profilesPath) == profilesBytes);
     CHECK(readBytes(tempDir.filePath("settings.json")) == legacyBytes);
     for (const auto &line : capture->last_formatted())
@@ -511,7 +575,7 @@ TEST_CASE("ProfileController::importLegacyProfiles - imports once, token only in
     {
         ProfileController ctrl;
         QList<ProfileId>  imported;
-        QObject::connect(&ctrl, &ProfileController::legacyImportFinished, [&imported](const QList<ProfileId> &ids, const QMap<ProfileId, QString> &)
+        QObject::connect(&ctrl, &ProfileController::legacyImportFinished, [&imported](const QList<ProfileId> &ids, const QMap<ProfileId, ProfileSaveError> &)
                          { imported = ids; });
         ctrl.importLegacyProfiles();
         REQUIRE(waitForModelReset(ctrl.profileModel()));

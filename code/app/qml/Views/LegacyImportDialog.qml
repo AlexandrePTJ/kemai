@@ -8,6 +8,8 @@ import QtQuick.Layouts
 
 import Kemai
 
+import "../Components/ProfileSaveErrors.js" as ProfileSaveErrors
+
 // Offers to import the profiles of Kemai 0.11 found on this computer, all at once (content:
 // openspec/changes/legacy-profile-import/screens/profile-import.md). Escape answers Later.
 Popup {
@@ -193,7 +195,7 @@ Popup {
                             Text {
                                 Layout.fillWidth: true
                                 visible: row._reason !== ""
-                                text: "Not saved: " + row._reason
+                                text: ProfileSaveErrors.reason(row._reason)
                                 textFormat: Text.PlainText
                                 color: Theme.colorAccentRed
                                 font.pixelSize: Theme.fontSizeSmall

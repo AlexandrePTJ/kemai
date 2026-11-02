@@ -10,7 +10,10 @@ namespace kemai
     ProfileManager::ProfileManager(QObject *parent):
     ProfileController(parent)
     {
-        connect(this, &ProfileController::legacyImportFinished, this, [this](const QList<ProfileId> &importedIds, const QMap<ProfileId, QString> &failures)
+        connect(this, &ProfileController::profileSaveSucceeded, this, &ProfileManager::saveSucceeded);
+        connect(this, &ProfileController::profileSaveFailed, this, [this](ProfileId profileId, ProfileSaveError error)
+                { emit saveFailed(profileId, reasonKey(error)); });
+        connect(this, &ProfileController::legacyImportFinished, this, [this](const QList<ProfileId> &importedIds, const QMap<ProfileId, ProfileSaveError> &failures)
                 {
                     QVariantList failureList;
                     for (const auto &[id, reason] : failures.asKeyValueRange())
@@ -19,15 +22,22 @@ namespace kemai
                                                        { return candidate.profile.id == id; });
                         failureList.append(QVariantMap{
                             {"name",   it != legacyCandidates().end() ? it->finalName : QString()},
-                            {"reason", reason                                                   }
+                            {"reason", reasonKey(reason)                                        }
                         });
                     }
                     emit legacyImportCompleted(static_cast<int>(importedIds.size()), failureList); });
     }
 
-    void ProfileManager::upsert(const ProfileId &profileId, const QString &name, const QString &host, const QString &token)
+    QString ProfileManager::reasonKey(ProfileSaveError error)
     {
-        ProfileController::upsert(profileId, name, host, token);
+        auto key = QString::fromUtf8(magic_enum::enum_name(error).data());
+        key[0]   = key[0].toLower();
+        return key;
+    }
+
+    ProfileId ProfileManager::upsert(const ProfileId &profileId, const QString &name, const QString &host, const QString &token)
+    {
+        return ProfileController::upsert(profileId, name, host, token);
     }
 
     void ProfileManager::remove(const ProfileId &profileId)

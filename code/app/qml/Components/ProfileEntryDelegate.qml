@@ -16,6 +16,8 @@ Item {
 
     required property bool isSelected
     required property bool isLast
+    // Just saved: inline "Saved" and an accent outline that fades out
+    property bool justSaved: false
 
     signal selectionRequested(index: int)
 
@@ -52,6 +54,22 @@ Item {
         }
     }
 
+    // Just-saved outline
+    Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+        radius: Theme.radiusMedium
+        border.width: 1
+        border.color: Theme.colorAccentGreenDim
+        opacity: root.justSaved ? 1 : 0
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 600
+            }
+        }
+    }
+
     // Click to select / deselect (behind the action buttons)
     TapHandler {
         gesturePolicy: TapHandler.ReleaseWithinBounds
@@ -73,11 +91,33 @@ Item {
             spacing: 2
             Layout.fillWidth: true
 
-            Text {
-                text: root.name
-                color: Theme.colorTextPrimary
-                font.pixelSize: Theme.fontSizeNormal
-                font.bold: true
+            RowLayout {
+                spacing: 8
+
+                Text {
+                    text: root.name
+                    color: Theme.colorTextPrimary
+                    font.pixelSize: Theme.fontSizeNormal
+                    font.bold: true
+                }
+
+                RowLayout {
+                    visible: root.justSaved
+                    spacing: 4
+
+                    Icon {
+                        name: "check"
+                        size: 12
+                        color: Theme.colorAccentGreen
+                    }
+
+                    Text {
+                        text: "Saved"
+                        color: Theme.colorAccentGreen
+                        font.pixelSize: Theme.fontSizeXSmall
+                        font.weight: Font.Medium
+                    }
+                }
             }
 
             Text {

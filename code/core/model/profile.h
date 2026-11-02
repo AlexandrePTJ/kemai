@@ -33,6 +33,8 @@ namespace kemai
 
         Q_INVOKABLE QVariantMap getByIndex(int index) const;
         Q_INVOKABLE QVariantMap getById(const ProfileId &id) const;
+        // Row of the profile, -1 when absent
+        Q_INVOKABLE int indexOf(const ProfileId &id) const;
 
         int                    rowCount(const QModelIndex &parent) const override;
         QVariant               data(const QModelIndex &index, int role) const override;

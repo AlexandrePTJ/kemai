@@ -21,12 +21,14 @@ set(KEMAI_QML_FILES
         qml/Components/LucideIcons.js
         qml/Components/Highlight.js
         qml/Components/HistoryPeriods.js
+        qml/Components/ProfileSaveErrors.js
         qml/Components/NotificationBanner.qml
         qml/Components/PrimaryEditButton.qml
         qml/Components/PrimaryRedButton.qml
         qml/Components/ProfileComboBox.qml
         qml/Components/ProfileEntryDelegate.qml
         qml/Components/ProfileForm.qml
+        qml/Components/ProfileSaveButton.qml
         qml/Components/ProjectActivityField.qml
         qml/Components/SearchSelect.qml
         qml/Components/SecondaryButton.qml

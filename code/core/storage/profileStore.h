@@ -12,6 +12,14 @@
 
 namespace kemai
 {
+    // Why a profile was not saved (worded by the UI)
+    enum class ProfileSaveError
+    {
+        ProfilesFileUnreadable, // corrupt, written by a newer Kemai, or unreadable: left untouched
+        ProfilesFileUnwritable,
+        KeychainRefused // a new profile is removed from the file again, an edited one keeps its previous token
+    };
+
     class ProfileStore : public QObject
     {
         Q_OBJECT
@@ -33,9 +41,8 @@ namespace kemai
     signals:
         void profilesLoaded(const std::vector<kemai::Profile> &profiles);
         void profileSaved(kemai::ProfileId profileId);
-        // The profile could not be saved (profiles file unreadable or not writable, keychain refused the token);
-        // message is technical, for the log and the UI to word
-        void profileSaveFailed(kemai::ProfileId profileId, const QString &message);
+        // The profile could not be saved; `message` is technical, for the log only
+        void profileSaveFailed(kemai::ProfileId profileId, kemai::ProfileSaveError error, const QString &message);
         void profileRemoved(kemai::ProfileId profileId);
 
     private:

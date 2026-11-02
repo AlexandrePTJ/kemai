@@ -15,6 +15,7 @@
 #include <data/profile.h>
 #include <model/profile.h>
 #include <storage/legacySettingsReader.h>
+#include <storage/profileStore.h>
 
 namespace kemai
 {
@@ -45,8 +46,10 @@ namespace kemai
 
         ProfileModel *profileModel() const;
 
-        void upsert(const ProfileId &profileId, const QString &name, const QString &host, const QString &token);
-        void remove(const ProfileId &profileId);
+        // Saves the profile (a new one when `profileId` is null) and returns its id; answered by profileSaveSucceeded
+        // or profileSaveFailed with that id
+        ProfileId upsert(const ProfileId &profileId, const QString &name, const QString &host, const QString &token);
+        void      remove(const ProfileId &profileId);
 
         // Kemai 0.11's profiles against the existing ones (names compared case-sensitively, hosts normalized)
         static std::vector<LegacyCandidate> legacyCandidatesOf(const std::vector<LegacyProfile> &legacyProfiles, const std::vector<Profile> &profiles);
@@ -65,13 +68,16 @@ namespace kemai
 
     signals:
         void legacyCandidatesChanged();
-        // failures: profile id -> technical reason, worded by the UI
-        void legacyImportFinished(const QList<kemai::ProfileId> &importedIds, const QMap<kemai::ProfileId, QString> &failures);
+        // failures: profile id -> why it was not saved, worded by the UI
+        void legacyImportFinished(const QList<kemai::ProfileId> &importedIds, const QMap<kemai::ProfileId, kemai::ProfileSaveError> &failures);
+        // Outcome of upsert() (never of an import's saves): succeeded once the reloaded profiles hold it
+        void profileSaveSucceeded(kemai::ProfileId profileId);
+        void profileSaveFailed(kemai::ProfileId profileId, kemai::ProfileSaveError error);
 
     private:
         void onProfilesLoaded(const std::vector<Profile> &profiles);
         void onProfileSaved(ProfileId profileId);
-        void onProfileSaveFailed(ProfileId profileId, const QString &message);
+        void onProfileSaveFailed(ProfileId profileId, ProfileSaveError error, const QString &message);
         void onProfileRemoved(ProfileId profileId);
 
         void updateLegacyCandidates();
@@ -87,10 +93,13 @@ namespace kemai
         std::vector<LegacyCandidate> m_legacyCandidates;
 
         // Import in progress
-        bool                     m_importing{false};
-        std::vector<Profile>     m_importQueue;
-        ProfileId                m_importCurrent;
-        QList<ProfileId>         m_importedIds;
-        QMap<ProfileId, QString> m_importFailures;
+        bool                              m_importing{false};
+        std::vector<Profile>              m_importQueue;
+        ProfileId                         m_importCurrent;
+        QList<ProfileId>                  m_importedIds;
+        QMap<ProfileId, ProfileSaveError> m_importFailures;
+
+        // Saved by upsert(), confirmed once the reload that follows has updated the model
+        QList<ProfileId> m_savedAwaitingReload;
     };
 } // namespace kemai

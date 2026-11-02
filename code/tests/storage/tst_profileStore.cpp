@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
+#include <optional>
+
 #include <catch2/catch_test_macros.hpp>
 
 #include <QFile>
@@ -118,26 +120,58 @@ TEST_CASE("ProfileStore::save - never overwrites a corrupt file", "[profileStore
     REQUIRE(readFile(path) == original);
 }
 
-TEST_CASE("ProfileStore::save - reports a profile it does not save", "[profileStore][unit]")
+TEST_CASE("ProfileStore::save - reports a profile it does not save, with the reason", "[profileStore][unit]")
 {
     QTemporaryDir tempDir;
     REQUIRE(tempDir.isValid());
     const auto path = tempDir.filePath("profiles.json");
-    writeFile(path, R"({"version": "1.0", "profiles": [ {"name": "Home")");
 
     ProfileStore store;
     store.setStorePath(path);
 
-    ProfileId failedId;
-    QString   failure;
-    QObject::connect(&store, &ProfileStore::profileSaveFailed, [&failedId, &failure](ProfileId id, const QString &message)
+    ProfileId                       failedId;
+    std::optional<ProfileSaveError> error;
+    QString                         failure;
+    QObject::connect(&store, &ProfileStore::profileSaveFailed, [&](ProfileId id, ProfileSaveError reason, const QString &message)
                      {
                          failedId = id;
+                         error    = reason;
                          failure  = message; });
 
     const auto profile = makeValidProfile();
-    store.save(profile);
+
+    SECTION("corrupt file")
+    {
+        writeFile(path, R"({"version": "1.0", "profiles": [ {"name": "Home")");
+        store.save(profile);
+        CHECK(error == ProfileSaveError::ProfilesFileUnreadable);
+    }
+
+    SECTION("file of a newer Kemai")
+    {
+        writeFile(path, QJsonDocument(makeProfilesJson("2.0")).toJson());
+        store.save(profile);
+        CHECK(error == ProfileSaveError::ProfilesFileUnreadable);
+    }
+
+    SECTION("folder not writable")
+    {
+        QFile::setPermissions(tempDir.path(), QFileDevice::ReadOwner | QFileDevice::ExeOwner);
+        QFile probe(tempDir.filePath("probe"));
+        if (probe.open(QIODevice::WriteOnly))
+        {
+            // Running with rights that ignore permissions (root): nothing to check
+            probe.remove();
+            QFile::setPermissions(tempDir.path(), QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);
+            SKIP("The folder stays writable");
+        }
+        store.save(profile);
+        QFile::setPermissions(tempDir.path(), QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);
+        CHECK(error == ProfileSaveError::ProfilesFileUnwritable);
+        CHECK_FALSE(QFile::exists(path));
+    }
 
     CHECK(failedId == profile.id);
     CHECK_FALSE(failure.isEmpty());
+    CHECK_FALSE(failure.contains(profile.token));
 }
