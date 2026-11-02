@@ -1387,7 +1387,7 @@ TEST_CASE("SessionController::needsCustomFields - asks only when something is mi
     SECTION("The restarted entry's value fills it")
     {
         fake->metaFieldRules = {requiredField("ticket")};
-        auto source          = makeTimeSheet(40, QDateTime::currentDateTimeUtc().addDays(-1), QDateTime::currentDateTimeUtc().addDays(-1).addSecs(3600));
+        auto source          = makeTimeSheet(40, QDate::currentDate().startOfDay(), QDate::currentDate().startOfDay().addSecs(3600));
         source.metaFields    = {
             {"ticket", "KEM-12"}
         };
@@ -1409,7 +1409,7 @@ TEST_CASE("SessionController::needsCustomFields - asks only when something is mi
     SECTION("An invalid value is asked for again")
     {
         fake->metaFieldRules = {requiredField("contact", "email")};
-        auto source          = makeTimeSheet(40, QDateTime::currentDateTimeUtc().addDays(-1), QDateTime::currentDateTimeUtc().addDays(-1).addSecs(3600));
+        auto source          = makeTimeSheet(40, QDate::currentDate().startOfDay(), QDate::currentDate().startOfDay().addSecs(3600));
         source.metaFields    = {
             {"contact", "john@"}
         };
@@ -1424,7 +1424,7 @@ TEST_CASE("SessionController::startTimeSheet - writes defaulted and reused value
 {
     auto fake            = std::make_shared<FakeKimaiClient>();
     fake->metaFieldRules = {requiredField("kind", "choice", "a|Alpha,b|Beta"), requiredField("ticket"), requiredField("template", "invoice-template")};
-    auto source          = makeTimeSheet(40, QDateTime::currentDateTimeUtc().addDays(-1), QDateTime::currentDateTimeUtc().addDays(-1).addSecs(3600));
+    auto source          = makeTimeSheet(40, QDate::currentDate().startOfDay(), QDate::currentDate().startOfDay().addSecs(3600));
     source.metaFields    = {
         {"kind",   "b"     },
         {"ticket", "KEM-12"}

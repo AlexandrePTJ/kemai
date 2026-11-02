@@ -140,11 +140,20 @@ TEST_CASE("ProfileStore::save - reports a profile it does not save, with the rea
 
     const auto profile = makeValidProfile();
 
+    // In each section: a skipped section makes Catch2 run the test case once more without entering any
+    const auto checkReported = [&]
+    {
+        CHECK(failedId == profile.id);
+        CHECK_FALSE(failure.isEmpty());
+        CHECK_FALSE(failure.contains(profile.token));
+    };
+
     SECTION("corrupt file")
     {
         writeFile(path, R"({"version": "1.0", "profiles": [ {"name": "Home")");
         store.save(profile);
         CHECK(error == ProfileSaveError::ProfilesFileUnreadable);
+        checkReported();
     }
 
     SECTION("file of a newer Kemai")
@@ -152,6 +161,7 @@ TEST_CASE("ProfileStore::save - reports a profile it does not save, with the rea
         writeFile(path, QJsonDocument(makeProfilesJson("2.0")).toJson());
         store.save(profile);
         CHECK(error == ProfileSaveError::ProfilesFileUnreadable);
+        checkReported();
     }
 
     SECTION("folder not writable")
@@ -169,9 +179,6 @@ TEST_CASE("ProfileStore::save - reports a profile it does not save, with the rea
         QFile::setPermissions(tempDir.path(), QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);
         CHECK(error == ProfileSaveError::ProfilesFileUnwritable);
         CHECK_FALSE(QFile::exists(path));
+        checkReported();
     }
-
-    CHECK(failedId == profile.id);
-    CHECK_FALSE(failure.isEmpty());
-    CHECK_FALSE(failure.contains(profile.token));
 }
