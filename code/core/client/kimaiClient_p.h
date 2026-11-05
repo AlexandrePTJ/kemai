@@ -73,6 +73,10 @@ namespace kemai
         // empty when not redirected that way
         static QString httpsRedirectBase(QNetworkReply *networkReply);
 
+        // Before Qt 6.11, the manager's transfer timeout no longer applies once a reply follows a redirect:
+        // a server that stops answering after it would leave the request pending forever
+        void watchRedirectedTransfer(QNetworkReply *networkReply) const;
+
         template<class ResultType>
         QFuture<ResultType> processApiNetworkReplySingleObject(ApiMethod method, QNetworkReply *networkReply)
         {
@@ -118,6 +122,10 @@ namespace kemai
             QPromise<ResultType> promise;
             promise.start();
             auto future = promise.future();
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 11, 0)
+            watchRedirectedTransfer(networkReply);
+#endif
 
             connect(
                 networkReply,

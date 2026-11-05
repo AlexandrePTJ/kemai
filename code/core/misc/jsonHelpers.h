@@ -4,6 +4,7 @@
 
 // Qt headers
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 
 namespace kemai

@@ -10,6 +10,7 @@
 // Qt headers
 #include <QCoreApplication>
 #include <QFuture>
+#include <QTimer>
 #include <QUrlQuery>
 
 // Project headers
@@ -243,6 +244,43 @@ QString KimaiClient::KimaiClientPrivate::httpsRedirectBase(QNetworkReply *networ
     const auto path = base.path();
     base.setPath(path.left(std::max<qsizetype>(0, path.indexOf("/api/"))));
     return base.toString();
+}
+
+void KimaiClient::KimaiClientPrivate::watchRedirectedTransfer(QNetworkReply *networkReply) const
+{
+    const auto timeout = m_networkAccessManager->transferTimeoutAsDuration();
+    if (timeout <= std::chrono::milliseconds::zero())
+    {
+        return;
+    }
+
+    connect(networkReply,
+            &QNetworkReply::redirected,
+            networkReply,
+            [networkReply, timeout]
+            {
+                if (networkReply->findChild<QTimer *>("redirectedTransferTimeout") != nullptr)
+                {
+                    return; // Already armed by an earlier redirect
+                }
+
+                auto *timer = new QTimer(networkReply);
+                timer->setObjectName("redirectedTransferTimeout");
+                timer->setSingleShot(true);
+                timer->setInterval(timeout);
+                connect(timer,
+                        &QTimer::timeout,
+                        networkReply,
+                        [networkReply]
+                        {
+                            spdlog::warn("No data for too long after a redirect to {}: aborting",
+                                         networkReply->url().toString(QUrl::RemoveUserInfo | QUrl::RemoveQuery));
+                            networkReply->abort();
+                        });
+                connect(networkReply, &QNetworkReply::downloadProgress, timer, qOverload<>(&QTimer::start));
+                connect(networkReply, &QNetworkReply::uploadProgress, timer, qOverload<>(&QTimer::start));
+                timer->start();
+            });
 }
 
 KimaiApiError KimaiClient::KimaiClientPrivate::makeParseError(ApiMethod method, const QString &reason)

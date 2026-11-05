@@ -31,6 +31,10 @@ T waitForFuture(QFuture<T> future, int timeoutMs = 10000)
     QTimer::singleShot(timeoutMs, &loop, &QEventLoop::quit);
     watcher.setFuture(future);
     loop.exec();
+    if (!future.isFinished())
+    {
+        FAIL("The request did not finish within " << timeoutMs << " ms");
+    }
     return watcher.result();
 }
 
@@ -43,6 +47,10 @@ void waitForFuture(QFuture<void> future, int timeoutMs = 10000)
     QTimer::singleShot(timeoutMs, &loop, &QEventLoop::quit);
     watcher.setFuture(future);
     loop.exec();
+    if (!future.isFinished())
+    {
+        FAIL("The request did not finish within " << timeoutMs << " ms");
+    }
     future.waitForFinished();
 }
 

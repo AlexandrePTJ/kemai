@@ -91,7 +91,7 @@ else ()
 endif ()
 
 # Enable Qt auto-tools globally (AUTOMOC, AUTOUIC, AUTORCC) for all subdirectories
-qt_standard_project_setup(REQUIRES 6.11)
+qt_standard_project_setup(REQUIRES 6.10)
 
 # Write version to file to ease scripting
 file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${KEMAI_DISPLAY_VERSION})
