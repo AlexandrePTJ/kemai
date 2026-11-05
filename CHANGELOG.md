@@ -21,6 +21,7 @@ Alpha releases are marked by ` [alpha]` after their date (`## [26.10.1] - 2026-1
 - With Kimai's Task Management plugin, the History | Tasks switch moved to the right of the timer status line
 
 ### Fixed
+- Kemai no longer crashes at start under KDE Plasma
 - Log files no longer lose their last lines when Kemai crashes or is killed
 - The day and week totals of the history count every entry of the week, not only those among the latest 50 listed
 - Saving a profile in the profile manager now shows that it is saved, or why it was not (keychain refusal, profiles file unreadable or not writable), and keeps what was typed so it can be saved again

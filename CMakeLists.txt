@@ -61,8 +61,8 @@ option(KEMAI_DEPLOY_QT "Copy Qt (libraries, plugins, QML imports) next to Kemai 
 
 # Qt first: qtkeychain finds it too, and Qt's deploy support (used by cmake --install) must be set up
 # from this scope, otherwise its QML deployment commands are missing at install time
-# LabsPlatform: the tray icon (Qt.labs.platform SystemTrayIcon), native on every platform without Qt Widgets
-find_package(Qt6 REQUIRED COMPONENTS Gui Network LinguistTools Quick LabsPlatform)
+# Widgets: the tray icon only (QSystemTrayIcon and its menu); the UI is QML
+find_package(Qt6 REQUIRED COMPONENTS Gui Network LinguistTools Quick Widgets)
 if (UNIX AND NOT APPLE)
     # Presence (idle time, session lock) over D-Bus
     find_package(Qt6 REQUIRED COMPONENTS DBus)

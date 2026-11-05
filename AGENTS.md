@@ -46,7 +46,7 @@ Integration tests run against a real Kimai server when `KEMAI_TEST_HOST` and `KE
 - **Secrets**: never log, print, store in a plain file or show an API token. Tokens go to the system keychain only.
 - **Errors**: the core types errors (`KimaiApiError`), controllers decide what to do with them, the UI words them. Every failed request is logged and either reaches the UI or carries a comment saying why it is silent. No user-facing text in `code/core`.
 - **Async**: QFuture continuations use a context object: `.then(this, …)` and `.onFailed(this, …)`.
-- **QML**: no Qt Quick Controls `Dialog` (use the `Popup` pattern of the existing dialogs), no `MouseArea` (use pointer handlers), no Qt Widgets. Declare `required property` in delegates and qualify member access with an id.
+- **QML**: no Qt Quick Controls `Dialog` (use the `Popup` pattern of the existing dialogs), no `MouseArea` (use pointer handlers), no Qt Widgets (the only ones are the tray icon and its menu, in `code/app/tray/`). Declare `required property` in delegates and qualify member access with an id.
 - **Files**: every new source file starts with the SPDX header:
 
   ```cpp

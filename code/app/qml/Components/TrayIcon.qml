@@ -1,20 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Alexandre Petitjean
 // SPDX-License-Identifier: MIT
 import QtQuick
-import Qt.labs.platform as Platform
 
 import Kemai
 
 // Native tray icon: timer state at a glance, window toggle, stop and quit
-Platform.SystemTrayIcon {
+SystemTrayIcon {
     id: root
 
     // Set by Main.qml (not required: created by an Instantiator)
     property Window window: null
     // Null on the login view: "Not connected"
     property SessionContext session: null
-
-    signal quitRequested
 
     readonly property bool _running: root.session !== null && root.session.hasActiveTimesheet
     // macOS menu bar: monochrome template images, recolored by the system
@@ -28,16 +25,10 @@ Platform.SystemTrayIcon {
     property double _deactivatedAt: 0
     // Whether the window was in front when the menu opened ("Show"/"Hide")
     property bool _inFrontAtMenu: false
+    // Shown again maximized when it was minimized from maximized
+    property int _restoreVisibility: Window.Windowed
 
-    visible: root.available
-    icon.source: "qrc:/assets/images/tray/kemai-tray-" + (root._running ? "running" : "idle") + (root._template ? "-template" : "") + ".svg"
-    icon.mask: root._template
-    tooltip: root._tooltip()
-
-    onActivated: reason => {
-        if (reason === Platform.SystemTrayIcon.Trigger)
-            root.toggleWindow()
-    }
+    signal quitRequested
 
     function toggleWindow() {
         if (root._windowInFront())
@@ -59,36 +50,6 @@ Platform.SystemTrayIcon {
         if (!w.visible || w.visibility === Window.Minimized)
             return false
         return w.active || Date.now() - root._deactivatedAt < 500
-    }
-
-    // Shown again maximized when it was minimized from maximized
-    property int _restoreVisibility: Window.Windowed
-
-    // SystemTrayIcon has no default property: helpers are held by properties
-    readonly property Connections _windowWatch: Connections {
-        target: root.window
-        function onActiveChanged() {
-            if (!root.window.active)
-                root._deactivatedAt = Date.now()
-        }
-        function onVisibilityChanged() {
-            const v = root.window.visibility
-            if (v === Window.Windowed || v === Window.Maximized || v === Window.FullScreen)
-                root._restoreVisibility = v
-        }
-    }
-
-    readonly property Timer _minuteTick: Timer {
-        interval: 60000
-        repeat: true
-        running: root._running
-        onTriggered: root._now = new Date()
-    }
-    readonly property Connections _sessionWatch: Connections {
-        target: root.session
-        function onActiveTimesheetChanged() {
-            root._now = new Date()
-        }
     }
 
     function _elapsed() {
@@ -126,34 +87,72 @@ Platform.SystemTrayIcon {
         return project.slice(0, max - 1).trim() + "…"
     }
 
-    menu: Platform.Menu {
-        onAboutToShow: root._inFrontAtMenu = root._windowInFront()
+    visible: root.available
+    iconSource: "qrc:/assets/images/tray/kemai-tray-" + (root._running ? "running" : "idle") + (root._template ? "-template" : "") + ".svg"
+    iconMask: root._template
+    tooltip: root._tooltip()
 
-        Platform.MenuItem {
-            text: root._inFrontAtMenu ? qsTr("Hide Kemai") : qsTr("Show Kemai")
-            onTriggered: {
-                if (root._inFrontAtMenu)
-                    root.window.hide()
-                else
-                    root.showWindow()
-            }
+    onActivated: reason => {
+        if (reason === SystemTrayIcon.Trigger)
+            root.toggleWindow()
+    }
+    onMenuAboutToShow: root._inFrontAtMenu = root._windowInFront()
+
+    Connections {
+        target: root.window
+        function onActiveChanged() {
+            if (!root.window.active)
+                root._deactivatedAt = Date.now()
         }
-        Platform.MenuSeparator {}
-        // Never hidden: the menu does not shift under the cursor
-        Platform.MenuItem {
-            text: root._running ? qsTr("Stop “%1”").arg(root._stopTarget()) : qsTr("Stop timer")
-            enabled: root._running
-            onTriggered: {
-                // A failure shows in the window's banner: make sure it can be seen
-                if (!root.window.visible || root.window.visibility === Window.Minimized)
-                    root.showWindow()
-                root.session.stopActiveTimeSheet()
-            }
+        function onVisibilityChanged() {
+            const v = root.window.visibility
+            if (v === Window.Windowed || v === Window.Maximized || v === Window.FullScreen)
+                root._restoreVisibility = v
         }
-        Platform.MenuSeparator {}
-        Platform.MenuItem {
-            text: qsTr("Quit Kemai")
-            onTriggered: root.quitRequested()
+    }
+
+    Timer {
+        interval: 60000
+        repeat: true
+        running: root._running
+        onTriggered: root._now = new Date()
+    }
+    Connections {
+        target: root.session
+        function onActiveTimesheetChanged() {
+            root._now = new Date()
         }
+    }
+
+    // Menu entries, in this order
+    TrayMenuItem {
+        text: root._inFrontAtMenu ? qsTr("Hide Kemai") : qsTr("Show Kemai")
+        onTriggered: {
+            if (root._inFrontAtMenu)
+                root.window.hide()
+            else
+                root.showWindow()
+        }
+    }
+    TrayMenuItem {
+        separator: true
+    }
+    // Never hidden: the menu does not shift under the cursor
+    TrayMenuItem {
+        text: root._running ? qsTr("Stop “%1”").arg(root._stopTarget()) : qsTr("Stop timer")
+        enabled: root._running
+        onTriggered: {
+            // A failure shows in the window's banner: make sure it can be seen
+            if (!root.window.visible || root.window.visibility === Window.Minimized)
+                root.showWindow()
+            root.session.stopActiveTimeSheet()
+        }
+    }
+    TrayMenuItem {
+        separator: true
+    }
+    TrayMenuItem {
+        text: qsTr("Quit Kemai")
+        onTriggered: root.quitRequested()
     }
 }

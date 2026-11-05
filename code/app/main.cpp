@@ -5,9 +5,9 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QFontDatabase>
-#include <QGuiApplication>
 #include <QLoggingCategory>
 #include <QQmlApplicationEngine>
 #include <QScopeGuard>
@@ -50,14 +50,15 @@ int main(int argc, char *argv[])
         // focused"): harmless and floods the log. QT_LOGGING_RULES still overrides this for debugging.
         QLoggingCategory::setFilterRules(QStringLiteral("qt.qpa.wayland.textinput.warning=false"));
 
-        // QtApp setup
-        QGuiApplication app(argc, argv);
-        QGuiApplication::setApplicationName("Kemai");
-        QGuiApplication::setOrganizationName("Kemai");
-        QGuiApplication::setApplicationVersion(KEMAI_VERSION);
+        // QtApp setup. QApplication, not QGuiApplication: the tray icon (QSystemTrayIcon) and KDE's platform theme need
+        // Qt Widgets; the UI itself is QML only
+        QApplication app(argc, argv);
+        QApplication::setApplicationName("Kemai");
+        QApplication::setOrganizationName("Kemai");
+        QApplication::setApplicationVersion(KEMAI_VERSION);
 #if defined(Q_OS_LINUX)
         // Wayland compositors match the window to the desktop entry (name, icon) by this app ID
-        QGuiApplication::setDesktopFileName("io.github.AlexandrePTJ.Kemai");
+        QApplication::setDesktopFileName("io.github.AlexandrePTJ.Kemai");
 #endif
 
         // CLI options
@@ -129,7 +130,7 @@ int main(int argc, char *argv[])
         else
         {
             auto fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
-            QGuiApplication::setFont(fontFamilies.first());
+            QApplication::setFont(fontFamilies.first());
         }
 
         // Setup QML and run
@@ -139,7 +140,7 @@ int main(int argc, char *argv[])
         });
         engine.loadFromModule("Kemai", "Main");
 
-        return QGuiApplication::exec();
+        return QApplication::exec();
     }
     catch (std::exception &ex)
     {

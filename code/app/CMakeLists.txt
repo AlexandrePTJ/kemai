@@ -87,6 +87,8 @@ set(KEMAI_QML_SOURCES
         context/updateNotifier.h
         context/profileManager.cpp
         context/profileManager.h
+        tray/systemTrayIcon.cpp
+        tray/systemTrayIcon.h
         helpers/qmlFormatHelpers.cpp
         helpers/qmlFormatHelpers.h
         model/activityFilterProxyModel.cpp
@@ -150,13 +152,14 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/context
         ${CMAKE_CURRENT_SOURCE_DIR}/helpers
         ${CMAKE_CURRENT_SOURCE_DIR}/model
-        ${CMAKE_CURRENT_SOURCE_DIR}/monitor)
+        ${CMAKE_CURRENT_SOURCE_DIR}/monitor
+        ${CMAKE_CURRENT_SOURCE_DIR}/tray)
 
 target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE KemaiCore Qt6::Gui Qt6::Quick Qt6::LabsPlatform spdlog::spdlog magic_enum::magic_enum)
+        PRIVATE KemaiCore Qt6::Gui Qt6::Quick Qt6::Widgets spdlog::spdlog magic_enum::magic_enum)
 
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE wtsapi32)
