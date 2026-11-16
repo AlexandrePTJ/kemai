@@ -5,26 +5,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project uses [calendar versions](https://calver.org/) (`YY.MONTH.PATCH`) since the rewrite; versions up to 0.11.1 followed [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Alpha releases are marked by ` [alpha]` after their date (`## [26.10.1] - 2026-10-26 [alpha]`); the release metadata shown by Linux software centers lists them as development releases.
 
-## [Unreleased]
+## [26.11.1] - 2026-11-16
+
+First stable release of the complete rewrite of Kemai (Qt 6 / QML), which succeeds 0.11.1. Source-only for now: no Windows package yet (signed packages are on their way), build it as shown below. It can be installed next to Kemai 0.11.x: it keeps its own settings and never modifies 0.11.x's, and offers to import its profiles at first start.
+
+Login requires an API token (Kimai 2.14 or later): login with username and API password is no longer supported.
 
 ### Added
-- Signed Windows packages, once the project is accepted by SignPath Foundation: a portable ZIP for alpha releases, an installer for stable releases, which asks to uninstall Kemai 0.11.x first
-- Linux: desktop entry, icon and AppStream metadata installed with Kemai; a Flatpak manifest, for Flathub
+- New QML interface: timer bar, history of your time entries with day labels and the running entry first, day and week totals
+- The history shows a period (this week by default, this month or the last 30 days, remembered), named in its header with its dates, and can be filtered by text (project, activity, description, tags); a timer running since before the period stays listed, entries planned later in the period are marked
+- Connection profiles with tokens stored in the system keychain, auto-login, logout from the account menu
 - Profiles of Kemai 0.11 found on the same computer are offered for import at start, with their API tokens moved to the system keychain
+- Edit dialog for time entries: project and activity search, description, start and end, tags (new tags are created on Kimai), delete
+- Creating customers, projects and activities from the project and activity search
 - Required custom fields of time entries (Kimai's custom fields plugin) are asked for before a timer starts when they would be left empty, and shown and checked when editing an entry
-- The history can be filtered by text (project, activity, description, tags) within the period it shows
+- Task Management plugin: list, start and close your open tasks (shown only when the plugin is installed)
+- Running timer kept in sync with the web interface and other clients
+- Stopping the timer when idle or when the session is locked (optional, in the settings)
+- Settings dialog; window size and position remembered
+- System tray icon showing whether a timer runs (project, activity and duration in its tooltip), with a menu to show the window, stop the timer or quit; optional close and minimize to the tray (on Linux, needs a desktop that hosts tray icons)
+- Trusting a self-signed certificate for one server, after checking its fingerprint; trusted certificates listed in the settings
+- Log files and a log journal (filter, copy for a bug report, open the log folder), without any API token in them
+- Update check at start and on demand: a notice links to the release page of a newer version (nothing is downloaded); About dialog; open Kimai in the browser
+- Projects and activities cache refreshed on demand and when it gets old; clear messages when the network or the server fails
+- Linux: desktop entry, icon and AppStream metadata installed with Kemai; a Flatpak manifest, for Flathub
 
 ### Changed
-- Versions have a two-digit year (`26.10.1`), the same number everywhere, Windows installer included; the first alpha, published as 2026.10.1, does not see later releases in its update check
-- Debug messages are no longer printed on the console (hence the system journal) unless Kemai is started with `--verbose`; log files and the log journal still have them
-- The history shows a period — this week by default, this month or the last 30 days, remembered — named in its header with its dates, instead of the latest 50 entries; a timer running since before the period stays listed, entries planned later in the period are marked
-- With Kimai's Task Management plugin, the History | Tasks switch moved to the right of the timer status line
+- Calendar versions (`YY.MONTH.PATCH`): stable releases from the `master` branch, alpha releases from `develop`
 
-### Fixed
-- Kemai no longer crashes at start under KDE Plasma
-- Log files no longer lose their last lines when Kemai crashes or is killed
-- The day and week totals of the history count every entry of the week, not only those among the latest 50 listed
-- Saving a profile in the profile manager now shows that it is saved, or why it was not (keychain refusal, profiles file unreadable or not writable), and keeps what was typed so it can be saved again
+### Not there yet (compared with 0.11.1)
+- Translations
+- Packages: Windows packages (a portable ZIP for alphas, an installer replacing Kemai 0.11.x for stable releases) will be signed once the project is accepted by SignPath Foundation; Flathub comes next
+
+### Since 26.10.1 [alpha]
+- Added: import of Kemai 0.11 profiles, required custom fields, history filter, Linux desktop integration and Flatpak manifest
+- Changed: the history shows a period instead of the latest 50 entries; with Task Management, the History | Tasks switch moved to the right of the timer status line
+- Changed: versions have a two-digit year (`26.10.1`), the same number everywhere; the first alpha, published as 2026.10.1, does not see later releases in its update check
+- Changed: debug messages are no longer printed on the console (hence the system journal) unless Kemai is started with `--verbose`; log files and the log journal still have them
+- Fixed: Kemai no longer crashes at start under KDE Plasma
+- Fixed: log files no longer lose their last lines when Kemai crashes or is killed
+- Fixed: the day and week totals count every entry of the week, not only those among the latest 50 listed
+- Fixed: saving a profile in the profile manager now shows that it is saved, or why it was not (keychain refusal, profiles file unreadable or not writable), and keeps what was typed so it can be saved again
 
 ## [26.10.1] - 2026-10-26 [alpha]
 
