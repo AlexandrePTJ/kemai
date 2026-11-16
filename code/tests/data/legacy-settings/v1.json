@@ -1,0 +1,25 @@
+{
+    "events": {
+        "idleDelayMinutes": 5,
+        "stopOnIdle": false,
+        "stopOnLock": false
+    },
+    "kemai": {
+        "closeToSystemTray": false,
+        "geometry": "",
+        "ignoredVersion": "0.0.0",
+        "language": "en_US",
+        "minimizeToSystemTray": false
+    },
+    "profiles": [
+        {
+            "host": "https://kimai.example.com",
+            "id": "{2a6c8e0f-4b1d-4d3f-9a5c-7e9b1d3f5a28}",
+            "name": "default",
+            "token": "example-legacy-password",
+            "username": "someone"
+        }
+    ],
+    "trustedCertificates": [],
+    "version": 1
+}

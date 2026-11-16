@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+SPDX-License-Identifier: MIT
+
+Injected by CPack into the stable installer (CPACK_WIX_PATCH_FILE): setup stops while Kemai 0.9-0.11.x is installed.
+Those MSIs were installed per-user (no ALLUSERS), this one per-machine, so Windows Installer cannot upgrade them: the
+user uninstalls 0.11 first, which keeps its settings.json. Found by the registry value its shortcuts wrote for the
+installing user (vendor "Humanity", CPack's default then), or by its Kemai.exe at the root of Program Files\Kemai.
+-->
+<CPackWiXPatch>
+  <CPackWiXFragment Id="#PRODUCT">
+    <Property Id="KEMAI_LEGACY_REGISTRY">
+      <RegistrySearch Id="KemaiLegacyRegistry" Root="HKCU" Key="Software\Humanity\Kemai" Name="installed" Type="raw" />
+    </Property>
+    <Property Id="KEMAI_LEGACY_EXE">
+      <DirectorySearch Id="KemaiLegacyFolder" Path="[ProgramFiles64Folder]Kemai" Depth="0">
+        <FileSearch Id="KemaiLegacyExe" Name="Kemai.exe" />
+      </DirectorySearch>
+    </Property>
+    <Launch Condition="Installed OR NOT (KEMAI_LEGACY_REGISTRY OR KEMAI_LEGACY_EXE)"
+            Message="Kemai 0.11 is installed on this computer. Uninstall it from Settings &gt; Apps &gt; Installed apps, then run this installer again. The profiles saved in Kemai 0.11 are kept: Kemai offers to import them at first start." />
+  </CPackWiXFragment>
+</CPackWiXPatch>

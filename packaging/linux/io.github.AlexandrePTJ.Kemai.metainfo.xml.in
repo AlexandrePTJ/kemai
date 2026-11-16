@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+SPDX-License-Identifier: CC0-1.0
+
+AppStream metadata, configured by code/app/CMakeLists.txt: the releases come from CHANGELOG.md
+(cmake/changelogToMetainfo.cmake), the screenshots from docs/screenshots/ at the build's tag.
+-->
+<component type="desktop-application">
+  <id>io.github.AlexandrePTJ.Kemai</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <!-- Kemai, and the components linked or bundled into it: qtkeychain, Lucide icons, Raveo font, Kimai logo -->
+  <project_license>MIT AND BSD-3-Clause AND ISC AND OFL-1.1 AND CC-BY-SA-4.0</project_license>
+
+  <name>Kemai</name>
+  <summary>Track your time on a Kimai server</summary>
+  <developer id="io.github.alexandreptj">
+    <name>Alexandre Petitjean</name>
+  </developer>
+
+  <description>
+    <p>
+      Kemai is a desktop client for Kimai, the open source time-tracking web application. It keeps the timer at hand
+      without opening the browser: pick a project and an activity, start, stop, and see your recent entries.
+    </p>
+    <ul>
+      <li>Start and stop the timer, and restart a recent entry in one click</li>
+      <li>Edit or delete time entries: project, activity, description, tags, start and end</li>
+      <li>Create customers, projects and activities from the search</li>
+      <li>Task Management plugin: start and close your open tasks</li>
+      <li>Stop the timer when you are away from the computer or lock the session</li>
+      <li>Tray icon showing whether a timer runs</li>
+      <li>Several Kimai servers or accounts as profiles, API tokens kept in the system keychain</li>
+    </ul>
+    <p>Kemai needs a Kimai 2 server and an API token created in Kimai.</p>
+  </description>
+
+  <launchable type="desktop-id">io.github.AlexandrePTJ.Kemai.desktop</launchable>
+  <url type="homepage">https://github.com/AlexandrePTJ/kemai</url>
+  <url type="bugtracker">https://github.com/AlexandrePTJ/kemai/issues</url>
+  <url type="vcs-browser">https://github.com/AlexandrePTJ/kemai</url>
+  <url type="contribute">https://github.com/AlexandrePTJ/kemai/blob/develop/CONTRIBUTING.md</url>
+
+  <content_rating type="oars-1.1"/>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>The timer and the recent time entries</caption>
+      <image>https://raw.githubusercontent.com/AlexandrePTJ/kemai/@KEMAI_SCREENSHOTS_REF@/docs/screenshots/main-view.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Editing a time entry</caption>
+      <image>https://raw.githubusercontent.com/AlexandrePTJ/kemai/@KEMAI_SCREENSHOTS_REF@/docs/screenshots/edit-entry.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Logging in with a saved profile</caption>
+      <image>https://raw.githubusercontent.com/AlexandrePTJ/kemai/@KEMAI_SCREENSHOTS_REF@/docs/screenshots/login.png</image>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+@KEMAI_METAINFO_RELEASES@  </releases>
+</component>

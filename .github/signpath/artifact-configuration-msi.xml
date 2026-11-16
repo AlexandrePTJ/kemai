@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+SPDX-License-Identifier: MIT
+
+Reference copy of the SignPath artifact configuration of the stable Windows installer (.github/workflows/release.yml).
+The artifact is the MSI built by `cpack -G WIX`, zipped by actions/upload-artifact. SignPath signs Kemai.exe inside
+it first (refused unless its product name and version match), re-packages the MSI, then signs the MSI: one request,
+one approval. Paths inside an MSI are those of the installed folder. Keep it in sync with SignPath.
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" required="true" />
+  </parameters>
+  <zip-file>
+    <msi-file path="Kemai-*-windows-x64.msi">
+      <pe-file path="bin/Kemai.exe" product-name="Kemai" product-version="${version}">
+        <authenticode-sign />
+      </pe-file>
+      <authenticode-sign />
+    </msi-file>
+  </zip-file>
+</artifact-configuration>

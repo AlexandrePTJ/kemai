@@ -1,0 +1,86 @@
+project(KemaiCore)
+
+add_library(${PROJECT_NAME} STATIC)
+
+set(KEMAI_LIB_SOURCES
+        context/profileController.h
+        context/profileController.cpp
+        context/sessionController.h
+        context/sessionController.cpp
+        client/iKimaiClient.h
+        client/kimaiApiError.h
+        client/kimaiApiError.cpp
+        client/kimaiSystem.h
+        client/kimaiSystem.cpp
+        client/kimaiResources.h
+        client/kimaiResources.cpp
+        client/kimaiTimesheets.h
+        client/kimaiTimesheets.cpp
+        client/kimaiCache.h
+        client/kimaiCache.cpp
+        client/kimaiCertificate.h
+        client/kimaiCertificate.cpp
+        client/kimaiClient.h
+        client/kimaiClient_p.h
+        client/kimaiClient.cpp
+        client/kemaiUpdateChecker.h
+        client/kemaiUpdateChecker.cpp
+        data/appSettings.cpp
+        data/appSettings.h
+        data/profile.cpp
+        data/profile.h
+        misc/customFields.h
+        misc/customFields.cpp
+        misc/formatHelpers.h
+        misc/formatHelpers.cpp
+        misc/fuzzyMatch.h
+        misc/fuzzyMatch.cpp
+        misc/jsonHelpers.h
+        misc/jsonHelpers.cpp
+        misc/logFiles.h
+        misc/logFiles.cpp
+        misc/logJournalSink.h
+        misc/logJournalSink.cpp
+        misc/pathHelpers.h
+        misc/pathHelpers.cpp
+        misc/historyPeriods.h
+        misc/historyPeriods.cpp
+        misc/windowPlacement.h
+        misc/windowPlacement.cpp
+        model/activityListModel.cpp
+        model/activityListModel.h
+        model/customFieldsModel.cpp
+        model/customFieldsModel.h
+        model/logEntryModel.cpp
+        model/logEntryModel.h
+        model/profile.cpp
+        model/profile.h
+        model/taskModel.cpp
+        model/taskModel.h
+        model/timesheetModel.cpp
+        model/timesheetModel.h
+        storage/appSettingsStore.cpp
+        storage/appSettingsStore.h
+        storage/legacySettingsReader.cpp
+        storage/legacySettingsReader.h
+        storage/profileStore.cpp
+        storage/profileStore.h
+        storage/secretStorage.cpp
+        storage/secretStorage.h
+)
+
+configure_file(kemaiConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/kemaiConfig.h)
+
+target_sources(${PROJECT_NAME} PRIVATE ${KEMAI_LIB_SOURCES})
+
+target_include_directories(${PROJECT_NAME}
+        PUBLIC
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(${PROJECT_NAME}
+        PUBLIC Qt6::Network
+        PRIVATE spdlog::spdlog fmt::fmt magic_enum::magic_enum qt6keychain)
+
+# Publish the core metatypes so the app's QML_FOREIGN registrations (and qmllint/qmlcachegen) see them
+qt_extract_metatypes(${PROJECT_NAME})

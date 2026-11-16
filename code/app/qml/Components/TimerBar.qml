@@ -1,0 +1,63 @@
+// SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+// SPDX-License-Identifier: MIT
+import QtQuick
+import QtQuick.Layouts
+import Kemai
+
+Rectangle {
+    id: root
+
+    property string timerText: "00:00:00"
+    property string entryDescription: ""
+    property bool isRunning: false
+    required property ActivityListModel activityModel
+    readonly property bool hasValidActivity: descriptionField.selectedActivityId > 0
+
+    signal stopClicked
+    signal startClicked(int activityId, int projectId)
+    signal createRequested(string kind, string name)
+
+    // A pair created (or chosen) for the search: selected, ready to start
+    function selectPair(pair) {
+        descriptionField.selectPair(pair)
+        startButton.forceActiveFocus()
+    }
+
+    implicitHeight: 56
+    color: Theme.colorSurfaceLight
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.leftMargin: 18
+        anchors.rightMargin: 18
+        spacing: 12
+
+        // Timer display
+        Text {
+            text: root.timerText
+            color: root.isRunning ? Theme.colorAccentGreen : Theme.colorTextSecondary
+            font.features: Theme.fontFeaturesTabular
+            font.pixelSize: Theme.fontSizeTimer
+            font.bold: true
+            Layout.minimumWidth: 110
+        }
+
+        ActivityComboBox {
+            id: descriptionField
+            Layout.fillWidth: true
+            sourceModel: root.activityModel
+            text: root.entryDescription
+            onCreateRequested: (kind, name) => root.createRequested(kind, name)
+        }
+
+        StartStopButton {
+            id: startButton
+            implicitHeight: 46
+            implicitWidth: 80
+
+            isStarted: root.isRunning
+            enabled: root.isRunning || root.hasValidActivity
+            onClicked: root.isRunning ? root.stopClicked() : root.startClicked(descriptionField.selectedActivityId, descriptionField.selectedProjectId)
+        }
+    }
+}

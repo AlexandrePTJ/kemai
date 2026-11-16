@@ -1,0 +1,109 @@
+# SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+# SPDX-License-Identifier: MIT
+#
+# Reference Flatpak manifest: builds the working tree (development build). The Flathub copy of a release is written
+# from it by .github/scripts/flathub-manifest.sh (git source at the release tag, version and channel set).
+# Permissions and their reasons: packaging/flatpak/README.md.
+id: io.github.AlexandrePTJ.Kemai
+runtime: org.kde.Platform
+runtime-version: '6.11'
+sdk: org.kde.Sdk
+command: Kemai
+
+finish-args:
+  # The Kimai server (no update check: Flathub delivers updates)
+  - --share=network
+  # Display: Wayland, X11 when there is no Wayland; Qt Quick renders with the GPU
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --device=dri
+  # API tokens in the desktop's keychain (Secret Service; KWallet on Plasma)
+  - --talk-name=org.freedesktop.secrets
+  - --talk-name=org.kde.kwalletd6
+  # Tray icon (StatusNotifierItem)
+  - --talk-name=org.kde.StatusNotifierWatcher
+  # Stop the timer when idle (GNOME, KDE). No logind (Flathub refuses org.freedesktop.login1): stopping on lock shows
+  # as unsupported in the settings
+  - --talk-name=org.gnome.Mutter.IdleMonitor
+  - --talk-name=org.freedesktop.ScreenSaver
+
+cleanup:
+  - /include
+  - /lib/cmake
+  - /share/cmake
+  - /share/magic_enum
+  - /lib/pkgconfig
+  - /share/pkgconfig
+  - /mkspecs
+  - '*.a'
+
+modules:
+  # Same versions as the CPMAddPackage lines of the root CMakeLists.txt
+  - name: fmt
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DFMT_DOC=OFF
+      - -DFMT_TEST=OFF
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    sources:
+      - type: git
+        url: https://github.com/fmtlib/fmt.git
+        tag: 12.2.0
+        commit: 1be298e1bd68957e4cd352e1f676f00e07dcfb57
+
+  - name: magic_enum
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DMAGIC_ENUM_OPT_BUILD_EXAMPLES=OFF
+      - -DMAGIC_ENUM_OPT_BUILD_TESTS=OFF
+    sources:
+      - type: git
+        url: https://github.com/Neargye/magic_enum.git
+        tag: v0.9.8
+        commit: 1384769c66bd16ec9bb1353f45fe8ec8ccc12dbd
+
+  - name: spdlog
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DSPDLOG_FMT_EXTERNAL=ON
+      - -DSPDLOG_BUILD_EXAMPLE=OFF
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    sources:
+      - type: git
+        url: https://github.com/gabime/spdlog.git
+        tag: v1.17.0
+        commit: 79524ddd08a4ec981b7fea76afd08ee05f83755d
+
+  - name: qtkeychain
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_WITH_QT6=ON
+      - -DBUILD_SHARED_LIBS=OFF
+      - -DBUILD_TRANSLATIONS=OFF
+      - -DBUILD_TESTING=OFF
+    sources:
+      - type: git
+        url: https://github.com/frankosterfeld/qtkeychain.git
+        tag: 0.17.0
+        commit: 875f77d9f61bd97fd84cca47ce3bc71186dfbd09
+
+  - name: kemai
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DKEMAI_BUILD_LOCAL_DEPENDENCIES=OFF
+      - -DBUILD_TESTING=OFF
+      - -DKEMAI_DEPLOY_QT=OFF
+      - -DKEMAI_ENABLE_UPDATE_CHECK=OFF
+    sources:
+      - type: dir
+        path: ../..
+        skip:
+          - build
+          - .flatpak-builder
+          - flatpak-build

@@ -1,0 +1,24 @@
+// SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+// SPDX-License-Identifier: MIT
+import QtQuick
+import QtQuick.Controls
+
+import Kemai
+
+AbstractButton {
+    id: root
+
+    contentItem: Text {
+        id: contentText
+        text: root.text
+        color: Theme.colorTextPrimary
+        font.pixelSize: Theme.fontSizeSmall
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+    }
+
+    background: Rectangle {
+        color: root.hovered ? Theme.colorButtonEditDown : Theme.colorButtonEdit
+        radius: Theme.radiusSmall
+    }
+}

@@ -1,0 +1,50 @@
+name: Flatpak
+# Builds the reference Flatpak manifest (the working tree) the way Flathub does, in Flathub's KDE 6.11 image, and
+# runs Flathub's linter on the manifest and on the build. Only when packaging inputs change, or by hand.
+on:
+  push:
+    paths:
+      - 'packaging/**'
+      - 'cmake/**'
+      - '**/CMakeLists.txt'
+      - 'CHANGELOG.md'
+      - '.github/workflows/flatpak.yml'
+  pull_request:
+    paths:
+      - 'packaging/**'
+      - 'cmake/**'
+      - '**/CMakeLists.txt'
+      - 'CHANGELOG.md'
+      - '.github/workflows/flatpak.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  flatpak:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.11
+      # flatpak-builder sandboxes each build step with bubblewrap
+      options: --privileged
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Lint the manifest
+        run: flatpak-builder-lint manifest packaging/flatpak/io.github.AlexandrePTJ.Kemai.yml
+
+      - name: Build
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          manifest-path: packaging/flatpak/io.github.AlexandrePTJ.Kemai.yml
+          bundle: Kemai-dev.flatpak
+          repo-dir: repo
+          # As on Flathub: the AppStream screenshots are fetched and stored with the build
+          mirror-screenshots-url: https://dl.flathub.org/media
+          upload-artifact: false
+
+      - name: Lint the build
+        run: flatpak-builder-lint repo repo

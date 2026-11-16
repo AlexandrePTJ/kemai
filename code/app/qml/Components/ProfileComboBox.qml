@@ -1,0 +1,68 @@
+// SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+// SPDX-License-Identifier: MIT
+pragma ComponentBehavior: Bound
+
+import QtQuick
+import QtQuick.Controls
+
+import Kemai
+
+ComboBox {
+    id: root
+
+    background: Rectangle {
+        color: Theme.colorSurface
+        radius: Theme.radiusMedium
+        implicitHeight: 40
+    }
+
+    contentItem: Text {
+        leftPadding: 10
+        rightPadding: 30
+        text: root.displayText
+        color: Theme.colorTextPrimary
+        font.pixelSize: Theme.fontSizeNormal
+        verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
+    }
+
+    delegate: ItemDelegate {
+        id: entry
+
+        required property int index
+        required property string name
+
+        width: root.width
+        highlighted: root.highlightedIndex === entry.index
+        contentItem: Text {
+            text: entry.name
+            color: Theme.colorTextPrimary
+            font.pixelSize: Theme.fontSizeNormal
+            verticalAlignment: Text.AlignVCenter
+        }
+        background: Rectangle {
+            color: entry.highlighted ? Theme.colorBackground : "transparent"
+        }
+    }
+
+    popup: Popup {
+        y: root.height + 2
+        width: root.width
+        padding: 4
+        background: Rectangle {
+            color: Theme.colorSurfaceLight
+            radius: Theme.radiusMedium
+        }
+        contentItem: ListView {
+            id: popupList
+            clip: true
+
+            WheelScroller {
+                flickable: popupList
+            }
+            implicitHeight: contentHeight
+            model: root.popup.visible ? root.delegateModel : null
+            currentIndex: root.highlightedIndex
+        }
+    }
+}

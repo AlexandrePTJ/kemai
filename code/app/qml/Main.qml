@@ -1,0 +1,170 @@
+// SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+// SPDX-License-Identifier: MIT
+pragma ComponentBehavior: Bound
+
+import QtQuick
+import QtQuick.Controls
+
+import Kemai
+
+ApplicationWindow {
+    id: main
+
+    // Set by main(): the log of this run, for the log journal
+    required property LogJournal logJournal
+
+    // Default size; shown by appContext with the saved geometry once completed
+    width: 800
+    height: 600
+    title: appContext.windowTitle
+
+    // Geometry of the window when not maximized, saved on close
+    property rect _normalGeometry: Qt.rect(0, 0, 0, 0)
+    // Open session, null on the login view (tray icon)
+    property SessionContext _session: null
+    // Kemai 0.11 profiles offered once per run, whatever login view shows next
+    property bool _legacyImportOffered: false
+    function _trackNormalGeometry() {
+        if (main.visibility === Window.Windowed)
+            main._normalGeometry = Qt.rect(main.x, main.y, main.width, main.height)
+    }
+    onXChanged: main._trackNormalGeometry()
+    onYChanged: main._trackNormalGeometry()
+    onWidthChanged: main._trackNormalGeometry()
+    onHeightChanged: main._trackNormalGeometry()
+    // Last shown state: what a hidden or minimized window comes back to, and what is saved
+    property int _shownVisibility: Window.Windowed
+    onVisibilityChanged: {
+        main._trackNormalGeometry()
+        if (main.visibility === Window.Windowed || main.visibility === Window.Maximized || main.visibility === Window.FullScreen)
+            main._shownVisibility = main.visibility
+        else
+        // Minimize to tray: off the taskbar, back from the tray icon
+        if (main.visibility === Window.Minimized && main._toTray(appContext.preferences.minimizeToTray))
+            Qt.callLater(main.hide)
+    }
+    function _saveGeometry() {
+        appContext.saveWindowGeometry(main._normalGeometry, main._shownVisibility === Window.Maximized)
+    }
+    // Only while the tray icon can bring the window back
+    function _toTray(enabled) {
+        const tray = trayInstantiator.object as TrayIcon
+        return enabled && tray !== null && tray.available
+    }
+    onClosing: close => {
+        main._saveGeometry()
+        // Close to tray: Kemai keeps running, quit from the tray menu
+        if (main._toTray(appContext.preferences.closeToTray)) {
+            close.accepted = false
+            main.hide()
+        }
+    }
+
+    KemaiContext {
+        id: appContext
+        onLoginSucceeded: session => {
+            // Central 401 handling: an expired session drops back to the login view
+            session.sessionExpired.connect(() => {
+                main._session = null
+                stackView.replace(null, loginViewComponent)
+            })
+            main._session = session
+            stackView.replace(null, mainViewComponent, {
+                sessionContext: session
+            })
+        }
+        onLoggedOut: {
+            main._session = null
+            stackView.replace(null, loginViewComponent)
+        }
+    }
+
+    // Tray icon; never created offscreen (no tray, and Qt warns about it)
+    Instantiator {
+        id: trayInstantiator
+        active: Qt.platform.pluginName !== "offscreen" && Qt.platform.pluginName !== "minimal"
+        delegate: TrayIcon {
+            window: main
+            session: main._session
+            // Quitting keeps a running timer running on the server
+            onQuitRequested: {
+                main._saveGeometry()
+                Qt.quit()
+            }
+        }
+    }
+
+    // Idle time and session lock, for the inactivity settings and stops
+    PresenceMonitor {
+        id: presenceMonitor
+    }
+
+    // GitHub releases: checked once at start, and on demand
+    UpdateNotifier {
+        id: updateNotifier
+        preferences: appContext.preferences
+    }
+
+    SettingsDialog {
+        id: settingsDialog
+        kemaiContext: appContext
+        presence: presenceMonitor
+        updates: updateNotifier
+        tray: trayInstantiator.object
+        // A version found from Settings › Updates stays announced once the dialog is closed
+        onClosed: updateNotifier.showInStrip()
+    }
+
+    AboutDialog {
+        id: aboutDialog
+    }
+
+    LogJournalDialog {
+        id: logJournalDialog
+        journal: main.logJournal
+    }
+
+    Component {
+        id: mainViewComponent
+        MainView {
+            preferences: appContext.preferences
+            presence: presenceMonitor
+            updates: updateNotifier
+            settingsAvailable: settingsDialog.hasSections
+            onSettingsRequested: settingsDialog.open()
+            onLogJournalRequested: logJournalDialog.open()
+            onAboutRequested: aboutDialog.open()
+            // The session lives as long as its view: released once the view is gone (logout or expiry),
+            // never while a transition still binds to it
+            Component.onDestruction: appContext.closeSession(sessionContext)
+            onLogoutRequested: appContext.logout()
+        }
+    }
+
+    Component {
+        id: loginViewComponent
+        LoginView {
+            kemaiContext: appContext
+            offerLegacyImport: !main._legacyImportOffered
+            onLegacyImportOffered: main._legacyImportOffered = true
+            updates: updateNotifier
+            settingsAvailable: settingsDialog.hasSections
+            onSettingsRequested: settingsDialog.open()
+            onLogJournalRequested: logJournalDialog.open()
+            onAboutRequested: aboutDialog.open()
+        }
+    }
+
+    StackView {
+        id: stackView
+        anchors.fill: parent
+
+        initialItem: loginViewComponent
+    }
+
+    Component.onCompleted: {
+        appContext.showWindowWithSavedGeometry(main)
+        appContext.initialize()
+        updateNotifier.checkAtStart()
+    }
+}

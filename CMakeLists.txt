@@ -1,5 +1,44 @@
-cmake_minimum_required(VERSION 3.11)
-project(KemaiProject VERSION 0.11.1 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.30)
+
+# Version: a release build gets the calendar git tag (KEMAI_VERSION) and its channel (KEMAI_CHANNEL, from the
+# tagged branch) from the release workflow; any other build is a development build named after its commit.
+set(KEMAI_VERSION "" CACHE STRING "Release version (calendar tag YY.MONTH.PATCH); empty for a development build")
+set(KEMAI_CHANNEL "" CACHE STRING "Release channel (alpha or stable); required with KEMAI_VERSION")
+if (KEMAI_VERSION)
+    if (NOT KEMAI_VERSION MATCHES "^[0-9][0-9]\\.(1[0-2]|[1-9])\\.[0-9]+$")
+        message(FATAL_ERROR "KEMAI_VERSION '${KEMAI_VERSION}' is not a calendar version YY.MONTH.PATCH")
+    endif ()
+    if (NOT KEMAI_CHANNEL MATCHES "^(alpha|stable)$")
+        message(FATAL_ERROR "KEMAI_CHANNEL must be alpha or stable with KEMAI_VERSION (got '${KEMAI_CHANNEL}')")
+    endif ()
+    set(_kemai_project_version ${KEMAI_VERSION})
+else ()
+    set(_kemai_project_version 0.0.0)
+endif ()
+project(KemaiProject VERSION ${_kemai_project_version} LANGUAGES CXX)
+if (APPLE)
+    # macOS presence backend (code/app/monitor/macPresenceBackend.mm)
+    enable_language(OBJCXX)
+endif ()
+
+if (KEMAI_VERSION)
+    set(KEMAI_DISPLAY_VERSION ${KEMAI_VERSION})
+    set(KEMAI_BUILD_CHANNEL ${KEMAI_CHANNEL})
+else ()
+    # Read at configure time: goes stale after new commits until CMake reconfigures
+    set(KEMAI_DISPLAY_VERSION "dev")
+    set(KEMAI_BUILD_CHANNEL "dev")
+    find_package(Git QUIET)
+    if (GIT_FOUND)
+        execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                OUTPUT_VARIABLE _kemai_commit OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+        if (_kemai_commit)
+            set(KEMAI_DISPLAY_VERSION "dev-${_kemai_commit}")
+        endif ()
+    endif ()
+endif ()
+message(STATUS "Kemai version ${KEMAI_DISPLAY_VERSION} (${KEMAI_BUILD_CHANNEL})")
 
 # Point CMake to the custom modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake)
@@ -9,114 +48,54 @@ list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Setup output dirs to <build root>/bin and <build root>/lib
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+
 # Options
 option(KEMAI_ENABLE_UPDATE_CHECK "Allow Kemai to check for update from Github releases" ON)
 option(KEMAI_BUILD_LOCAL_DEPENDENCIES "Download and build dependencies (except Qt6)" ON)
+# OFF: `cmake --install` installs only Kemai's own files, for packages whose Qt comes from the system or a runtime
+option(KEMAI_DEPLOY_QT "Copy Qt (libraries, plugins, QML imports) next to Kemai at install time" ON)
+
+# Qt first: qtkeychain finds it too, and Qt's deploy support (used by cmake --install) must be set up
+# from this scope, otherwise its QML deployment commands are missing at install time
+# Widgets: the tray icon only (QSystemTrayIcon and its menu); the UI is QML
+find_package(Qt6 REQUIRED COMPONENTS Gui Network LinguistTools Quick Widgets)
+if (UNIX AND NOT APPLE)
+    # Presence (idle time, session lock) over D-Bus
+    find_package(Qt6 REQUIRED COMPONENTS DBus)
+endif ()
 
 # Install dependencies sources to build if required
+# Keep these versions in step with the modules of packaging/flatpak/io.github.AlexandrePTJ.Kemai.yml
 if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
-    set(SPDLOG_FMT_EXTERNAL ON)
-
-    include(FetchContent)
-    FetchContent_Declare(fmt
-            GIT_REPOSITORY https://github.com/fmtlib/fmt
-            GIT_TAG 10.2.1
-            OVERRIDE_FIND_PACKAGE)
-    FetchContent_Declare(magic_enum
-            GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-            GIT_TAG v0.9.5
-            OVERRIDE_FIND_PACKAGE)
-    FetchContent_Declare(spdlog
-            GIT_REPOSITORY https://github.com/gabime/spdlog.git
-            GIT_TAG v1.14.0
-            OVERRIDE_FIND_PACKAGE)
-    FetchContent_Declare(range-v3
-            GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
-            GIT_TAG 0.12.0
-            OVERRIDE_FIND_PACKAGE)
+    include(cmake/get_cpm.cmake)
+    CPMAddPackage("gh:fmtlib/fmt#12.2.0")
+    CPMAddPackage("gh:Neargye/magic_enum#v0.9.8")
+    CPMAddPackage("gh:catchorg/Catch2#v3.16.1")
+    CPMAddPackage(URI "gh:gabime/spdlog#v1.17.0" OPTIONS "SPDLOG_FMT_EXTERNAL ON")
+    CPMAddPackage(URI "gh:frankosterfeld/qtkeychain#0.17.0" OPTIONS "BUILD_WITH_QT6 ON" "BUILD_SHARED_LIBS OFF" "BUILD_TRANSLATIONS OFF" "BUILD_TESTING OFF")
 endif (KEMAI_BUILD_LOCAL_DEPENDENCIES)
 
-# Find external dependencies
+# Find dependencies
 find_package(fmt REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(range-v3 REQUIRED)
-
-# Setup Qt
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-find_package(Qt6 QUIET COMPONENTS Widgets Network LinguistTools)
-if (NOT Qt6_FOUND)
-    message(NOTICE "Qt6 not found. Fallback to Qt5")
-    find_package(Qt5 COMPONENTS Widgets Network LinguistTools REQUIRED)
-    add_compile_definitions(UNICODE _UNICODE)
-    message(STATUS "Using Qt ${Qt5_VERSION}")
+if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
+    find_package(qtkeychain REQUIRED)
 else ()
-    message(STATUS "Using Qt ${Qt6_VERSION}")
+    # Installed qtkeychain names its package after the Qt version; the target stays qt6keychain
+    find_package(Qt6Keychain REQUIRED)
 endif ()
 
-# Write version to file to ease packaging
-file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${PROJECT_VERSION})
+# Enable Qt auto-tools globally (AUTOMOC, AUTOUIC, AUTORCC) for all subdirectories
+qt_standard_project_setup(REQUIRES 6.10)
 
-# Common package configuration
-set(KEMAI_GUID "88815E44-85A0-469C-9740-B4887D456BAA")
-set(KEMAI_PROJECT_NAME "Kemai")
-set(CPACK_PACKAGE_NAME ${KEMAI_PROJECT_NAME})
-set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-
-# OS Dependant options / configurations
-if (WIN32)
-    # Hide console
-    if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
-        set(OS_BUNDLE WIN32)
-    endif ()
-
-    # Add Qt libs and installer for windows platform
-    include(WinDeployQt)
-
-    # Add OpenSSL binaries for installer
-    include(WinDeployOpenSSL)
-
-    # Package
-    set(DEPLOY_DIR .)
-    set(CPACK_GENERATOR WIX)
-    set(CPACK_WIX_UPGRADE_GUID ${KEMAI_GUID})
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY ${KEMAI_PROJECT_NAME})
-    set(CPACK_PACKAGE_EXECUTABLES Kemai;${KEMAI_PROJECT_NAME})
-    set(CPACK_CREATE_DESKTOP_LINKS Kemai;${KEMAI_PROJECT_NAME})
-    set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt)
-elseif (APPLE)
-    set(OS_BUNDLE MACOSX_BUNDLE)
-    #    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
-    set(DEPLOY_DIR .)
-    set(CPACK_GENERATOR DragNDrop)
-    install(FILES LICENSE.txt DESTINATION ${DEPLOY_DIR})
-else ()
-    include(GNUInstallDirs)
-    set(OS_BUNDLE)
-    set(DEPLOY_DIR bin)
-    # install(FILES share/kemai.desktop DESTINATION ${)
-    install(FILES share/kemai.desktop
-            DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
-    )
-    install(FILES src/resources/icons/kimai.png
-            DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps/
-    )
-    install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/)
-endif ()
+# Write version to file to ease scripting
+file(WRITE ${CMAKE_BINARY_DIR}/version.txt ${KEMAI_DISPLAY_VERSION})
 
 # Project code
-add_subdirectory(src)
-
-# Install targets and files
-install(TARGETS Kemai DESTINATION ${DEPLOY_DIR})
-
-if (WIN32)
-    windeployqt(Kemai ${DEPLOY_DIR})
-    windeployopenssl(${DEPLOY_DIR})
-endif ()
-
-include(CPack)
+include(CTest)
+add_subdirectory(code)

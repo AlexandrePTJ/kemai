@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+# SPDX-License-Identifier: MIT
+[Desktop Entry]
+Type=Application
+Name=Kemai
+GenericName=Time Tracker
+Comment=Track your time on a Kimai server
+Exec=Kemai
+Icon=io.github.AlexandrePTJ.Kemai
+Terminal=false
+Categories=Office;ProjectManagement;Qt;
+Keywords=Kimai;time;tracking;timesheet;timer;
+StartupWMClass=Kemai
+SingleMainWindow=true

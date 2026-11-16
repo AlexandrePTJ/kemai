@@ -43,6 +43,7 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
+CMakeUserPresets.json
 
 # ---> JetBrains
 .idea/
@@ -53,9 +54,21 @@ out/
 /build/
 /dist/
 *.AppImage
+runtime/
+.env
 
 # ---> MacOSX
 .DS_Store
 
 # ---> Visual Studio
 .vs/
+
+# ---> VS Code (keep shared project config, ignore machine-specific)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+
+# ---> Tools
+aqtinstall.log

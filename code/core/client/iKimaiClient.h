@@ -1,0 +1,69 @@
+// SPDX-FileCopyrightText: 2026 Alexandre Petitjean
+// SPDX-License-Identifier: MIT
+#pragma once
+
+// STL headers
+#include <optional>
+
+// Qt headers
+#include <QFuture>
+#include <QStringList>
+
+// Project headers
+#include <client/kimaiResources.h>
+#include <client/kimaiSystem.h>
+#include <client/kimaiTimesheets.h>
+
+namespace kemai
+{
+    /*!
+     * Abstract Kimai API client. Production code uses KimaiClient (network);
+     * tests inject a fake resolving futures immediately.
+     * Failed futures carry a KimaiApiError.
+     */
+    class IKimaiClient
+    {
+    public:
+        virtual ~IKimaiClient() = default;
+
+        // Page size of requestTimeSheets with a begin date (the largest Kimai serves)
+        static constexpr int TimeSheetsPageSize = 500;
+
+        virtual QFuture<KimaiVersion>         requestKimaiVersion()    = 0;
+        virtual QFuture<KimaiUser>            requestMeUserInfo()      = 0;
+        virtual QFuture<KimaiTimeSheetConfig> requestTimeSheetConfig() = 0;
+        virtual QFuture<KimaiPlugins>         requestPlugins()         = 0;
+        // Custom fields of time entries; fails with NotFound when the instance has no custom fields plugin
+        virtual QFuture<KimaiMetaFieldRules> requestTimeSheetMetaFields() = 0;
+        // The instance's color palette (name -> #rrggbb)
+        virtual QFuture<KimaiColorChoices> requestColorChoices() = 0;
+        virtual QFuture<KimaiCustomers>    requestCustomers()    = 0;
+        // The latest 50 entries; with `begin`, the entries started from then on (until `end` when given), by pages of 500
+        virtual QFuture<KimaiTimeSheets> requestTimeSheets(std::optional<QDateTime> begin = std::nullopt, std::optional<QDateTime> end = std::nullopt, int page = 1) = 0;
+        virtual QFuture<KimaiTimeSheets> requestActiveTimeSheets()                                                                                                   = 0;
+        virtual QFuture<KimaiTimeSheets> requestRecentTimeSheets()                                                                                                   = 0;
+        virtual QFuture<KimaiProjects>   requestProjects(std::optional<int> customerId = std::nullopt)                                                               = 0;
+        virtual QFuture<KimaiActivities> requestActivities(std::optional<int> projectId = std::nullopt)                                                              = 0;
+        virtual QFuture<QStringList>     requestTags(const QString &name)                                                                                            = 0; // names containing `name`
+
+        virtual QFuture<KimaiCustomer> addCustomer(const KimaiCustomer &customer) = 0;
+        virtual QFuture<KimaiProject>  addProject(const KimaiProject &project)    = 0;
+        virtual QFuture<KimaiActivity> addActivity(const KimaiActivity &activity) = 0;
+        // Kimai ignores unknown tag names sent with a timesheet: create them first (needs tag management rights)
+        virtual QFuture<void> createTag(const QString &name) = 0;
+
+        virtual QFuture<KimaiTimeSheet> startTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode)  = 0;
+        virtual QFuture<KimaiTimeSheet> updateTimeSheet(const KimaiTimeSheet &timeSheet, KimaiTimeSheetConfig::TrackingMode trackingMode) = 0;
+        virtual QFuture<void>           deleteTimeSheet(int timeSheetId)                                                                  = 0;
+        // One custom field value; fails with NotFound when that field does not apply to the entry
+        virtual QFuture<KimaiTimeSheet> setTimeSheetMeta(int timeSheetId, const QString &name, const QString &value) = 0;
+        // Stops a running timesheet now (server time); works in punch mode, where an update cannot send an end
+        virtual QFuture<KimaiTimeSheet> stopTimeSheet(int timeSheetId) = 0;
+
+        // Open tasks (pending, in progress) assigned to the user, Task Management plugin
+        virtual QFuture<KimaiTasks> requestTasks(int userId) = 0;
+        // Starts a timer on the task (Kimai answers with that timesheet; stops a running one when only one may run)
+        virtual QFuture<KimaiTimeSheet> startTask(int taskId) = 0;
+        virtual QFuture<KimaiTask>      closeTask(int taskId) = 0;
+    };
+} // namespace kemai
