@@ -93,4 +93,6 @@ Contributions are welcome: read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code
 
 [MIT](LICENSE.txt), © 2020–2026 Alexandre Petitjean. Third-party components are listed with their licenses in *About Kemai*.
 
-Why "Kemai"? Because "Il n'y a que Maille qui m'aille".
+## Why "Kemai"?
+
+Because "Il n'y a que Maille qui m'aille".
